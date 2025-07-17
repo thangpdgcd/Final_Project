@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Danh sách sản phẩm</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      h1 {
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      th,
+      td {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .image-thumb {
+        width: 80px;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Danh sách sản phẩm</h1>
+
+    <% if (products && products.length > 0) { %>
+    <table>
+      <thead>
+        <tr>
+          <th>Tên</th>
+          <th>Giá</th>
+          <th>Tồn kho</th>
+          <th>Mô tả</th>
+          <th>Danh mục</th>
+          <th>Người tạo</th>
+          <th>Hình ảnh</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% products.forEach(product => { %>
+        <tr>
+          <td><%= product.Name %></td>
+          <td><%= product.Price.toLocaleString('vi-VN') %> đ</td>
+          <td><%= product.Stock %></td>
+          <td><%= product.Description || "Không có" %></td>
+          <td><%= product.category ? product.category.Name : "Chưa gán" %></td>
+          <td><%= product.user ? product.user.Name : "Không rõ" %></td>
+          <td>
+            <% if (product.Image) { %>
+            <img src="<%= product.Image %>" alt="Image" class="image-thumb" />
+            <% } else { %> Không có <% } %>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <% } else { %>
+    <p>Không có sản phẩm nào.</p>
+    <% } %>
+  </body>
+</html>

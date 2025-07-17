@@ -1,20 +1,20 @@
-import productService from "../services/productService.js";
+import productService from "../service/productService.js";
 
 // Lấy tất cả sản phẩm
-export const getAllProducts = async (req, res) => {
+let getAllProducts = async (req, res) => {
   try {
-    const products = await productService.getAllProducts();
-    res.status(200).json(products);
+    let products = await productService.getAllProducts();
+    res.render("products", { title: "User List", products });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 // Lấy sản phẩm theo ID
-export const getProductById = async (req, res) => {
-  const id = req.params.id;
+let getProductById = async (req, res) => {
+  let id = req.params.id;
   try {
-    const product = await productService.getProductById(id);
+    let product = await productService.getProductById(id);
     res.status(200).json(product);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -22,9 +22,9 @@ export const getProductById = async (req, res) => {
 };
 
 // Tạo mới sản phẩm
-export const createProduct = async (req, res) => {
+let createProduct = async (req, res) => {
   try {
-    const product = await productService.createProduct(req.body);
+    let product = await productService.createProduct(req.body);
     res.status(201).json(product);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -32,10 +32,10 @@ export const createProduct = async (req, res) => {
 };
 
 // Cập nhật sản phẩm
-export const updateProduct = async (req, res) => {
-  const id = req.params.id;
+let updateProduct = async (req, res) => {
+  let id = req.params.id;
   try {
-    const updated = await productService.updateProduct(id, req.body);
+    let updated = await productService.updateProduct(id, req.body);
     res.status(200).json(updated);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -43,12 +43,19 @@ export const updateProduct = async (req, res) => {
 };
 
 // Xóa sản phẩm
-export const deleteProduct = async (req, res) => {
-  const id = req.params.id;
+let deleteProduct = async (req, res) => {
+  let id = req.params.id;
   try {
-    const result = await productService.deleteProduct(id);
+    let result = await productService.deleteProduct(id);
     res.status(200).json(result);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
+};
+export default {
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
 };
