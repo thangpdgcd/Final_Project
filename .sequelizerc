@@ -1,0 +1,11 @@
+// .sequelizerc
+import path from "path";
+
+const __dirname = path.resolve();
+
+export default {
+  config: path.resolve(__dirname, "src/config/config.js"),
+  "models-path": path.resolve(__dirname, "src/models"),
+  "seeders-path": path.resolve(__dirname, "src/seeders"),
+  "migrations-path": path.resolve(__dirname, "src/migrations"),
+};
