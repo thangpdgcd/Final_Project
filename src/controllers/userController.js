@@ -4,7 +4,7 @@ import userService from "../service/userservice.js";
 const getAllConUsers = async (req, res) => {
   try {
     const users = await userService.getAllUsers();
-    res.status(200).json(users);
+    res.render("users", { title: "User List", users });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

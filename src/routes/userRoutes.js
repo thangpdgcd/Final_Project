@@ -1,12 +1,26 @@
 import express from "express";
-import userController from "../controllers/userController.js"; // Assuming you have a userController to handle the logic
+import userController from "../controllers/userController.js";
 
 const router = express.Router();
 
-router.get("/api/users", userController.getAllConUsers);
-router.get("/api/users/:id", userController.getOneUsers);
-router.post("/api/create-users", userController.createUsers);
-router.put("/api/users/:id", userController.updateUsers);
-router.delete("/api/users/:id", userController.deleteUser);
+// GET all users
+router.get("/users", userController.getAllConUsers);
 
-export default router;
+// GET user by ID
+router.get("/users/:id", userController.getOneUsers);
+
+// POST create user
+router.post("/create-users", userController.createUsers);
+
+// PUT update user
+router.put("/users/:id", userController.updateUsers);
+
+// DELETE user
+router.delete("/users/:id", userController.deleteUser);
+
+// Attach all user routes under /api
+const initUserRoutes = (app) => {
+  app.use("/api", router); // /api/users, /api/users/:id
+};
+
+export default initUserRoutes;
