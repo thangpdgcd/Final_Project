@@ -4,7 +4,7 @@ import productService from "../service/productService.js";
 let getAllProducts = async (req, res) => {
   try {
     let products = await productService.getAllProducts();
-    res.render("products", { title: "User List", products });
+    res.render("products", {   products });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

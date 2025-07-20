@@ -1,7 +1,6 @@
-// src/models/product.js
-import { Model } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 
-export default (sequelize, DataTypes) => {
+export default  (sequelize) => {
   class Product extends Model {
     static associate(models) {
       // Một sản phẩm thuộc về một người dùng
@@ -31,6 +30,8 @@ export default (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Product",
+      tableName: "Products", // tên bảng thực tế trong CSDL
+      timestamps: true, // nếu bạn sử dụng createdAt/updatedAt
     }
   );
 

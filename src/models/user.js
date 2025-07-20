@@ -3,7 +3,7 @@ import { Model, DataTypes } from "sequelize";
 export default (sequelize) => {
   class User extends Model {
     static associate(models) {
-      // Define associations here if needed
+      // define association here
     }
   }
 

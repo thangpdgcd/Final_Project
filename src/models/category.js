@@ -10,7 +10,7 @@ export default (sequelize) => {
 
   Category.init(
     {
-      Categories_ID: {
+      Category_ID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,

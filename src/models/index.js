@@ -8,7 +8,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import configModule from "../config/config.js";
+import configModule from "../config/config.cjs";
 const env = process.env.NODE_ENV || "development";
 const config = configModule[env];
 
