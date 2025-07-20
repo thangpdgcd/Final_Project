@@ -12,8 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.2.0",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
     "mysql2": "^3.14.2",
+    "path": "^0.12.7",
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
