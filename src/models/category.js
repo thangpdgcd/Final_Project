@@ -4,13 +4,13 @@ export default (sequelize) => {
   class Category extends Model {
     static associate(models) {
       // Nếu có bảng Product, bạn có thể thêm quan hệ ở đây:
-      // Category.hasMany(models.Product, { foreignKey: "Category_ID", as: "products" });
+      // Category.hasMany(models.Product, { foreignKey: "Categories_ID", as: "products" });
     }
   }
 
   Category.init(
     {
-      Category_ID: {
+      Categories_ID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,

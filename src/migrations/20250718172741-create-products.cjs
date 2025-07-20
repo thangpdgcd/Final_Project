@@ -15,7 +15,7 @@ module.exports = {
       Users_ID: {
         type: Sequelize.INTEGER,
       },
-      Cartegories_ID: {
+      Categories_ID: {
         type: Sequelize.INTEGER,
       },
       Description: {

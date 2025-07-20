@@ -41,14 +41,14 @@ let createProduct = (data) => {
       Stock = 0,
       Description = null,
       Image = null,
-      Category_ID,
+      Categories_ID,
       Users_ID,
     } = data;
 
     // Validate bắt buộc
-    if (!Name || !Price || !Category_ID || !Users_ID) {
+    if (!Name || !Price || !Categories_ID || !Users_ID) {
       return reject(
-        new Error("Vui lòng cung cấp Name, Price, Category_ID và Users_ID.")
+        new Error("Vui lòng cung cấp Name, Price, Categories_ID và Users_ID.")
       );
     }
     try {
@@ -58,7 +58,7 @@ let createProduct = (data) => {
 
       // 2. Kiểm tra danh mục tồn tại (dùng where)
       let categoryExists = await Category.findOne({
-        where: { id: Category_ID },
+        where: { id: Categories_ID },
       });
       if (!categoryExists) return reject(new Error("Danh mục không tồn tại."));
 
@@ -73,7 +73,7 @@ let createProduct = (data) => {
         Stock,
         Description,
         Image,
-        Category_ID,
+        Categories_ID,
         Users_ID,
       });
 
