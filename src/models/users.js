@@ -1,13 +1,13 @@
 import { Model, DataTypes } from "sequelize";
 
 export default (sequelize, DataTypes) => {
-  class User extends Model {
+  class Users extends Model {
     static associate(models) {
       // define association here
     }
   }
 
-  User.init(
+  Users.init(
     {
       Users_ID: {
         type: DataTypes.INTEGER,
@@ -34,11 +34,11 @@ export default (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "User",
+      modelName: "Users",
       tableName: "Users",
       timestamps: true,
     }
   );
 
-  return User;
+  return Users;
 };

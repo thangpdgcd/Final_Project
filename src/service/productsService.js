@@ -1,13 +1,13 @@
 // src/services/ProductsService.js
 import db from "../models/index.js";
 
-let { Products, User, Categories } = db;
+let { Products, Users, Categories } = db;
 
 let getAllProducts = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let Productss = await Products.findAll({
-        include: [{ association: "user" }, { association: "Categories" }],
+        include: [{ association: "users" }, { association: "categories" }],
       });
       resolve(Productss);
     } catch (error) {
@@ -20,7 +20,7 @@ let getProductsById = (Productsbyid) => {
   return new Promise(async (resolve, reject) => {
     try {
       let Products = await Products.findByPk(Productsbyid, {
-        include: [{ association: "user" }, { association: "Categories" }],
+        include: [{ association: "users" }, { association: "Categories" }],
       });
       if (!Products) {
         reject(new Error("Sản phẩm không tồn tại"));
@@ -64,7 +64,7 @@ let createProducts = (data) => {
         return reject(new Error("Danh mục không tồn tại."));
 
       // 3. Kiểm tra người dùng tồn tại (dùng where)
-      let userExists = await User.findOne({ where: { Users_ID: Users_ID } });
+      let userExists = await Users.findOne({ where: { Users_ID: Users_ID } });
       if (!userExists) return reject(new Error("Người dùng không tồn tại."));
 
       // 4. Tạo sản phẩm

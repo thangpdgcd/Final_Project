@@ -54,7 +54,7 @@
           <td><%= product.Price.toLocaleString('vi-VN') %> đ</td>
           <td><%= product.Stock %></td>
           <td><%= product.Description || "Không có" %></td>
-          <td><%= product.Categories ? product.Categories.Name : "Chưa gán" %></td>
+          <td><%= product.category ? product.category.Name : "Chưa gán" %></td>
           <td><%= product.user ? product.user.Name : "Không rõ" %></td>
           <td>
             <% if (product.Image) { %>

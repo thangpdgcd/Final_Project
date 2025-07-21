@@ -1,5 +1,5 @@
 import express from "express";
-import userController from "../controllers/usersController.js";
+import userController from "../../src/controllers/usersController.js"; // Import the user controller
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.post("/create-users", userController.createUsers);
 router.put("/users/:id", userController.updateUsers);
 
 // DELETE user
-router.delete("/users/:id", userController.deleteUser);
+router.delete("/users/:id", userController.deleteUsers);
 
 // Attach all user routes under /api
 const initUserRoutes = (app) => {
