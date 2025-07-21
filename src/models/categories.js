@@ -1,14 +1,11 @@
 import { Model, DataTypes } from "sequelize";
 
 export default (sequelize) => {
-  class Category extends Model {
-    static associate(models) {
-      // Nếu có bảng Product, bạn có thể thêm quan hệ ở đây:
-      // Category.hasMany(models.Product, { foreignKey: "Categories_ID", as: "products" });
-    }
+  class Categories extends Model {
+    static associate(models) {}
   }
 
-  Category.init(
+  Categories.init(
     {
       Categories_ID: {
         type: DataTypes.INTEGER,
@@ -26,11 +23,11 @@ export default (sequelize) => {
     },
     {
       sequelize,
-      modelName: "Category",
+      modelName: "Categories",
       tableName: "Categories", // tên bảng thực tế trong CSDL
       timestamps: false, // nếu bạn không dùng createdAt/updatedAt
     }
   );
 
-  return Category;
+  return Categories;
 };

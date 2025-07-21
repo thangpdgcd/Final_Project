@@ -1,31 +1,31 @@
-// src/services/productService.js
+// src/services/ProductsService.js
 import db from "../models/index.js";
 
-let { Product, User, Category } = db;
+let { Products, User, Categories } = db;
 
 let getAllProducts = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      let products = await Product.findAll({
-        include: [{ association: "user" }, { association: "category" }],
+      let Productss = await Products.findAll({
+        include: [{ association: "user" }, { association: "Categories" }],
       });
-      resolve(products);
+      resolve(Productss);
     } catch (error) {
       reject(new Error("Không thể lấy danh sách sản phẩm: " + error.message));
     }
   });
 };
 
-let getProductById = (id) => {
+let getProductsById = (Productsbyid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let product = await Product.findByPk(id, {
-        include: [{ association: "user" }, { association: "category" }],
+      let Products = await Products.findByPk(Productsbyid, {
+        include: [{ association: "user" }, { association: "Categories" }],
       });
-      if (!product) {
+      if (!Products) {
         reject(new Error("Sản phẩm không tồn tại"));
       } else {
-        resolve(product);
+        resolve(Products);
       }
     } catch (error) {
       reject(new Error("Không thể lấy sản phẩm: " + error.message));
@@ -33,7 +33,7 @@ let getProductById = (id) => {
   });
 };
 
-let createProduct = (data) => {
+let createProducts = (data) => {
   return new Promise(async (resolve, reject) => {
     let {
       Name,
@@ -53,21 +53,22 @@ let createProduct = (data) => {
     }
     try {
       // 1. Kiểm tra tên sản phẩm trùng
-      let nameExists = await Product.findOne({ where: { Name } });
+      let nameExists = await Products.findOne({ where: { Name } });
       if (nameExists) return reject(new Error("Tên sản phẩm đã tồn tại."));
 
       // 2. Kiểm tra danh mục tồn tại (dùng where)
-      let categoryExists = await Category.findOne({
-        where: { id: Categories_ID },
+      let CategoriesExists = await Categories.findOne({
+        where: { Categories_ID: Categories_ID },
       });
-      if (!categoryExists) return reject(new Error("Danh mục không tồn tại."));
+      if (!CategoriesExists)
+        return reject(new Error("Danh mục không tồn tại."));
 
       // 3. Kiểm tra người dùng tồn tại (dùng where)
-      let userExists = await User.findOne({ where: { id: Users_ID } });
+      let userExists = await User.findOne({ where: { Users_ID: Users_ID } });
       if (!userExists) return reject(new Error("Người dùng không tồn tại."));
 
       // 4. Tạo sản phẩm
-      let newProduct = await Product.create({
+      let newProducts = await Products.create({
         Name,
         Price,
         Stock,
@@ -77,22 +78,22 @@ let createProduct = (data) => {
         Users_ID,
       });
 
-      resolve(newProduct);
+      resolve(newProducts);
     } catch (error) {
       reject(new Error("Không thể tạo sản phẩm: " + error.message));
     }
   });
 };
 
-let updateProduct = (id, data) => {
+let updateProducts = (UpdateProducts, data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let product = await Product.findByPk(id);
-      if (!product) {
+      let Products = await Products.findByPk(UpdateProducts);
+      if (!Products) {
         reject(new Error("Sản phẩm không tồn tại"));
       } else {
-        await product.update(data);
-        resolve(product);
+        await Products.update(data);
+        resolve(Products);
       }
     } catch (error) {
       reject(new Error("Không thể cập nhật sản phẩm: " + error.message));
@@ -100,14 +101,14 @@ let updateProduct = (id, data) => {
   });
 };
 
-let deleteProduct = (id) => {
+let deleteProducts = (Productsid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let product = await Product.findByPk(id);
-      if (!product) {
+      let Products = await Products.findByPk(Productsid);
+      if (!Products) {
         reject(new Error("Sản phẩm không tồn tại"));
       } else {
-        await product.destroy();
+        await Products.destroy();
         resolve({ message: "Xóa sản phẩm thành công" });
       }
     } catch (error) {
@@ -118,8 +119,8 @@ let deleteProduct = (id) => {
 
 export default {
   getAllProducts,
-  getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct,
+  getProductsById,
+  createProducts,
+  updateProducts,
+  deleteProducts,
 };

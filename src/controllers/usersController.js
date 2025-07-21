@@ -1,4 +1,4 @@
-import userService from "../service/userservice.js";
+import userService from "../service/userservices.js";
 
 // Lấy tất cả người dùng
 let getAllConUsers = async (req, res) => {

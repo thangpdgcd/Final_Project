@@ -11,32 +11,41 @@ module.exports = {
       },
       Name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       Users_ID: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       Categories_ID: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       Description: {
         type: Sequelize.TEXT,
+        allowNull: true,
       },
       Price: {
         type: Sequelize.FLOAT,
+        allowNull: false,
       },
       Stock: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       Image: {
         type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },

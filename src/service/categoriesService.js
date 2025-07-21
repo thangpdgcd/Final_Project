@@ -1,12 +1,12 @@
 import db from "../models/index.js";
 
-let { Category } = db;
+let { Categories } = db;
 
 // Lấy tất cả danh mục
 let getAllCategories = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      let categories = await Category.findAll();
+      let categories = await Categories.findAll();
       resolve(categories);
     } catch (error) {
       reject(new Error("Không thể lấy danh sách danh mục: " + error.message));
@@ -15,21 +15,21 @@ let getAllCategories = () => {
 };
 
 // Lấy danh mục theo ID
-let getCategoryById = (id) => {
+let getCategoriesById = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let category = await Category.findByPk(id);
-      if (!category) {
+      let Categories = await Categories.findByPk(id);
+      if (!Categories) {
         return reject(new Error("Không tìm thấy danh mục với ID: " + id));
       }
-      resolve(category);
+      resolve(Categories);
     } catch (error) {
       reject(new Error("Lỗi khi lấy danh mục theo ID: " + error.message));
     }
   });
 };
 // Tạo danh mục mới
-let createCategory = (data) => {
+let createCategories = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       let { Name, Description } = data;
@@ -38,44 +38,44 @@ let createCategory = (data) => {
         return reject(new Error("Tên danh mục là bắt buộc."));
       }
 
-      let newCategory = await Category.create({ Name, Description });
-      resolve(newCategory);
+      let newCategories = await Categories.create({ Name, Description });
+      resolve(newCategories);
     } catch (error) {
       reject(new Error("Không thể tạo danh mục: " + error.message));
     }
   });
 };
 // Cập nhật danh mục
-let updateCategory = (id, data) => {
+let updateCategories = (id, data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let category = await Category.findByPk(id);
-      if (!category) {
+      let Categories = await Categories.findByPk(id);
+      if (!Categories) {
         return reject(new Error("Không tìm thấy danh mục để cập nhật."));
       }
 
       let { Name, Description } = data;
 
-      category.Name = Name || category.Name;
-      category.Description = Description || category.Description;
+      Categories.Name = Name || Categories.Name;
+      Categories.Description = Description || Categories.Description;
 
-      await category.save();
-      resolve(category);
+      await Categories.save();
+      resolve(Categories);
     } catch (error) {
       reject(new Error("Không thể cập nhật danh mục: " + error.message));
     }
   });
 };
 // Xóa danh mục
-let deleteCategory = (id) => {
+let deleteCategories = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let category = await Category.findByPk(id);
-      if (!category) {
+      let Categories = await Categories.findByPk(id);
+      if (!Categories) {
         return reject(new Error("Không tìm thấy danh mục để xóa."));
       }
 
-      await category.destroy();
+      await Categories.destroy();
       resolve({ message: "Xóa danh mục thành công." });
     } catch (error) {
       reject(new Error("Không thể xóa danh mục: " + error.message));
@@ -84,8 +84,8 @@ let deleteCategory = (id) => {
 };
 export default {
   getAllCategories,
-  getCategoryById,
-  createCategory,
-  updateCategory,
-  deleteCategory,
+  getCategoriesById,
+  createCategories,
+  updateCategories,
+  deleteCategories,
 };
