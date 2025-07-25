@@ -10,12 +10,12 @@ module.exports = {
         autoIncrement: true,
         primaryKey: true,
       },
-      Order_ID: {
+      Orders_ID: {
         type: Sequelize.INTEGER,
         allowNull: false,
         // Không khai báo foreign key
       },
-      Product_ID: {
+      Products_ID: {
         type: Sequelize.INTEGER,
         allowNull: false,
         // Không khai báo foreign key

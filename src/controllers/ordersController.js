@@ -4,7 +4,7 @@ import ordersService from "../service/ordersService.js";
 const getAllOrders = async (req, res) => {
   try {
     const orders = await ordersService.getAllOrders();
-    res.status(200).json(orders);
+    res.render("orders", { orders }); // nếu dùng EJS
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

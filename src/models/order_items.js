@@ -21,7 +21,7 @@ export default (sequelize) => {
 
   Order_Items.init(
     {
-      Order_Item_ID: {
+      Order_Items_ID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,

@@ -6,6 +6,7 @@ import initUserRoutes from "./routes/usersRoutes.js";
 import initProductsRoutes from "./routes/productsRoutes.js";
 import initCategoriesRoutes from "../src/routes/categoriesRoutes.js";
 import initOrdersRoutes from "./routes/ordersRoutes.js";
+import initOrderItemsRoutes from "./routes/orderItemsRoutes.js"; // Import the order items routes
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -22,6 +23,7 @@ initUserRoutes(app); // nếu có
 initProductsRoutes(app); // nếu có định tuyến sản phẩm
 initCategoriesRoutes(app); // nếu có định tuyến danh mục
 initOrdersRoutes(app); // nếu có định tuyến đơn hàng
+initOrderItemsRoutes(app); // nếu có định tuyến đơn hàng
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
