@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Danh sách thanh toán</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <h1>Danh sách Thanh Toán</h1>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Order_Items_ID</th>
+          <th>Phương thức</th>
+          <th>Trạng thái</th>
+          <th>Số tiền</th>
+          <th>Đã thanh toán</th>
+          <th>Mã giao dịch</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (payments && payments.length > 0) { %> <%
+        payments.forEach(function(payment) { %>
+        <tr>
+          <td><%= payment.Payments_ID %></td>
+          <td><%= payment.Order_Items_ID %></td>
+          <td><%= payment.Payments_Method %></td>
+          <td><%= payment.Payments_Status %></td>
+          <td><%= payment.Amount %></td>
+          <td><%= payment.Paid ? "Có" : "Không" %></td>
+          <td><%= payment.Transaction_ID %></td>
+        </tr>
+        <% }) %> <% } else { %>
+        <tr>
+          <td colspan="7">Không có dữ liệu thanh toán.</td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </body>
+</html>
