@@ -3,8 +3,10 @@ import orderItemsService from "../service/orderItemsService.js";
 
 let getAllOrderItems = async (req, res) => {
   try {
-    let ordersitems = await orderItemsService.getAllOrderItems();
-    res.render("ordersitems", { ordersitems }); // nếu dùng EJS
+    let orderItems = await orderItemsService.getAllOrderItems();
+    //render views orderItems.ejs with data
+    console.log("check----", orderItems);
+    return res.render("orderItems", { orderItems });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

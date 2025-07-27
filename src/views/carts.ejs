@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Giỏ Hàng</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- nếu có css -->
+  </head>
+  <body>
+    <h1>Giỏ Hàng của Người Dùng <%= userId %></h1>
+
+    <% if (cartItems && cartItems.length > 0) { %>
+    <table border="1" cellpadding="10">
+      <thead>
+        <tr>
+          <th>Sản phẩm</th>
+          <th>Số lượng</th>
+          <th>Giá tại thời điểm thêm</th>
+          <th>Tổng</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% cartItems.forEach(function(item) { %>
+        <tr>
+          <td><%= item.products?.Name || 'Không rõ' %></td>
+          <td><%= item.Quantity %></td>
+          <td>
+            <%= item.Price_At_Added.toLocaleString('vi-VN', { style: 'currency',
+            currency: 'VND' }) %>
+          </td>
+          <td>
+            <%= (item.Quantity * item.Price_At_Added).toLocaleString('vi-VN', {
+            style: 'currency', currency: 'VND' }) %>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <% } else { %>
+    <p>Giỏ hàng trống.</p>
+    <% } %>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cart Items</title>
+    <style>
+      table {
+        width: 60%;
+        border-collapse: collapse;
+        margin: 20px auto;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px 12px;
+        text-align: center;
+      }
+      form {
+        display: inline;
+      }
+      h1 {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Cart Items</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cart ID</th>
+          <th>Product ID</th>
+          <th>Quantity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (cartItems && cartItems.length > 0) { %> <%
+        cartItems.forEach(function(item) { %>
+        <tr>
+          <td><%= item.Cart_Items_ID %></td>
+          <td><%= item.Carts_ID %></td>
+          <td><%= item.Products_ID %></td>
+          <td>
+            <form
+              action="/cart-items/<%= item.Cart_Items_ID %>?_method=PUT"
+              method="POST">
+              <input
+                type="number"
+                name="quantity"
+                value="<%= item.Quantity %>"
+                min="0" />
+              <button type="submit">Update</button>
+            </form>
+          </td>
+          <td>
+            <form
+              action="/cart-items/<%= item.Cart_Items_ID %>?_method=DELETE"
+              method="POST"
+              onsubmit="return confirm('Are you sure?')">
+              <button type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+        <% }); %> <% } else { %>
+        <tr>
+          <td colspan="5">No items in the cart.</td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </body>
+</html>
