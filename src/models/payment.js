@@ -4,7 +4,7 @@ export default (sequelize, DataTypes) => {
   class Payments extends Model {
     static associate(models) {
       // Payment thuộc về Order_Item
-      Payments.belongsTo(models.Order_Item, {
+      Payments.belongsTo(models.Order_Items, {
         foreignKey: "Order_Items_ID",
         targetKey: "Order_Items_ID",
         as: "orderItems",
@@ -19,7 +19,7 @@ export default (sequelize, DataTypes) => {
     }
   }
 
-  Payment.init(
+  Payments.init(
     {
       Payments_ID: {
         type: DataTypes.INTEGER,
