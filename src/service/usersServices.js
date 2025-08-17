@@ -1,6 +1,6 @@
 import db from "../models/index.js";
 let { Users } = db;
-
+import bcrypt from "bcrypt";
 // Lấy tất cả người dùng
 let getAllUsers = () => {
   return new Promise(async (resolve, reject) => {
@@ -29,26 +29,31 @@ let getUsersById = (id) => {
 // Tạo người dùng mới
 let createUsers = (data) => {
   return new Promise(async (resolve, reject) => {
-    let { Name, Email, Address, PhoneNumber } = data;
+    let { name, email, address, phoneNumber, password } = data;
 
-    if (!Email || !Address) {
+    if (!email || !address || !password) {
       return reject(new Error("Thiếu thông tin bắt buộc"));
     }
 
     try {
-      let existingEmail = await Users.findOne({
-        where: { Email },
-        attributes: { exclude: ["createdAt", "updatedAt"] },
-      });
+      let existingEmail = await Users.findOne({ where: { email } });
       if (existingEmail) return reject(new Error("Email đã tồn tại."));
 
-      let existingAddress = await Users.findOne({
-        where: { Address },
-        attributes: { exclude: ["createdAt", "updatedAt"] },
-      });
+      let existingAddress = await Users.findOne({ where: { address } });
       if (existingAddress) return reject(new Error("Địa chỉ đã tồn tại."));
 
-      let newUser = await Users.create({ Name, Email, Address, PhoneNumber });
+      // Mã hoá password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      let newUser = await Users.create({
+        name,
+        email,
+        address,
+        phoneNumber,
+        password: hashedPassword,
+        roleID,
+      });
+
       resolve(newUser);
     } catch (error) {
       reject(new Error("Không thể tạo người dùng: " + error.message));
@@ -85,6 +90,21 @@ let deleteUsers = (id) => {
     }
   });
 };
+let searchUsers = (name) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let users = await Users.findAll({
+        where: {
+          name: name,
+        }, // so sánh chính xác
+      });
+
+      resolve(users);
+    } catch (error) {
+      reject(new Error("Không thể tìm kiếm người dùng: " + error.message));
+    }
+  });
+};
 
 export default {
   getAllUsers,
@@ -92,4 +112,5 @@ export default {
   createUsers,
   updateUsers,
   deleteUsers,
+  searchUsers,
 };
