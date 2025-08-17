@@ -1,12 +1,21 @@
 import usersService from "../../src/service/usersServices.js"; // Import the user service
 
 // Lấy tất cả người dùng
-let getAllConUsers = async (req, res) => {
+let getAllUsers = async (req, res) => {
   try {
+    let { name } = req.query;
+
+    if (name) {
+      // Nếu có query name thì search theo name
+      let result = await usersService.searchUsers(name);
+      return res.status(200).json(result);
+    }
+
+    // Nếu không có query thì lấy toàn bộ
     let users = await usersService.getAllUsers();
-    res.render("users", { title: "Users List", users });
+    return res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -56,7 +65,7 @@ let deleteUsers = async (req, res) => {
 };
 
 export default {
-  getAllConUsers,
+  getAllUsers,
   getOneUsers,
   createUsers,
   updateUsers,
