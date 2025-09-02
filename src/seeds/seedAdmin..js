@@ -1,19 +1,19 @@
 // src/seeds/seedAdmin.js
 import bcrypt from "bcrypt";
-import db from "../models/index.js"; // import toàn bộ models để lấy cả Users và sequelize
+import db from "../models/index.js";
 import dotenv from "dotenv";
 dotenv.config();
 
 const seedAdmin = async () => {
   try {
-    await db.sequelize.sync(); // đảm bảo DB đã kết nối và bảng đã sẵn sàng
+    await db.sequelize.sync();
 
     const existingAdmin = await db.Users.findOne({
       where: { name: "admin" },
     });
 
     if (existingAdmin) {
-      console.log("⚠️ Tài khoản admin đã tồn tại.");
+      console.log("⚠️ Administrator account already exists.");
       return;
     }
 
@@ -28,9 +28,9 @@ const seedAdmin = async () => {
       phoneNumber: "0123456789",
     });
 
-    console.log("✅ Tạo tài khoản admin thành công.");
+    console.log("✅ create admin successfully.");
   } catch (error) {
-    console.error("❌ Lỗi khi tạo admin:", error);
+    console.error("❌ error create admin:", error);
   } finally {
     await db.sequelize.close(); // đóng kết nối sau khi chạy xong
   }
