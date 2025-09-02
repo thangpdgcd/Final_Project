@@ -3,37 +3,37 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("Products", {
-      Products_ID: {
+      product_ID: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      Name: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      Users_ID: {
+      user_ID: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      Categories_ID: {
+      categories_ID: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      Description: {
+      description: {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      Price: {
+      price: {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
-      Stock: {
+      stock: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      Image: {
+      image: {
         type: Sequelize.STRING,
         allowNull: true,
       },
