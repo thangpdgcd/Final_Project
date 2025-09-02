@@ -3,10 +3,15 @@ import orderItemsService from "../service/orderItemsService.js";
 
 let getAllOrderItems = async (req, res) => {
   try {
-    let orderItems = await orderItemsService.getAllOrderItems();
-    //render views orderItems.ejs with data
-    console.log("check----", orderItems);
-    return res.render("orderItems", { orderItems });
+    let { name } = req.query;
+    if (name) {
+      let result = await orderItemsService.searchOrderItem(name);
+      return res.status(200).json(result); // nếu chỉ muốn API JSON
+    }
+    let cart = await orderItemsService.getAllCategories();
+
+    return res.status(200).json(cart); // nếu chỉ muốn API JSON
+    // return res.render("products", { products }); // nếu dùng EJS
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
