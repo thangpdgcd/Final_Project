@@ -5,15 +5,15 @@ export default (sequelize, DataTypes) => {
     static associate(models) {
       // Payment thuộc về Order_Item
       Payments.belongsTo(models.Order_Items, {
-        foreignKey: "Order_Items_ID",
-        targetKey: "Order_Items_ID",
+        foreignKey: "orderitem_ID",
+        targetKey: "orderitem_ID",
         as: "orderItems",
       });
 
       // Nếu bạn cần liên kết trực tiếp tới Orders
       Payments.belongsTo(models.Orders, {
-        foreignKey: "Orders_ID",
-        targetKey: "Orders_ID",
+        foreignKey: "order_ID",
+        targetKey: "order_ID",
         as: "orders",
       });
     }
@@ -21,44 +21,44 @@ export default (sequelize, DataTypes) => {
 
   Payments.init(
     {
-      Payments_ID: {
+      payment_ID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      Order_Items_ID: {
+      orderitem_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Order_Items",
-          key: "Order_Item_ID",
+          model: "orderitem_ID",
+          key: "orderitem_ID",
         },
       },
-      Orders_ID: {
+      order_ID: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
           model: "Orders",
-          key: "Orders_ID",
+          key: "order_ID",
         },
       },
-      Payments_Method: {
+      payments_method: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      Payments_Status: {
+      payments_status: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      Amount: {
+      amount: {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
-      Paid: {
+      paid: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
-      Transaction_ID: {
+      transaction_ID: {
         type: DataTypes.STRING,
         allowNull: true,
       },
