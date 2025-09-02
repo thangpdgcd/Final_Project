@@ -2,8 +2,15 @@ import paymentService from "../service/paymentsService.js";
 
 let getAllPayments = async (req, res) => {
   try {
-    let payments = await paymentService.getAllPayments();
-    res.render("payments", { payments }); // nếu dùng EJS
+    let { name } = req.query;
+    if (name) {
+      let result = await paymentService.searchPayments(name);
+      return res.status(200).json(result); // nếu chỉ muốn API JSON
+    }
+    let payment = await paymentService.getAllCategories();
+
+    return res.status(200).json(payment); // nếu chỉ muốn API JSON
+    // return res.render("products", { products }); // nếu dùng EJS
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
