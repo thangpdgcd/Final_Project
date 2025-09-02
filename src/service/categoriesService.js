@@ -2,90 +2,106 @@ import db from "../models/index.js";
 
 let { Categories } = db;
 
-// Lấy tất cả danh mục
 let getAllCategories = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let categories = await Categories.findAll();
       resolve(categories);
     } catch (error) {
-      reject(new Error("Không thể lấy danh sách danh mục: " + error.message));
+      reject(new Error("Unable to retrieve category list: " + error.message));
     }
   });
 };
 
-// Lấy danh mục theo ID
 let getCategoriesById = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let Categories = await Categories.findByPk(id);
-      if (!Categories) {
-        return reject(new Error("Không tìm thấy danh mục với ID: " + id));
+      let category = await Categories.findByPk(id);
+      if (!category) {
+        return reject(new Error("Category not found with ID: " + id));
       }
-      resolve(Categories);
+      resolve(category);
     } catch (error) {
-      reject(new Error("Lỗi khi lấy danh mục theo ID: " + error.message));
+      reject(new Error("Error retrieving category by ID: " + error.message));
     }
   });
 };
-// Tạo danh mục mới
+
 let createCategories = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let { Name, Description } = data;
+      let { name, description } = data;
 
-      if (!Name) {
-        return reject(new Error("Tên danh mục là bắt buộc."));
+      if (!name) {
+        return reject(new Error("Category name is required."));
       }
 
-      let newCategories = await Categories.create({ Name, Description });
-      resolve(newCategories);
+      let newCategory = await Categories.create({ name, description });
+      resolve(newCategory);
     } catch (error) {
-      reject(new Error("Không thể tạo danh mục: " + error.message));
+      reject(new Error("Unable to create category: " + error.message));
     }
   });
 };
-// Cập nhật danh mục
+
 let updateCategories = (id, data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let Categories = await Categories.findByPk(id);
-      if (!Categories) {
-        return reject(new Error("Không tìm thấy danh mục để cập nhật."));
+      let category = await Categories.findByPk(id);
+      if (!category) {
+        return reject(new Error("Category not found for update."));
       }
 
       let { Name, Description } = data;
 
-      Categories.Name = Name || Categories.Name;
-      Categories.Description = Description || Categories.Description;
+      category.Name = Name || category.Name;
+      category.Description = Description || category.Description;
 
-      await Categories.save();
-      resolve(Categories);
+      await category.save();
+      resolve(category);
     } catch (error) {
-      reject(new Error("Không thể cập nhật danh mục: " + error.message));
+      reject(new Error("Unable to update category: " + error.message));
     }
   });
 };
-// Xóa danh mục
+
 let deleteCategories = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let Categories = await Categories.findByPk(id);
-      if (!Categories) {
-        return reject(new Error("Không tìm thấy danh mục để xóa."));
+      let category = await Categories.findByPk(id);
+      if (!category) {
+        return reject(new Error("Category not found for deletion."));
       }
 
-      await Categories.destroy();
-      resolve({ message: "Xóa danh mục thành công." });
+      await category.destroy();
+      resolve({ message: "Category deleted successfully." });
     } catch (error) {
-      reject(new Error("Không thể xóa danh mục: " + error.message));
+      reject(new Error("Unable to delete category: " + error.message));
     }
   });
 };
+
+let searchCategories = (name) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let categories = await Categories.findAll({
+        where: {
+          name: name,
+        },
+      });
+
+      resolve(categories);
+    } catch (error) {
+      reject(new Error("Unable to search category: " + error.message));
+    }
+  });
+};
+
 export default {
   getAllCategories,
   getCategoriesById,
   createCategories,
   updateCategories,
   deleteCategories,
+  searchCategories,
 };
