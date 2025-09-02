@@ -45,12 +45,12 @@
       <tbody>
         <% orders.forEach(order => { %>
         <tr>
-          <td><%= order.Orders_ID %></td>
+          <td><%= order.order_ID %></td>
           <td><%= order.users ? order.users.Name : "Không rõ" %></td>
           <td><%= order.Shipping_Address || "Không có" %></td>
-          <td><%= Number(order.Total_Amount).toLocaleString("vi-VN") %> đ</td>
-          <td><%= order.Status || "Đang xử lý" %></td>
-          <td><%= new Date(order.createdAt).toLocaleString("vi-VN") %></td>
+          <td><%= Number(order.Total_Amount).toLocaleString("en-EN") %> đ</td>
+          <td><%= order.Status || "pending" %></td>
+          <td><%= new Date(order.createdAt).toLocaleString("en-EN") %></td>
         </tr>
         <% }) %>
       </tbody>
