@@ -1,4 +1,3 @@
-// src/service/ordersService.js
 import db from "../models/index.js";
 
 const { Orders, Users } = db;
@@ -9,12 +8,12 @@ const getAllOrders = async () => {
       include: {
         model: Users,
         as: "users",
-        attributes: ["Users_ID", "Name", "Email"],
+        attributes: ["user_ID", "name", "email"],
       },
     });
     return orders;
   } catch (error) {
-    throw new Error("Không thể lấy danh sách đơn hàng: " + error.message);
+    throw new Error("Unable to retrieve order list: " + error.message);
   }
 };
 
@@ -24,69 +23,87 @@ const getOrderById = async (Orderid) => {
       include: {
         model: Users,
         as: "users",
-        attributes: ["Users_ID", "Name", "Email"],
+        attributes: ["user_ID", "name", "email"],
       },
     });
 
     if (!orders) {
-      throw new Error("Không tìm thấy đơn hàng");
+      throw new Error("Order not found");
     }
 
     return orders;
   } catch (error) {
-    throw new Error("Lỗi khi lấy đơn hàng: " + error.message);
+    throw new Error("Error retrieving order: " + error.message);
   }
 };
 
 const createOrders = async (data) => {
   try {
-    const { User_ID, Total_Amount, Status, Shipping_Address } = data;
+    const { user_ID, total_Amount, status, shipping_Address } = data;
 
-    // Kiểm tra người dùng tồn tại
-    const users = await Users.findOne({ where: { Users_ID: User_ID } });
+    const users = await Users.findOne({ where: { user_ID: user_ID } });
     if (!users) {
-      throw new Error("Người dùng không tồn tại");
+      throw new Error("User does not exist");
     }
 
     const newOrders = await Orders.create({
-      User_ID,
-      Total_Amount,
-      Status,
-      Shipping_Address,
+      user_ID,
+      total_Amount,
+      status,
+      shipping_Address,
     });
 
     return newOrders;
   } catch (error) {
-    throw new Error("Không thể tạo đơn hàng: " + error.message);
+    throw new Error("Unable to create order: " + error.message);
   }
 };
 
-const updateOrder = async (UpdateOrderid, data) => {
+const updateOrder = async (updateOrderid, data) => {
   try {
-    const orders = await Orders.findByPk(UpdateOrderid);
+    const orders = await Orders.findByPk(updateOrderid);
     if (!orders) {
-      throw new Error("Không tìm thấy đơn hàng");
+      throw new Error("Order not found");
     }
 
     await orders.update(data);
     return orders;
   } catch (error) {
-    throw new Error("Không thể cập nhật đơn hàng: " + error.message);
+    throw new Error("Unable to update order: " + error.message);
   }
 };
 
-const deleteOrder = async (DeleteOrderid) => {
+const deleteOrder = async (deleteOrderid) => {
   try {
-    const order = await Orders.findByPk(DeleteOrderid);
+    const order = await Orders.findByPk(deleteOrderid);
     if (!order) {
-      throw new Error("Không tìm thấy đơn hàng");
+      throw new Error("Order not found");
     }
 
     await order.destroy();
-    return { message: "Đã xóa đơn hàng thành công" };
+    return { message: "Order deleted successfully" };
   } catch (error) {
-    throw new Error("Không thể xóa đơn hàng: " + error.message);
+    throw new Error("Unable to delete order: " + error.message);
   }
+};
+
+let searchOrders = async ({ user_ID, status }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let whereClause = {};
+      if (user_ID) {
+        whereClause.user_ID = user_ID;
+      } else if (status) {
+        whereClause.status = status;
+      } else {
+        return reject(new Error("Please provide user_ID or status to search"));
+      }
+      let orders = await Orders.findAll({ where: whereClause });
+      resolve(orders);
+    } catch (error) {
+      reject(new Error("Unable to search orders: " + error.message));
+    }
+  });
 };
 
 export default {
@@ -95,4 +112,5 @@ export default {
   createOrders,
   updateOrder,
   deleteOrder,
+  searchOrders,
 };
