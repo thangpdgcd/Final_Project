@@ -40,9 +40,9 @@
         <% if (cartItems && cartItems.length > 0) { %> <%
         cartItems.forEach(function(item) { %>
         <tr>
-          <td><%= item.Cart_Items_ID %></td>
-          <td><%= item.Carts_ID %></td>
-          <td><%= item.Products_ID %></td>
+          <td><%= item.cartitems_ID %></td>
+          <td><%= item.cart_ID %></td>
+          <td><%= item.product_ID %></td>
           <td>
             <form
               action="/cart-items/<%= item.Cart_Items_ID %>?_method=PUT"
