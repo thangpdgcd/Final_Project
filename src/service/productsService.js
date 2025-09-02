@@ -1,4 +1,3 @@
-// src/services/ProductsService.js
 import db from "../models/index.js";
 
 let { Products, Users, Categories } = db;
@@ -6,29 +5,29 @@ let { Products, Users, Categories } = db;
 let getAllProducts = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      let Productss = await Products.findAll({
+      let products = await Products.findAll({
         include: [{ association: "users" }, { association: "categories" }],
       });
-      resolve(Productss);
+      resolve(products);
     } catch (error) {
-      reject(new Error("Không thể lấy danh sách sản phẩm: " + error.message));
+      reject(new Error("Unable to retrieve product list: " + error.message));
     }
   });
 };
 
-let getProductsById = (Productsbyid) => {
+let getProductsById = (productsbyid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let Products = await Products.findByPk(Productsbyid, {
+      let products = await Products.findByPk(productsbyid, {
         include: [{ association: "users" }, { association: "Categories" }],
       });
-      if (!Products) {
-        reject(new Error("Sản phẩm không tồn tại"));
+      if (!products) {
+        reject(new Error("Product does not exist"));
       } else {
-        resolve(Products);
+        resolve(products);
       }
     } catch (error) {
-      reject(new Error("Không thể lấy sản phẩm: " + error.message));
+      reject(new Error("Unable to retrieve product: " + error.message));
     }
   });
 };
@@ -36,51 +35,46 @@ let getProductsById = (Productsbyid) => {
 let createProducts = (data) => {
   return new Promise(async (resolve, reject) => {
     let {
-      Name,
-      Price,
-      Stock = 0,
-      Description = null,
-      Image = null,
-      Categories_ID,
-      Users_ID,
+      name,
+      price,
+      stock = 0,
+      description = null,
+      image = null,
+      categories_ID,
+      user_ID,
     } = data;
 
-    // Validate bắt buộc
-    if (!Name || !Price || !Categories_ID || !Users_ID) {
+    if (!name || !price || !categories_ID || !user_ID) {
       return reject(
-        new Error("Vui lòng cung cấp Name, Price, Categories_ID và Users_ID.")
+        new Error("Please provide Name, Price, Categories_ID and Users_ID.")
       );
     }
     try {
-      // 1. Kiểm tra tên sản phẩm trùng
-      let nameExists = await Products.findOne({ where: { Name } });
-      if (nameExists) return reject(new Error("Tên sản phẩm đã tồn tại."));
+      let nameExists = await Products.findOne({ where: { name } });
+      if (nameExists) return reject(new Error("Product name already exists."));
 
-      // 2. Kiểm tra danh mục tồn tại (dùng where)
       let CategoriesExists = await Categories.findOne({
-        where: { Categories_ID: Categories_ID },
+        where: { categories_ID: categories_ID },
       });
       if (!CategoriesExists)
-        return reject(new Error("Danh mục không tồn tại."));
+        return reject(new Error("Category does not exist."));
 
-      // 3. Kiểm tra người dùng tồn tại (dùng where)
-      let userExists = await Users.findOne({ where: { Users_ID: Users_ID } });
-      if (!userExists) return reject(new Error("Người dùng không tồn tại."));
+      let userExists = await Users.findOne({ where: { user_ID: user_ID } });
+      if (!userExists) return reject(new Error("User does not exist."));
 
-      // 4. Tạo sản phẩm
       let newProducts = await Products.create({
-        Name,
-        Price,
-        Stock,
-        Description,
-        Image,
-        Categories_ID,
-        Users_ID,
+        name,
+        price,
+        stock,
+        description,
+        image,
+        categories_ID,
+        user_ID,
       });
 
       resolve(newProducts);
     } catch (error) {
-      reject(new Error("Không thể tạo sản phẩm: " + error.message));
+      reject(new Error("Unable to create product: " + error.message));
     }
   });
 };
@@ -88,15 +82,15 @@ let createProducts = (data) => {
 let updateProducts = (UpdateProducts, data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let Products = await Products.findByPk(UpdateProducts);
-      if (!Products) {
-        reject(new Error("Sản phẩm không tồn tại"));
+      let product = await Products.findByPk(UpdateProducts);
+      if (!product) {
+        reject(new Error("Product does not exist"));
       } else {
-        await Products.update(data);
-        resolve(Products);
+        await product.update(data);
+        resolve(product);
       }
     } catch (error) {
-      reject(new Error("Không thể cập nhật sản phẩm: " + error.message));
+      reject(new Error("Unable to update product: " + error.message));
     }
   });
 };
@@ -104,17 +98,28 @@ let updateProducts = (UpdateProducts, data) => {
 let deleteProducts = (Productsid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let Products = await Products.findByPk(Productsid);
-      if (!Products) {
-        reject(new Error("Sản phẩm không tồn tại"));
+      let product = await Products.findByPk(Productsid);
+      if (!product) {
+        reject(new Error("Product does not exist"));
       } else {
-        await Products.destroy();
-        resolve({ message: "Xóa sản phẩm thành công" });
+        await product.destroy();
+        resolve({ message: "Product deleted successfully" });
       }
     } catch (error) {
-      reject(new Error("Không thể xóa sản phẩm: " + error.message));
+      reject(new Error("Unable to delete product: " + error.message));
     }
   });
+};
+
+let searchProducts = async (name) => {
+  try {
+    return await Products.findAll({
+      where: { name },
+      include: [{ association: "users" }, { association: "categories" }],
+    });
+  } catch (error) {
+    throw new Error("Unable to search product: " + error.message);
+  }
 };
 
 export default {
@@ -123,4 +128,5 @@ export default {
   createProducts,
   updateProducts,
   deleteProducts,
+  searchProducts,
 };
