@@ -3,28 +3,28 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("Payments", {
-      Payments_ID: {
+      payment_ID: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      Order_Items_ID: {
+      orderitem_ID: {
         type: Sequelize.INTEGER,
       },
-      Payment_Method: {
+      payment_method: {
         type: Sequelize.STRING,
       },
-      Payment_Status: {
+      payment_status: {
         type: Sequelize.STRING,
       },
-      Amount: {
+      amount: {
         type: Sequelize.FLOAT,
       },
-      Paid: {
+      paid: {
         type: Sequelize.BOOLEAN,
       },
-      Transaction_ID: {
+      transaction_ID: {
         type: Sequelize.STRING,
       },
       createdAt: {
