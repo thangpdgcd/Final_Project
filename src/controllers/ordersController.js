@@ -3,10 +3,17 @@ import ordersService from "../service/ordersService.js";
 
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await ordersService.getAllOrders();
-    res.render("orders", { orders }); // nếu dùng EJS
+    let { user_ID, status } = req.query;
+    if (user_ID || status) {
+      let result = await ordersService.searchOrders({ user_ID, status });
+      return res.status(200).json(result);
+    } else {
+      return res.status(400).json({ message: "Thiếu tham số tìm kiếm" });
+    }
+
+    // return res.render("products", { products }); // nếu dùng EJS
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
