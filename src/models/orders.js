@@ -5,8 +5,8 @@ export default (sequelize, DataTypes) => {
     static associate(models) {
       // Mỗi đơn hàng thuộc về một người dùng
       Orders.belongsTo(models.Users, {
-        foreignKey: "User_ID",
-        targetKey: "Users_ID", // vì Users có khóa chính là Users_ID
+        foreignKey: "user_ID",
+        targetKey: "user_ID", // vì Users có khóa chính là Users_ID
         as: "users",
       });
     }
@@ -14,24 +14,24 @@ export default (sequelize, DataTypes) => {
 
   Orders.init(
     {
-      Orders_ID: {
+      order_ID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      User_ID: {
+      user_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      Total_Amount: {
+      total_Amount: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
       },
-      Status: {
+      status: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      Shipping_Address: {
+      shipping_Address: {
         type: DataTypes.STRING,
         allowNull: true,
       },
