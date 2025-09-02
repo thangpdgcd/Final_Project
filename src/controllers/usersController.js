@@ -31,10 +31,10 @@ let getOneUsers = async (req, res) => {
 };
 
 // Tạo người dùng mới
-let createUsers = async (req, res) => {
+let createAdmin = async (req, res) => {
   try {
     let data = req.body;
-    let newUsers = await usersService.createUsers(data);
+    let newUsers = await usersService.createAdmin(data);
     res.status(201).json(newUsers);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -67,7 +67,7 @@ let deleteUsers = async (req, res) => {
 export default {
   getAllUsers,
   getOneUsers,
-  createUsers,
+  createAdmin,
   updateUsers,
   deleteUsers,
 };
