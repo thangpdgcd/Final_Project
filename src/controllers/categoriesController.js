@@ -2,10 +2,17 @@ import CategoriesService from "../service/categoriesService.js";
 // Lấy tất cả danh mục
 let getAllCategories = async (req, res) => {
   try {
-    let categories = await CategoriesService.getAllCategories();
-    res.render("categories", { title: "Categories list", categories });
+    let { name } = req.query;
+    if (name) {
+      let result = await Categories.searchCart(name);
+      return res.status(200).json(result); // nếu chỉ muốn API JSON
+    }
+    let cart = await Categories.getAllCategories();
+
+    return res.status(200).json(cart); // nếu chỉ muốn API JSON
+    // return res.render("products", { products }); // nếu dùng EJS
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
