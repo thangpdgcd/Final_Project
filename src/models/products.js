@@ -4,49 +4,49 @@ export default (sequelize) => {
   class Products extends Model {
     static associate(models) {
       Products.belongsTo(models.Users, {
-        foreignKey: "Users_ID",
+        foreignKey: "user_ID",
         as: "users",
       });
 
       Products.belongsTo(models.Categories, {
-        foreignKey: "Categories_ID",
-        targetKey: "Categories_ID",
+        foreignKey: "categories_ID",
+        targetKey: "categories_ID",
         as: "categories",
       });
     }
   }
   Products.init(
     {
-      Products_ID: {
+      product_ID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      Name: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      Description: {
+      description: {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      Price: {
+      price: {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
-      Stock: {
+      stock: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      Image: {
+      image: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      Users_ID: {
+      user_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      Categories_ID: {
+      categories_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
