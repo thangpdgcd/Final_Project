@@ -1,13 +1,18 @@
 import productsService from "../service/productsService.js";
 
 // Lấy tất cả sản phẩm
-const getAllProducts = async (req, res) => {
+let getAllProducts = async (req, res) => {
   try {
-    const products = await productsService.getAllProducts();
-    res.render("products", { products }); // nếu dùng EJS
-    // res.status(200).json(products); // nếu dùng API JSON
+    let { name } = req.query;
+    if (name) {
+      let result = await productsService.searchProducts(name);
+      return res.status(200).json(result); // nếu chỉ muốn API JSON
+    }
+    let products = await productsService.getAllProducts();
+    return res.status(200).json(products); // nếu chỉ muốn API JSON
+    // return res.render("products", { products }); // nếu dùng EJS
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
