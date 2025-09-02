@@ -5,15 +5,15 @@ export default (sequelize) => {
     static associate(models) {
       // Mỗi Cart_Item thuộc về một Cart
       Cart_Items.belongsTo(models.Carts, {
-        foreignKey: "Carts_ID",
-        targetKey: "Carts_ID",
+        foreignKey: "cart_ID",
+        targetKey: "cart_ID",
         as: "carts",
       });
 
       // Mỗi Cart_Item thuộc về một Product
       Cart_Items.belongsTo(models.Products, {
-        foreignKey: "Products_ID",
-        targetKey: "Products_ID",
+        foreignKey: "product_ID",
+        targetKey: "product_ID",
         as: "products",
       });
     }
@@ -21,25 +21,25 @@ export default (sequelize) => {
 
   Cart_Items.init(
     {
-      Cart_Items_ID: {
+      cartitem_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
-      Carts_ID: {
+      cart_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      Products_ID: {
+      product_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      Quantity: {
+      quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      Price_At_Added: {
+      price_at_added: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
       },
