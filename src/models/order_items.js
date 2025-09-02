@@ -5,15 +5,15 @@ export default (sequelize) => {
     static associate(models) {
       // Liên kết với bảng Orders
       Order_Items.belongsTo(models.Orders, {
-        foreignKey: "Orders_ID",
-        targetKey: "Orders_ID",
+        foreignKey: "order_ID",
+        targetKey: "order_ID",
         as: "orders",
       });
 
       // Liên kết với bảng Products
       Order_Items.belongsTo(models.Products, {
-        foreignKey: "Products_ID",
-        targetKey: "Products_ID", // đúng tên khóa chính của bảng Products
+        foreignKey: "product_ID",
+        targetKey: "product_ID", // đúng tên khóa chính của bảng Products
         as: "products",
       });
     }
@@ -21,25 +21,25 @@ export default (sequelize) => {
 
   Order_Items.init(
     {
-      Order_Items_ID: {
+      orderitem_ID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
       },
-      Orders_ID: {
+      order_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      Products_ID: {
+      product_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      Quantity: {
+      quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      Price: {
+      price: {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
