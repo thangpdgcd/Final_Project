@@ -3,15 +3,17 @@ let cartItemsController = {
   // GET /api/cart-items
   async getAllCartItems(req, res) {
     try {
-      const cartItems = await cartItemService.getAllCartItems();
-      return res.render("cartItems", {
-        cartItems, // ✅ Đảm bảo bạn truyền biến này vào view
-      });
+      let { name } = req.query;
+      if (name) {
+        let result = await cartItemService.searchCartItems(name);
+        return res.status(200).json(result); // nếu chỉ muốn API JSON
+      }
+      let cartItem = await cartItemService.getAllCartItems();
+
+      return res.status(200).json(cartItem); // nếu chỉ muốn API JSON
+      // return res.render("products", { products }); // nếu dùng EJS
     } catch (error) {
-      res.status(500).json({
-        message: "Failed to retrieve cart items",
-        error: error.message,
-      });
+      return res.status(500).json({ message: error.message });
     }
   },
 
