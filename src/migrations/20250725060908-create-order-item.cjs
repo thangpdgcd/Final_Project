@@ -4,27 +4,27 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("Order_Items", {
-      Order_Items_ID: {
+      orderitem_ID: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
-      Orders_ID: {
+      order_ID: {
         type: Sequelize.INTEGER,
         allowNull: false,
         // Không khai báo foreign key
       },
-      Products_ID: {
+      product_ID: {
         type: Sequelize.INTEGER,
         allowNull: false,
         // Không khai báo foreign key
       },
-      Quantity: {
+      quantity: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      Price: {
+      price: {
         type: Sequelize.FLOAT,
         allowNull: false,
       },
