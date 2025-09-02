@@ -32,9 +32,8 @@ module.exports = {
         allowNull: false,
       },
       roleID: {
-        type: Sequelize.STRING("1", "2", "3"), // ✅ nên dùng "user" (số ít) cho đồng bộ
+        type: Sequelize.STRING, // ✅ nên dùng "user" (số ít) cho đồng bộ
         allowNull: false,
-        defaultValue: "1",
       },
       createdAt: {
         allowNull: false,
