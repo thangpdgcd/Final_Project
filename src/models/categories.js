@@ -7,16 +7,16 @@ export default (sequelize) => {
 
   Categories.init(
     {
-      Categories_ID: {
+      categories_ID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      Name: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      Description: {
+      description: {
         type: DataTypes.STRING,
         allowNull: true,
       },
