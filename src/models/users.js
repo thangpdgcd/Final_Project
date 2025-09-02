@@ -1,35 +1,39 @@
+// models/users.js
 import { Model, DataTypes } from "sequelize";
 
-export default (sequelize, DataTypes) => {
+export default (sequelize) => {
   class Users extends Model {
     static associate(models) {
-      // define association here
+      // Define associations here
     }
   }
 
   Users.init(
     {
-      Users_ID: {
+      user_ID: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      Name: {
+      name: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
-      Email: {
+      email: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
       },
-      Address: {
+      address: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      PhoneNumber: {
+      phoneNumber: {
         type: DataTypes.STRING,
-        allowNull: true,
+      },
+      password: {
+        type: DataTypes.STRING,
+      },
+      roleID: {
+        type: DataTypes.STRING, // "1" for user, "2" for admin, "3" for manager
+        allowNull: false,
       },
     },
     {
