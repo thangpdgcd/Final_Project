@@ -7,12 +7,10 @@ let createOrderItem = (data) => {
     try {
       const { Orders_ID, Products_ID, Quantity, Price } = data;
 
-      // Kiểm tra dữ liệu bắt buộc
       if (!Orders_ID || !Products_ID || !Quantity || !Price) {
-        return reject(new Error("Thiếu dữ liệu bắt buộc để tạo Order_Item."));
+        return reject(new Error("Missing required data to create Order_Item."));
       }
 
-      // Tạo Order_Item
       const orderItem = await Order_Items.create({
         Orders_ID,
         Products_ID,
@@ -22,7 +20,7 @@ let createOrderItem = (data) => {
 
       resolve(orderItem);
     } catch (error) {
-      reject(new Error("Không thể tạo Order_Item: " + error.message));
+      reject(new Error("Unable to create Order_Item: " + error.message));
     }
   });
 };
@@ -37,7 +35,7 @@ let getAllOrderItems = async () => {
     });
     return items;
   } catch (error) {
-    throw new Error("Không thể lấy danh sách Order_Items: " + error.message);
+    throw new Error("Unable to retrieve Order_Items list: " + error.message);
   }
 };
 
@@ -50,11 +48,11 @@ let getOrderItemById = async (id) => {
       ],
     });
     if (!item) {
-      throw new Error("Không tìm thấy Order_Item");
+      throw new Error("Order_Item not found");
     }
     return item;
   } catch (error) {
-    throw new Error("Lỗi khi lấy Order_Item: " + error.message);
+    throw new Error("Error retrieving Order_Item: " + error.message);
   }
 };
 
@@ -62,12 +60,12 @@ let updateOrderItem = async (id, data) => {
   try {
     let item = await Order_Items.findByPk(id);
     if (!item) {
-      throw new Error("Order_Item không tồn tại");
+      throw new Error("Order_Item does not exist");
     }
     let updatedItem = await item.update(data);
     return updatedItem;
   } catch (error) {
-    throw new Error("Không thể cập nhật Order_Item: " + error.message);
+    throw new Error("Unable to update Order_Item: " + error.message);
   }
 };
 
@@ -75,19 +73,34 @@ let deleteOrderItem = async (id) => {
   try {
     let item = await Order_Items.findByPk(id);
     if (!item) {
-      throw new Error("Order_Item không tồn tại");
+      throw new Error("Order_Item does not exist");
     }
     await item.destroy();
-    return { message: "Đã xóa thành công" };
+    return { message: "Deleted successfully" };
   } catch (error) {
-    throw new Error("Không thể xóa Order_Item: " + error.message);
+    throw new Error("Unable to delete Order_Item: " + error.message);
   }
 };
 
+let searchOrderItem = (name) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let orderItem = await Order_Items.findAll({
+        where: {
+          name: name,
+        },
+      });
+      resolve(orderItem);
+    } catch (error) {
+      reject(new Error("Unable to search user: " + error.message));
+    }
+  });
+};
 export default {
   createOrderItem,
   getAllOrderItems,
   getOrderItemById,
   updateOrderItem,
   deleteOrderItem,
+  searchOrderItem,
 };
