@@ -22,13 +22,13 @@
         <% if (payments && payments.length > 0) { %> <%
         payments.forEach(function(payment) { %>
         <tr>
-          <td><%= payment.Payments_ID %></td>
-          <td><%= payment.Order_Items_ID %></td>
-          <td><%= payment.Payments_Method %></td>
-          <td><%= payment.Payments_Status %></td>
-          <td><%= payment.Amount %></td>
-          <td><%= payment.Paid ? "Có" : "Không" %></td>
-          <td><%= payment.Transaction_ID %></td>
+          <td><%= payment.payment_ID %></td>
+          <td><%= payment.orderitem_ID %></td>
+          <td><%= payment.payments_method %></td>
+          <td><%= payment.payments_status %></td>
+          <td><%= payment.amount %></td>
+          <td><%= payment.paid ? "Có" : "Không" %></td>
+          <td><%= payment.transaction_ID %></td>
         </tr>
         <% }) %> <% } else { %>
         <tr>
