@@ -12,7 +12,7 @@
       <h1><%= isUpdate ? "Cập nhật danh mục" : "Thêm danh mục mới" %></h1>
 
       <form
-        action="<%= isUpdate ? `/categories/update/${Categories.Categories_ID}` : '/categories/create' %>"
+        action="<%= isUpdate ? `/categories/update/${Categories.categories_ID}` : '/categories/create' %>"
         method="POST">
         <div class="form-group">
           <label for="Name">Tên danh mục:</label>
