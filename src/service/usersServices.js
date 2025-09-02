@@ -1,48 +1,47 @@
 import db from "../models/index.js";
 let { Users } = db;
 import bcrypt from "bcrypt";
-// Lấy tất cả người dùng
+
 let getAllUsers = () => {
   return new Promise(async (resolve, reject) => {
     try {
       let usersList = await Users.findAll();
       resolve(usersList);
     } catch (error) {
-      reject(new Error("Không thể lấy danh sách người dùng: " + error.message));
+      reject(new Error("Unable to retrieve user list: " + error.message));
     }
   });
 };
 
-// Lấy 1 người dùng theo ID
 let getUsersById = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       let user = await Users.findByPk(id);
-      if (!user) return reject(new Error("Người dùng không tồn tại"));
+      if (!user) return reject(new Error("User does not exist"));
       resolve(user);
     } catch (error) {
-      reject(new Error("Không thể lấy thông tin người dùng: " + error.message));
+      reject(
+        new Error("Unable to retrieve user information: " + error.message)
+      );
     }
   });
 };
 
-// Tạo người dùng mới
-let createUsers = (data) => {
+let createAdmin = (data) => {
   return new Promise(async (resolve, reject) => {
-    let { name, email, address, phoneNumber, password } = data;
+    let { name, email, address, phoneNumber, password, roleID } = data;
 
     if (!email || !address || !password) {
-      return reject(new Error("Thiếu thông tin bắt buộc"));
+      return reject(new Error("Missing required information"));
     }
 
     try {
       let existingEmail = await Users.findOne({ where: { email } });
-      if (existingEmail) return reject(new Error("Email đã tồn tại."));
+      if (existingEmail) return reject(new Error("Email already exists."));
 
       let existingAddress = await Users.findOne({ where: { address } });
-      if (existingAddress) return reject(new Error("Địa chỉ đã tồn tại."));
+      if (existingAddress) return reject(new Error("Address already exists."));
 
-      // Mã hoá password
       const hashedPassword = await bcrypt.hash(password, 10);
 
       let newUser = await Users.create({
@@ -51,57 +50,56 @@ let createUsers = (data) => {
         address,
         phoneNumber,
         password: hashedPassword,
-        roleID,
+        roleID: roleID || 3,
       });
 
       resolve(newUser);
     } catch (error) {
-      reject(new Error("Không thể tạo người dùng: " + error.message));
+      reject(new Error("Unable to create user: " + error.message));
     }
   });
 };
 
-// Cập nhật người dùng
 let updateUsers = (id, data) => {
   return new Promise(async (resolve, reject) => {
     try {
       let user = await Users.findByPk(id);
-      if (!user) return reject(new Error("Người dùng không tồn tại"));
+      if (!user) return reject(new Error("User does not exist"));
 
       await user.update(data);
       resolve(user);
     } catch (error) {
-      reject(new Error("Không thể cập nhật người dùng: " + error.message));
+      reject(new Error("Unable to update user: " + error.message));
     }
   });
 };
 
-// Xoá người dùng
 let deleteUsers = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       let user = await Users.findByPk(id);
-      if (!user) return reject(new Error("Người dùng không tồn tại"));
+      if (!user) return reject(new Error("User does not exist"));
 
       await user.destroy();
-      resolve(); // hoặc resolve({ message: "Xoá thành công" })
+      resolve();
     } catch (error) {
-      reject(new Error("Không thể xoá người dùng: " + error.message));
+      reject(new Error("Unable to delete user: " + error.message));
     }
   });
 };
+
 let searchUsers = (name) => {
   return new Promise(async (resolve, reject) => {
     try {
       let users = await Users.findAll({
         where: {
           name: name,
-        }, // so sánh chính xác
+        },
       });
 
       resolve(users);
     } catch (error) {
-      reject(new Error("Không thể tìm kiếm người dùng: " + error.message));
+      reject(new Error("Unable to search user: " + error.message));
     }
   });
 };
@@ -109,7 +107,7 @@ let searchUsers = (name) => {
 export default {
   getAllUsers,
   getUsersById,
-  createUsers,
+  createAdmin,
   updateUsers,
   deleteUsers,
   searchUsers,
