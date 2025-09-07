@@ -1,14 +1,22 @@
 import React from "react";
 import logo from "./logo.svg";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-import LoginPage from "./components/login/login";
+import LoginPage from "./components/login";
+import HomePage from "./pages/customers/homes";
 
-function App() {
+const App = () => {
   return (
-    <div className='App'>
-      <LoginPage />
-    </div>
+    <Router>
+      <Routes>
+        {/* Trang Home */}
+        <Route path='/' element={<HomePage />} />
+
+        {/* Trang Login */}
+        <Route path='/login' element={<LoginPage />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;

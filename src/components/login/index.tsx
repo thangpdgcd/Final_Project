@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Layout, Form, Input, Button, Checkbox, message } from "antd";
 import { login, LoginPayload, LoginResponse } from "../../api/authApi";
+import { useNavigate } from "react-router-dom"; // ✅ import thêm
 
 const { Header, Content, Footer } = Layout;
 
@@ -10,6 +11,7 @@ interface LoginFormValues extends LoginPayload {
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate(); // ✅ khai báo hook navigate
 
   const onFinish = async (values: LoginFormValues) => {
     setLoading(true);
@@ -23,7 +25,8 @@ const LoginPage: React.FC = () => {
       localStorage.setItem("token", data.token);
 
       message.success("✅ Đăng nhập thành công!");
-      // redirect nếu cần, ví dụ: navigate("/dashboard");
+      // Ví dụ sau khi login thành công thì chuyển về home:
+      navigate("/");
     } catch (err: any) {
       console.error("Lỗi đăng nhập:", err.message);
       message.error(`❌ Đăng nhập thất bại: ${err.message}`);
@@ -38,7 +41,19 @@ const LoginPage: React.FC = () => {
 
   return (
     <Layout className='login-layout'>
-      <Header className='login-header'>My App</Header>
+      <Header className='login-header'>
+        <div
+          onClick={() => navigate("/")} // ✅ click logo -> về home
+          style={{
+            color: "white",
+            fontSize: 20,
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}>
+          MyApp
+        </div>
+      </Header>
+
       <Content className='login-content'>
         <div className='login-form-container'>
           <h2 className='login-title'>Đăng nhập</h2>
@@ -80,6 +95,7 @@ const LoginPage: React.FC = () => {
           </Form>
         </div>
       </Content>
+
       <Footer className='login-footer'>© 2025 My App</Footer>
     </Layout>
   );
