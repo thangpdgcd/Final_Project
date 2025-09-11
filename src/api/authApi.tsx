@@ -1,8 +1,4 @@
 import axios from "axios";
-
-// =======================
-// Login
-// =======================
 export interface LoginPayload {
   email: string;
   password: string;
@@ -21,7 +17,6 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
     );
     return res.data;
   } catch (err: any) {
-    // Nếu server trả lỗi, err.response.data.message có thể có thông báo
     const msg =
       (err.response && err.response.data && err.response.data.message) ||
       "Lỗi đăng nhập";
@@ -29,17 +24,18 @@ export async function login(payload: LoginPayload): Promise<LoginResponse> {
   }
 }
 
-// =======================
-// Register
-// =======================
 export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
+  address?: string; // optional
+  phoneNumber?: string; // optional
+  roleID?: string; // optional, mặc định "1"
 }
 
 export interface RegisterResponse {
   message: string;
+  user?: any; // nếu backend trả về user object
 }
 
 export async function register(

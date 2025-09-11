@@ -1,8 +1,17 @@
 import axios from "axios";
+const apilogin = process.env.API_URL_LOGIN;
+const apiregister = process.env.API_URL_REGISTER;
 
-const API_URL_LOGIN = "http://localhost:8080/api/login"; // BE chạy ở cổng 8080
 
-export const getHello = async () => {
-  const res = await axios.get(`${API_URL_LOGIN}/hello`);
+// BE chạy ở cổng 8080
+
+export const apiLogin = async () => {
+  const res = await axios.get(`${apilogin}/hello`);
   return res.data;
 };
+
+export const apiRegister = async () => {
+  const res = await axios.get(`${apiregister}/hello`);
+  return res.data;
+};
+
