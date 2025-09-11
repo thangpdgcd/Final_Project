@@ -16,6 +16,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 import cors from "cors";
 import bodyParser from "body-parser";
+
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -29,7 +30,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(
   cors({
-    origin: "http://localhost:5000", // FE đang chạy port 5000
+    origin: "http://localhost:3000", // FE đang chạy port 5000
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -45,6 +46,7 @@ initProductsRoutes(app); // nếu có định tuyến sản phẩm
 initCategoriesRoutes(app); // nếu có định tuyến danh mục
 initOrdersRoutes(app); // nếu có định tuyến đơn hàng
 initOrderItemsRoutes(app); // nếu có định tuyến đơn hàng
+
 initCartRoutes(app); // nếu có định tuyến giỏ hàng
 initCartItemRoutes(app);
 initAuthenticated(app); // Khởi tạo các route đã xác thực
