@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { Layout, Form, Input, Button, Checkbox, message } from "antd";
+import {
+  Layout,
+  Form,
+  Input,
+  Button,
+  Checkbox,
+  message,
+  Menu,
+  Dropdown,
+} from "antd";
 import { register, RegisterPayload, RegisterResponse } from "../../api/authApi";
 import { useNavigate } from "react-router-dom";
+import { DownOutlined } from "@ant-design/icons";
+import logo from "../../../src/assets/img/logo_PhanCoffee.jpg";
+import "./index.scss";
 
 const { Header, Content, Footer } = Layout;
 
@@ -14,6 +26,7 @@ const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  // 🔹 Xử lý submit form
   const onFinish = async (values: RegisterFormValues) => {
     setLoading(true);
     try {
@@ -23,39 +36,66 @@ const RegisterPage: React.FC = () => {
         address: values.address,
         phoneNumber: values.phoneNumber,
         password: values.password,
-        roleID: "1",
+        roleID: "1", // giả sử mặc định role là user
       };
 
       const data: RegisterResponse = await register(payload);
-      console.log("checkdata------", data);
-      message.success("✅ login successfully! Please, Can You Login.");
+      console.log("✅ Register success:", data);
+
+      message.success("✅ Đăng ký thành công! Vui lòng đăng nhập.");
       navigate("/login");
     } catch (err: any) {
       console.error("❌ Error Sign Up:", err.message);
-      message.error(`❌ Sign Up Fail: ${err.message}`);
+      message.error("❌ Đăng ký thất bại. Vui lòng thử lại!");
     } finally {
       setLoading(false);
     }
   };
 
+  // 🔹 Dropdown menu
+  const menu = (
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: <span onClick={() => navigate("/login")}>Sign In</span>,
+        },
+        {
+          key: "2",
+          label: <span onClick={() => navigate("/register")}>Sign Up</span>,
+        },
+      ]}
+    />
+  );
+
   return (
     <Layout className='register-layout'>
-      <Header className='register-header'>
-        <div
-          onClick={() => navigate("/")}
-          style={{
-            color: "white",
-            fontSize: 20,
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}>
-          MyApp
+      {/* HEADER */}
+      <Header className='homepage__header'>
+        <div className='homepage__logo' onClick={() => navigate("/")}>
+          <img src={logo} alt='Phan Coffee' />
+          <span className='icon'>Phan Coffee</span>
         </div>
+
+        <Menu
+          mode='horizontal'
+          overflowedIndicator={false}
+          items={[{ key: "home", label: "Home" }]}
+          onClick={(e) => e.key === "home" && navigate("/")}
+        />
+
+        <Dropdown overlay={menu} trigger={["click"]}>
+          <Button>
+            User <DownOutlined />
+          </Button>
+        </Dropdown>
       </Header>
 
+      {/* CONTENT */}
       <Content className='register-content'>
         <div className='register-form-container'>
           <h2 className='register-title'>Đăng ký tài khoản</h2>
+
           <Form<RegisterFormValues>
             name='register'
             labelCol={{ span: 8 }}
@@ -148,7 +188,10 @@ const RegisterPage: React.FC = () => {
         </div>
       </Content>
 
-      <Footer className='register-footer'>© 2025 My App</Footer>
+      {/* FOOTER */}
+      <Footer className='register-footer'>
+        © {new Date().getFullYear()} Phan Coffee. All Rights Reserved.
+      </Footer>
     </Layout>
   );
 };

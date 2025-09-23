@@ -1,7 +1,20 @@
 import React, { useState } from "react";
-import { Layout, Form, Input, Button, Checkbox, message } from "antd";
-import { login, LoginPayload, LoginResponse } from "../../api/authApi";
-import { useNavigate } from "react-router-dom"; // ✅ import thêm
+import {
+  Layout,
+  Form,
+  Input,
+  Button,
+  Checkbox,
+  message,
+  Menu,
+  Dropdown,
+} from "antd";
+import { DownOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { login, LoginPayload, LoginResponse } from "../../api/authApi"; // ✅ đổi apiLogin -> login
+
+import logo from "../../../src/assets/img/logo_PhanCoffee.jpg";
+import "./index.scss";
 
 const { Header, Content, Footer } = Layout;
 
@@ -10,8 +23,8 @@ interface LoginFormValues extends LoginPayload {
 }
 
 const LoginPage: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate(); // ✅ khai báo hook navigate
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const onFinish = async (values: LoginFormValues) => {
     setLoading(true);
@@ -21,42 +34,68 @@ const LoginPage: React.FC = () => {
         password: values.password,
       };
 
-      const data: LoginResponse = await login(payload);
+      const data: LoginResponse = await login(payload); // ✅ dùng login POST
       localStorage.setItem("token", data.token);
 
       message.success("✅ Đăng nhập thành công!");
-      // Ví dụ sau khi login thành công thì chuyển về home:
       navigate("/");
     } catch (err: any) {
       console.error("Lỗi đăng nhập:", err.message);
-      message.error(`❌ Đăng nhập thất bại: ${err.message}`);
+      message.error("❌ Đăng nhập thất bại. Vui lòng kiểm tra email/mật khẩu!");
     } finally {
       setLoading(false);
     }
   };
 
   const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
+    console.log("Form submit failed:", errorInfo);
   };
+
+  const menu = (
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: <span onClick={() => navigate("/login")}>Sign In</span>,
+        },
+        {
+          key: "2",
+          label: <span onClick={() => navigate("/register")}>Sign Up</span>,
+        },
+      ]}
+    />
+  );
 
   return (
     <Layout className='login-layout'>
-      <Header className='login-header'>
-        <div
-          onClick={() => navigate("/")} // ✅ click logo -> về home
-          style={{
-            color: "white",
-            fontSize: 20,
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}>
-          MyApp
+      {/* HEADER */}
+      <Header className='homepage__header'>
+        <div className='header-left'>
+          <div className='homepage__logo' onClick={() => navigate("/")}>
+            <img src={logo} alt='Phan Coffee' />
+            <span className='icon'>Phan Coffee</span>
+          </div>
+
+          <Menu
+            mode='horizontal'
+            overflowedIndicator={false}
+            items={[{ key: "home", label: "Home" }]}
+            onClick={(e) => e.key === "home" && navigate("/")}
+          />
         </div>
+
+        <Dropdown overlay={menu} trigger={["click"]}>
+          <Button>
+            User <DownOutlined />
+          </Button>
+        </Dropdown>
       </Header>
 
+      {/* CONTENT */}
       <Content className='login-content'>
         <div className='login-form-container'>
           <h2 className='login-title'>Đăng nhập</h2>
+
           <Form<LoginFormValues>
             name='login'
             labelCol={{ span: 8 }}
@@ -69,7 +108,10 @@ const LoginPage: React.FC = () => {
             <Form.Item
               label='Email'
               name='email'
-              rules={[{ required: true, message: "Vui lòng nhập email!" }]}>
+              rules={[
+                { required: true, message: "Vui lòng nhập email!" },
+                { type: "email", message: "Email không hợp lệ!" },
+              ]}>
               <Input />
             </Form.Item>
 
@@ -91,12 +133,21 @@ const LoginPage: React.FC = () => {
               <Button type='primary' htmlType='submit' loading={loading}>
                 Đăng nhập
               </Button>
+              <Button
+                type='link'
+                onClick={() => navigate("/register")}
+                style={{ marginLeft: 8 }}>
+                Chưa có tài khoản? Đăng ký
+              </Button>
             </Form.Item>
           </Form>
         </div>
       </Content>
 
-      <Footer className='login-footer'>© 2025 My App</Footer>
+      {/* FOOTER */}
+      <Footer className='login-footer'>
+        © {new Date().getFullYear()} Phan Coffee. All Rights Reserved.
+      </Footer>
     </Layout>
   );
 };

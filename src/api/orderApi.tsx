@@ -1,5 +1,8 @@
 import axios from "axios";
 
+const apiorder =
+  process.env.REACT_APP_API_URL_ORDER || "http://localhost:8080/api/orders";
+
 export interface Order {
   order_ID: number;
   user_ID: number;
@@ -7,73 +10,39 @@ export interface Order {
   status?: string;
   shipping_Address?: string;
   createdAt?: string;
-  updatedAt?: string;
 }
 
-export interface CreateOrderPayload {
-  user_ID: number;
-  total_Amount: number;
-  status?: string;
-  shipping_Address?: string;
-}
-
-export interface UpdateOrderPayload extends Partial<CreateOrderPayload> {
-  order_ID: number;
-}
-
-export interface ApiResponse<T> {
-  message: string;
-  data?: T;
-}
-
-// Lấy tất cả đơn hàng
-export async function getAllOrders(): Promise<Order[]> {
-  const res = await axios.get<Order[]>("http://localhost:8080/api/orders");
+// ✅ Lấy tất cả đơn hàng (GET)
+export const getAllOrders = async (): Promise<Order[]> => {
+  const res = await axios.get<Order[]>(apiorder);
+  console.log(res.data);
   return res.data;
-}
+};
 
-// Lấy đơn hàng theo ID
-export async function getOrderById(id: number): Promise<Order> {
-  const res = await axios.get<Order>(`http://localhost:8080/api/orders/${id}`);
+// ✅ Lấy đơn hàng theo ID
+export const getOrderById = async (orderId: number): Promise<Order> => {
+  const res = await axios.get(apiorder, {
+    params: { orderId },
+  });
   return res.data;
-}
+};
 
-// Lấy tất cả đơn hàng của 1 user
-export async function getOrdersByUser(userId: number): Promise<Order[]> {
-  const res = await axios.get<Order[]>(
-    `http://localhost:8080/api/orders/user/${userId}`
-  );
+// ✅ Tạo đơn hàng mới (POST)
+export const createOrder = async (payload: Order): Promise<Order> => {
+  const res = await axios.post<Order>(apiorder, payload);
   return res.data;
-}
+};
 
-// Tạo đơn hàng mới
-export async function createOrder(
-  payload: CreateOrderPayload
-): Promise<ApiResponse<Order>> {
-  const res = await axios.post<ApiResponse<Order>>(
-    "http://localhost:8080/api/orders",
-    payload,
-    { headers: { "Content-Type": "application/json" } }
-  );
+// ✅ Cập nhật đơn hàng (PUT)
+export const updateOrder = async (
+  id: number,
+  payload: Partial<Order>
+): Promise<Order> => {
+  const res = await axios.put<Order>(`${apiorder}/${id}`, payload);
   return res.data;
-}
+};
 
-// Cập nhật đơn hàng
-export async function updateOrder(
-  payload: UpdateOrderPayload
-): Promise<ApiResponse<Order>> {
-  const res = await axios.put<ApiResponse<Order>>(
-    `http://localhost:8080/api/orders/${payload.order_ID}`,
-    payload,
-    { headers: { "Content-Type": "application/json" } }
-  );
-  return res.data;
-}
-
-// Xóa đơn hàng
-export async function deleteOrder(id: number): Promise<ApiResponse<null>> {
-  const res = await axios.delete<ApiResponse<null>>(
-    `http://localhost:8080/api/orders/${id}`
-  );
-  return res.data;
-}
+// ✅ Xoá đơn hàng (DELETE)
+export const deleteOrder = async (id: number): Promise<void> => {
+  await axios.delete(`${apiorder}/${id}`);
+};

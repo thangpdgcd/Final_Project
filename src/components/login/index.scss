@@ -1,0 +1,92 @@
+.login-layout {
+  min-height: 100vh;
+
+  .homepage__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #5c3d2e;
+
+    .homepage__logo {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+
+      img {
+        height: 40px;
+        margin-right: 12px;
+        border-radius: 8px;
+      }
+
+      .icon {
+        color: #fff;
+        font-weight: bold;
+        font-size: 18px;
+      }
+    }
+
+    .header-menu {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .ant-menu {
+      background: transparent;
+      border-bottom: none;
+
+      .ant-menu-item {
+        color: #fff !important;
+        font-weight: 500;
+
+        &:hover {
+          color: #f5f0eb !important;
+        }
+      }
+    }
+
+    .user-btn {
+      background: #fff;
+      color: #5c3d2e;
+      border-radius: 6px;
+      font-weight: 500;
+
+      &:hover {
+        background: #f5f0eb;
+        color: #5c3d2e;
+      }
+    }
+  }
+
+  .login-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+
+    .login-form-container {
+      width: 500px;
+      padding: 32px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+      .login-title {
+        text-align: center;
+        margin-bottom: 24px;
+        color: #5c3d2e;
+      }
+
+      .ant-form-item-label {
+        font-weight: 500;
+      }
+    }
+  }
+
+  .login-footer {
+    text-align: center;
+    background: #f5f0eb;
+    padding: 12px;
+    color: #5c3d2e;
+  }
+}

@@ -1,11 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import "./App.css";
+import "../src/styles/App.scss";
 import LoginPage from "./components/login";
 import HomePage from "./pages/customers/homes";
 import RegisterPage from "./components/register";
 import ProductList from "./pages/customers/products";
 import OrderList from "./pages/customers/orders";
-import Profile from "./pages/customers/profiles";
+import Userprofile from "./pages/customers/profiles";
+import About from "./pages/customers/abouts";
 const App = () => {
   return (
     <Router>
@@ -21,8 +22,11 @@ const App = () => {
         <Route path='/products' element={<ProductList />} />
         {/* Trang Orders */}
         <Route path='/orders' element={<OrderList />} />
+        <Route path='/profiles/:userid' element={<Userprofile />} />
 
-        <Route path='/profiles/:id' element={<Profile />} />
+        <Route path='/about' element={<About />} />
+
+        <Route path='/categories' element={<About />} />
       </Routes>
     </Router>
   );

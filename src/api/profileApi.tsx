@@ -1,5 +1,8 @@
 import axios from "axios";
 
+const apiprofile =
+  process.env.REACT_APP_API_URL || "http://localhost:8080/api/users/:id"; // ✅ CRA dùng process.env
+
 export interface UserProfile {
   user_ID: number;
   name: string;
@@ -8,9 +11,7 @@ export interface UserProfile {
   phoneNumber: string;
 }
 
-export const getUserById = async (id: string): Promise<UserProfile> => {
-  const res = await axios.get<UserProfile>(
-    `http://localhost:8080/api/users/${id}`
-  );
+export const apiProfile = async (id: string) => {
+  const res = await axios.get<UserProfile>(`${apiprofile}/users/${id}`);
   return res.data;
 };
