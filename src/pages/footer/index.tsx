@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import "./index.scss";
 import logofooter from "../../assets/img/logo_PhanCoffee.jpg";
+import { Link } from "react-router-dom";
 
 const { Footer } = Layout;
 const { Title } = Typography;
@@ -40,16 +41,40 @@ const FooterPage: React.FC = () => {
           </Title>
           <ul className='footer-links'>
             <li>
-              <a href='#'>Truyền Thông</a>
+              <Link
+                to={{
+                  pathname: "/some/path",
+                  search: "?query=string",
+                  hash: "#hash",
+                }}
+              />
             </li>
             <li>
-              <a href='#'>Cơ Hội Nghề Nghiệp</a>
+              <Link
+                to={{
+                  pathname: "/some/path",
+                  search: "?query=string",
+                  hash: "#hash",
+                }}
+              />
             </li>
             <li>
-              <a href='#'>Chính Sách Bảo Mật</a>
+              <Link
+                to={{
+                  pathname: "/some/path",
+                  search: "?query=string",
+                  hash: "#hash",
+                }}
+              />
             </li>
             <li>
-              <a href='#'>Thông Tin Liên Hệ</a>
+              <Link
+                to={{
+                  pathname: "/some/path",
+                  search: "?query=string",
+                  hash: "#hash",
+                }}
+              />
             </li>
           </ul>
         </Col>

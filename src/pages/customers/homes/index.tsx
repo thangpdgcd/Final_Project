@@ -12,7 +12,7 @@ import BannerCarousel from "../../service";
 import Contact from "../../contact";
 import FooterPage from "../../footer";
 
-const { Header, Content, Footer } = Layout;
+const { Header, Content } = Layout;
 const { Meta } = Card;
 
 const HomePage: React.FC = () => {
