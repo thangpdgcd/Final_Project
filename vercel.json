@@ -7,5 +7,5 @@
       "config": { "distDir": "build" }
     }
   ],
-  "routes": [{ "src": "/(.*)", "dest": "my-app/build/$1" }]
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }
