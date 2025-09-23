@@ -1,0 +1,78 @@
+.app-footer {
+  background: #fff;
+  color: #000;
+  width: 100%;
+  padding: 40px 20px;
+
+  font-size: 14px;
+
+  .footer-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .footer-logo-img {
+      width: 100px;
+      margin-bottom: 12px;
+    }
+    .company-name {
+      font-weight: bold;
+      font-size: 16px;
+      margin: 8px 0;
+      color: #000;
+    }
+    p {
+      margin: 4px 0;
+      color: #333;
+    }
+  }
+
+  .footer-title {
+    color: #000;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-top: 80px;
+  }
+
+  .footer-links,
+  .social-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-height: 120px; // 👈 đảm bảo chiều cao bằng nhau
+
+    li {
+      margin-bottom: 8px;
+
+      a {
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: #000;
+        }
+      }
+    }
+  }
+
+  .social-links {
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      a {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+    }
+  }
+}
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; // 👈 các cột đều nhau
+}

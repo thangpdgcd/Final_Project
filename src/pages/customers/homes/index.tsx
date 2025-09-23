@@ -8,6 +8,9 @@ import bannerarabica from "../../../assets/img/arabicaphancofffee.png";
 import bannerhoney from "../../../assets/img/caphehoneyphancoffee.png";
 import "./index.scss";
 import aboutImage from "../../../assets/img/robustakontum.jpg";
+import BannerCarousel from "../../service";
+import Contact from "../../contact";
+import FooterPage from "../../footer";
 
 const { Header, Content, Footer } = Layout;
 const { Meta } = Card;
@@ -105,7 +108,7 @@ const HomePage: React.FC = () => {
               {" "}
               <Meta
                 title='ROBUSTA MĂNG ĐEN'
-                description='Cà phê MĂNG ĐEN BLEND Robusta & Arabica nguyên chất rang mộc đắng dịu thơm nồng pha phin, pha máy - Phan Coffee'
+                description='MANG DEN BLEND pure Robusta & Arabica roasted coffee, mild and aromatic, brewed with filter or machine - Phan Coffee'
               />
             </Card>
             <Card
@@ -183,12 +186,12 @@ const HomePage: React.FC = () => {
               <div className='about-text'>
                 <h2>ABOUT US</h2>
                 <p>
-                  Khi bạn cầm ly cà phê của Phan Coffee, bạn không chỉ nhận một
-                  sản phẩm – mà kèm theo đó là tâm huyết mà chúng mình đã gửi
-                  gắm vào đó. Cảm ơn những người đồng hành, những người đã chia
-                  sẻ và những lời đánh giá thật lòng từ bạn. Mỗi đánh giá là một
-                  viên gạch xây dựng niềm tin, là động lực để chúng mình tiếp
-                  tục phát triển. Have a nice day ❤️
+                  When you hold a cup of coffee from Phan Coffee, you not only
+                  receive a product - but also the passion that we have put into
+                  it. Thank you to our companions, those who have shared Please
+                  share and give us your real reviews. Each review is a member
+                  who builds trust, is the motivation for us to continue to
+                  develop. Have a nice day ❤️
                 </p>
                 <p>
                   ☕ PHAN COFFEE ROASTERS 📍 86 Lâm Tùng, xã Iachim, Kon Tum
@@ -209,12 +212,17 @@ const HomePage: React.FC = () => {
         {/* ===== GALLERY SECTION (THÊM MỚI) ===== */}
         <section className='gallery-section'>
           <div className='gallery-header'>
-            <h2>Our Gallery</h2>
+            <h2>Our Gallery Phan Coffee</h2>
             <p>
-              Lorem ipsum is simply dummy text of printing typesetting industry
-              lorem Ipsum the industry’s standard dummy text ever since the
-              1500s, when an unknown printer took a galley of type and scrambled
-              it to make a type specimen book.
+              The Central Highlands is known as one of the earliest coffee
+              growing regions in Vietnam. Here, the soil and climate are studied
+              to cultivate the most suitable coffee varieties. With ideal
+              altitude and fertile basalt soil, Central Highlands coffee creates
+              a difference in both flavor and productivity compared to other
+              growing regions. In particular, coffee trees are now also invested
+              in systematically, applying many advances in science and
+              technology, prioritizing organic care to achieve the best
+              productivity and quality.
             </p>
           </div>
 
@@ -234,12 +242,13 @@ const HomePage: React.FC = () => {
             </Button>
           </div>
         </section>
+        <BannerCarousel />
+        <Contact />
       </Content>
 
       {/* ===== FOOTER ===== */}
-      <Footer className='homepage__footer text-cyan-700 bg-amber-200'>
-        © {new Date().getFullYear()} CoffeeShop. All rights reserved.
-      </Footer>
+
+      <FooterPage />
     </Layout>
   );
 };

@@ -7,6 +7,7 @@ import ProductList from "./pages/customers/products";
 import OrderList from "./pages/customers/orders";
 import Userprofile from "./pages/customers/profiles";
 import About from "./pages/customers/abouts";
+import Contact from "./pages/contact";
 const App = () => {
   return (
     <Router>
@@ -27,6 +28,8 @@ const App = () => {
         <Route path='/about' element={<About />} />
 
         <Route path='/categories' element={<About />} />
+
+        <Route path='/contact' element={<Contact />} />
       </Routes>
     </Router>
   );

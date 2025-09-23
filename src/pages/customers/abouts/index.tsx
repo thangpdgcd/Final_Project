@@ -63,12 +63,12 @@ const About: React.FC = () => {
             <div className='about-text'>
               <h2>ABOUT US</h2>
               <p>
-                Khi bạn cầm ly cà phê của Phan Coffee, bạn không chỉ nhận một
-                sản phẩm – mà kèm theo đó là tâm huyết mà chúng mình đã gửi gắm
-                vào đó. Cảm ơn những người đồng hành, những người đã chia sẻ và
-                những lời đánh giá thật lòng từ bạn. Mỗi đánh giá là một viên
-                gạch xây dựng niềm tin, là động lực để chúng mình tiếp tục phát
-                triển. Have a nice day ❤️
+                When you hold a cup of coffee from Phan Coffee, you not only
+                receive a product - but also the passion that we have put into
+                it. Thank you to our companions, those who have shared Please
+                share and give us your real reviews. Each review is a member who
+                builds trust, is the motivation for us to continue to develop.
+                Have a nice day ❤️
               </p>
               <p>☕ PHAN COFFEE ROASTERS 📍 86 Lâm Tùng, xã Iachim, Kon Tum</p>
               <Button type='default' size='large' className='read-more'>
