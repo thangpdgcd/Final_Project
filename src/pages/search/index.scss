@@ -1,0 +1,35 @@
+.search-container {
+  max-width: 400px;
+  margin: 0 auto;
+  margin-top: 25px;
+  margin-left: 30px;
+
+  .ant-input-search {
+    .ant-input-group-addon {
+      background: transparent;
+      border: none;
+
+      .iconsearch {
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  .search-results {
+    margin-top: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+
+    .ant-list-item {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  }
+}

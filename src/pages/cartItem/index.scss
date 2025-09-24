@@ -1,0 +1,43 @@
+.cart-container {
+  padding: 24px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    margin-bottom: 16px;
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  .ant-table {
+    .ant-table-thead > tr > th {
+      background-color: #fafafa;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .ant-table-tbody > tr > td {
+      padding: 12px 8px;
+    }
+
+    .ant-input-number {
+      width: 80px;
+    }
+
+    .ant-btn-danger {
+      background-color: #ff4d4f;
+      border-color: #ff4d4f;
+      &:hover {
+        background-color: #d9363e;
+        border-color: #d9363e;
+      }
+    }
+  }
+
+  p {
+    margin-top: 16px;
+    font-size: 1rem;
+    color: #666;
+  }
+}

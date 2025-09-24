@@ -4,65 +4,60 @@ import axios from "axios";
 const apiBase = process.env.VITE_API_URL || "http://localhost:8080/api";
 
 /* --------- TYPES --------- */
-export interface Category {
-  category_ID: number;
-  name: string;
-  description?: string;
+export interface Cart {
+  cart_ID: number;
+  user_ID: number;
+  product_ID: number;
+  quantity: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface CreateCategoryPayload {
-  name: string;
-  description?: string;
+export interface CreateCartPayload {
+  user_ID: number;
+  product_ID: number;
+  quantity: number;
 }
 
-export interface UpdateCategoryPayload {
-  name?: string;
-  description?: string;
+export interface UpdateCartPayload {
+  quantity?: number;
 }
 
 /* --------- API FUNCTIONS --------- */
 
-// Lấy tất cả categories
-export async function getAllCategories(): Promise<Category[]> {
-  const res = await axios.get<Category[]>(`${apiBase}/categories`);
+// Lấy tất cả cart items
+export async function getAllCarts(): Promise<Cart[]> {
+  const res = await axios.get<Cart[]>(`${apiBase}/carts`);
   return res.data;
 }
 
-// Lấy category theo ID
-export async function getCategoryById(id: number): Promise<Category> {
-  const res = await axios.get<Category>(`${apiBase}/categories/${id}`);
+// Lấy cart theo ID
+export async function getCartById(id: number): Promise<Cart> {
+  const res = await axios.get<Cart>(`${apiBase}/carts/${id}`);
   return res.data;
 }
 
-// Tạo mới category
-export async function createCategory(
-  payload: CreateCategoryPayload
-): Promise<Category> {
-  const res = await axios.post<Category>(`${apiBase}/categories`, payload, {
+// Tạo mới cart item
+export async function createCart(payload: CreateCartPayload): Promise<Cart> {
+  const res = await axios.post<Cart>(`${apiBase}/carts`, payload, {
     headers: { "Content-Type": "application/json" },
   });
   return res.data;
 }
 
-// Cập nhật category
-export async function updateCategory(
+// Cập nhật cart item (ví dụ: đổi số lượng)
+export async function updateCart(
   id: number,
-  payload: UpdateCategoryPayload
-): Promise<Category> {
-  const res = await axios.put<Category>(
-    `${apiBase}/categories/${id}`,
-    payload,
-    {
-      headers: { "Content-Type": "application/json" },
-    }
-  );
+  payload: UpdateCartPayload
+): Promise<Cart> {
+  const res = await axios.put<Cart>(`${apiBase}/carts/${id}`, payload, {
+    headers: { "Content-Type": "application/json" },
+  });
   return res.data;
 }
 
-// Xoá category
-export async function deleteCategory(id: number): Promise<{ message: string }> {
-  const res = await axios.delete<{ message: string }>(
-    `${apiBase}/categories/${id}`
-  );
+// Xoá cart item
+export async function deleteCart(id: number): Promise<{ message: string }> {
+  const res = await axios.delete<{ message: string }>(`${apiBase}/carts/${id}`);
   return res.data;
 }

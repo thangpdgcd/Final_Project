@@ -11,6 +11,8 @@ import aboutImage from "../../../assets/img/robustakontum.jpg";
 import BannerCarousel from "../../service";
 import Contact from "../../contact";
 import FooterPage from "../../footer";
+import Search from "antd/es/transfer/search";
+import SearchComponent from "../../search";
 
 const { Header, Content } = Layout;
 const { Meta } = Card;
@@ -51,7 +53,8 @@ const HomePage: React.FC = () => {
           <img src={logo} alt='Phan Coffee' />
           <span className='logo-phancoffee'>Phan Coffee</span>
         </div>
-
+        {/* search */}
+        <SearchComponent />
         <Menu
           mode='horizontal'
           overflowedIndicator={false}
