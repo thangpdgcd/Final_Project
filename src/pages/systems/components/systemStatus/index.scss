@@ -1,0 +1,23 @@
+.system-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  text-transform: uppercase;
+  font-weight: 500;
+
+  &--active {
+    color: #52c41a;
+  }
+
+  &--inactive {
+    color: #bfbfbf;
+  }
+
+  &--error {
+    color: #ff4d4f;
+  }
+
+  &--pending {
+    color: #faad14;
+  }
+}

@@ -1,44 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getAllProducts, Product } from "../../../api/productApi";
-import {
-  Card,
-  Col,
-  Row,
-  Layout,
-  Menu,
-  Modal,
-  Form,
-  Input,
-  Select,
-  Button,
-} from "antd";
-import logo from "../../../assets/img/logo_PhanCoffee.jpg";
 import "./index.scss";
+import { Row, Col, Card, Spin, Alert, Layout, Menu } from "antd";
+import { getAllProducts, Product } from "../../../api/productApi";
+import logo from "../../../assets/img/logo_PhanCoffee.jpg";
+import { useNavigate } from "react-router-dom";
+import { ShoppingCartOutlined } from "@ant-design/icons";
 
 const { Header } = Layout;
-const { Meta } = Card;
-const { Option } = Select;
+
+/** ✅ helper ảnh: URL | data:image | base64 thuần */
+const getImageSrc = (img?: string | null) => {
+  if (!img) return "/no-image.png";
+  const v = String(img).trim();
+  if (/^https?:\/\//i.test(v)) return v;
+  if (v.startsWith("data:image/")) return v;
+  return `data:image/webp;base64,${v}`; // đổi webp->jpeg nếu bạn lưu jpeg
+};
 
 const ProductList: React.FC = () => {
-  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [form] = Form.useForm();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    getAllProducts()
-      .then((data) => setProducts(data))
-      .catch((err) => console.error("Error:", err.message));
-  }, []);
-
-  // Menu điều hướng
   const menuRoutes: Record<string, string> = {
     home: "/",
     products: "/products",
     contact: "/contact",
     login: "/login",
+    about: "/about",
+    carts: "/carts",
   };
 
   const handleMenuClick = (e: { key: string }) => {
@@ -46,32 +37,51 @@ const ProductList: React.FC = () => {
     if (path) navigate(path);
   };
 
-  // Xử lý mở modal khi chọn sản phẩm
-  const handleOrder = (product: Product) => {
-    setSelectedProduct(product);
-    setOpenModal(true);
-  };
+  const goDetail = (id: number) => navigate(`/products/${id}`);
 
-  const handleSubmit = () => {
-    form.validateFields().then((values) => {
-      console.log("Đặt hàng:", { ...values, product: selectedProduct });
-      Modal.success({
-        title: "Thành công",
-        content: `Bạn đã đặt hàng ${selectedProduct?.name} thành công!`,
-      });
-      setOpenModal(false);
-      form.resetFields();
-    });
-  };
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getAllProducts();
+        setProducts(data);
+      } catch (err: any) {
+        setError(err?.message || "Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: 50 }}>
+        <Spin size='large' />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert
+        message='Error'
+        description={error}
+        type='error'
+        showIcon
+        style={{ margin: 20 }}
+      />
+    );
+  }
 
   return (
-    <div className='product-container'>
-      {/* Header */}
+    <Layout>
       <Header className='homepage__header'>
-        <div className='homepage__logo'>
+        <div className='homepage__logo ' onClick={() => navigate("/")}>
           <img src={logo} alt='Phan Coffee' />
           <span className='logo-phancoffee'>Phan Coffee</span>
         </div>
+
+        <div style={{ flex: 1 }} />
 
         <Menu
           mode='horizontal'
@@ -84,100 +94,67 @@ const ProductList: React.FC = () => {
             { key: "contact", label: "Contact" },
             { key: "about", label: "About" },
             { key: "login", label: "Log In" },
+            {
+              key: "carts",
+              label: (
+                <div className='menu-cart'>
+                  <span className='menu-cart-icon text-2xl'>
+                    <ShoppingCartOutlined
+                      className='icon-carts'
+                      style={{ fontSize: 24 }}
+                    />
+                  </span>
+                </div>
+              ),
+            },
           ]}
         />
       </Header>
 
-      {/* Danh sách sản phẩm */}
-      <div className='product-list'>
+      <div className='product-list' style={{ padding: 20 }}>
         <Row gutter={[16, 16]}>
-          {products.map((p) => (
-            <Col xs={24} sm={12} md={8} lg={6} key={p.product_ID}>
-              <Card
-                hoverable
-                cover={
-                  p.image ? (
+          {products.length > 0 ? (
+            products.map((p) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={p.product_ID}>
+                <Card
+                  hoverable
+                  onClick={() => goDetail(p.product_ID)}
+                  cover={
                     <img
-                      src={`data:image/png;base64,${p.image}`}
+                      src={getImageSrc(p.image)}
                       alt={p.name}
                       style={{
                         width: "100%",
                         height: 200,
                         objectFit: "cover",
-                        borderRadius: "6px 6px 0 0",
+                        cursor: "pointer",
+                      }}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src =
+                          "/no-image.png";
                       }}
                     />
-                  ) : (
-                    <div
-                      style={{
-                        width: "100%",
-                        height: 200,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        background: "#f5f5f5",
-                        color: "#999",
-                        borderRadius: "6px 6px 0 0",
-                      }}>
-                      Không có ảnh
-                    </div>
-                  )
-                }
-                onClick={() => handleOrder(p)}>
-                <Meta
-                  title={p.name}
-                  description={
-                    <div className='product-meta'>
-                      <p>Giá: {p.price.toLocaleString("vi-VN")} đ</p>
-                      <p>Số lượng: {p.stock}</p>
-                    </div>
-                  }
-                />
-              </Card>
+                  }>
+                  <Card.Meta
+                    title={p.name}
+                    description={
+                      <>
+                        <p>Price: {p.price.toLocaleString()}₫</p>
+                        <p>Stock: {p.stock}</p>
+                      </>
+                    }
+                  />
+                </Card>
+              </Col>
+            ))
+          ) : (
+            <Col span={24} style={{ textAlign: "center" }}>
+              <p>No products found.</p>
             </Col>
-          ))}
+          )}
         </Row>
       </div>
-
-      {/* Modal đặt hàng */}
-      <Modal
-        open={openModal}
-        title={`Đặt hàng: ${selectedProduct?.name}`}
-        onCancel={() => setOpenModal(false)}
-        footer={null}>
-        <Form layout='vertical' form={form} onFinish={handleSubmit}>
-          <Form.Item
-            name='customerName'
-            label='Họ và tên'
-            rules={[{ required: true, message: "Vui lòng nhập họ tên" }]}>
-            <Input placeholder='Nhập họ và tên' />
-          </Form.Item>
-
-          <Form.Item
-            name='phone'
-            label='Số điện thoại'
-            rules={[
-              { required: true, message: "Vui lòng nhập số điện thoại" },
-            ]}>
-            <Input placeholder='Nhập số điện thoại' />
-          </Form.Item>
-
-          <Form.Item name='size' label='Chọn size'>
-            <Select placeholder='Chọn size'>
-              <Option value='S'>Size S</Option>
-              <Option value='M'>Size M</Option>
-              <Option value='L'>Size L</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item>
-            <Button type='primary' htmlType='submit' block>
-              Xác nhận đặt hàng
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </div>
+    </Layout>
   );
 };
 

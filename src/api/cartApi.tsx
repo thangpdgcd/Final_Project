@@ -1,63 +1,107 @@
 import axios from "axios";
 
-// Base URL lấy từ .env
-const apiBase = process.env.VITE_API_URL || "http://localhost:8080/api";
+/**
+ * Vite env phải dùng import.meta.env
+ * .env: VITE_API_URL=http://localhost:8080
+ */
+const API_HOST =
+  (import.meta as any).env?.VITE_API_URL || "http://localhost:8080";
+const apiBase = `${String(API_HOST).replace(/\/$/, "")}/api`;
 
-/* --------- TYPES --------- */
-export interface Cart {
+export interface CartProduct {
+  name: string;
+  price: number;
+  image?: string;
+}
+
+export interface CartItem {
+  cartitem_ID: number;
   cart_ID: number;
+  product_ID: number;
+  quantity: number;
+  price: number;
+  products?: CartProduct;
+}
+
+export interface AddToCartPayload {
   user_ID: number;
   product_ID: number;
   quantity: number;
-  createdAt?: string;
-  updatedAt?: string;
+  price: number;
 }
 
-export interface CreateCartPayload {
-  user_ID: number;
-  product_ID: number;
-  quantity: number;
+export interface AddToCartResponse {
+  message?: string;
+  data?: CartItem;
 }
 
-export interface UpdateCartPayload {
-  quantity?: number;
+function unwrapList(resData: any): CartItem[] {
+  if (Array.isArray(resData)) return resData;
+  if (Array.isArray(resData?.data)) return resData.data;
+  if (Array.isArray(resData?.cartItems)) return resData.cartItems;
+  return [];
 }
 
-/* --------- API FUNCTIONS --------- */
-
-// Lấy tất cả cart items
-export async function getAllCarts(): Promise<Cart[]> {
-  const res = await axios.get<Cart[]>(`${apiBase}/carts`);
-  return res.data;
+function authHeaders() {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-// Lấy cart theo ID
-export async function getCartById(id: number): Promise<Cart> {
-  const res = await axios.get<Cart>(`${apiBase}/carts/${id}`);
-  return res.data;
-}
+export async function getCartByUserId(user_ID: number): Promise<CartItem[]> {
+  const uid = Number(user_ID);
+  if (!Number.isFinite(uid) || uid <= 0) return [];
 
-// Tạo mới cart item
-export async function createCart(payload: CreateCartPayload): Promise<Cart> {
-  const res = await axios.post<Cart>(`${apiBase}/carts`, payload, {
-    headers: { "Content-Type": "application/json" },
+  const res = await axios.get(`${apiBase}/carts`, {
+    params: { user_ID: uid },
+    headers: { ...authHeaders() },
   });
-  return res.data;
+
+  return unwrapList(res.data);
 }
 
-// Cập nhật cart item (ví dụ: đổi số lượng)
-export async function updateCart(
-  id: number,
-  payload: UpdateCartPayload
-): Promise<Cart> {
-  const res = await axios.put<Cart>(`${apiBase}/carts/${id}`, payload, {
-    headers: { "Content-Type": "application/json" },
+export async function addToCart(
+  payload: AddToCartPayload
+): Promise<AddToCartResponse> {
+  const safePayload: AddToCartPayload = {
+    user_ID: Number(payload.user_ID),
+    product_ID: Number(payload.product_ID),
+    quantity: Number(payload.quantity),
+    price: Number(payload.price),
+  };
+
+  const res = await axios.post(`${apiBase}/add-to-cart`, safePayload, {
+    headers: { "Content-Type": "application/json", ...authHeaders() },
   });
-  return res.data;
+
+  return res.data as AddToCartResponse;
 }
 
-// Xoá cart item
-export async function deleteCart(id: number): Promise<{ message: string }> {
-  const res = await axios.delete<{ message: string }>(`${apiBase}/carts/${id}`);
-  return res.data;
+export async function updateCartItem(
+  cartItemId: number,
+  payload: { quantity: number }
+): Promise<CartItem> {
+  const id = Number(cartItemId);
+  const qty = Number(payload?.quantity);
+
+  const res = await axios.put(
+    `${apiBase}/cart-items/${id}`,
+    { quantity: qty },
+    {
+      headers: { "Content-Type": "application/json", ...authHeaders() },
+    }
+  );
+
+  return res.data as CartItem;
+}
+
+export async function removeCartItem(
+  cartItemId: number
+): Promise<{ message?: string }> {
+  const id = Number(cartItemId);
+
+  const res = await axios.delete(`${apiBase}/cart-items/${id}`, {
+    headers: { ...authHeaders() },
+  });
+
+  return res.data as { message?: string };
 }

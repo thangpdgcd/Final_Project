@@ -3,7 +3,7 @@ import {
   getAllCategories,
   createCategory,
   Category,
-} from "../../api/categoriesApi";
+} from "../../../api/categoriesApi";
 
 const CategoriesPage = () => {
   // Khai báo state đúng kiểu

@@ -1,124 +1,137 @@
-import React, { useEffect, useState } from "react";
-import { Card, Tabs, List, Tag, Spin, Button, Modal } from "antd";
-import { getAllOrders, getOrderById, Order } from "../../../api/orderApi";
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Layout, Menu, Table, Button, Typography } from "antd";
+import { ShoppingCartOutlined } from "@ant-design/icons";
+import logo from "../../../assets/img/logo_PhanCoffee.jpg";
+import SearchComponent from "../../search";
+import FooterPage from "../../footer";
 import "./index.scss";
 
-const { TabPane } = Tabs;
+const { Header, Content } = Layout;
+const { Title } = Typography;
 
-const statusColor: Record<string, string> = {
-  Pending: "orange",
-  Shipping: "blue",
-  Completed: "green",
-  Cancelled: "red",
-};
+const OrderPage: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-const CustomerOrders: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeKey, setActiveKey] = useState("all");
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  // 🛍️ Dữ liệu giỏ hàng được truyền từ PageCart
+  const cartItems = location.state?.cartItems || [];
 
-  // 🔹 Gọi API lấy tất cả đơn hàng khi load trang
-  useEffect(() => {
-    setLoading(true);
-    getAllOrders()
-      .then((data) => {
-        setOrders(data);
-      })
-      .catch((err) => {
-        console.error("Error getAllOrders:", err.response?.data || err.message);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  const columns = [
+    {
+      title: "Sản phẩm",
+      dataIndex: ["products", "name"],
+      key: "name",
+    },
+    {
+      title: "Số lượng",
+      dataIndex: "quantity",
+      key: "quantity",
+    },
+    {
+      title: "Đơn giá",
+      dataIndex: ["products", "price"],
+      key: "price",
+      render: (price: number) => `${price?.toLocaleString()}₫`,
+    },
+    {
+      title: "Thành tiền",
+      key: "total",
+      render: (_: any, record: any) =>
+        `${(
+          (record.products?.price || 0) * record.quantity
+        ).toLocaleString()}₫`,
+    },
+  ];
 
-  // 🔹 Lọc đơn hàng theo trạng thái
-  const filteredOrders =
-    activeKey === "all" ? orders : orders.filter((o) => o.status === activeKey);
+  const totalAmount = cartItems.reduce(
+    (sum: number, item: any) =>
+      sum + (item.products?.price || 0) * item.quantity,
+    0
+  );
 
-  // 🔹 Xem chi tiết đơn hàng theo ID
-  const handleViewDetail = async (id: number) => {
-    try {
-      const order = await getOrderById(id);
-      setSelectedOrder(order);
-      setModalVisible(true);
-    } catch (err: any) {
-      console.error("Error getOrderById:", err.message);
-    }
+  // 🌐 Menu điều hướng
+  const menuRoutes: Record<string, string> = {
+    home: "/",
+    products: "/products",
+    contact: "/contact",
+    about: "/about",
+    login: "/login",
+    carts: "/carts",
   };
 
+  const handleMenuClick = (e: { key: string }) => {
+    const path = menuRoutes[e.key];
+    if (path) navigate(path);
+  };
+
+  const menuItems = [
+    { key: "home", label: "Home" },
+    { key: "products", label: "Coffee" },
+    { key: "contact", label: "Contact" },
+    { key: "about", label: "About" },
+    { key: "login", label: "Log In" },
+    {
+      key: "carts",
+      label: (
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            height: "100%",
+          }}>
+          <ShoppingCartOutlined style={{ fontSize: 20, color: "#000" }} />
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <Card title='📦 Đơn hàng của tôi' className='customer-orders'>
-      <Tabs activeKey={activeKey} onChange={(key) => setActiveKey(key)}>
-        <TabPane tab='Tất cả' key='all' />
-        <TabPane tab='Chờ xử lý' key='Pending' />
-        <TabPane tab='Đang giao' key='Shipping' />
-        <TabPane tab='Hoàn thành' key='Completed' />
-        <TabPane tab='Đã hủy' key='Cancelled' />
-      </Tabs>
+    <Layout className='order-page'>
+      {/* ===== HEADER (from HomePage) ===== */}
+      <Header className='homepage__header'>
+        <div className='homepage__logo'>
+          <img src={logo} alt='Phan Coffee' />
+          <span className='logo-phancoffee'>Phan Coffee</span>
+        </div>
 
-      {loading ? (
-        <Spin tip='Đang tải danh sách đơn hàng...' />
-      ) : (
-        <List
-          itemLayout='horizontal'
-          dataSource={filteredOrders}
-          renderItem={(order) => (
-            <List.Item
-              actions={[
-                <Button
-                  type='link'
-                  onClick={() => handleViewDetail(order.order_ID)}>
-                  Xem chi tiết
-                </Button>,
-              ]}>
-              <List.Item.Meta
-                title={`Mã đơn: ${order.order_ID}`}
-                description={`Người dùng: ${order.user_ID}`}
-              />
-              <div style={{ textAlign: "right" }}>
-                <Tag color={statusColor[order.status ?? "Pending"]}>
-                  {order.status ?? "Pending"}
-                </Tag>
-                <div>{order.total_Amount.toLocaleString()} đ</div>
-              </div>
-            </List.Item>
-          )}
+        <SearchComponent />
+
+        <Menu
+          mode='horizontal'
+          overflowedIndicator={false}
+          onClick={handleMenuClick}
+          className='menu-home'
+          items={menuItems}
         />
-      )}
+      </Header>
 
-      {/* Modal chi tiết đơn hàng */}
-      <Modal
-        open={modalVisible}
-        title={`Chi tiết đơn hàng #${selectedOrder?.order_ID}`}
-        footer={null}
-        onCancel={() => setModalVisible(false)}>
-        {selectedOrder ? (
-          <div>
-            <p>
-              <b>Người dùng:</b> {selectedOrder.user_ID}
-            </p>
-            <p>
-              <b>Tổng tiền:</b> {selectedOrder.total_Amount.toLocaleString()} đ
-            </p>
-            <p>
-              <b>Trạng thái:</b> {selectedOrder.status ?? "Chưa cập nhật"}
-            </p>
-            <p>
-              <b>Địa chỉ giao hàng:</b>{" "}
-              {selectedOrder.shipping_Address ?? "Không có"}
-            </p>
-            <p>
-              <b>Ngày tạo:</b>{" "}
-              {new Date(selectedOrder.createdAt ?? "").toLocaleString()}
-            </p>
-          </div>
-        ) : (
-          <Spin tip='Đang tải chi tiết đơn hàng...' />
-        )}
-      </Modal>
-    </Card>
+      {/* ===== CONTENT ===== */}
+      <Content className='order-content' style={{ padding: "24px" }}>
+        <Title level={3}>🧾 Xác nhận đơn hàng</Title>
+        <Table
+          columns={columns}
+          dataSource={cartItems}
+          rowKey='cartitem_ID'
+          pagination={false}
+        />
+
+        <div style={{ textAlign: "right", marginTop: 24 }}>
+          <Title level={4}>Tổng cộng: {totalAmount.toLocaleString()}₫</Title>
+          <Button
+            type='primary'
+            size='large'
+            onClick={() => navigate("/", { state: { cartItems } })}>
+            Xác nhận đặt hàng
+          </Button>
+          {/* button paypal điều kiện-> khi ng dùng bấm và ẩn button xác nhận đơn hàng và hiện ra paypal*/}
+        </div>
+      </Content>
+
+      {/* ===== FOOTER (giống HomePage) ===== */}
+      <FooterPage />
+    </Layout>
   );
 };
 
-export default CustomerOrders;
+export default OrderPage;

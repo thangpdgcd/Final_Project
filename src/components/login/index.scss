@@ -1,92 +1,387 @@
 .login-layout {
   min-height: 100vh;
 
-  .homepage__header {
+  /* ===== HEADER: canh đều như Home ===== */
+  .pc-header.pc-header--clean {
+    height: 72px;
+    padding: 0 32px;
+    background: #fff !important;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #5c3d2e;
-
-    .homepage__logo {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-
-      img {
-        height: 40px;
-        margin-right: 12px;
-        border-radius: 8px;
-      }
-
-      .icon {
-        color: #fff;
-        font-weight: bold;
-        font-size: 18px;
-      }
-    }
-
-    .header-menu {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .ant-menu {
-      background: transparent;
-      border-bottom: none;
-
-      .ant-menu-item {
-        color: #fff !important;
-        font-weight: 500;
-
-        &:hover {
-          color: #f5f0eb !important;
-        }
-      }
-    }
-
-    .user-btn {
-      background: #fff;
-      color: #5c3d2e;
-      border-radius: 6px;
-      font-weight: 500;
-
-      &:hover {
-        background: #f5f0eb;
-        color: #5c3d2e;
-      }
-    }
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
 
-  .login-content {
+  /* QUAN TRỌNG: trái & phải width bằng nhau -> center luôn đúng giữa */
+  .pc-header__left,
+  .pc-header__right {
+    width: 260px;
+    display: flex;
+    align-items: center;
+  }
+
+  .pc-header__left {
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .pc-header__logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    object-fit: cover;
+  }
+
+  .pc-header__brand {
+    font-size: 18px;
+    font-weight: 800;
+    color: #2b2b2b;
+    white-space: nowrap;
+  }
+
+  .pc-header__center {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
+  }
 
-    .login-form-container {
-      width: 500px;
-      padding: 32px;
-      background: #fff;
+  .pc-header__title {
+    font-weight: 800;
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  /* ===== CONTENT: background trắng ===== */
+  .login-content {
+    min-height: calc(100vh - 72px - 56px);
+    padding: 32px 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff !important;
+  }
+
+  .login-hero {
+    width: min(1040px, 94vw);
+  }
+
+  /* ===== CARD ===== */
+  .login-card {
+    min-height: 520px;
+    border-radius: 22px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #111;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  }
+
+  /* LEFT */
+  .login-left {
+    background: rgba(18, 18, 18, 0.92);
+    color: #fff;
+    padding: 22px 26px;
+    backdrop-filter: blur(8px);
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .brand-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  .kicker {
+    font-size: 11px;
+    letter-spacing: 1.6px;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+  }
+
+  .brand {
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+  }
+
+  .headline {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 4px 0 8px;
+
+    .accent {
+      color: #f5c46b;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .title {
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 1000;
+      letter-spacing: 1px;
+    }
+  }
+
+  .sub {
+    color: rgba(255, 255, 255, 0.72);
+    margin-bottom: 10px;
+  }
+
+  /* Social */
+  .social-wrap {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .social-btn {
+    height: 40px;
+    border-radius: 12px;
+    font-weight: 800;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.92);
+
+    &:hover {
+      border-color: rgba(245, 196, 107, 0.55);
+      background: rgba(245, 196, 107, 0.14);
+      color: #fff;
+    }
+  }
+
+  .divider {
+    margin: 10px 0 !important;
+    color: rgba(255, 255, 255, 0.55) !important;
+
+    &::before,
+    &::after {
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+  }
+
+  /* Form */
+  .login-form {
+    .ant-form-item {
+      margin-bottom: 10px;
+    }
+
+    .ant-form-item-label > label {
+      color: rgba(255, 255, 255, 0.88);
+      font-weight: 800;
+    }
+
+    /* input thường */
+    .ant-input,
+    .ant-input-password {
+      height: 40px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
 
-      .login-title {
-        text-align: center;
-        margin-bottom: 24px;
-        color: #5c3d2e;
+    .ant-input::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .ant-input-password input {
+      background: transparent;
+      color: #fff;
+    }
+
+    /* ================================
+       ✅ FIX PASSWORD (Input.Password)
+       - Height đồng bộ
+       - Icon mắt nằm gọn
+       - Padding chuẩn, không bị lệch
+    ================================= */
+    .pc-password.ant-input-affix-wrapper {
+      height: 48px;
+      border-radius: 14px;
+
+      /* nền & viền premium */
+      background: rgba(0, 0, 0, 0.35) !important;
+      border: 1px solid rgba(245, 196, 107, 0.35) !important;
+
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        border-color: rgba(245, 196, 107, 0.6) !important;
       }
 
-      .ant-form-item-label {
-        font-weight: 500;
+      &.ant-input-affix-wrapper-focused {
+        border-color: rgba(245, 196, 107, 0.9) !important;
+        box-shadow: 0 0 0 3px rgba(245, 196, 107, 0.18) !important;
+      }
+
+      /* input bên trong */
+      input.ant-input {
+        border: none;
+        height: 100%;
+        background: transparent;
+        color: #fff;
+        padding: 0 8px;
+        font-weight: 700;
+
+        &::placeholder {
+          border: none;
+          background: transparent;
+          color: fff;
+        }
+      }
+
+      /* suffix (icon mắt) */
+      .ant-input-suffix {
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .ant-input-password-icon {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.72);
+        padding: 7px;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          color: #f5c46b;
+          background: rgba(245, 196, 107, 0.14);
+        }
       }
     }
   }
 
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 4px 0 10px;
+
+    .ant-checkbox-wrapper {
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .forgot {
+      padding: 0;
+      color: rgba(255, 255, 255, 0.72);
+
+      &:hover {
+        color: #f5c46b;
+      }
+    }
+  }
+
+  .btn-login {
+    height: 42px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 900;
+    background: linear-gradient(135deg, #f5c46b, #ff9b2f);
+
+    &:hover {
+      background: linear-gradient(135deg, #ffd27a, #ff9b2f) !important;
+    }
+  }
+
+  .btn-signup {
+    margin-top: 6px;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.7);
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  .badge {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(245, 196, 107, 0.14);
+    border: 1px solid rgba(245, 196, 107, 0.22);
+    padding: 8px 12px;
+    border-radius: 14px;
+    color: #f5c46b;
+    font-weight: 800;
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: #f5c46b;
+      box-shadow: 0 0 16px rgba(245, 196, 107, 0.65);
+    }
+  }
+
+  /* RIGHT */
+  .login-right {
+    background: linear-gradient(
+        to left,
+        rgba(0, 0, 0, 0.55),
+        rgba(0, 0, 0, 0.12)
+      ),
+      url("../../../src/assets/img/loginbackground.jpg");
+    background-size: cover;
+    background-position: center;
+    filter: saturate(1.05) contrast(1.03);
+  }
+
+  /* ===== FOOTER ===== */
   .login-footer {
-    text-align: center;
-    background: #f5f0eb;
-    padding: 12px;
-    color: #5c3d2e;
+    height: 56px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #fff;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    color: rgba(0, 0, 0, 0.72);
+    padding: 0 14px;
+  }
+
+  .login-footer__inner {
+    display: flex;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 12px;
+
+    .sep {
+      opacity: 0.5;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .pc-header__left,
+    .pc-header__right {
+      width: 180px;
+    }
+
+    .login-card {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .login-right {
+      height: 220px;
+    }
   }
 }

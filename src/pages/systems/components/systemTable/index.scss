@@ -1,0 +1,29 @@
+.system-table {
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .ant-table {
+    border-radius: 8px;
+  }
+
+  .ant-table-thead > tr > th {
+    background-color: #fafafa;
+    font-weight: 600;
+    color: #595959;
+  }
+
+  .ant-table-tbody > tr > td {
+    font-size: 14px;
+    color: #262626;
+  }
+
+  .ant-pagination {
+    margin-top: 16px;
+  }
+
+  .ant-table-row:hover > td {
+    background-color: #f5f9ff !important;
+  }
+}

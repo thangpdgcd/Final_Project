@@ -1,17 +1,12 @@
 import React, { useState } from "react";
+import { Layout, Form, Input, Button, Checkbox, message, Divider } from "antd";
 import {
-  Layout,
-  Form,
-  Input,
-  Button,
-  Checkbox,
-  message,
-  Menu,
-  Dropdown,
-} from "antd";
-import { DownOutlined } from "@ant-design/icons";
+  FacebookFilled,
+  InstagramFilled,
+  ChromeOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { login, LoginPayload, LoginResponse } from "../../api/authApi"; // ✅ đổi apiLogin -> login
+import { login, LoginPayload, LoginResponse } from "../../api/authApi";
 
 import logo from "../../../src/assets/img/logo_PhanCoffee.jpg";
 import "./index.scss";
@@ -34,119 +29,175 @@ const LoginPage: React.FC = () => {
         password: values.password,
       };
 
-      const data: LoginResponse = await login(payload); // ✅ dùng login POST
+      const data: LoginResponse = await login(payload);
+
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
+
+      const userId =
+        (data as any)?.user_ID ??
+        (data as any)?.data?.user_ID ??
+        (data as any)?.user?.user_ID ??
+        (data as any)?.user?.id ??
+        (data as any)?.id;
+
+      if (userId) {
+        localStorage.setItem("user_ID", String(userId));
+      } else {
+        localStorage.removeItem("user_ID");
+      }
 
       message.success("✅ Đăng nhập thành công!");
       navigate("/");
     } catch (err: any) {
-      console.error("Lỗi đăng nhập:", err.message);
-      message.error("❌ Đăng nhập thất bại. Vui lòng kiểm tra email/mật khẩu!");
+      message.error("❌ Sai email hoặc mật khẩu!");
     } finally {
       setLoading(false);
     }
   };
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Form submit failed:", errorInfo);
+  const onSocialLogin = (provider: "facebook" | "google" | "instagram") => {
+    message.info(`🔒 Đăng nhập bằng ${provider.toUpperCase()} (UI demo)`);
   };
-
-  const menu = (
-    <Menu
-      items={[
-        {
-          key: "1",
-          label: <span onClick={() => navigate("/login")}>Sign In</span>,
-        },
-        {
-          key: "2",
-          label: <span onClick={() => navigate("/register")}>Sign Up</span>,
-        },
-      ]}
-    />
-  );
 
   return (
     <Layout className='login-layout'>
-      {/* HEADER */}
-      <Header className='homepage__header'>
-        <div className='header-left'>
-          <div className='homepage__logo' onClick={() => navigate("/")}>
-            <img src={logo} alt='Phan Coffee' />
-            <span className='icon'>Phan Coffee</span>
-          </div>
-
-          <Menu
-            mode='horizontal'
-            overflowedIndicator={false}
-            items={[{ key: "home", label: "Home" }]}
-            onClick={(e) => e.key === "home" && navigate("/")}
-          />
+      <Header className='pc-header pc-header--clean'>
+        <div className='pc-header__left' onClick={() => navigate("/")}>
+          <img className='pc-header__logo' src={logo} alt='Phan Coffee' />
+          <span className='pc-header__brand'>Phan Coffee</span>
         </div>
 
-        <Dropdown overlay={menu} trigger={["click"]}>
-          <Button>
-            User <DownOutlined />
-          </Button>
-        </Dropdown>
+        <div className='pc-header__center' />
+
+        <div className='pc-header__right' />
       </Header>
 
-      {/* CONTENT */}
       <Content className='login-content'>
-        <div className='login-form-container'>
-          <h2 className='login-title'>Đăng nhập</h2>
+        <div className='login-hero'>
+          <div className='login-card'>
+            <div className='login-left'>
+              <div className='brand-row'>
+                <img src={logo} alt='Phan Coffee' className='brand-logo' />
+                <div>
+                  <div className='kicker'>WELCOME BACK</div>
+                  <div className='brand'>PHAN COFFEE</div>
+                </div>
+              </div>
 
-          <Form<LoginFormValues>
-            name='login'
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-            autoComplete='off'
-            className='login-form'>
-            <Form.Item
-              label='Email'
-              name='email'
-              rules={[
-                { required: true, message: "Vui lòng nhập email!" },
-                { type: "email", message: "Email không hợp lệ!" },
-              ]}>
-              <Input />
-            </Form.Item>
+              <div className='headline'>
+                <span className='accent'>SPECIAL</span>
+                <span className='title'>COFFEE</span>
+              </div>
 
-            <Form.Item
-              label='Mật khẩu'
-              name='password'
-              rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}>
-              <Input.Password />
-            </Form.Item>
+              <p className='sub'>
+                It is a good time for the great taste of coffee.
+              </p>
 
-            <Form.Item
-              name='remember'
-              valuePropName='checked'
-              wrapperCol={{ offset: 8, span: 16 }}>
-              <Checkbox>Ghi nhớ đăng nhập</Checkbox>
-            </Form.Item>
+              <div className='social-wrap'>
+                <Button
+                  className='social-btn'
+                  onClick={() => onSocialLogin("facebook")}
+                  icon={<FacebookFilled />}
+                  block>
+                  Continue with Facebook
+                </Button>
 
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type='primary' htmlType='submit' loading={loading}>
-                Đăng nhập
-              </Button>
-              <Button
-                type='link'
-                onClick={() => navigate("/register")}
-                style={{ marginLeft: 8 }}>
-                Chưa có tài khoản? Đăng ký
-              </Button>
-            </Form.Item>
-          </Form>
+                <Button
+                  className='social-btn'
+                  onClick={() => onSocialLogin("google")}
+                  icon={<ChromeOutlined />}
+                  block>
+                  Continue with Google
+                </Button>
+
+                <Button
+                  className='social-btn'
+                  onClick={() => onSocialLogin("instagram")}
+                  icon={<InstagramFilled />}
+                  block>
+                  Continue with Instagram
+                </Button>
+              </div>
+
+              <Divider className='divider'>or sign in with email</Divider>
+
+              <Form<LoginFormValues>
+                layout='vertical'
+                initialValues={{ remember: true }}
+                onFinish={onFinish}
+                className='login-form'>
+                <Form.Item
+                  label='Email'
+                  name='email'
+                  rules={[
+                    { required: true, message: "Vui lòng nhập email" },
+                    { type: "email", message: "Email không hợp lệ" },
+                  ]}>
+                  <Input placeholder='you@example.com' />
+                </Form.Item>
+
+                <Form.Item
+                  label='Mật khẩu'
+                  name='password'
+                  rules={[
+                    { required: true, message: "Vui lòng nhập mật khẩu" },
+                  ]}>
+                  <Input.Password
+                    className='pc-password'
+                    placeholder='••••••••'
+                  />
+                </Form.Item>
+
+                <div className='row'>
+                  <Form.Item name='remember' valuePropName='checked' noStyle>
+                    <Checkbox>Ghi nhớ</Checkbox>
+                  </Form.Item>
+
+                  <Button
+                    type='link'
+                    className='forgot'
+                    onClick={() =>
+                      message.info("Chưa làm chức năng quên mật khẩu")
+                    }>
+                    Quên mật khẩu?
+                  </Button>
+                </div>
+
+                <Button
+                  htmlType='submit'
+                  type='primary'
+                  loading={loading}
+                  className='btn-login'
+                  block>
+                  Đăng nhập
+                </Button>
+
+                <Button
+                  type='link'
+                  className='btn-signup'
+                  onClick={() => navigate("/register")}>
+                  Chưa có tài khoản? Đăng ký
+                </Button>
+
+                <div className='badge'>
+                  <span className='dot' />
+                  Express Delivery • 1900 9999
+                </div>
+              </Form>
+            </div>
+
+            <div className='login-right' />
+          </div>
         </div>
       </Content>
 
-      {/* FOOTER */}
       <Footer className='login-footer'>
-        © {new Date().getFullYear()} Phan Coffee. All Rights Reserved.
+        <div className='login-footer__inner'>
+          <span>© {new Date().getFullYear()} Phan Coffee</span>
+          <span className='sep'>•</span>
+          <span>All Rights Reserved</span>
+        </div>
       </Footer>
     </Layout>
   );

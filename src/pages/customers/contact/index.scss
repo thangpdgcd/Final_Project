@@ -1,0 +1,267 @@
+/* ===== CONTACT SECTION ===== */
+.contact {
+  background: #f6efe6;
+  padding: 60px 0 80px;
+}
+
+/* bọc Row của AntD */
+.contact .ant-row {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===== CARD CHUNG ===== */
+.contact__card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 0; // form/map tự handle padding
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== FORM CARD (BÊN TRÁI) ===== */
+.contact__card--form {
+  position: relative;
+  overflow: hidden;
+  background: url("../../../assets/img/518290335_780416141172650_7724989381247019356_n.jpg")
+    center/cover;
+}
+
+/* overlay tối + blur nhẹ */
+.contact__card--form::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(0, 0, 0, 0.4), transparent),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.96));
+  backdrop-filter: blur(3px);
+}
+
+/* nội dung form thật */
+.contact__form-inner {
+  position: relative;
+  z-index: 1;
+  padding: 26px 26px 24px;
+  color: #f5f5f5;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* tiêu đề */
+.contact__title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.contact__subtitle {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-bottom: 18px;
+}
+
+/* ===== FORM + INPUT ===== */
+.contact__form {
+  flex: 1; // đẩy form chiếm chiều cao, nút nằm cuối
+
+  .ant-form-item {
+    margin-bottom: 14px;
+  }
+
+  .ant-form-item-label > label {
+    color: #f5f5f5;
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  .ant-input,
+  .ant-input-affix-wrapper {
+    background: #1b1d1f;
+    border: 1px solid #343638;
+    border-radius: 999px;
+    color: #eee;
+    padding: 10px 16px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #f5a623;
+    }
+
+    &.ant-input-affix-wrapper-focused,
+    &:focus {
+      border-color: #f5a623;
+      box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.32);
+    }
+  }
+
+  /* input bên trong affix wrapper */
+  .ant-input-affix-wrapper .ant-input {
+    background: transparent;
+    border-radius: 999px;
+    padding-left: 4px;
+  }
+
+  textarea.ant-input {
+    border-radius: 18px;
+    min-height: 120px;
+    padding: 10px 14px;
+    resize: vertical;
+  }
+
+  .ant-input::placeholder {
+    color: #b3b3b3;
+  }
+
+  .ant-input-prefix {
+    color: #f5a623;
+    margin-right: 6px;
+  }
+}
+
+/* ===== NÚT ===== */
+.contact__actions {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.contact__btn {
+  border-radius: 999px;
+  font-weight: 600;
+  min-width: 130px;
+  padding: 0 22px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* nút gửi */
+.contact__btn--primary {
+  background: linear-gradient(135deg, #f5a623, #ff6f3c);
+  border-color: transparent;
+  color: #111;
+  box-shadow: 0 10px 18px rgba(255, 132, 63, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #ff8c3c, #ffc861);
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(255, 132, 63, 0.55);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 14px rgba(255, 132, 63, 0.4);
+  }
+}
+
+/* nút outline */
+.contact__btn--outline {
+  border-color: #f5a623;
+  color: #f5a623;
+  background: transparent;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f5a623;
+    color: #111;
+    box-shadow: 0 10px 18px rgba(245, 166, 35, 0.3);
+  }
+}
+
+/* ===== MAP CARD (BÊN PHẢI) ===== */
+.contact__card--map {
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact__map-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #2b1b16;
+}
+
+.contact__map-address {
+  font-size: 13px;
+  color: #6b5745;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  .anticon {
+    color: #8b5a2b;
+    font-size: 14px;
+  }
+}
+
+.contact__map-wrapper {
+  flex: 1;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  margin-bottom: 10px;
+  min-height: 260px;
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+}
+
+.contact__map-note {
+  font-size: 12px;
+  color: #8c7b6a;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+  .contact {
+    padding: 48px 0 64px;
+  }
+
+  .contact .ant-row {
+    padding: 0 16px;
+  }
+
+  .contact__form-inner {
+    padding: 22px 18px 20px;
+  }
+
+  .contact__map-wrapper {
+    min-height: 230px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact {
+    padding: 40px 0 56px;
+  }
+
+  .contact .ant-row {
+    padding: 0 12px;
+  }
+
+  .contact__actions {
+    flex-direction: column;
+
+    .contact__btn {
+      width: 100%;
+    }
+  }
+
+  .contact__map-wrapper {
+    min-height: 220px;
+  }
+}

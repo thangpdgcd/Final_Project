@@ -1,0 +1,33 @@
+.system-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: #f5f7fa;
+    transform: translateY(-2px);
+  }
+
+  &__icon {
+    font-size: 28px;
+    color: #1677ff;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+  }
+}

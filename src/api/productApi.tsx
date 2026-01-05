@@ -1,9 +1,10 @@
 import axios from "axios";
 
-// Base URL lấy từ .env
-const apiBase = process.env.VITE_API_URL || "http://localhost:8080/api";
+// ✅ Vite dùng import.meta.env (process.env sẽ undefined)
+const apiBase =
+  (import.meta as any).env?.VITE_API_URL?.replace(/\/$/, "") ||
+  "http://localhost:8080/api";
 
-/* --------- TYPES --------- */
 export interface Product {
   product_ID: number;
   name: string;
@@ -15,73 +16,39 @@ export interface Product {
   user_ID: number;
 }
 
-export interface CreateProductPayload {
-  name: string;
-  price: number;
-  stock?: number;
-  description?: string;
-  image?: string | null;
-  categories_ID: number;
-  user_ID: number;
-}
-
-export interface UpdateProductPayload {
-  name?: string;
-  price?: number;
-  stock?: number;
-  description?: string;
-  image?: string | null;
-  categories_ID?: number;
-  user_ID?: number;
-}
-
-/* --------- API FUNCTIONS --------- */
-
-// Lấy tất cả products
+/** GET: /api/products */
 export async function getAllProducts(): Promise<Product[]> {
-  const res = await axios.get<Product[]>(`${apiBase}/products`);
-  return res.data;
+  const res = await axios.get(`${apiBase}/products`);
+  if (Array.isArray(res.data)) return res.data;
+  if (res.data && Array.isArray(res.data.products)) return res.data.products;
+  return [];
 }
 
-// Tìm kiếm products theo tên
-export async function searchProducts(name: string): Promise<Product[]> {
-  const res = await axios.get<Product[]>(
-    `${apiBase}/products?name=${encodeURIComponent(name)}`
-  );
-  return res.data;
-}
-
-// Lấy product theo ID
+/** GET: /api/products/:id */
 export async function getProductById(id: number): Promise<Product> {
-  const res = await axios.get<Product>(`${apiBase}/products/${id}`);
+  const res = await axios.get(`${apiBase}/products/${id}`);
   return res.data;
 }
 
-// Tạo mới product
+/** ✅ POST: /api/create-products  (đúng theo route backend) */
 export async function createProduct(
-  payload: CreateProductPayload
+  payload: Omit<Product, "product_ID">
 ): Promise<Product> {
-  const res = await axios.post<Product>(`${apiBase}/products`, payload, {
-    headers: { "Content-Type": "application/json" },
-  });
+  const res = await axios.post(`${apiBase}/create-products`, payload);
   return res.data;
 }
 
-// Cập nhật product
+/** PUT: /api/products/:id */
 export async function updateProduct(
   id: number,
-  payload: UpdateProductPayload
+  payload: Partial<Product>
 ): Promise<Product> {
-  const res = await axios.put<Product>(`${apiBase}/products/${id}`, payload, {
-    headers: { "Content-Type": "application/json" },
-  });
+  const res = await axios.put(`${apiBase}/products/${id}`, payload);
   return res.data;
 }
 
-// Xoá product
+/** DELETE: /api/products/:id */
 export async function deleteProduct(id: number): Promise<{ message: string }> {
-  const res = await axios.delete<{ message: string }>(
-    `${apiBase}/products/${id}`
-  );
+  const res = await axios.delete(`${apiBase}/products/${id}`);
   return res.data;
 }
