@@ -1,16 +1,21 @@
 import db from "../models/index.js";
-let { Users } = db;
+let { Users, Orders } = db;
 import bcrypt from "bcrypt";
 
-let getAllUsers = () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let usersList = await Users.findAll();
-      resolve(usersList);
-    } catch (error) {
-      reject(new Error("Unable to retrieve user list: " + error.message));
-    }
-  });
+const getAllUsers = async () => {
+  try {
+    const usersList = await Users.findAll({
+      include: {
+        model: Orders,
+        as: "orders", // phải trùng alias khi khai báo quan hệ
+        attributes: ["order_ID", "total_Amount", "status"],
+      },
+      attributes: ["user_ID", "name", "email", "address", "phoneNumber"], // lấy info user
+    });
+    return usersList;
+  } catch (error) {
+    throw new Error("Unable to retrieve user list: " + error.message);
+  }
 };
 
 let getUsersById = (id) => {
@@ -29,28 +34,40 @@ let getUsersById = (id) => {
 
 let createAdmin = (data) => {
   return new Promise(async (resolve, reject) => {
-    let { name, email, address, phoneNumber, password, roleID } = data;
-
-    if (!email || !address || !password) {
-      return reject(new Error("Missing required information"));
-    }
-
     try {
-      let existingEmail = await Users.findOne({ where: { email } });
+      let { name, email, address, phoneNumber, password, roleID } = data;
+
+      if (!name || !email || !password) {
+        return reject(new Error("Missing required information"));
+      }
+
+      // ✅ ép roleID về number (mặc định Admin=2)
+      const finalRoleID =
+        roleID !== undefined && roleID !== null && String(roleID).trim() !== ""
+          ? Number(roleID)
+          : 2;
+
+      // ✅ chặn role ngoài phạm vi bạn dùng
+      const safeRoleID = [1, 2, 3].includes(finalRoleID) ? finalRoleID : 2;
+
+      // ✅ check email unique là đủ
+      const existingEmail = await Users.findOne({ where: { email } });
       if (existingEmail) return reject(new Error("Email already exists."));
 
-      let existingAddress = await Users.findOne({ where: { address } });
-      if (existingAddress) return reject(new Error("Address already exists."));
+      // ❌ KHÔNG nên check address unique (bỏ đi)
+      // const existingAddress = await Users.findOne({ where: { address } });
+      // if (existingAddress) return reject(new Error("Address already exists."));
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      let newUser = await Users.create({
+      const newUser = await Users.create({
         name,
         email,
-        address,
-        phoneNumber,
+        address: address || "",
+        phoneNumber: phoneNumber || "",
         password: hashedPassword,
-        roleID: roleID || 3,
+        roleID: safeRoleID, // ✅ number 1/2/3
+        status: data.status || "active", // nếu có cột status
       });
 
       resolve(newUser);
@@ -65,7 +82,6 @@ let updateUsers = (id, data) => {
     try {
       let user = await Users.findByPk(id);
       if (!user) return reject(new Error("User does not exist"));
-
       await user.update(data);
       resolve(user);
     } catch (error) {

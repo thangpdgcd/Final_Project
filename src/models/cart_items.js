@@ -39,7 +39,7 @@ export default (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      price_at_added: {
+      price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
       },

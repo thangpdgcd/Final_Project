@@ -1,25 +1,9 @@
 // src/controller/ordersController.js
 import ordersService from "../service/ordersService.js";
 
-const getAllOrders = async (req, res) => {
+const getOrderById = async (req, res) => {
   try {
-    let { user_ID, status } = req.query;
-    if (user_ID || status) {
-      let result = await ordersService.searchOrders({ user_ID, status });
-      return res.status(200).json(result);
-    } else {
-      return res.status(400).json({ message: "Thiếu tham số tìm kiếm" });
-    }
-
-    // return res.render("products", { products }); // nếu dùng EJS
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-const getOrdersById = async (req, res) => {
-  try {
-    const orders = await ordersService.getOrdersById(req.params.id);
+    let orders = await ordersService.getOrderById(req.params.id);
     res.status(200).json(orders);
   } catch (error) {
     res.status(404).json({ message: error.message });
@@ -28,10 +12,13 @@ const getOrdersById = async (req, res) => {
 
 const createOrders = async (req, res) => {
   try {
-    const newOrders = await ordersService.createOrders(req.body);
-    res.status(201).json(newOrders);
+    const { user_ID } = req.body;
+    if (!user_ID) return res.status(400).json({ message: "Missing user_ID" });
+
+    const order = await ordersService.createOrders(user_ID);
+    res.status(201).json({ message: "Order created successfully", order });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -57,8 +44,7 @@ const deleteOrders = async (req, res) => {
 };
 
 export default {
-  getAllOrders,
-  getOrdersById,
+  getOrderById,
   createOrders,
   updateOrders,
   deleteOrders,

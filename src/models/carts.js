@@ -1,6 +1,6 @@
 import { Model, DataTypes } from "sequelize";
 
-export default (sequelize) => {
+export default (sequelize, models) => {
   class Carts extends Model {
     static associate(models) {
       // Mỗi giỏ hàng thuộc về 1 người dùng
@@ -8,6 +8,20 @@ export default (sequelize) => {
         foreignKey: "user_ID",
         targetKey: "user_ID",
         as: "users", // alias để gọi như: cart.getUser()
+      });
+
+      // Mối quan hệ N:M với Products thông qua Cart_Items
+      Carts.belongsToMany(models.Products, {
+        through: models.Cart_Items,
+        as: "products",
+        foreignKey: "cart_ID",
+        otherKey: "product_ID",
+      });
+
+      // 1 cart có nhiều cart items
+      Carts.hasMany(models.Cart_Items, {
+        foreignKey: "cart_ID",
+        as: "cart_Items", // 👈 alias phải trùng
       });
     }
   }
@@ -20,7 +34,7 @@ export default (sequelize) => {
         autoIncrement: true,
         primaryKey: true,
       },
-      userID: {
+      user_ID: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
@@ -28,8 +42,8 @@ export default (sequelize) => {
     {
       sequelize,
       modelName: "Carts",
-      tableName: "Carts", // chú ý: nên dùng số nhiều nếu theo chuẩn Sequelize CLI
-      timestamps: false, // nếu không dùng createdAt / updatedAt
+      tableName: "Carts",
+      timestamps: false,
     }
   );
 

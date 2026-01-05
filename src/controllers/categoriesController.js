@@ -4,13 +4,12 @@ let getAllCategories = async (req, res) => {
   try {
     let { name } = req.query;
     if (name) {
-      let result = await Categories.searchCart(name);
-      return res.status(200).json(result); // nếu chỉ muốn API JSON
+      let result = await CategoriesService.searchCategories(name);
+      return res.status(200).json(result);
     }
-    let cart = await Categories.getAllCategories();
+    let categories = await CategoriesService.getAllCategories();
 
-    return res.status(200).json(cart); // nếu chỉ muốn API JSON
-    // return res.render("products", { products }); // nếu dùng EJS
+    return res.status(200).json(categories);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

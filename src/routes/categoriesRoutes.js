@@ -1,6 +1,5 @@
 import express from "express";
-import CategoriesController from "../controllers/CategoriesController.js"; // Import controller for Categories operations
-
+import CategoriesController from "../../src/controllers/categoriesController.js";
 const router = express.Router();
 
 // GET tất cả danh mục

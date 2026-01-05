@@ -1,44 +1,86 @@
 import db from "../models/index.js";
 let { Carts, Cart_Items, Products } = db;
 
-let getAllCarts = () => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      let carts = await Carts.findAll();
-      resolve(carts);
-    } catch (error) {
-      reject(new Error("Không thể lấy danh sách giỏ hàng: " + error.message));
-    }
+// Add product to cart
+const addToCart = async (user_ID, product_ID, quantity, price) => {
+  const uId = Number(user_ID);
+  const pId = Number(product_ID);
+  const qty = Number(quantity);
+  const unitPrice = Number(price);
+
+  if (!Number.isFinite(uId) || uId <= 0) {
+    throw new Error("Invalid user_ID");
+  }
+  if (!Number.isFinite(pId) || pId <= 0) {
+    throw new Error("Invalid product_ID");
+  }
+  if (!Number.isFinite(qty) || qty <= 0) {
+    throw new Error("Invalid quantity");
+  }
+  if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
+    throw new Error("Invalid price");
+  }
+
+  let cart = await db.Carts.findOne({ where: { user_ID: uId } });
+  if (!cart) {
+    cart = await db.Carts.create({ user_ID: uId });
+  }
+
+  let cartItem = await db.Cart_Items.findOne({
+    where: { cart_ID: cart.cart_ID, product_ID: pId },
   });
-};
 
-let createCartIfNotExists = (userId) => {
+  if (cartItem) {
+    const newQty = Number(cartItem.quantity) + qty;
+    cartItem.quantity = newQty;
+    cartItem.price = unitPrice * newQty;
+    await cartItem.save();
+  } else {
+    cartItem = await db.Cart_Items.create({
+      cart_ID: cart.cart_ID,
+      product_ID: pId,
+      quantity: qty,
+      price: unitPrice * qty,
+    });
+  }
+
+  return cartItem;
+};
+let getCartByUserId = (user_ID) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!userId) return reject(new Error("User ID là bắt buộc"));
+      if (!user_ID) return reject(new Error("User ID là bắt buộc"));
 
-      let cart = await Carts.findOne({ where: { user_ID: userId } });
-      if (!cart) {
-        cart = await Carts.create({ user_ID: userId });
-      }
-      resolve(cart);
-    } catch (error) {
-      reject(new Error("Không thể tạo giỏ hàng: " + error.message));
-    }
-  });
-};
-
-let getCartByUserId = (userId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (!userId) return reject(new Error("User ID là bắt buộc"));
-
-      let cart = await Carts.findOne({
-        where: { user_ID: userId },
+      const cart = await Carts.findOne({
+        where: { user_ID },
         include: [
           {
             model: Cart_Items,
-            as: "cart_items",
+            as: "cart_Items",
+            include: [{ model: Products, as: "products" }],
+          },
+        ],
+      });
+
+      if (!cart) return resolve([]);
+      resolve(cart.cart_Items || []);
+    } catch (error) {
+      reject(new Error("Không thể lấy giỏ hàng: " + error.message));
+    }
+  });
+};
+
+let getCartItem = (cart_ID) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!cart_ID) return reject(new Error("Cart ID là bắt buộc"));
+
+      let cart = await Carts.findOne({
+        where: { cart_ID: cart_ID },
+        include: [
+          {
+            model: Cart_Items,
+            as: "cart_Items", // đúng alias như model
             include: [
               {
                 model: Products,
@@ -49,46 +91,17 @@ let getCartByUserId = (userId) => {
         ],
       });
 
-      resolve(cart);
+      if (!cart) return resolve(null);
+
+      // Trả về riêng mảng cart_Items nếu bạn chỉ muốn cart item
+      resolve(cart.cart_Items);
     } catch (error) {
       reject(new Error("Không thể lấy giỏ hàng: " + error.message));
     }
   });
 };
 
-let addToCart = (userId, productId, quantity, priceAtAdded) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (!userId || !productId || !quantity || !priceAtAdded) {
-        return reject(new Error("Thiếu tham số bắt buộc khi thêm vào giỏ"));
-      }
-
-      let cart = await createCartIfNotExists(userId);
-
-      let [item, created] = await Cart_Items.findOrCreate({
-        where: {
-          cart_ID: cart.carts_ID,
-          product_ID: productId,
-        },
-        defaults: {
-          Quantity: quantity,
-          Price_At_Added: priceAtAdded,
-        },
-      });
-
-      if (!created) {
-        item.Quantity += quantity;
-        await item.save();
-      }
-
-      resolve(item);
-    } catch (error) {
-      reject(new Error("Không thể thêm sản phẩm vào giỏ: " + error.message));
-    }
-  });
-};
-
-let updateCartQuantity = (cartItemId, quantity) => {
+let updateCart = (cartItemId, quantity) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!cartItemId || !quantity) {
@@ -137,11 +150,10 @@ let searchCart = (name) => {
   });
 };
 export default {
-  getAllCarts,
-  createCartIfNotExists,
-  getCartByUserId,
+  getCartItem,
   addToCart,
-  updateCartQuantity,
+  updateCart,
   removeCart,
   searchCart,
+  getCartByUserId,
 };

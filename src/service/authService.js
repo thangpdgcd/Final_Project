@@ -54,7 +54,7 @@ const registerUser = async ({
     address,
     phoneNumber,
     password: hashedPassword,
-    role: allowedRoles.includes(role) ? roleID : "1", // Mặc định là "1" (user)
+    roleID: allowedRoles.includes(roleID) ? roleID : "1", // Mặc định là "1" (user)
   });
 
   return {

@@ -1,21 +1,14 @@
 import express from "express";
 import userController from "../../src/controllers/usersController.js"; // Import the user controller
-
+// import authMiddleware from "../middlewares/auth.js";
 const router = express.Router();
 
 // GET all users
+// routes/userRoutes.js
 router.get("/users", userController.getAllUsers);
-
-// GET user by ID
-router.get("/users/:id", userController.getOneUsers);
-
-// POST create user
+router.get("/users/:id", userController.getUsersbyID);
 router.post("/create-users", userController.createAdmin);
-
-// PUT update user
 router.put("/users/:id", userController.updateUsers);
-
-// DELETE user
 router.delete("/users/:id", userController.deleteUsers);
 
 // Search users

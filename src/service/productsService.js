@@ -1,14 +1,29 @@
 import db from "../models/index.js";
 
 let { Products, Users, Categories } = db;
-
 let getAllProducts = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      let products = await Products.findAll({
-        include: [{ association: "users" }, { association: "categories" }],
+      let products = await db.Products.findAll({
+        include: [
+          { model: db.Categories, as: "categories" },
+          { model: db.Users, as: "users" },
+        ],
       });
-      resolve(products);
+      if (products && products.length > 0) {
+        products = products.map((item) => {
+          if (item.image) {
+            // Only return the base64 string, no prefix
+            item.image = item.image.toString("base64");
+          }
+          return item;
+        });
+      }
+      resolve({
+        errorCode: 0,
+        message: "OK",
+        products,
+      });
     } catch (error) {
       reject(new Error("Unable to retrieve product list: " + error.message));
     }
@@ -19,7 +34,7 @@ let getProductsById = (productsbyid) => {
   return new Promise(async (resolve, reject) => {
     try {
       let products = await Products.findByPk(productsbyid, {
-        include: [{ association: "users" }, { association: "Categories" }],
+        include: [{ association: "users" }, { association: "categories" }],
       });
       if (!products) {
         reject(new Error("Product does not exist"));
@@ -34,42 +49,51 @@ let getProductsById = (productsbyid) => {
 
 let createProducts = (data) => {
   return new Promise(async (resolve, reject) => {
-    let {
-      name,
-      price,
-      stock = 0,
-      description = null,
-      image = null,
-      categories_ID,
-      user_ID,
-    } = data;
+    let { name, price, stock, description, image, categories_ID, user_ID } =
+      data;
 
-    if (!name || !price || !categories_ID || !user_ID) {
+    if (
+      !name ||
+      price === undefined ||
+      price === null ||
+      categories_ID === undefined ||
+      categories_ID === null ||
+      user_ID === undefined ||
+      user_ID === null
+    ) {
       return reject(
         new Error("Please provide Name, Price, Categories_ID and Users_ID.")
       );
     }
+
     try {
-      let nameExists = await Products.findOne({ where: { name } });
+      const nameExists = await Products.findOne({
+        where: { name: String(name).trim() },
+      });
       if (nameExists) return reject(new Error("Product name already exists."));
 
-      let CategoriesExists = await Categories.findOne({
-        where: { categories_ID: categories_ID },
+      const categoryExists = await Categories.findOne({
+        where: { categories_ID: Number(categories_ID) },
       });
-      if (!CategoriesExists)
-        return reject(new Error("Category does not exist."));
+      if (!categoryExists) return reject(new Error("Category does not exist."));
 
-      let userExists = await Users.findOne({ where: { user_ID: user_ID } });
+      const userExists = await Users.findOne({
+        where: { user_ID: Number(user_ID) },
+      });
       if (!userExists) return reject(new Error("User does not exist."));
 
-      let newProducts = await Products.create({
-        name,
-        price,
-        stock,
-        description,
-        image,
-        categories_ID,
-        user_ID,
+      // ✅ image giờ là path do multer tạo: "/uploads/xxx.jpg"
+      const finalImage =
+        typeof image === "string" && image.trim() ? image.trim() : null;
+
+      const newProducts = await Products.create({
+        name: String(name).trim(),
+        price: Number(price),
+        stock: stock === undefined || stock === null ? 0 : Number(stock),
+        description: description || "",
+        image: finalImage, // ✅ lưu path
+        categories_ID: Number(categories_ID),
+        user_ID: Number(user_ID),
       });
 
       resolve(newProducts);

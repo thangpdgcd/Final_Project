@@ -20,7 +20,7 @@ let getAllUsers = async (req, res) => {
 };
 
 // Lấy 1 người dùng theo ID
-let getOneUsers = async (req, res) => {
+let getUsersbyID = async (req, res) => {
   try {
     let id = req.params.id;
     let users = await usersService.getUsersById(id);
@@ -66,7 +66,7 @@ let deleteUsers = async (req, res) => {
 
 export default {
   getAllUsers,
-  getOneUsers,
+  getUsersbyID,
   createAdmin,
   updateUsers,
   deleteUsers,

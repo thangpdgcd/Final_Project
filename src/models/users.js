@@ -4,7 +4,8 @@ import { Model, DataTypes } from "sequelize";
 export default (sequelize) => {
   class Users extends Model {
     static associate(models) {
-      // Define associations here
+      Users.hasMany(models.Orders, { foreignKey: "user_ID", as: "orders" });
+      Users.hasOne(models.Carts, { foreignKey: "user_ID", as: "carts" });
     }
   }
 

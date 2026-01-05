@@ -11,15 +11,23 @@ const registerUser = async (req, res) => {
         .json({ message: "Tên, Email và mật khẩu là bắt buộc." });
     }
 
+    // ✅ nhận roleID từ FE (nếu có), không thì default = "1"
+    // Chuẩn hoá về string số: "1" | "2" | "3"
+    const finalRoleID =
+      roleID !== undefined && roleID !== null && `${roleID}`.trim() !== ""
+        ? String(roleID)
+        : "1";
+
     const userData = await authService.registerUser({
       name,
       email,
       address,
       phoneNumber,
       password,
-      roleID: process.env.USER || "1", // Mặc định là "1" (user)
+      roleID: finalRoleID,
     });
 
+    console.log("✅ Người dùng đã đăng ký thành công:", userData);
     return res
       .status(201)
       .json({ message: "Đăng ký thành công", user: userData });
@@ -36,12 +44,13 @@ const login = async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ message: "Email và mật khẩu là bắt buộc." });
   }
-
+  console.log("🔑 Thông tin đăng nhập:", { email, password: "[Đã ẩn]" });
   try {
     const result = await authService.login(email, password);
     return res.status(200).json({ message: "Đăng nhập thành công", ...result });
   } catch (error) {
     console.error("❌ Lỗi login:", error);
+
     return res.status(401).json({ message: error.message });
   }
 };
@@ -81,22 +90,22 @@ const showRegisterPage = (_, res) => {
 // ✅ Đăng ký từ EJS (POST)
 const registerEJS = async (req, res) => {
   try {
-    const { Name, Email, Address, PhoneNumber, password, roleID } = req.body;
+    const { name, email, address, phoneNumber, password, roleID } = req.body;
 
-    if (!Name || !Email || !password) {
+    if (!name || !email || !password) {
       return res.render("register", {
         message: "Vui lòng nhập đầy đủ thông tin.",
       });
     }
 
     const allowedRoles = ["1", "2", "3"];
-    const validatedRole = allowedRoles.includes(role) ? roleID : "1"; // Mặc định là "1" (user)
+    const validatedRole = allowedRoles.includes(roleID) ? roleID : "1"; // Mặc định là "1" (user)
 
     await authService.register({
-      Name,
-      Email,
-      Address,
-      PhoneNumber,
+      name,
+      email,
+      address,
+      phoneNumber,
       password,
       role: validatedRole,
     });

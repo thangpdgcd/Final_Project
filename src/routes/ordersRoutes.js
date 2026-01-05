@@ -1,27 +1,26 @@
 // src/routes/ordersRoutes.js
 import express from "express";
-import ordersController from "../../src/controllers/ordersController.js"; // ✅ Đã thêm "s"
+import OrdersController from "../controllers/ordersController.js";
 
 const router = express.Router();
 
-// GET all orders
-router.get("/orders", ordersController.getAllOrders);
+/* ================== CRUD ORDERS ================== */
 
-// GET order by ID
-router.get("/orders/:id", ordersController.getOrdersById);
+// POST /api/orders
+router.post("/create-orders", OrdersController.createOrders);
 
-// POST create order
-router.post("/create-orders", ordersController.createOrders);
+// GET /api/orders/:id
+router.get("/orders/:id", OrdersController.getOrderById);
 
-// PUT update order
-router.put("/orders/:id", ordersController.updateOrders);
+// PUT /api/orders/:id
+router.put("/orders/:id", OrdersController.updateOrders);
 
-// DELETE order
-router.delete("/orders/:id", ordersController.deleteOrders);
+// DELETE /api/orders/:id
+router.delete("/orders/:id", OrdersController.deleteOrders);
 
-// Attach all order routes under /api
+/* ================== INIT ================== */
 const initOrdersRoutes = (app) => {
-  app.use("/api", router); // /api/orders, /api/create-orders
+  app.use("/api/orders", router);
 };
 
 export default initOrdersRoutes;

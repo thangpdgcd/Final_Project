@@ -1,4 +1,3 @@
-// src/seeds/seedAdmin.js
 import bcrypt from "bcrypt";
 import db from "../models/index.js";
 import dotenv from "dotenv";
@@ -13,7 +12,7 @@ const seedAdmin = async () => {
     });
 
     if (existingAdmin) {
-      console.log("⚠️ Administrator account already exists.");
+      console.log("Administrator account already exists.");
       return;
     }
 
@@ -22,7 +21,7 @@ const seedAdmin = async () => {
     await db.Users.create({
       name: "admin",
       password: hashedPassword,
-      roleID: "2", // 2 for admin
+      roleID: "3",
       email: "admin@example.com",
       address: "123 Admin Street",
       phoneNumber: "0123456789",
@@ -36,4 +35,4 @@ const seedAdmin = async () => {
   }
 };
 
-seedAdmin();
+export default seedAdmin;

@@ -1,25 +1,10 @@
 import db from "../models/index.js";
+let { Orders, Cart_Items, Carts, Users, Order_Items } = db;
 
-const { Orders, Users } = db;
-
-const getAllOrders = async () => {
+const getOrderById = async (order_ID) => {
   try {
-    const orders = await Orders.findAll({
-      include: {
-        model: Users,
-        as: "users",
-        attributes: ["user_ID", "name", "email"],
-      },
-    });
-    return orders;
-  } catch (error) {
-    throw new Error("Unable to retrieve order list: " + error.message);
-  }
-};
-
-const getOrderById = async (Orderid) => {
-  try {
-    const orders = await Orders.findByPk(Orderid, {
+    console.log("🔍 Searching order_ID:", order_ID);
+    const orders = await Orders.findByPk(order_ID, {
       include: {
         model: Users,
         as: "users",
@@ -37,26 +22,47 @@ const getOrderById = async (Orderid) => {
   }
 };
 
-const createOrders = async (data) => {
-  try {
-    const { user_ID, total_Amount, status, shipping_Address } = data;
+const createOrders = async (user_ID) => {
+  if (!user_ID) throw new Error("Missing user_ID");
 
-    const users = await Users.findOne({ where: { user_ID: user_ID } });
-    if (!users) {
-      throw new Error("User does not exist");
-    }
+  // Lấy giỏ hàng của user
+  const cart = await Carts.findOne({
+    where: { user_ID },
+    include: [{ model: Cart_Items, as: "cart_Items" }],
+  });
+  if (!cart) return reject(new Error("Cart not found"));
+  if (!cart.cart_Items || cart.cart_Items.length === 0)
+    return reject(new Error("Cart is empty"));
+  if (!cart || cart.cart_Items.length === 0) throw new Error("Cart is empty");
 
-    const newOrders = await Orders.create({
-      user_ID,
-      total_Amount,
-      status,
-      shipping_Address,
+  // Tính tổng tiền = price * quantity
+  const totalAmount = cart.cart_Items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  // Tạo order
+  const order = await Orders.create({
+    user_ID,
+    total_Amount: totalAmount,
+    status: "Pending",
+    shipping_Address: "Chưa cập nhật",
+  });
+
+  // Tạo order items
+  for (const item of cart.cart_Items) {
+    await Order_Items.create({
+      order_ID: order.order_ID,
+      product_ID: item.product_ID,
+      quantity: item.quantity,
+      price: item.price,
     });
-
-    return newOrders;
-  } catch (error) {
-    throw new Error("Unable to create order: " + error.message);
   }
+
+  // Xoá giỏ hàng sau khi tạo order
+  await Cart_Items.destroy({ where: { cart_ID: cart.cart_ID } });
+
+  return order;
 };
 
 const updateOrder = async (updateOrderid, data) => {
@@ -107,7 +113,6 @@ let searchOrders = async ({ user_ID, status }) => {
 };
 
 export default {
-  getAllOrders,
   getOrderById,
   createOrders,
   updateOrder,

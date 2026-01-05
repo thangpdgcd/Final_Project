@@ -13,6 +13,13 @@ export default (sequelize) => {
         targetKey: "categories_ID",
         as: "categories",
       });
+
+      Products.belongsToMany(models.Carts, {
+        through: models.Cart_Items,
+        as: "carts",
+        foreignKey: "product_ID",
+        otherKey: "cart_ID",
+      });
     }
   }
   Products.init(
@@ -39,11 +46,11 @@ export default (sequelize) => {
         allowNull: false,
       },
       image: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true,
       },
       user_ID: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       categories_ID: {
