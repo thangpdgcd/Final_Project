@@ -42,7 +42,8 @@ export interface CreateOrderItemPayload {
 
 // ✅ Lấy đơn hàng theo ID
 export const getOrderById = async (id: number): Promise<Order> => {
-  const res = await axios.get<Order>(`${apiBase}/orders/${id}`);
+  // BE: GET /api/orders/orders/:id
+  const res = await axios.get<Order>(`${apiBase}/orders/orders/${id}`);
   return res.data;
 };
 
@@ -50,9 +51,14 @@ export const getOrderById = async (id: number): Promise<Order> => {
 export const createOrder = async (
   payload: CreateOrderPayload
 ): Promise<Order> => {
-  const res = await axios.post<Order>(`${apiBase}/create-orders`, payload, {
-    headers: { "Content-Type": "application/json" },
-  });
+  // BE: POST /api/orders/create-orders
+  const res = await axios.post<Order>(
+    `${apiBase}/orders/create-orders`,
+    payload,
+    {
+      headers: { "Content-Type": "application/json" },
+    }
+  );
   return res.data;
 };
 
@@ -61,28 +67,38 @@ export const updateOrder = async (
   id: number,
   payload: Partial<Order>
 ): Promise<Order> => {
-  const res = await axios.put<Order>(`${apiBase}/orders/${id}`, payload, {
-    headers: { "Content-Type": "application/json" },
-  });
+  // BE: PUT /api/orders/orders/:id
+  const res = await axios.put<Order>(
+    `${apiBase}/orders/orders/${id}`,
+    payload,
+    {
+      headers: { "Content-Type": "application/json" },
+    }
+  );
   return res.data;
 };
 
 // ✅ Xoá đơn hàng
 export const deleteOrder = async (id: number): Promise<{ message: string }> => {
+  // BE: DELETE /api/orders/orders/:id
   const res = await axios.delete<{ message: string }>(
-    `${apiBase}/orders/${id}`
+    `${apiBase}/orders/orders/${id}`
   );
   return res.data;
 };
 
-/* ================= ORDER ITEMS API ================= */
+/* ================= ORDER ITEMS API =================
+   ⚠️ Phần này chỉ đúng nếu BE của bạn thật sự có các routes dưới đây.
+   Nếu BE chưa có /orders/:order_ID/items hoặc /orderitems... thì sẽ 404.
+*/
 
 // ✅ Lấy tất cả order items theo order_ID
 export const getOrderItemsByOrderId = async (
   order_ID: number
 ): Promise<OrderItem[]> => {
+  // giả định BE: GET /api/orders/orders/:order_ID/items
   const res = await axios.get<OrderItem[]>(
-    `${apiBase}/orders/${order_ID}/items`
+    `${apiBase}/orders/orders/${order_ID}/items`
   );
   return res.data;
 };
@@ -91,9 +107,14 @@ export const getOrderItemsByOrderId = async (
 export const createOrderItem = async (
   payload: CreateOrderItemPayload
 ): Promise<OrderItem> => {
-  const res = await axios.post<OrderItem>(`${apiBase}/orderitems`, payload, {
-    headers: { "Content-Type": "application/json" },
-  });
+  // giả định BE: POST /api/orders/orderitems
+  const res = await axios.post<OrderItem>(
+    `${apiBase}/orders/orderitems`,
+    payload,
+    {
+      headers: { "Content-Type": "application/json" },
+    }
+  );
   return res.data;
 };
 
@@ -101,8 +122,9 @@ export const createOrderItem = async (
 export const deleteOrderItem = async (
   orderitem_ID: number
 ): Promise<{ message: string }> => {
+  // giả định BE: DELETE /api/orders/orderitems/:orderitem_ID
   const res = await axios.delete<{ message: string }>(
-    `${apiBase}/orderitems/${orderitem_ID}`
+    `${apiBase}/orders/orderitems/${orderitem_ID}`
   );
   return res.data;
 };
