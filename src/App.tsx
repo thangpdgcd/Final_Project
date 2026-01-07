@@ -10,15 +10,14 @@ import Contact from "./pages/customers/contact";
 import OrderDetail from "./pages/customers/orders";
 import PageCart from "./pages/customers/cart";
 import SystemPage from "./pages/systems/pages/SystemPage";
-
 import ProductDetailPage from "./pages/customers/product_details";
+import PaymentPage from "./pages/customers/payment";
 const App = () => {
   return (
     <Router>
       <Routes>
         {/* Trang Home */}
         <Route path='/' element={<HomePage />} />
-
         {/* Trang Login */}
         <Route path='/login' element={<LoginPage />} />
         {/* Trang Register */}
@@ -26,19 +25,17 @@ const App = () => {
         {/* Trang Products */}
         <Route path='/products' element={<ProductList />} />
         {/* Trang Orders */}
-
         <Route path='/products/:id' element={<ProductDetailPage />} />
-
         <Route path='/profiles/:userid' element={<Userprofile />} />
-
         <Route path='/about' element={<About />} />
-
         <Route path='/categories' element={<About />} />
-
         <Route path='/contacts' element={<Contact />} />
+        <Route path='/orders-details' element={<OrderDetail />} />
         <Route path='/orders' element={<OrderDetail />} />
         <Route path='/carts' element={<PageCart />} />
         <Route path='/system' element={<SystemPage />} />
+        <Route path='/paypal/config' element={<PaymentPage />} />{" "}
+        {/* ✅ thêm dòng này */}
       </Routes>
     </Router>
   );
