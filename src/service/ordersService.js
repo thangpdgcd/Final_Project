@@ -22,34 +22,41 @@ const getOrderById = async (order_ID) => {
   }
 };
 
-const createOrders = async (user_ID) => {
+const createOrders = async (user_ID, opts = {}) => {
   if (!user_ID) throw new Error("Missing user_ID");
 
-  // Lấy giỏ hàng của user
+  const {
+    status = "Pending",
+    paymentMethod = null,
+    paypalCaptureId = null,
+  } = opts;
+
   const cart = await Carts.findOne({
     where: { user_ID },
     include: [{ model: Cart_Items, as: "cart_Items" }],
   });
-  if (!cart) return reject(new Error("Cart not found"));
-  if (!cart.cart_Items || cart.cart_Items.length === 0)
-    return reject(new Error("Cart is empty"));
-  if (!cart || cart.cart_Items.length === 0) throw new Error("Cart is empty");
 
-  // Tính tổng tiền = price * quantity
+  if (!cart) throw new Error("Cart not found");
+  if (!cart.cart_Items || cart.cart_Items.length === 0)
+    throw new Error("Cart is empty");
+
   const totalAmount = cart.cart_Items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  // Tạo order
   const order = await Orders.create({
     user_ID,
     total_Amount: totalAmount,
-    status: "Pending",
+    status, // ✅ Paid hoặc Pending
     shipping_Address: "Chưa cập nhật",
+
+    // ✅ nếu DB có cột thì lưu thêm
+    payment_Method: paymentMethod,
+    paypal_Capture_Id: paypalCaptureId,
+    paid_At: status === "Paid" ? new Date() : null,
   });
 
-  // Tạo order items
   for (const item of cart.cart_Items) {
     await Order_Items.create({
       order_ID: order.order_ID,
@@ -59,7 +66,6 @@ const createOrders = async (user_ID) => {
     });
   }
 
-  // Xoá giỏ hàng sau khi tạo order
   await Cart_Items.destroy({ where: { cart_ID: cart.cart_ID } });
 
   return order;

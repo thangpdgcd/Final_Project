@@ -1,12 +1,26 @@
 import express from "express";
-let router = express.Router();
-let initPaymentsRoutes = (app) => {
+
+const router = express.Router();
+
+const initPaymentsRoutes = (app) => {
   router.get("/payment/config", (req, res) => {
+    const client_id = process.env.PAYPAL_CLIENT_ID;
+
+    if (!client_id) {
+      return res.status(500).json({
+        status: "error",
+        message: "Missing PAYPAL_CLIENT_ID in .env",
+      });
+    }
+
+    res.set("Cache-Control", "no-store");
     return res.status(200).json({
       status: "success",
-      data: process.env.CLIENT_ID,
+      data: client_id,
     });
   });
+
   return app.use("/", router);
 };
+
 export default initPaymentsRoutes;

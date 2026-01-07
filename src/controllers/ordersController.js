@@ -16,7 +16,7 @@ const createOrders = async (req, res) => {
     if (!user_ID) return res.status(400).json({ message: "Missing user_ID" });
 
     const order = await ordersService.createOrders(user_ID);
-    res.status(201).json({ message: "Order created successfully", order });
+    res.status(201).json({ message: "Order created  successfully", order });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
