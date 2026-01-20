@@ -22,25 +22,25 @@ const FooterPage: React.FC = () => {
   return (
     <Footer className='app-footer'>
       <div className='app-footer__inner'>
-        {/* 3 cột giống hình mẫu */}
+        {/* 3 columns */}
         <Row gutter={[48, 32]}>
-          {/* Cột 1: More About Company */}
+          {/* Column 1: About */}
           <Col xs={24} md={8} className='footer-column'>
             <Title level={4} className='footer-heading'>
-              VỀ PHAN COFFEE
+              ABOUT PHAN COFFEE
             </Title>
             <p className='footer-text'>
-              Phan Coffee là không gian dành cho những người yêu cà phê rang xay
-              nguyên chất, nơi bạn có thể tận hưởng hương vị đậm đà trong một
-              không gian ấm cúng và gần gũi giữa lòng Sài Gòn.
+              Phan Coffee is a place for people who love pure, freshly roasted
+              coffee. Here, you can enjoy bold flavors in a warm, friendly space
+              in the heart of Ho Chi Minh City.
             </p>
             <p className='footer-signature'>– Phan Coffee</p>
           </Col>
 
-          {/* Cột 2: Keep Connected */}
+          {/* Column 2: Social */}
           <Col xs={24} md={8} className='footer-column'>
             <Title level={4} className='footer-heading'>
-              KẾT NỐI VỚI CHÚNG TÔI
+              CONNECT WITH US
             </Title>
             <ul className='footer-list footer-list--social'>
               <li>
@@ -90,21 +90,21 @@ const FooterPage: React.FC = () => {
             </ul>
           </Col>
 
-          {/* Cột 3: Contact Information */}
+          {/* Column 3: Contact */}
           <Col xs={24} md={8} className='footer-column'>
             <Title level={4} className='footer-heading'>
-              THÔNG TIN LIÊN HỆ
+              CONTACT INFORMATION
             </Title>
             <ul className='footer-list footer-list--contact'>
               <li>
                 <HomeOutlined className='contact-icon' />
                 <div>
                   <Text className='footer-contact-line'>
-                    82-84 Bùi Thị Xuân, P. Bến Thành
+                    82–84 Bui Thi Xuan St., Ben Thanh Ward
                   </Text>
                   <br />
                   <Text className='footer-contact-line'>
-                    Q.1, TP. Hồ Chí Minh
+                    District 1, Ho Chi Minh City, Vietnam
                   </Text>
                 </div>
               </li>
@@ -116,7 +116,7 @@ const FooterPage: React.FC = () => {
                   </Text>
                   <br />
                   <Text className='footer-contact-line'>
-                    Tel: (84.28) 3925 1852
+                    Tel: (+84 28) 3925 1852
                   </Text>
                 </div>
               </li>
@@ -133,7 +133,7 @@ const FooterPage: React.FC = () => {
         </Row>
       </div>
 
-      {/* Dải bar dưới giống hình */}
+      {/* Bottom bar */}
       <div className='app-footer__bottom'>
         <div className='footer-bottom-left'>
           © {year} Phan Coffee. All rights reserved.

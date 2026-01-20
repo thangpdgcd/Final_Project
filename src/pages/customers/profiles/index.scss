@@ -1,0 +1,174 @@
+@import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
+
+.profile-page {
+  min-height: calc(100vh - 72px);
+  padding: 40px 16px;
+  background: linear-gradient(180deg, #1f2124 0%, #2b241c 60%, #1c1e20 100%);
+  color: #fff;
+
+  &--center {
+    display: grid;
+    place-items: center;
+  }
+
+  &__container {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  &__alert {
+    margin-bottom: 14px;
+  }
+
+  &__actions {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}
+
+.profile-card {
+  border-radius: 18px !important;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(27, 29, 31, 0.92) !important;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+
+  .ant-card-body {
+    padding: 18px !important;
+  }
+}
+
+.profile-card__header {
+  display: grid;
+  grid-template-columns: 140px 1fr 180px;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 10px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.profile-card__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 1px solid rgba(212, 165, 116, 0.22);
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  &:hover {
+    background: rgba(212, 165, 116, 0.12);
+    border-color: rgba(212, 165, 116, 0.35);
+    color: #d4a574;
+  }
+}
+
+.profile-card__title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(212, 165, 116, 0.22);
+  background: rgba(212, 165, 116, 0.08);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.profile-avatar__fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #d4a574;
+}
+
+.profile-card__nameBlock {
+  min-width: 0;
+}
+
+.profile-card__name {
+  font-family: "Viaoda Libre", serif;
+  font-size: 22px;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.profile-card__sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.62);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 520px;
+}
+
+.profile-card__headerActions {
+  display: flex;
+  justify-content: flex-end;
+
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+  }
+}
+
+.profile-card__body {
+  padding: 16px 10px 6px;
+}
+
+.profile-desc {
+  .ant-descriptions-view {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(212, 165, 116, 0.18);
+    background: rgba(45, 48, 53, 0.5);
+  }
+
+  .ant-descriptions-item-label {
+    background: rgba(212, 165, 116, 0.08) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 600 !important;
+    width: 220px;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  .ant-descriptions-item-content {
+    background: rgba(0, 0, 0, 0.12) !important;
+    color: rgba(255, 255, 255, 0.88) !important;
+    font-weight: 500;
+  }
+}
+
+/* Optional: nếu bạn đang dùng html.dark thì chỉnh thêm */
+html.dark .profile-page {
+  background: linear-gradient(180deg, #0f1113 0%, #191513 60%, #0c0e10 100%);
+}

@@ -97,11 +97,8 @@
     &__overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0.55),
-          rgba(0, 0, 0, 0.35)
-        ),
+      background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.35)),
         radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.4), transparent 60%);
       mix-blend-mode: multiply;
     }
@@ -372,7 +369,8 @@
           border-radius: 10px;
           object-fit: cover;
           transition: transform 0.4s ease;
-          box-shadow: rgba(14, 30, 37, 0.12) 0 2px 4px,
+          box-shadow:
+            rgba(14, 30, 37, 0.12) 0 2px 4px,
             rgba(14, 30, 37, 0.32) 0 2px 16px;
         }
 
@@ -436,11 +434,8 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(
-          circle at top,
-          rgba(0, 0, 0, 0.35),
-          transparent
-        ),
+      background:
+        radial-gradient(circle at top, rgba(0, 0, 0, 0.35), transparent),
         linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.96));
       backdrop-filter: blur(3px);
     }
@@ -456,7 +451,7 @@
     }
 
     .contact-title {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
       margin-bottom: 4px;
     }
@@ -546,7 +541,9 @@
       border-color: transparent;
       color: #111;
       box-shadow: 0 10px 18px rgba(255, 132, 63, 0.4);
-      transition: transform 0.15s ease, box-shadow 0.15s ease,
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
         background 0.2s ease;
 
       &:hover {

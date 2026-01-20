@@ -4,7 +4,6 @@ const apilogin = process.env.API_URL_LOGIN || "http://localhost:8080/api/login";
 const apiregister =
   process.env.API_URL_REGISTER || "http://localhost:8080/api/register";
 
-// Kiểu dữ liệu
 export interface LoginPayload {
   email: string;
   password: string;
@@ -28,13 +27,11 @@ export interface RegisterResponse {
   email: string;
 }
 
-// 🔹 Login API (POST)
 export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
   const res = await axios.post(`${apilogin}`, payload);
   return res.data;
 };
 
-// 🔹 Register API (POST)
 export const register = async (
   payload: RegisterPayload
 ): Promise<RegisterResponse> => {

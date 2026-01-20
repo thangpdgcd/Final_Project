@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiProfile, UserProfile } from "../../../api/profileApi";
 import { Card, Descriptions, Spin, Alert } from "antd";
-
+import "./index.scss";
 const Profile: React.FC = () => {
   const { userid } = useParams();
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -22,7 +22,7 @@ const Profile: React.FC = () => {
         setUser(userData);
       } catch (err: any) {
         setError(
-          err.response?.data?.message || "Lỗi khi tải thông tin người dùng"
+          err.response?.data?.message || "Lỗi khi tải thông tin người dùng",
         );
       } finally {
         setLoading(false);

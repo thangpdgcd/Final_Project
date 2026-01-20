@@ -16,6 +16,7 @@ import {
   Button,
   message,
   Breadcrumb,
+  Badge,
 } from "antd";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ShoppingCartOutlined } from "@ant-design/icons";
@@ -80,13 +81,14 @@ const ProductDetailPage: React.FC = () => {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
+  // ✅ đồng bộ route giống ProductList: /carts
   const menuRoutes: Record<string, string> = {
     home: "/",
     products: "/products",
     contact: "/contact",
     about: "/about",
     login: "/login",
-    cart: "/cart",
+    carts: "/carts",
   };
 
   const handleMenuClick = (e: { key: string }) => {
@@ -102,6 +104,7 @@ const ProductDetailPage: React.FC = () => {
     if (path) navigate(path);
   };
 
+  // ✅ lấy giỏ hàng giống ProductList + thêm Badge số lượng
   const menuitems = [
     { key: "home", label: "Home" },
     { key: "products", label: "Coffee" },
@@ -112,20 +115,27 @@ const ProductDetailPage: React.FC = () => {
       label: isLoggedIn ? "Log Out" : "Log In",
     },
     {
-      key: "cart",
+      key: "carts",
       label: (
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            height: "100%",
-          }}>
-          <ShoppingCartOutlined style={{ fontSize: 20, color: "#fff" }} />
-        </span>
+        <div className='menu-cart'>
+          <Badge
+            count={cartItems?.length || 0}
+            size='small'
+            overflowCount={99}
+            offset={[6, -2]}>
+            <span className='menu-cart-icon text-2xl'>
+              <ShoppingCartOutlined
+                className='icon-carts'
+                style={{ fontSize: 24 }}
+              />
+            </span>
+          </Badge>
+        </div>
       ),
     },
   ];
 
+  // Load product
   useEffect(() => {
     if (!id) return;
     (async () => {
@@ -144,9 +154,10 @@ const ProductDetailPage: React.FC = () => {
     })();
   }, [id]);
 
+  // Load cart for badge + check existed
   useEffect(() => {
     const fetchCart = async () => {
-      if (!user_ID) {
+      if (!user_ID || !localStorage.getItem("token")) {
         setCartItems([]);
         return;
       }
@@ -161,7 +172,7 @@ const ProductDetailPage: React.FC = () => {
       }
     };
     fetchCart();
-  }, [user_ID]);
+  }, [user_ID, isLoggedIn]);
 
   const inStock = useMemo(() => (product?.stock ?? 0) > 0, [product]);
 
@@ -199,6 +210,7 @@ const ProductDetailPage: React.FC = () => {
 
       message.success(`Đã thêm ${qty} sản phẩm vào giỏ`);
 
+      // ✅ update badge/cartItems ngay lập tức
       setCartItems((prev: any) => [
         ...prev,
         {
@@ -208,6 +220,7 @@ const ProductDetailPage: React.FC = () => {
           quantity: qty,
           price: product.price * qty,
           products: {
+            product_ID: product.product_ID,
             name: product.name,
             price: product.price,
             image: product.image,

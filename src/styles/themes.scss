@@ -1,0 +1,39 @@
+/* ========== THEME VARIABLES ========== */
+
+/* LIGHT (default) */
+:root {
+  --bg-main: #f7f4ef;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #fdf9f4;
+
+  --bg-header: #2d3035;
+
+  --text-main: #2b1b16;
+  --text-muted: #6e5a4b;
+
+  --border-soft: rgba(0, 0, 0, 0.08);
+
+  --accent: #d4a574;
+}
+
+/* DARK */
+html.dark {
+  --bg-main: #0f1113;
+  --bg-surface: #15181b;
+  --bg-surface-2: #101214;
+
+  --bg-header: #17191c;
+
+  --text-main: rgba(255, 255, 255, 0.92);
+  --text-muted: rgba(255, 255, 255, 0.6);
+
+  --border-soft: rgba(255, 255, 255, 0.12);
+
+  --accent: #f5a623;
+}
+
+/* Global apply */
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+}

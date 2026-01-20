@@ -19,9 +19,14 @@ import "./index.scss";
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
-const API_BASE = "http://localhost:8080";
+const API_BASE = "http://localhost:8080"; // ✅ bỏ "/" cuối
+
 const CONFIG_ENDPOINT = "/payment/config";
-const CREATE_ORDER_DB_ENDPOINT = "/api/orders/create-orders";
+const CREATE_ORDER_DB_ENDPOINT = "/api/create-orders";
+
+const ORDERS_HISTORY_ROUTE = "/history-orders";
+
+const LAST_ORDER_KEY = "last_order_payload";
 
 declare global {
   interface Window {
@@ -39,14 +44,12 @@ const OrderPage: React.FC = () => {
   const [sdkReady, setSdkReady] = useState(false);
   const [loadingSdk, setLoadingSdk] = useState(false);
 
-  const [paid, setPaid] = useState(false);
-  const [captureResult, setCaptureResult] = useState<any>(null);
-
   const [savingOrder, setSavingOrder] = useState(false);
   const [error, setError] = useState("");
 
   const paypalRef = useRef<HTMLDivElement | null>(null);
   const renderedRef = useRef(false);
+  const savingOnceRef = useRef(false);
 
   const columns = [
     { title: "Product", dataIndex: ["products", "name"], key: "name" },
@@ -87,6 +90,7 @@ const OrderPage: React.FC = () => {
     about: "/about",
     login: "/login",
     carts: "/carts",
+    orders: ORDERS_HISTORY_ROUTE,
   };
 
   const handleMenuClick = (e: { key: string }) => {
@@ -100,6 +104,7 @@ const OrderPage: React.FC = () => {
     { key: "contact", label: "Contact" },
     { key: "about", label: "About" },
     { key: "login", label: "Log In" },
+    { key: "orders", label: "Orders" },
     {
       key: "carts",
       label: (
@@ -121,10 +126,7 @@ const OrderPage: React.FC = () => {
     try {
       return { ok: res.ok, data: JSON.parse(text) };
     } catch {
-      return {
-        ok: false,
-        data: { message: text || "Response is not JSON" },
-      };
+      return { ok: false, data: { message: text || "Response is not JSON" } };
     }
   };
 
@@ -191,15 +193,22 @@ const OrderPage: React.FC = () => {
       return;
     }
 
-    setShowPaypal(true);
-    setPaid(false);
-    setCaptureResult(null);
+    // reset flags
+    savingOnceRef.current = false;
     renderedRef.current = false;
+
+    setShowPaypal(true);
+    setSdkReady(false);
+    setError("");
 
     await addPaypalScript();
   };
 
-  const handleSaveOrderToDB = async () => {
+  // ✅ Save DB + lưu sessionStorage + redirect sang OrdersPageHistory
+  const handleSaveOrderToDBAndGoOrdersHistory = async (capture: any) => {
+    if (savingOnceRef.current) return; // chống double-call
+    savingOnceRef.current = true;
+
     try {
       setSavingOrder(true);
       setError("");
@@ -214,30 +223,38 @@ const OrderPage: React.FC = () => {
           user_ID: Number(user_ID),
           status: "Paid",
           paymentMethod: "PayPal",
-          paypalCaptureId: captureResult?.id || null,
+          paypalCaptureId: capture?.id || null,
         }),
       });
 
       const { ok, data } = await safeJson(res);
       if (!ok) throw new Error(data?.message || "Failed to create order");
 
-      message.success("Order saved to database ✅");
-      navigate("/orders", {
-        state: {
-          orderData: {
-            user_ID,
-            payment: "PayPal",
-            totalPriceVND: totalAmountVND,
-            totalPriceUSD: amountUSD,
-            cartItems,
-            captureResult,
-          },
-          created: data,
+      const payload = {
+        orderData: {
+          user_ID,
+          payment: "PayPal",
+          totalPriceVND: totalAmountVND,
+          totalPriceUSD: amountUSD,
+          cartItems,
+          captureResult: capture,
         },
-      });
+        created: data,
+      };
+
+      // ✅ refresh (F5) vẫn còn data
+      sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(payload));
+
+      message.success(
+        "Payment success ✅ Redirecting to your ordered products..."
+      );
+
+      // ✅ redirect đến đúng trang bạn đưa (OrdersPageHistory)
+      navigate(ORDERS_HISTORY_ROUTE, { state: payload });
     } catch (e: any) {
       console.error(e);
       setError(e?.message || "Failed to save order");
+      savingOnceRef.current = false; // cho phép thử lại nếu fail
     } finally {
       setSavingOrder(false);
     }
@@ -270,15 +287,12 @@ const OrderPage: React.FC = () => {
           });
         },
 
+        // ✅ Pay xong → capture → auto save DB → auto redirect OrdersPageHistory
         onApprove: async (_data: any, actions: any) => {
           try {
             const capture = await actions.order.capture();
-            setCaptureResult(capture);
-            setPaid(true);
             setShowPaypal(false);
-            message.success(
-              "PayPal payment successful! Click confirm to save the order."
-            );
+            await handleSaveOrderToDBAndGoOrdersHistory(capture);
           } catch (e: any) {
             console.error(e);
             setError(e?.message || "Capture failed");
@@ -297,11 +311,12 @@ const OrderPage: React.FC = () => {
 
   const handleBack = () => {
     setShowPaypal(false);
-    setPaid(false);
-    setCaptureResult(null);
     setSdkReady(false);
+    setLoadingSdk(false);
+    setSavingOrder(false);
     setError("");
     renderedRef.current = false;
+    savingOnceRef.current = false;
     if (paypalRef.current) paypalRef.current.innerHTML = "";
   };
 
@@ -343,11 +358,12 @@ const OrderPage: React.FC = () => {
             </div>
           )}
 
-          {!showPaypal && !paid && (
+          {!showPaypal && (
             <Button
               type='primary'
               size='large'
-              disabled={!cartItems?.length}
+              disabled={!cartItems?.length || savingOrder}
+              loading={savingOrder}
               onClick={handleConfirmOrder}>
               Confirm Order
             </Button>
@@ -356,27 +372,15 @@ const OrderPage: React.FC = () => {
           {showPaypal && (
             <div
               style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
-              <Button onClick={handleBack}>Back</Button>
+              <Button onClick={handleBack} disabled={savingOrder}>
+                Back
+              </Button>
 
               <div style={{ minWidth: 260 }}>
                 {loadingSdk && <Spin tip='Loading PayPal...' />}
+                {savingOrder && <Spin tip='Saving order...' />}
                 <div ref={paypalRef} />
               </div>
-            </div>
-          )}
-
-          {!showPaypal && paid && (
-            <div
-              style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
-              <Button onClick={handleBack}>Cancel</Button>
-
-              <Button
-                type='primary'
-                size='large'
-                loading={savingOrder}
-                onClick={handleSaveOrderToDB}>
-                Confirm Payment (Save Order)
-              </Button>
             </div>
           )}
         </div>

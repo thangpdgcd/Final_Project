@@ -1,3 +1,4 @@
+// src/pages/login/index.tsx
 import React, { useState } from "react";
 import { Layout, Form, Input, Button, Checkbox, message, Divider } from "antd";
 import {
@@ -11,7 +12,10 @@ import { login, LoginPayload, LoginResponse } from "../../api/authApi";
 import logo from "../../../src/assets/img/logo_PhanCoffee.jpg";
 import "./index.scss";
 
-const { Header, Content, Footer } = Layout;
+// ✅ import FooterPage (giống HomePage)
+import FooterPage from "../footer/index";
+
+const { Header, Content } = Layout;
 
 interface LoginFormValues extends LoginPayload {
   remember: boolean;
@@ -41,27 +45,25 @@ const LoginPage: React.FC = () => {
         (data as any)?.user?.id ??
         (data as any)?.id;
 
-      if (userId) {
-        localStorage.setItem("user_ID", String(userId));
-      } else {
-        localStorage.removeItem("user_ID");
-      }
+      if (userId) localStorage.setItem("user_ID", String(userId));
+      else localStorage.removeItem("user_ID");
 
-      message.success("✅ Đăng nhập thành công!");
+      message.success("✅ Logged in successfully!");
       navigate("/");
     } catch (err: any) {
-      message.error("❌ Sai email hoặc mật khẩu!");
+      message.error("❌ Incorrect email or password!");
     } finally {
       setLoading(false);
     }
   };
 
   const onSocialLogin = (provider: "facebook" | "google" | "instagram") => {
-    message.info(`🔒 Đăng nhập bằng ${provider.toUpperCase()} (UI demo)`);
+    message.info(`🔒 Continue with ${provider.toUpperCase()} (UI demo)`);
   };
 
   return (
     <Layout className='login-layout'>
+      {/* ===== HEADER (match Home) ===== */}
       <Header className='pc-header pc-header--clean'>
         <div className='pc-header__left' onClick={() => navigate("/")}>
           <img className='pc-header__logo' src={logo} alt='Phan Coffee' />
@@ -69,13 +71,14 @@ const LoginPage: React.FC = () => {
         </div>
 
         <div className='pc-header__center' />
-
         <div className='pc-header__right' />
       </Header>
 
+      {/* ===== CONTENT ===== */}
       <Content className='login-content'>
         <div className='login-hero'>
           <div className='login-card'>
+            {/* LEFT */}
             <div className='login-left'>
               <div className='brand-row'>
                 <img src={logo} alt='Phan Coffee' className='brand-logo' />
@@ -84,15 +87,6 @@ const LoginPage: React.FC = () => {
                   <div className='brand'>PHAN COFFEE</div>
                 </div>
               </div>
-
-              <div className='headline'>
-                <span className='accent'>SPECIAL</span>
-                <span className='title'>COFFEE</span>
-              </div>
-
-              <p className='sub'>
-                It is a good time for the great taste of coffee.
-              </p>
 
               <div className='social-wrap'>
                 <Button
@@ -131,17 +125,20 @@ const LoginPage: React.FC = () => {
                   label='Email'
                   name='email'
                   rules={[
-                    { required: true, message: "Vui lòng nhập email" },
-                    { type: "email", message: "Email không hợp lệ" },
+                    { required: true, message: "Please enter your email." },
+                    {
+                      type: "email",
+                      message: "Please enter a valid email address.",
+                    },
                   ]}>
                   <Input placeholder='you@example.com' />
                 </Form.Item>
 
                 <Form.Item
-                  label='Mật khẩu'
+                  label='Password'
                   name='password'
                   rules={[
-                    { required: true, message: "Vui lòng nhập mật khẩu" },
+                    { required: true, message: "Please enter your password." },
                   ]}>
                   <Input.Password
                     className='pc-password'
@@ -151,16 +148,16 @@ const LoginPage: React.FC = () => {
 
                 <div className='row'>
                   <Form.Item name='remember' valuePropName='checked' noStyle>
-                    <Checkbox>Ghi nhớ</Checkbox>
+                    <Checkbox>Remember me</Checkbox>
                   </Form.Item>
 
                   <Button
                     type='link'
                     className='forgot'
                     onClick={() =>
-                      message.info("Chưa làm chức năng quên mật khẩu")
+                      message.info("Forgot password is not implemented yet.")
                     }>
-                    Quên mật khẩu?
+                    Forgot password?
                   </Button>
                 </div>
 
@@ -170,35 +167,29 @@ const LoginPage: React.FC = () => {
                   loading={loading}
                   className='btn-login'
                   block>
-                  Đăng nhập
+                  Log in
                 </Button>
 
+                <Button type='link' className='btn-signup'>
+                  No account yet?{" "}
+                </Button>
                 <Button
                   type='link'
-                  className='btn-signup'
+                  className='btn-register'
                   onClick={() => navigate("/register")}>
-                  Chưa có tài khoản? Đăng ký
+                  Register
                 </Button>
-
-                <div className='badge'>
-                  <span className='dot' />
-                  Express Delivery • 1900 9999
-                </div>
               </Form>
             </div>
 
+            {/* RIGHT */}
             <div className='login-right' />
           </div>
         </div>
       </Content>
 
-      <Footer className='login-footer'>
-        <div className='login-footer__inner'>
-          <span>© {new Date().getFullYear()} Phan Coffee</span>
-          <span className='sep'>•</span>
-          <span>All Rights Reserved</span>
-        </div>
-      </Footer>
+      {/* ✅ FOOTER PAGE (same as Home) */}
+      <FooterPage />
     </Layout>
   );
 };

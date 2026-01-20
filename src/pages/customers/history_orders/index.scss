@@ -1,0 +1,227 @@
+/* OrdersPageHistory - index.scss */
+
+.orders-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+
+  /* ===== Header ===== */
+  .homepage__header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 18px;
+    height: 72px;
+    background: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+    .homepage__logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 210px;
+
+      img {
+        width: 44px;
+        height: 44px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .logo-phancoffee {
+        font-weight: 700;
+        font-size: 18px;
+        color: #111827;
+        letter-spacing: 0.2px;
+      }
+    }
+
+    /* Search component container (nếu component có width) */
+    .search-component,
+    .search {
+      flex: 1;
+      max-width: 560px;
+    }
+
+    .menu-home {
+      margin-left: auto;
+      border-bottom: none;
+      background: transparent;
+
+      .ant-menu-item {
+        border-radius: 10px;
+        margin: 0 4px !important;
+
+        &::after {
+          border-bottom: none !important;
+        }
+      }
+
+      .ant-menu-item-selected {
+        background: rgba(0, 0, 0, 0.04) !important;
+        color: #111827 !important;
+      }
+    }
+  }
+
+  /* ===== Content ===== */
+  .orders-content {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 18px 16px 28px;
+
+    /* Top bar (title + buttons) */
+    > div:first-child {
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 14px;
+      padding: 14px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Card / Alert block */
+    .ant-card,
+    .ant-alert {
+      border-radius: 14px;
+    }
+
+    .ant-card {
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+
+      .ant-card-body {
+        padding: 14px 14px;
+      }
+    }
+
+    /* Table block */
+    .ant-table-wrapper {
+      margin-top: 12px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    .ant-table {
+      background: transparent;
+
+      .ant-table-thead > tr > th {
+        background: #fafafa;
+        font-weight: 650;
+        color: #111827;
+      }
+
+      .ant-table-tbody > tr > td {
+        color: #111827;
+      }
+
+      .ant-table-tbody > tr:hover > td {
+        background: rgba(0, 0, 0, 0.02);
+      }
+    }
+
+    /* Total area */
+    .orders-total {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+
+      .total-row {
+        display: flex;
+        justify-content: flex-end;
+        align-items: baseline;
+        gap: 10px;
+
+        .label {
+          font-weight: 600;
+          color: #374151;
+        }
+
+        .value {
+          font-weight: 800;
+          font-size: 18px;
+          color: #111827;
+        }
+      }
+
+      .usd-hint {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 2px;
+        color: #6b7280;
+        font-size: 13px;
+      }
+    }
+
+    /* Empty state */
+    .ant-empty {
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+      margin-top: 12px;
+    }
+  }
+
+  /* ===== Footer (nếu FooterPage có wrapper) ===== */
+  .footer,
+  .footer-page {
+    margin-top: 22px;
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 992px) {
+  .orders-page {
+    .homepage__header {
+      flex-wrap: wrap;
+      height: auto;
+      padding: 12px 14px;
+
+      .homepage__logo {
+        min-width: auto;
+      }
+
+      .menu-home {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+
+    .orders-content {
+      padding: 14px 12px 24px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .orders-page {
+    .homepage__header {
+      .homepage__logo {
+        img {
+          width: 40px;
+          height: 40px;
+        }
+
+        .logo-phancoffee {
+          font-size: 16px;
+        }
+      }
+    }
+
+    .orders-content {
+      > div:first-child {
+        padding: 12px;
+      }
+    }
+  }
+}

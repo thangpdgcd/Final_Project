@@ -1,0 +1,264 @@
+@import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
+
+/* ===== WRAPPER ===== */
+.header-wrapper {
+  position: relative;
+}
+
+/* ===== HEADER ===== */
+.homepage__header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 72px;
+  padding: 0 48px;
+
+  background: #2d3035 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ant-layout-header.homepage__header {
+  background: #2d3035 !important;
+  line-height: 72px;
+}
+
+/* ===== LOGO ===== */
+.homepage__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+
+  img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .logo-phancoffee {
+    font-family: "Viaoda Libre", serif;
+    font-size: 22px;
+    color: #fff;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+}
+
+/* ===== MENU ===== */
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-item {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+
+  color: #fff;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(212, 165, 116, 0.12);
+    color: #d4a574;
+  }
+
+  &.nav-item-active {
+    color: #d4a574;
+    background: rgba(212, 165, 116, 0.12);
+  }
+}
+
+.nav-item__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icon-only {
+  padding: 10px 12px;
+  min-width: 42px;
+  justify-content: center;
+}
+
+.nav-darkmode {
+  border: 1px solid rgba(212, 165, 116, 0.18);
+  background: rgba(212, 165, 116, 0.08);
+
+  &:hover {
+    background: rgba(212, 165, 116, 0.16);
+  }
+}
+
+.nav-cart {
+  margin-left: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(212, 165, 116, 0.1);
+
+  &:hover {
+    background: rgba(212, 165, 116, 0.2);
+  }
+}
+
+/* ================================
+   ✅ QUICK MENU (AntD Dropdown) RỘNG HƠN
+   giống panel đứng trong ảnh bạn gửi
+================================ */
+
+/* Wrap dropdown overlay */
+.ant-dropdown {
+  /* Nới rộng menu */
+  .ant-dropdown-menu {
+    min-width: 110px; /* ✅ rộng hơn */
+    padding: 10px 8px;
+    border-radius: 14px;
+
+    background: rgba(45, 48, 53, 0.98);
+    border: 1px solid rgba(212, 165, 116, 0.12);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Item: icon canh giữa như hình */
+  .ant-dropdown-menu-item {
+    padding: 12px 14px; /* ✅ thoáng hơn */
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center; /* ✅ icon nằm giữa */
+
+    color: rgba(255, 255, 255, 0.9);
+
+    &:hover {
+      background: rgba(212, 165, 116, 0.12);
+      color: #d4a574;
+    }
+  }
+
+  /* Divider đẹp hơn */
+  .ant-dropdown-menu-item-divider {
+    margin: 8px 6px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* Nếu bạn muốn icon to hơn trong dropdown */
+.ant-dropdown .ant-dropdown-menu-item .anticon {
+  font-size: 18px;
+}
+
+/* ===== SUBMENU BAR ===== */
+.submenu-bar {
+  position: absolute;
+  top: 72px; /* bằng height header */
+  left: 0;
+  width: 100%;
+
+  background: #24272b;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: all 0.25s ease;
+  z-index: 99;
+}
+
+.submenu-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.submenu-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 48px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.submenu-item {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(212, 165, 116, 0.06);
+  border: 1px solid rgba(212, 165, 116, 0.12);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(212, 165, 116, 0.16);
+    transform: translateY(-2px);
+  }
+}
+
+.submenu-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #d4a574;
+  margin-bottom: 4px;
+}
+
+.submenu-desc {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ===== DARK MODE (html.dark) ===== */
+html.dark {
+  background: #111;
+}
+
+html.dark .homepage__header {
+  background: #17191c !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html.dark .submenu-bar {
+  background: #15171a;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Dark mode cho dropdown */
+html.dark .ant-dropdown .ant-dropdown-menu {
+  background: rgba(23, 25, 28, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .homepage__header {
+    padding: 0 20px;
+  }
+
+  .nav-menu {
+    gap: 12px;
+  }
+
+  .submenu-inner {
+    grid-template-columns: 1fr;
+    padding: 16px 20px;
+  }
+}

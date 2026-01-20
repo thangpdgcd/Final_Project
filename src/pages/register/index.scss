@@ -1,0 +1,364 @@
+/* src/pages/register/index.scss */
+@import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
+
+.register-layout {
+  min-height: 100vh;
+  --font-brand: "Viaoda Libre", serif;
+
+  /* ===== HEADER: match Login/Home ===== */
+  .pc-header.pc-header--clean {
+    height: 72px;
+    padding: 0 32px;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .pc-header__left,
+  .pc-header__right {
+    width: 260px;
+    display: flex;
+    align-items: center;
+  }
+
+  .pc-header__left {
+    gap: 10px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .pc-header__logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+
+  .pc-header__brand {
+    font-family: var(--font-brand);
+    font-size: 22px;
+    letter-spacing: 1px;
+    font-weight: 400;
+    color: #2b1b16;
+    white-space: nowrap;
+  }
+
+  .pc-header__center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* ===== CONTENT ===== */
+  .register-content {
+    min-height: calc(100vh - 72px - 56px);
+    padding: 32px 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f7f4ef !important;
+  }
+
+  .register-hero {
+    width: min(1040px, 94vw);
+  }
+
+  /* ===== CARD ===== */
+  .register-card {
+    min-height: 560px;
+    border-radius: 22px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #111;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  }
+
+  /* LEFT */
+  .register-left {
+    background: rgba(18, 18, 18, 0.92);
+    color: #fff;
+    padding: 22px 26px;
+    backdrop-filter: blur(8px);
+  }
+
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .brand-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  .kicker {
+    font-size: 11px;
+    letter-spacing: 1.6px;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+  }
+
+  .brand {
+    font-family: var(--font-brand);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .headline {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 6px 0 10px;
+
+    .accent {
+      font-family: var(--font-brand);
+      color: #f5c46b;
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+    }
+
+    .title {
+      font-family: var(--font-brand);
+      font-size: 40px;
+      line-height: 1;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+  }
+
+  .sub {
+    color: rgba(255, 255, 255, 0.72);
+    margin-bottom: 10px;
+  }
+
+  .divider {
+    margin: 10px 0 !important;
+    color: rgba(255, 255, 255, 0.55) !important;
+
+    &::before,
+    &::after {
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+  }
+
+  /* small grid row for phone + address */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Form */
+  .register-form {
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+
+    .ant-form-item {
+      margin-bottom: 10px;
+    }
+
+    .ant-form-item-label > label {
+      color: rgba(255, 255, 255, 0.88);
+      font-weight: 700;
+    }
+
+    .ant-input,
+    .ant-input-password {
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    .ant-input::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .ant-input-password input {
+      background: transparent;
+      color: #fff;
+    }
+
+    /* ✅ reuse same password style */
+    .pc-password.ant-input-affix-wrapper {
+      height: 48px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.35) !important;
+      border: 1px solid rgba(245, 196, 107, 0.35) !important;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        border-color: rgba(245, 196, 107, 0.6) !important;
+      }
+
+      &.ant-input-affix-wrapper-focused {
+        border-color: rgba(245, 196, 107, 0.9) !important;
+        box-shadow: 0 0 0 3px rgba(245, 196, 107, 0.18) !important;
+      }
+
+      input.ant-input {
+        border: none;
+        height: 100%;
+        background: transparent;
+        color: #fff;
+        padding: 0 8px;
+        font-weight: 700;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.45);
+        }
+      }
+
+      .ant-input-suffix {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .ant-input-password-icon {
+        font-size: 18px;
+        color: rgba(255, 255, 255, 0.72);
+        padding: 7px;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          color: #f5c46b;
+          background: rgba(245, 196, 107, 0.14);
+        }
+      }
+    }
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 4px 0 10px;
+
+    .ant-checkbox-wrapper {
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .to-login {
+      padding: 0;
+      color: rgba(255, 255, 255, 0.72);
+
+      &:hover {
+        color: #f5c46b;
+      }
+    }
+  }
+
+  .btn-register-primary {
+    height: 42px;
+    border-radius: 999px;
+    border: none;
+    font-weight: 800;
+    background: linear-gradient(135deg, #f5a623, #ff6f3c);
+
+    &:hover {
+      background: linear-gradient(135deg, #ff8c3c, #ffc861) !important;
+    }
+  }
+
+  .btn-signin {
+    margin-top: 6px;
+    padding: 12px;
+    gap: 20px;
+    color: rgba(255, 255, 255, 0.7);
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  .btn-login {
+    padding: 22px 2px;
+    float: right;
+    border: none;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.85);
+
+    &:hover {
+      color: #f5c46b;
+    }
+  }
+
+  /* RIGHT */
+  .register-right {
+    background:
+      linear-gradient(to left, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.12)),
+      url("../../../src/assets/img/loginbackground.jpg");
+    background-size: cover;
+    background-position: center;
+    filter: saturate(1.05) contrast(1.03);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .pc-header__left,
+    .pc-header__right {
+      width: 180px;
+    }
+
+    .register-card {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .register-right {
+      height: 220px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .pc-header.pc-header--clean {
+      padding: 0 14px;
+      height: 64px;
+    }
+    .pc-header__brand {
+      font-size: 18px;
+    }
+    .register-left {
+      padding: 18px 16px;
+    }
+    .headline .title {
+      font-size: 34px;
+      letter-spacing: 0.12em;
+    }
+  }
+}
+
