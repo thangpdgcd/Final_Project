@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { apiProfile, UserProfile } from "../../../api/profileApi";
 import { Card, Descriptions, Spin, Alert } from "antd";
 import "./index.scss";
+import Chatbox from "../../../components/chatbox";
 const Profile: React.FC = () => {
   const { userid } = useParams();
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -83,6 +84,7 @@ const Profile: React.FC = () => {
           <p>Không tìm thấy thông tin người dùng</p>
         )}
       </Card>
+      <Chatbox />
     </div>
   );
 };

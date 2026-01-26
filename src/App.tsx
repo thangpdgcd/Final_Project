@@ -1,12 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ConfigProvider, theme as antdTheme } from "antd";
-import { useEffect, useState } from "react";
-
 import "../src/styles/App.scss";
-
-import LoginPage from "./pages/login";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import LoginPage from "./components/login";
 import HomePage from "./pages/customers/homes";
-import RegisterPage from "./pages/register";
+import RegisterPage from "../src/components/register";
 import ProductList from "./pages/customers/products";
 import Userprofile from "./pages/customers/profiles";
 import About from "./pages/customers/abouts";
@@ -18,25 +16,8 @@ import ProductDetailPage from "./pages/customers/product_details";
 import PaymentPage from "./pages/customers/payment";
 import OrdersPageHistory from "./pages/customers/history_orders";
 
-const App = () => {
-  // ✅ Lắng nghe trạng thái dark mode từ <html>
-  const [dark, setDark] = useState<boolean>(() =>
-    document.documentElement.classList.contains("dark"),
-  );
-
-  useEffect(() => {
-    // Theo dõi khi class html thay đổi (Header toggle)
-    const observer = new MutationObserver(() => {
-      setDark(document.documentElement.classList.contains("dark"));
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
+const AppContent = () => {
+  const { dark } = useTheme();
 
   return (
     <ConfigProvider
@@ -58,12 +39,19 @@ const App = () => {
           <Route path='/orders' element={<OrderDetail />} />
           <Route path='/carts' element={<PageCart />} />
           <Route path='/system' element={<SystemPage />} />
-
           <Route path='/paypal/config' element={<PaymentPage />} />
           <Route path='/history-orders' element={<OrdersPageHistory />} />
         </Routes>
       </Router>
     </ConfigProvider>
+  );
+};
+
+const App = () => {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 };
 

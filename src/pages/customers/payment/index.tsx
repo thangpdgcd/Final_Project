@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./index.scss";
+import Chatbox from "../../../components/chatbox";
 
 const API_BASE =
   (process.env.REACT_APP_API_BASE_URL?.replace(/\/$/, "") as string) ||
@@ -256,6 +257,7 @@ export default function PaymentPage() {
           Config endpoint: <b>{CONFIG_ENDPOINT}</b>
         </div>
       </div>
+      <Chatbox />
     </div>
   );
 }

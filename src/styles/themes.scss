@@ -33,7 +33,39 @@ html.dark {
 }
 
 /* Global apply */
+html {
+  background: var(--bg-main);
+}
+
 body {
   background: var(--bg-main);
   color: var(--text-main);
+}
+
+#root {
+  background: var(--bg-main);
+  min-height: 100vh;
+}
+
+/* Ant Design Layout override */
+.ant-layout {
+  background: var(--bg-main) !important;
+}
+
+.ant-layout-content {
+  background: var(--bg-main) !important;
+}
+
+/* Dark mode specific overrides */
+html.dark {
+  html,
+  body,
+  #root {
+    background: var(--bg-main) !important;
+  }
+
+  .ant-layout,
+  .ant-layout-content {
+    background: var(--bg-main) !important;
+  }
 }

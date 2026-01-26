@@ -1,0 +1,131 @@
+.best-sellers {
+  position: relative;
+  padding: 80px 40px 90px;
+  text-align: center;
+
+  /* 🌤 BACKGROUND GIỐNG ẢNH THẬT */
+  background-image:
+    radial-gradient(
+      circle at top center,
+      rgba(226, 187, 187, 0.65),
+      rgba(110, 110, 99, 0.85) 45%,
+      rgba(138, 135, 131, 0.95) 100%
+    ),
+    url("https://res.cloudinary.com/dfjecxrnl/image/upload/v1769116531/ChatGPT_Image_04_14_05_23_thg_1_2026_bjznxf.png");
+
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+
+  /* tạo chiều sâu giống mockup */
+  background-attachment: fixed;
+
+  /* ================= TITLE ================= */
+  .section-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .section-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 540px;
+    margin: 0 auto 36px;
+  }
+
+  /* ================= GRID ================= */
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+    margin-top: 32px;
+  }
+
+  /* ================= PRODUCT CARD ================= */
+  .product-card {
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+
+    box-shadow:
+      0 12px 30px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.12);
+    }
+
+    /* body ant-card */
+    .ant-card-body {
+      padding: 18px 18px 16px;
+    }
+
+    .ant-card-meta-title {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text-main);
+    }
+
+    .ant-card-meta-description {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    &__footer {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &__price {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 15px;
+    }
+  }
+}
+
+// ===== DARK MODE =====
+html.dark {
+  .best-sellers {
+    background-image:
+      radial-gradient(
+        circle at top center,
+        rgba(15, 17, 19, 0.85),
+        rgba(21, 24, 27, 0.95) 45%,
+        rgba(15, 17, 19, 0.98) 100%
+      ),
+      url("https://res.cloudinary.com/dfjecxrnl/image/upload/v1769116531/ChatGPT_Image_04_14_05_23_thg_1_2026_bjznxf.png");
+
+    .product-card {
+      background: var(--bg-surface);
+      border-color: var(--border-soft);
+      box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+      &:hover {
+        box-shadow: 0 22px 50px rgba(0, 0, 0, 0.5);
+      }
+    }
+  }
+}
+
+/* ================= IMAGE TRONG CAROUSEL ================= */
+.img-banner {
+  width: 100%;
+  display: block;
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+}

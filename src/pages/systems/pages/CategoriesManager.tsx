@@ -1,4 +1,3 @@
-// src/pages/systems/pages/CategoryManager.tsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Table,
@@ -26,8 +25,8 @@ import {
   deleteCategoryService,
   filterCategories,
   toCategoryFormValues,
-  getCategoryId,
   normalizeCategory,
+  getCategoryId, // ✅ FIX: THIẾU IMPORT NÀY
   type CategoryFormValues,
 } from "../../../pages/systems/services/categoryservicesSystem";
 
@@ -53,10 +52,9 @@ const CategoryManager: React.FC = () => {
     } catch (error: any) {
       console.error(
         "Fetch categories error:",
-        error?.response?.data || error?.message || error
+        error?.response?.data || error?.message || error,
       );
-      message.destroy();
-      message.error("Không thể tải danh sách danh mục. Kiểm tra backend!");
+      message.error("Không thể tải danh sách danh mục.");
     } finally {
       setLoading(false);
     }
@@ -70,7 +68,7 @@ const CategoryManager: React.FC = () => {
 
   const filteredCategories = useMemo(
     () => filterCategories(categories, searchText),
-    [categories, searchText]
+    [categories, searchText],
   );
 
   const handleAddCategory = () => {
@@ -82,10 +80,8 @@ const CategoryManager: React.FC = () => {
   const handleEditCategory = (record: any) => {
     const id = getCategoryId(record);
     if (!id) {
-      message.error(
-        "Record không có ID hợp lệ (category_ID / id / categoryId...)."
-      );
-      console.log("Record keys:", Object.keys(record || {}), record);
+      message.error("Danh mục không có ID hợp lệ.");
+      console.log("Record:", record);
       return;
     }
 
@@ -97,21 +93,17 @@ const CategoryManager: React.FC = () => {
   const handleDeleteCategory = async (record: any) => {
     const id = getCategoryId(record);
     if (!id) {
-      message.error("Không tìm thấy ID danh mục hợp lệ để xoá.");
-      console.log("Delete record:", record);
+      message.error("Không tìm thấy ID danh mục để xoá.");
       return;
     }
 
     try {
       await deleteCategoryService(id);
       setCategories((prev) => prev.filter((c) => getCategoryId(c) !== id));
-      message.success("Đã xóa danh mục.");
+      message.success("Đã xoá danh mục.");
     } catch (error: any) {
-      console.error(
-        "Delete category error:",
-        error?.response?.data || error?.message || error
-      );
-      message.error(error?.response?.data?.message || "Xóa danh mục thất bại.");
+      console.error(error);
+      message.error(error?.response?.data?.message || "Xoá danh mục thất bại.");
     }
   };
 
@@ -119,49 +111,28 @@ const CategoryManager: React.FC = () => {
     try {
       setSaving(true);
 
-      const nextName = values.name.trim();
-      const nextDesc = values.description?.trim() || "";
-
       if (editingCategory) {
         const id = getCategoryId(editingCategory);
         if (!id) {
-          message.error("Không tìm thấy ID danh mục hợp lệ để cập nhật.");
-          console.log("editingCategory:", editingCategory);
+          message.error("ID danh mục không hợp lệ.");
           return;
         }
 
-        const updatedFromApi = await updateCategoryService(id, values);
-
-        const normalizedApi = normalizeCategory(updatedFromApi ?? {});
-        const normalizedEditing = normalizeCategory(editingCategory);
-
-        const nextRecord = {
-          ...normalizedEditing,
-          ...normalizedApi,
-          category_ID: id,
-          name: nextName,
-          description: nextDesc,
-        };
+        const updated = await updateCategoryService(id, values);
+        const normalized = normalizeCategory(updated ?? {});
 
         setCategories((prev) =>
           prev.map((c) =>
-            getCategoryId(c) === id ? { ...c, ...nextRecord } : c
-          )
+            getCategoryId(c) === id ? { ...c, ...normalized } : c,
+          ),
         );
 
         message.success("Cập nhật danh mục thành công.");
       } else {
-        const createdFromApi = await createCategoryService(values);
+        const created = await createCategoryService(values);
+        const normalized = normalizeCategory(created ?? {});
 
-        // ✅ normalize để chắc chắn table đọc được name/description
-        const createdNormalized = normalizeCategory(createdFromApi ?? {});
-        const nextCreated = {
-          ...createdNormalized,
-          name: nextName,
-          description: nextDesc,
-        };
-
-        setCategories((prev) => [nextCreated, ...prev]);
+        setCategories((prev) => [normalized, ...prev]);
         message.success("Tạo danh mục mới thành công.");
       }
 
@@ -169,10 +140,7 @@ const CategoryManager: React.FC = () => {
       setEditingCategory(null);
       form.resetFields();
     } catch (error: any) {
-      console.error(
-        "Save category error:",
-        error?.response?.data || error?.message || error
-      );
+      console.error(error);
       message.error(error?.response?.data?.message || "Lưu danh mục thất bại.");
     } finally {
       setSaving(false);
@@ -182,32 +150,28 @@ const CategoryManager: React.FC = () => {
   const columns: ColumnsType<any> = [
     {
       title: "ID",
-      key: "id",
       width: 80,
       sorter: (a, b) => (getCategoryId(a) ?? 0) - (getCategoryId(b) ?? 0),
-      render: (_: any, record: any) =>
-        getCategoryId(record) ?? <span style={{ opacity: 0.6 }}>—</span>,
+      render: (_, record) =>
+        getCategoryId(record) ?? <span style={{ opacity: 0.5 }}>—</span>,
     },
     {
       title: "Tên danh mục",
       dataIndex: "name",
       width: 240,
-      render: (_: any, record: any) => record?.name ?? record?.Name ?? "—",
+      render: (_, record) => record?.name ?? "—",
     },
     {
       title: "Mô tả",
       dataIndex: "description",
       ellipsis: true,
-      render: (_: any, record: any) =>
-        record?.description ??
-        record?.Description ?? <span style={{ opacity: 0.6 }}>—</span>,
+      render: (_, record) =>
+        record?.description ?? <span style={{ opacity: 0.5 }}>—</span>,
     },
     {
       title: "Hành động",
-      key: "actions",
-      fixed: "right",
       width: 160,
-      render: (_: any, record: any) => (
+      render: (_, record) => (
         <Space>
           <Button
             size='small'
@@ -218,7 +182,7 @@ const CategoryManager: React.FC = () => {
 
           <Popconfirm
             title='Xóa danh mục'
-            description='Bạn chắc chắn muốn xóa danh mục này?'
+            description='Bạn chắc chắn muốn xóa?'
             okText='Xóa'
             cancelText='Hủy'
             onConfirm={() => handleDeleteCategory(record)}>
@@ -238,12 +202,12 @@ const CategoryManager: React.FC = () => {
         extra={
           <Space>
             <Input
-              placeholder='Tìm theo ID hoặc tên danh mục...'
+              placeholder='Tìm theo ID hoặc tên...'
               allowClear
-              style={{ width: 280 }}
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              style={{ width: 260 }}
             />
             <Button
               type='primary'
@@ -255,45 +219,37 @@ const CategoryManager: React.FC = () => {
         }>
         <Table
           rowKey={(record) =>
-            String(
-              getCategoryId(record) ??
-                record?.name ??
-                record?.Name ??
-                Math.random()
-            )
+            String(getCategoryId(record) ?? record?.name ?? Math.random())
           }
           columns={columns}
           dataSource={filteredCategories}
           loading={loading}
           pagination={{ pageSize: 10 }}
-          scroll={{ x: 800 }}
         />
       </Card>
 
       <Modal
-        title={editingCategory ? "Cập nhật danh mục" : "Thêm danh mục mới"}
+        title={editingCategory ? "Cập nhật danh mục" : "Thêm danh mục"}
         open={isModalOpen}
         onCancel={() => {
           setIsModalOpen(false);
           setEditingCategory(null);
           form.resetFields();
         }}
-        okText={editingCategory ? "Lưu" : "Tạo mới"}
         onOk={() => form.submit()}
         confirmLoading={saving}
+        okText={editingCategory ? "Lưu" : "Tạo"}
         destroyOnClose>
         <Form form={form} layout='vertical' onFinish={handleSubmit}>
           <Form.Item
             label='Tên danh mục'
             name='name'
-            rules={[
-              { required: true, message: "Vui lòng nhập tên danh mục!" },
-            ]}>
-            <Input placeholder='Tên danh mục' />
+            rules={[{ required: true, message: "Nhập tên danh mục!" }]}>
+            <Input />
           </Form.Item>
 
           <Form.Item label='Mô tả' name='description'>
-            <TextArea rows={3} placeholder='Mô tả danh mục (tuỳ chọn)' />
+            <TextArea rows={3} />
           </Form.Item>
         </Form>
       </Modal>

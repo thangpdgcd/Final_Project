@@ -8,27 +8,37 @@ import {
   SendOutlined,
 } from "@ant-design/icons";
 import "./index.scss";
+import Chatbox from "../../../components/chatbox";
 
 const { TextArea } = Input;
+
+const BG_IMAGE =
+  "https://res.cloudinary.com/dfjecxrnl/image/upload/v1769110199/ChatGPT_Image_02_27_53_23_thg_1_2026_gj9nxi.png";
 
 const Contact: React.FC = () => {
   const [form] = Form.useForm();
 
   const handleFinish = (values: any) => {
     console.log("Contact form:", values);
-    // TODO: call API / gửi email...
   };
 
   return (
-    <section className='contact'>
-      <Row gutter={[32, 32]} justify='center'>
+    <section
+      className='contact'
+      style={{
+        backgroundImage: `url(${BG_IMAGE})`,
+      }}>
+      <div className='contact__overlay' />
+
+      <Row gutter={[32, 32]} justify='center' className='contact__content'>
         {/* FORM */}
-        <Col xs={24} lg={14}>
+        <Col xs={24} lg={12}>
           <div className='contact__card contact__card--form'>
             <div className='contact__form-inner'>
-              <h2 className='contact__title'>Liên hệ Phan Coffee</h2>
+              <h2 className='contact__title'>Contact Phan Coffee</h2>
               <p className='contact__subtitle'>
-                Hãy để lại thông tin, chúng tôi sẽ liên hệ lại sớm nhất có thể.
+                Leave your information and we will get back to you as soon as
+                possible.
               </p>
 
               <Form
@@ -39,23 +49,21 @@ const Contact: React.FC = () => {
                 <Form.Item
                   label='Name'
                   name='name'
-                  rules={[{ required: true, message: "Vui lòng nhập tên" }]}>
-                  <Input
-                    size='large'
-                    prefix={<UserOutlined />}
-                    placeholder='Nhập tên của bạn'
-                  />
+                  
+                  rules={[
+                    { required: true, message: "Please enter your name" },
+                  ]}>
+                  <Input prefix={<UserOutlined />} placeholder='Your name' />
                 </Form.Item>
 
                 <Form.Item
                   label='Email'
                   name='email'
                   rules={[
-                    { required: true, message: "Vui lòng nhập email" },
-                    { type: "email", message: "Email không hợp lệ" },
+                    { required: true, message: "Please enter your email" },
+                    { type: "email", message: "Invalid email format" },
                   ]}>
                   <Input
-                    size='large'
                     prefix={<MailOutlined />}
                     placeholder='you@example.com'
                   />
@@ -65,10 +73,12 @@ const Contact: React.FC = () => {
                   label='Phone Number'
                   name='phone'
                   rules={[
-                    { required: true, message: "Vui lòng nhập số điện thoại" },
+                    {
+                      required: true,
+                      message: "Please enter your phone number",
+                    },
                   ]}>
                   <Input
-                    size='large'
                     prefix={<PhoneOutlined />}
                     placeholder='(+84) 123 456 789'
                   />
@@ -78,33 +88,29 @@ const Contact: React.FC = () => {
                   <TextArea
                     rows={4}
                     maxLength={500}
-                    placeholder='Lời nhắn của bạn...'
                     showCount
+                    placeholder='Your message...'
                   />
                 </Form.Item>
 
                 <div className='contact__actions'>
                   <Button
-                    type='primary'
                     htmlType='submit'
-                    size='large'
                     icon={<SendOutlined />}
                     className='contact__btn contact__btn--primary'>
-                    Gửi
+                    Send
                   </Button>
 
                   <Button
-                    type='default'
-                    size='large'
                     className='contact__btn contact__btn--outline'
                     icon={<EnvironmentOutlined />}
                     onClick={() =>
                       window.open(
-                        "https://www.google.com/maps?q=Lâm+Tùng,+Ia+Chim,+Kon+Tum",
-                        "_blank"
+                        "https://www.google.com/maps?q=86+Lâm+Tùng,+Ia+Chim,+Kon+Tum",
+                        "_blank",
                       )
                     }>
-                    Chỉ đường
+                    Directions
                   </Button>
                 </div>
               </Form>
@@ -113,30 +119,30 @@ const Contact: React.FC = () => {
         </Col>
 
         {/* MAP */}
-        <Col xs={24} lg={10}>
+        <Col xs={24} lg={12}>
           <div className='contact__card contact__card--map'>
             <h3 className='contact__map-title'>Phan Coffee Roasters</h3>
             <p className='contact__map-address'>
-              <EnvironmentOutlined /> 86 Lâm Tùng, xã Ia Chim, Kon Tum
+              <EnvironmentOutlined /> 86 Lam Tung, Ia Chim, Kon Tum
             </p>
 
             <div className='contact__map-wrapper'>
               <iframe
                 title='Phan Coffee Map'
-                src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d82073.09943964124!2d107.85568379170502!3d14.288538558851073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x316c071545f23d2f%3A0x6984552c63ea458c!2zTMOibSBUw7luZywgSWEgQ2hpbSwgVHAuIEtvbiBUdW0sIEtvbiBUdW0sIFZp4buHdCBOYW0!5e0!3m2!1svi!2sus!4v1765157913835!5m2!1svi!2sus'
+                src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3866.0051352833216!2d107.92426178451606!3d14.311134348382254!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x316c07005090c739%3A0xa89c75670a39361d!2sC%C3%94NG%20TY%20TNHH%20PHAN%20COFFEE!5e0!3m2!1svi!2s!4v1769112965332!5m2!1svi!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade'
                 loading='lazy'
                 allowFullScreen
-                referrerPolicy='no-referrer-when-downgrade'
               />
             </div>
 
             <div className='contact__map-note'>
-              Mở Google Maps để xem đường đi chi tiết, thời gian di chuyển và
-              gợi ý tuyến đường phù hợp.
+              Open Google Maps to view directions, travel time and route
+              suggestions.
             </div>
           </div>
         </Col>
       </Row>
+      <Chatbox />
     </section>
   );
 };

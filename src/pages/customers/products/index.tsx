@@ -1,61 +1,46 @@
 import React, { useEffect, useState } from "react";
-import "./index.scss";
-import { Row, Col, Card, Spin, Alert, Layout, Menu } from "antd";
-import { getAllProducts, Product } from "../../../api/productApi";
-import logo from "../../../assets/img/logo_PhanCoffee.jpg";
+import { Row, Col, Card, Spin, Alert, Layout, Breadcrumb } from "antd";
 import { useNavigate } from "react-router-dom";
-import { ShoppingCartOutlined } from "@ant-design/icons";
+import "./index.scss";
 
-const { Header } = Layout;
+import HeaderPage from "../../../components/header";
+import { getAllProducts, Product } from "../../../api/productApi";
 
-/** ✅ helper ảnh: URL | data:image | base64 thuần */
+import FooterPage from "../../../components/footer";
+import Chatbox from "../../../components/chatbox";
+
+const { Content } = Layout;
+
 const getImageSrc = (img?: string | null) => {
   if (!img) return "/no-image.png";
   const v = String(img).trim();
   if (/^https?:\/\//i.test(v)) return v;
   if (v.startsWith("data:image/")) return v;
-  return `data:image/webp;base64,${v}`; // đổi webp->jpeg nếu bạn lưu jpeg
+  return `data:image/webp;base64,${v}`;
 };
 
 const ProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const menuRoutes: Record<string, string> = {
-    home: "/",
-    products: "/products",
-    contact: "/contact",
-    login: "/login",
-    about: "/about",
-    carts: "/carts",
-  };
-
-  const handleMenuClick = (e: { key: string }) => {
-    const path = menuRoutes[e.key];
-    if (path) navigate(path);
-  };
-
-  const goDetail = (id: number) => navigate(`/products/${id}`);
-
   useEffect(() => {
-    const fetchProducts = async () => {
+    (async () => {
       try {
         const data = await getAllProducts();
         setProducts(data);
-      } catch (err: any) {
-        setError(err?.message || "Failed to load products");
+      } catch (e: any) {
+        setError(e?.message || "Lỗi tải sản phẩm");
       } finally {
         setLoading(false);
       }
-    };
-    fetchProducts();
+    })();
   }, []);
 
   if (loading) {
     return (
-      <div style={{ textAlign: "center", marginTop: 50 }}>
+      <div className='page-loading'>
         <Spin size='large' />
       </div>
     );
@@ -64,96 +49,83 @@ const ProductList: React.FC = () => {
   if (error) {
     return (
       <Alert
-        message='Error'
+        message='Lỗi'
         description={error}
         type='error'
         showIcon
-        style={{ margin: 20 }}
+        style={{ margin: 24 }}
       />
     );
   }
 
   return (
-    <Layout>
-      <Header className='homepage__header'>
-        <div className='homepage__logo ' onClick={() => navigate("/")}>
-          <img src={logo} alt='Phan Coffee' />
-          <span className='logo-phancoffee'>Phan Coffee</span>
-        </div>
+    <Layout className='product-page'>
+      <HeaderPage />
 
-        <div style={{ flex: 1 }} />
+      <Content className='product-page__content'>
+        {/* Breadcrumb */}
+        <Breadcrumb className='product-breadcrumb'>
+          <Breadcrumb.Item>Trang chủ</Breadcrumb.Item>
+          <Breadcrumb.Item>Sản phẩm</Breadcrumb.Item>
+        </Breadcrumb>
 
-        <Menu
-          mode='horizontal'
-          overflowedIndicator={false}
-          onClick={handleMenuClick}
-          className='menu-home'
-          items={[
-            { key: "home", label: "Home" },
-            { key: "products", label: "Coffee" },
-            { key: "contact", label: "Contact" },
-            { key: "about", label: "About" },
-            { key: "login", label: "Log In" },
-            {
-              key: "carts",
-              label: (
-                <div className='menu-cart'>
-                  <span className='menu-cart-icon text-2xl'>
-                    <ShoppingCartOutlined
-                      className='icon-carts'
-                      style={{ fontSize: 24 }}
-                    />
-                  </span>
-                </div>
-              ),
-            },
-          ]}
-        />
-      </Header>
+        {/* Title */}
+        <h1 className='product-page__title'>Cà phê rang xay</h1>
+        <p className='product-page__subtitle'>
+          Tuyển chọn từ những vùng trồng cà phê chất lượng cao
+        </p>
 
-      <div className='product-list' style={{ padding: 20 }}>
-        <Row gutter={[16, 16]}>
+        <Row gutter={[24, 32]}>
           {products.length > 0 ? (
             products.map((p) => (
               <Col xs={24} sm={12} md={8} lg={6} key={p.product_ID}>
                 <Card
                   hoverable
-                  onClick={() => goDetail(p.product_ID)}
-                  cover={
+                  className='coffee-card'
+                  onClick={() => navigate(`/products/${p.product_ID}`)}>
+                  {/* IMAGE */}
+                  <div className='coffee-card__image'>
                     <img
                       src={getImageSrc(p.image)}
                       alt={p.name}
-                      style={{
-                        width: "100%",
-                        height: 200,
-                        objectFit: "cover",
-                        cursor: "pointer",
-                      }}
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src =
                           "/no-image.png";
                       }}
                     />
-                  }>
-                  <Card.Meta
-                    title={p.name}
-                    description={
-                      <>
-                        <p>Price: {p.price.toLocaleString()}₫</p>
-                        <p>Stock: {p.stock}</p>
-                      </>
-                    }
-                  />
+                  </div>
+
+                  {/* BODY */}
+                  <div className='coffee-card__body'>
+                    <h3 className='coffee-card__name'>{p.name}</h3>
+
+                    {/* TAGS – sau này có thể map từ DB */}
+                    <div className='coffee-card__tags'>
+                      <span>Arabica</span>
+                      <span>Kon Tum</span>
+                      <span>Medium Roast</span>
+                    </div>
+
+                    <div className='coffee-card__footer'>
+                      <div className='price'>{p.price.toLocaleString()}₫</div>
+
+                      <div className={`stock ${p.stock > 0 ? "in" : "out"}`}>
+                        {p.stock > 0 ? `Còn ${p.stock}` : "Hết hàng"}
+                      </div>
+                    </div>
+                  </div>
                 </Card>
               </Col>
             ))
           ) : (
-            <Col span={24} style={{ textAlign: "center" }}>
-              <p>No products found.</p>
+            <Col span={24} className='empty-text'>
+              Không có sản phẩm
             </Col>
           )}
         </Row>
-      </div>
+      </Content>
+      <FooterPage />
+      <Chatbox />
     </Layout>
   );
 };

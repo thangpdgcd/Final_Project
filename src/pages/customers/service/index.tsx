@@ -26,11 +26,11 @@ const ServicesSection: React.FC = () => {
     <div className='services-section'>
       <h1 className='title'>Services Phan Coffee</h1>
       <p className='subtitle'>
-        The people in the Central Highlands of Kon Tum, especially my village of
-        Dak Ha Commune, are the ones that grow the coffee trees for the Phan
-        Coffee brand. After roughly five years of cultivation, the coffee is
-        often picked by the public. The Phan Coffee plant then processes the
-        coffee to create the greatest goods for consumers. of Phan Coffee{" "}
+        The people in the Phan Coffee of Kon Tum, especially my village of Dak
+        Ha Commune, are the ones that grow the coffee trees for the Phan Coffee
+        brand. After roughly five years of cultivation, the coffee is often
+        picked by the public. The Phan Coffee plant then processes the coffee to
+        create the greatest goods for consumers. of Phan Coffee{" "}
       </p>
 
       <Row gutter={[24, 24]} justify='center'>

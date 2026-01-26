@@ -4,6 +4,7 @@ import {
   createCategory,
   Category,
 } from "../../../api/categoriesApi";
+import Chatbox from "../../../components/chatbox";
 
 const CategoriesPage = () => {
   // Khai báo state đúng kiểu
@@ -28,6 +29,7 @@ const CategoriesPage = () => {
           <li key={c.category_ID}>{c.name}</li>
         ))}
       </ul>
+      <Chatbox />
     </div>
   );
 };

@@ -1,22 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Layout,
-  Menu,
-  Table,
-  Button,
-  Typography,
-  message,
-  Alert,
-  Spin,
-} from "antd";
+import { Layout, Table, Button, Typography, message, Alert, Spin } from "antd";
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import logo from "../../../assets/img/logo_PhanCoffee.jpg";
-import SearchComponent from "../../search";
-import FooterPage from "../../footer";
-import "./index.scss";
 
-const { Header, Content } = Layout;
+import FooterPage from "../../../components/footer";
+import "./index.scss";
+import HeaderPage from "../../../components/header";
+import Chatbox from "../../../components/chatbox";
+
+const { Content } = Layout;
 const { Title } = Typography;
 
 const API_BASE = "http://localhost:8080"; // ✅ bỏ "/" cuối
@@ -74,7 +66,7 @@ const OrderPage: React.FC = () => {
     return cartItems.reduce(
       (sum: number, item: any) =>
         sum + (item.products?.price || 0) * item.quantity,
-      0
+      0,
     );
   }, [cartItems]);
 
@@ -166,7 +158,7 @@ const OrderPage: React.FC = () => {
       script.type = "text/javascript";
       script.async = true;
       script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(
-        clientId
+        clientId,
       )}&currency=USD&intent=capture`;
       script.setAttribute("data-paypal-sdk", "1");
 
@@ -246,7 +238,7 @@ const OrderPage: React.FC = () => {
       sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(payload));
 
       message.success(
-        "Payment success ✅ Redirecting to your ordered products..."
+        "Payment success ✅ Redirecting to your ordered products...",
       );
 
       // ✅ redirect đến đúng trang bạn đưa (OrdersPageHistory)
@@ -322,22 +314,7 @@ const OrderPage: React.FC = () => {
 
   return (
     <Layout className='order-page'>
-      <Header className='homepage__header'>
-        <div className='homepage__logo'>
-          <img src={logo} alt='Phan Coffee' />
-          <span className='logo-phancoffee'>Phan Coffee</span>
-        </div>
-
-        <SearchComponent />
-
-        <Menu
-          mode='horizontal'
-          overflowedIndicator={false}
-          onClick={handleMenuClick}
-          className='menu-home'
-          items={menuItems}
-        />
-      </Header>
+      <HeaderPage />
 
       <Content className='order-content' style={{ padding: 24 }}>
         <Title level={3}>Order Confirmation</Title>
@@ -387,6 +364,7 @@ const OrderPage: React.FC = () => {
       </Content>
 
       <FooterPage />
+      <Chatbox />
     </Layout>
   );
 };

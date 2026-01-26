@@ -8,6 +8,7 @@ import {
   SunOutlined,
   DownOutlined,
 } from "@ant-design/icons";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 const Link = ({
   href,
@@ -70,26 +71,8 @@ const NAV: NavItem[] = [
 /** ------------------ component ------------------ */
 export function SubMenuHeader(): React.ReactElement {
   const [openKey, setOpenKey] = React.useState<OpenKey>(null);
-  const [dark, setDark] = React.useState<boolean>(false);
   const wrapRef = React.useRef<HTMLDivElement | null>(null);
-
-  // Tailwind dark mode using `class` strategy
-  React.useEffect(() => {
-    const root = document.documentElement;
-    const saved = localStorage.getItem("theme");
-    const isDark = saved ? saved === "dark" : root.classList.contains("dark");
-    setDark(isDark);
-    root.classList.toggle("dark", isDark);
-  }, []);
-
-  const toggleDark = React.useCallback(() => {
-    setDark((prev) => {
-      const next = !prev;
-      document.documentElement.classList.toggle("dark", next);
-      localStorage.setItem("theme", next ? "dark" : "light");
-      return next;
-    });
-  }, []);
+  const { dark, toggleDark } = useTheme();
 
   // close menus when clicking outside
   React.useEffect(() => {

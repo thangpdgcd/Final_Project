@@ -6,11 +6,11 @@ import { register, RegisterPayload, RegisterResponse } from "../../api/authApi";
 
 import logo from "../../../src/assets/img/logo_PhanCoffee.jpg";
 import "./index.scss";
-
+import HeaderPage from "../../components/header/index";
 // ✅ Footer same as Home/Login
-import FooterPage from "../footer/index";
+import FooterPage from "../../components/footer/index";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 interface RegisterFormValues extends RegisterPayload {
   confirmPassword: string;
@@ -49,15 +49,8 @@ const RegisterPage: React.FC = () => {
   return (
     <Layout className='register-layout'>
       {/* ===== HEADER (same as Login/Home) ===== */}
-      <Header className='pc-header pc-header--clean'>
-        <div className='pc-header__left' onClick={() => navigate("/")}>
-          <img className='pc-header__logo' src={logo} alt='Phan Coffee' />
-          <span className='pc-header__brand'>Phan Coffee</span>
-        </div>
 
-        <div className='pc-header__center' />
-        <div className='pc-header__right' />
-      </Header>
+      <HeaderPage />
 
       {/* ===== CONTENT ===== */}
       <Content className='register-content'>

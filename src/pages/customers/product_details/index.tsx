@@ -24,6 +24,7 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import logo from "../../../assets/img/logo_PhanCoffee.jpg";
 import { getProductById, Product } from "../../../api/productApi";
 import { addToCart, getCartByUserId, CartItem } from "../../../api/cartApi";
+import Chatbox from "../../../components/chatbox";
 
 const { Header, Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -384,6 +385,7 @@ const ProductDetailPage: React.FC = () => {
           </Card>
         </div>
       </Content>
+      <Chatbox />
     </Layout>
   );
 };

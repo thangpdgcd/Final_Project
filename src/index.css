@@ -1,3 +1,7 @@
+html {
+  background: var(--bg-main, #f7f4ef);
+}
+
 body {
   margin: 0;
   font-family:
@@ -5,6 +9,12 @@ body {
     "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-main, #f7f4ef);
+}
+
+#root {
+  background: var(--bg-main, #f7f4ef);
+  min-height: 100vh;
 }
 
 code {

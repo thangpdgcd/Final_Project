@@ -13,9 +13,10 @@ import {
 } from "antd";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 import logo from "../../../assets/img/logo_PhanCoffee.jpg";
-import SearchComponent from "../../search";
-import FooterPage from "../../footer";
+
+import FooterPage from "../../../components/footer";
 import "./index.scss";
+import Chatbox from "../../../components/chatbox";
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -70,7 +71,7 @@ const OrdersPageHistory: React.FC = () => {
     return cartItems.reduce(
       (sum: number, item: any) =>
         sum + (item.products?.price || 0) * item.quantity,
-      0
+      0,
     );
   }, [cartItems]);
 
@@ -114,7 +115,7 @@ const OrdersPageHistory: React.FC = () => {
           <span className='logo-phancoffee'>Phan Coffee</span>
         </div>
 
-        <SearchComponent />
+        
 
         <Menu
           mode='horizontal'
@@ -199,6 +200,7 @@ const OrdersPageHistory: React.FC = () => {
       </Content>
 
       <FooterPage />
+      <Chatbox />
     </Layout>
   );
 };

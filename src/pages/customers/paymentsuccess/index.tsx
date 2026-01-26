@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import "./index.scss";
+import Chatbox from "../../../components/chatbox";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
@@ -84,6 +85,7 @@ export default function PaypalSuccessPage() {
           ← Quay lại trang thanh toán
         </a>
       </div>
+      <Chatbox />
     </div>
   );
 }

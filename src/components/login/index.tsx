@@ -1,4 +1,3 @@
-// src/pages/login/index.tsx
 import React, { useState } from "react";
 import { Layout, Form, Input, Button, Checkbox, message, Divider } from "antd";
 import {
@@ -12,10 +11,10 @@ import { login, LoginPayload, LoginResponse } from "../../api/authApi";
 import logo from "../../../src/assets/img/logo_PhanCoffee.jpg";
 import "./index.scss";
 
-// ✅ import FooterPage (giống HomePage)
-import FooterPage from "../footer/index";
+import HeaderPage from "../header";
+import FooterPage from "../footer";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 interface LoginFormValues extends LoginPayload {
   remember: boolean;
@@ -38,43 +37,23 @@ const LoginPage: React.FC = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
 
-      const userId =
-        (data as any)?.user_ID ??
-        (data as any)?.data?.user_ID ??
-        (data as any)?.user?.user_ID ??
-        (data as any)?.user?.id ??
-        (data as any)?.id;
-
-      if (userId) localStorage.setItem("user_ID", String(userId));
-      else localStorage.removeItem("user_ID");
-
       message.success("✅ Logged in successfully!");
       navigate("/");
-    } catch (err: any) {
+    } catch {
       message.error("❌ Incorrect email or password!");
     } finally {
       setLoading(false);
     }
   };
 
-  const onSocialLogin = (provider: "facebook" | "google" | "instagram") => {
-    message.info(`🔒 Continue with ${provider.toUpperCase()} (UI demo)`);
+  const onSocialLogin = (provider: string) => {
+    message.info(`🔒 Continue with ${provider} (UI demo)`);
   };
 
   return (
     <Layout className='login-layout'>
-      {/* ===== HEADER (match Home) ===== */}
-      <Header className='pc-header pc-header--clean'>
-        <div className='pc-header__left' onClick={() => navigate("/")}>
-          <img className='pc-header__logo' src={logo} alt='Phan Coffee' />
-          <span className='pc-header__brand'>Phan Coffee</span>
-        </div>
+      <HeaderPage />
 
-        <div className='pc-header__center' />
-        <div className='pc-header__right' />
-      </Header>
-
-      {/* ===== CONTENT ===== */}
       <Content className='login-content'>
         <div className='login-hero'>
           <div className='login-card'>
@@ -91,25 +70,25 @@ const LoginPage: React.FC = () => {
               <div className='social-wrap'>
                 <Button
                   className='social-btn'
-                  onClick={() => onSocialLogin("facebook")}
                   icon={<FacebookFilled />}
-                  block>
+                  block
+                  onClick={() => onSocialLogin("Facebook")}>
                   Continue with Facebook
                 </Button>
 
                 <Button
                   className='social-btn'
-                  onClick={() => onSocialLogin("google")}
                   icon={<ChromeOutlined />}
-                  block>
+                  block
+                  onClick={() => onSocialLogin("Google")}>
                   Continue with Google
                 </Button>
 
                 <Button
                   className='social-btn'
-                  onClick={() => onSocialLogin("instagram")}
                   icon={<InstagramFilled />}
-                  block>
+                  block
+                  onClick={() => onSocialLogin("Instagram")}>
                   Continue with Instagram
                 </Button>
               </div>
@@ -126,10 +105,7 @@ const LoginPage: React.FC = () => {
                   name='email'
                   rules={[
                     { required: true, message: "Please enter your email." },
-                    {
-                      type: "email",
-                      message: "Please enter a valid email address.",
-                    },
+                    { type: "email", message: "Invalid email format." },
                   ]}>
                   <Input placeholder='you@example.com' />
                 </Form.Item>
@@ -151,19 +127,13 @@ const LoginPage: React.FC = () => {
                     <Checkbox>Remember me</Checkbox>
                   </Form.Item>
 
-                  <Button
-                    type='link'
-                    className='forgot'
-                    onClick={() =>
-                      message.info("Forgot password is not implemented yet.")
-                    }>
+                  <Button type='link' className='forgot'>
                     Forgot password?
                   </Button>
                 </div>
 
                 <Button
                   htmlType='submit'
-                  type='primary'
                   loading={loading}
                   className='btn-login'
                   block>
@@ -171,7 +141,7 @@ const LoginPage: React.FC = () => {
                 </Button>
 
                 <Button type='link' className='btn-signup'>
-                  No account yet?{" "}
+                  No account yet?
                 </Button>
                 <Button
                   type='link'
@@ -188,7 +158,6 @@ const LoginPage: React.FC = () => {
         </div>
       </Content>
 
-      {/* ✅ FOOTER PAGE (same as Home) */}
       <FooterPage />
     </Layout>
   );
