@@ -1,17 +1,14 @@
 import usersService from "../../src/service/usersServices.js"; // Import the user service
 
-// Lấy tất cả người dùng
 let getAllUsers = async (req, res) => {
   try {
     let { name } = req.query;
 
     if (name) {
-      // Nếu có query name thì search theo name
       let result = await usersService.searchUsers(name);
       return res.status(200).json(result);
     }
 
-    // Nếu không có query thì lấy toàn bộ
     let users = await usersService.getAllUsers();
     return res.status(200).json(users);
   } catch (error) {
@@ -19,7 +16,6 @@ let getAllUsers = async (req, res) => {
   }
 };
 
-// Lấy 1 người dùng theo ID
 let getUsersbyID = async (req, res) => {
   try {
     let id = req.params.id;
@@ -30,7 +26,6 @@ let getUsersbyID = async (req, res) => {
   }
 };
 
-// Tạo người dùng mới
 let createAdmin = async (req, res) => {
   try {
     let data = req.body;
@@ -41,7 +36,6 @@ let createAdmin = async (req, res) => {
   }
 };
 
-// Cập nhật người dùng
 let updateUsers = async (req, res) => {
   try {
     let id = req.params.id;
@@ -53,12 +47,11 @@ let updateUsers = async (req, res) => {
   }
 };
 
-// Xoá người dùng
 let deleteUsers = async (req, res) => {
   try {
     let id = req.params.id;
     await usersService.deleteUsers(id);
-    res.status(204).send(); // No Content
+    res.status(204).send();
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

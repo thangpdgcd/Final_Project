@@ -1,38 +1,37 @@
+// src/server.js
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 import path from "path";
-
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
 import paypal from "paypal-rest-sdk";
 
-import initPaymentsRoutes from "./routes/paymentsRoutes.js";
 import configViewEngine from "../src/config/viewEngine.js";
 import initRoutes from "../src/routes/index.js";
+
 import initUserRoutes from "./routes/usersRoutes.js";
 import initProductsRoutes from "./routes/productsRoutes.js";
 import initCategoriesRoutes from "../src/routes/categoriesRoutes.js";
 import initOrdersRoutes from "./routes/ordersRoutes.js";
 import initCartRoutes from "./routes/cartsRoutes.js";
-import initUploadRoutes from "./routes/uploadRoute.js";
-import initCloudinaryRoutes from "./routes/cloudinaryRoutes.js";
+
 import initAuthenticated from "./routes/authRoutes.js";
 import initHomeRoutes from "./routes/homeRoutes.js";
-import authMiddleware from "../src/middlewares/auth.js";
+import initPaymentsRoutes from "./routes/paymentsRoutes.js";
 
-// ✅ tính __dirname trước
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ ép dotenv đọc đúng file .env (thường nằm ở backend/.env)
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: new URL("../.env", import.meta.url) });
+//log cloudinary config status
 
-// ✅ debug để chắc chắn env đã load (xong rồi có thể xoá)
 console.log("ENV FILE:", path.resolve(__dirname, "../.env"));
 console.log(
   "PAYPAL_CLIENT_ID:",
-  process.env.PAYPAL_CLIENT_ID ? "✅ OK" : "❌ MISSING"
+  process.env.PAYPAL_CLIENT_ID ? "✅ OK" : "❌ MISSING",
 );
 
 const app = express();
@@ -51,10 +50,10 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
     optionsSuccessStatus: 200,
-  })
+    limit: "50mb",
+  }),
 );
 
-// ✅ config PayPal chỉ chạy khi có env
 if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
   console.error("❌ Missing PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET in .env");
 } else {
@@ -62,33 +61,26 @@ if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
     mode: "sandbox",
     client_id: process.env.PAYPAL_CLIENT_ID,
     client_secret: process.env.PAYPAL_CLIENT_SECRET,
+    limit: "50mb",
   });
   console.log("✅ PayPal configured");
 }
 
 configViewEngine(app);
-
-// routes
 initRoutes(app);
 initUserRoutes(app);
 initProductsRoutes(app);
 initCategoriesRoutes(app);
 initOrdersRoutes(app);
-initUploadRoutes(app);
 initCartRoutes(app);
 initAuthenticated(app);
 initHomeRoutes(app);
-initPaymentsRoutes(app); // ✅ chỉ gọi 1 lần, bỏ initPaymentRoutes trùng
-initCloudinaryRoutes(app);
+initPaymentsRoutes(app);
 
-app.get("/homeapi", authMiddleware, (req, res) => {
-  res.json({ message: "Truy cập thành công", user: req.user });
-});
-
-app.use("/openapi.json", express.static(path.join(__dirname, "openapi.json")));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is running at http://0.0.0.0:${PORT}/`);
+  console.log(`Swagger UI: http://localhost:${PORT}/api-docs`);
 });
 
 export default app;

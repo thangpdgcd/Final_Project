@@ -13,7 +13,6 @@ let getAllProducts = () => {
       if (products && products.length > 0) {
         products = products.map((item) => {
           if (item.image) {
-            // Only return the base64 string, no prefix
             item.image = item.image.toString("base64");
           }
           return item;
@@ -62,7 +61,7 @@ let createProducts = (data) => {
       user_ID === null
     ) {
       return reject(
-        new Error("Please provide Name, Price, Categories_ID and Users_ID.")
+        new Error("Please provide Name, Price, Categories_ID and Users_ID."),
       );
     }
 
@@ -82,7 +81,6 @@ let createProducts = (data) => {
       });
       if (!userExists) return reject(new Error("User does not exist."));
 
-      // ✅ image giờ là path do multer tạo: "/uploads/xxx.jpg"
       const finalImage =
         typeof image === "string" && image.trim() ? image.trim() : null;
 
@@ -136,14 +134,19 @@ let deleteProducts = (Productsid) => {
 };
 
 let searchProducts = async (name) => {
-  try {
-    return await Products.findAll({
-      where: { name },
-      include: [{ association: "users" }, { association: "categories" }],
-    });
-  } catch (error) {
-    throw new Error("Unable to search product: " + error.message);
-  }
+  return new Promise(async (resolve, reject) => {
+    try {
+      let searchproducts = await Products.findAll({
+        searchproducts,
+        where: { name },
+        include: [{ association: "users" }, { association: "categories" }],
+      });
+      resolve(searchproducts);
+    } catch (error) {
+      reject(searchproducts);
+      throw new Error("Unable to search product: " + error.message);
+    }
+  });
 };
 
 export default {

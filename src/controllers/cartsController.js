@@ -24,12 +24,11 @@ let addToCart = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // 👉 cartService sẽ lo phần: tạo giỏ mới nếu chưa có + thêm/cập nhật sản phẩm
     const cart = await cartService.addToCart(
       user_ID,
       product_ID,
       quantity,
-      price
+      price,
     );
 
     return res.status(201).json({

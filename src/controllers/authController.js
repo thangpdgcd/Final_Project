@@ -1,7 +1,6 @@
 import authService from "../service/authService.js";
 
-// ✅ API: Đăng ký người dùng (JSON)
-const registerUser = async (req, res) => {
+let registerUser = async (req, res) => {
   try {
     const { name, email, address, phoneNumber, password, roleID } = req.body;
 
@@ -10,9 +9,6 @@ const registerUser = async (req, res) => {
         .status(400)
         .json({ message: "Tên, Email và mật khẩu là bắt buộc." });
     }
-
-    // ✅ nhận roleID từ FE (nếu có), không thì default = "1"
-    // Chuẩn hoá về string số: "1" | "2" | "3"
     const finalRoleID =
       roleID !== undefined && roleID !== null && `${roleID}`.trim() !== ""
         ? String(roleID)
@@ -37,8 +33,7 @@ const registerUser = async (req, res) => {
   }
 };
 
-// ✅ API: Đăng nhập người dùng (JSON)
-const login = async (req, res) => {
+let login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -55,13 +50,11 @@ const login = async (req, res) => {
   }
 };
 
-// ✅ Giao diện đăng nhập (GET)
-const showLoginPage = (_, res) => {
+let showLoginPage = (_, res) => {
   res.render("login", { message: null });
 };
 
-// ✅ Đăng nhập từ EJS (POST)
-const loginEJS = async (req, res) => {
+let loginEJS = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -82,13 +75,11 @@ const loginEJS = async (req, res) => {
   }
 };
 
-// ✅ Giao diện đăng ký (GET)
-const showRegisterPage = (_, res) => {
+let showRegisterPage = (_, res) => {
   res.render("register", { message: null });
 };
 
-// ✅ Đăng ký từ EJS (POST)
-const registerEJS = async (req, res) => {
+let registerEJS = async (req, res) => {
   try {
     const { name, email, address, phoneNumber, password, roleID } = req.body;
 
@@ -99,7 +90,7 @@ const registerEJS = async (req, res) => {
     }
 
     const allowedRoles = ["1", "2", "3"];
-    const validatedRole = allowedRoles.includes(roleID) ? roleID : "1"; // Mặc định là "1" (user)
+    const validatedRole = allowedRoles.includes(roleID) ? roleID : "1"; // default là "1" (user)
 
     await authService.register({
       name,

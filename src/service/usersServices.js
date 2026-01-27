@@ -26,7 +26,7 @@ let getUsersById = (id) => {
       resolve(user);
     } catch (error) {
       reject(
-        new Error("Unable to retrieve user information: " + error.message)
+        new Error("Unable to retrieve user information: " + error.message),
       );
     }
   });

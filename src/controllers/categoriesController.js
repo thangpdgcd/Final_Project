@@ -1,5 +1,5 @@
 import CategoriesService from "../service/categoriesService.js";
-// Lấy tất cả danh mục
+
 let getAllCategories = async (req, res) => {
   try {
     let { name } = req.query;
@@ -15,7 +15,6 @@ let getAllCategories = async (req, res) => {
   }
 };
 
-// Lấy danh mục theo ID
 let getCategoriesById = async (req, res) => {
   try {
     let id = req.params.id;
@@ -26,7 +25,6 @@ let getCategoriesById = async (req, res) => {
   }
 };
 
-// Tạo danh mục mới
 let createCategories = async (req, res) => {
   try {
     let data = req.body;
@@ -37,7 +35,6 @@ let createCategories = async (req, res) => {
   }
 };
 
-// Cập nhật danh mục
 let updateCategories = async (req, res) => {
   try {
     let id = req.params.id;
@@ -49,7 +46,6 @@ let updateCategories = async (req, res) => {
   }
 };
 
-// Xóa danh mục
 let deleteCategories = async (req, res) => {
   try {
     let id = req.params.id;
