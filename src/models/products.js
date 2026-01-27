@@ -46,7 +46,7 @@ export default (sequelize) => {
         allowNull: false,
       },
       image: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING,
         allowNull: true,
       },
       user_ID: {
