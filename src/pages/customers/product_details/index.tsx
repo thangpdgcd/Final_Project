@@ -1,32 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./index.scss";
 
-import {
-  Layout,
-  Menu,
-  Card,
-  Row,
-  Col,
-  Typography,
-  Tag,
-  Space,
-  Divider,
-  Select,
-  InputNumber,
-  Button,
-  message,
-  Breadcrumb,
-  Badge,
-} from "antd";
+import { Layout, Card, Typography, Tag, Space, Divider, Select, InputNumber, Button, message, Breadcrumb } from "antd";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 
-import logo from "../../../assets/img/logo_PhanCoffee.jpg";
 import { getProductById, Product } from "../../../api/productApi";
 import { addToCart, getCartByUserId, CartItem } from "../../../api/cartApi";
 import Chatbox from "../../../components/chatbox";
+import HeaderPage from "../../../components/header";
+import FooterPage from "../../../components/footer";
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
 
 const getImageSrc = (img?: string | null) => {
@@ -82,60 +67,6 @@ const ProductDetailPage: React.FC = () => {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  // ✅ đồng bộ route giống ProductList: /carts
-  const menuRoutes: Record<string, string> = {
-    home: "/",
-    products: "/products",
-    contact: "/contact",
-    about: "/about",
-    login: "/login",
-    carts: "/carts",
-  };
-
-  const handleMenuClick = (e: { key: string }) => {
-    if (e.key === "logout") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      localStorage.removeItem("user_ID");
-      setIsLoggedIn(false);
-      navigate("/login");
-      return;
-    }
-    const path = menuRoutes[e.key];
-    if (path) navigate(path);
-  };
-
-  // ✅ lấy giỏ hàng giống ProductList + thêm Badge số lượng
-  const menuitems = [
-    { key: "home", label: "Home" },
-    { key: "products", label: "Coffee" },
-    { key: "contact", label: "Contact" },
-    { key: "about", label: "About" },
-    {
-      key: isLoggedIn ? "logout" : "login",
-      label: isLoggedIn ? "Log Out" : "Log In",
-    },
-    {
-      key: "carts",
-      label: (
-        <div className='menu-cart'>
-          <Badge
-            count={cartItems?.length || 0}
-            size='small'
-            overflowCount={99}
-            offset={[6, -2]}>
-            <span className='menu-cart-icon text-2xl'>
-              <ShoppingCartOutlined
-                className='icon-carts'
-                style={{ fontSize: 24 }}
-              />
-            </span>
-          </Badge>
-        </div>
-      ),
-    },
-  ];
-
   // Load product
   useEffect(() => {
     if (!id) return;
@@ -181,15 +112,15 @@ const ProductDetailPage: React.FC = () => {
     if (!product) return;
 
     if (!localStorage.getItem("token") || !user_ID) {
-      message.warning("Vui lòng đăng nhập để thêm vào giỏ hàng");
+      message.warning("Please log in to add items to your cart");
       navigate("/login", { state: { from: location.pathname } });
       return;
     }
 
-    if (!inStock) return message.warning("Sản phẩm đã hết hàng!");
-    if (!weight) return message.warning("Vui lòng chọn Khối lượng");
-    if (!grind) return message.warning("Vui lòng chọn Phân loại");
-    if (cartLoading) return message.info("Đang kiểm tra giỏ hàng...");
+    if (!inStock) return message.warning("This product is out of stock!");
+    if (!weight) return message.warning("Please select a weight");
+    if (!grind) return message.warning("Please select a grind option");
+    if (cartLoading) return message.info("Checking your cart...");
 
     const existed = cartItems.some((it: any) => {
       const pid = it?.products?.product_ID ?? it?.product_ID;
@@ -197,7 +128,7 @@ const ProductDetailPage: React.FC = () => {
     });
 
     if (existed) {
-      message.warning("Sản phẩm này đã có trong giỏ hàng rồi!");
+      message.warning("This product is already in your cart!");
       return;
     }
 
@@ -209,7 +140,7 @@ const ProductDetailPage: React.FC = () => {
         price: product.price,
       });
 
-      message.success(`Đã thêm ${qty} sản phẩm vào giỏ`);
+      message.success(`Added ${qty} item${qty > 1 ? "s" : ""} to cart`);
 
       // ✅ update badge/cartItems ngay lập tức
       setCartItems((prev: any) => [
@@ -231,160 +162,159 @@ const ProductDetailPage: React.FC = () => {
     } catch (err: any) {
       const msg = err?.response?.data?.message;
       if (msg && /exist|already|đã/i.test(msg)) {
-        message.warning("Sản phẩm này đã có trong giỏ hàng rồi!");
+        message.warning("This product is already in your cart!");
         return;
       }
       console.error(err);
-      message.error(msg || "Không thể thêm sản phẩm vào giỏ");
+      message.error(msg || "Unable to add this product to your cart");
     }
   };
 
   return (
     <Layout className='pd-layout'>
-      <Header className='homepage__header pd-header'>
-        <div className='homepage__logo' onClick={() => navigate("/")}>
-          <img src={logo} alt='Phan Coffee' />
-          <span className='logo-phancoffee'>Phan Coffee</span>
-        </div>
-
-        <Menu
-          mode='horizontal'
-          overflowedIndicator={false}
-          onClick={handleMenuClick}
-          className='menu-home pd-menu'
-          selectedKeys={[
-            Object.keys(menuRoutes).find(
-              (k) => menuRoutes[k] === location.pathname
-            ) || "",
-          ]}
-          items={menuitems}
-        />
-      </Header>
+      <HeaderPage />
 
       <Content className='pd-content'>
-        <div className='pd-container'>
-          <Breadcrumb className='pd-breadcrumb' />
+        <div className='product-detail'>
+          <Breadcrumb className='pd-breadcrumb'>
+            <Breadcrumb.Item>
+              <span className='pd-link' onClick={() => navigate("/")}>
+                Home
+              </span>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <span className='pd-link' onClick={() => navigate("/products")}>
+                Coffee
+              </span>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>{product?.name || "Details"}</Breadcrumb.Item>
+          </Breadcrumb>
 
           <Card className='pd-card' bordered={false}>
             {loading ? (
-              <div className='pd-loading'>Đang tải...</div>
+              <div className='pd-loading'>Loading...</div>
             ) : !product ? (
-              <Text>Không tìm thấy sản phẩm</Text>
+              <Text>Product not found</Text>
             ) : (
-              <Row gutter={[28, 28]} align='top'>
-                <Col xs={24} lg={12}>
-                  <div className='pd-media'>
-                    <img
-                      className='pd-image'
-                      src={getImageSrc(product.image)}
-                      alt={product.name}
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src =
-                          "/no-image.png";
-                      }}
-                    />
-                    <button
-                      className='pd-zoom'
-                      type='button'
-                      aria-label='Zoom'
-                      onClick={() =>
-                        window.open(getImageSrc(product.image), "_blank")
-                      }
-                    />
+              <div className='pd-grid'>
+                <div className='pd-media'>
+                  <img
+                    className='pd-image'
+                    src={getImageSrc(product.image)}
+                    alt={product.name}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src =
+                        "/no-image.png";
+                    }}
+                  />
+                  <button
+                    className='pd-zoom'
+                    type='button'
+                    aria-label='Zoom'
+                    onClick={() =>
+                      window.open(getImageSrc(product.image), "_blank")
+                    }
+                  />
+                </div>
+
+                <div className='pd-info'>
+                  <Title className='pd-title'>{product.name}</Title>
+
+                  <div className='pd-price'>
+                    {Number(product.price || 0).toLocaleString()} ₫
+                    <span className='pd-price-note'> / item</span>
                   </div>
-                </Col>
 
-                <Col xs={24} lg={12}>
-                  <div className='pd-info'>
-                    <Title className='pd-title'>{product.name}</Title>
+                  <Paragraph className='pd-desc'>
+                    {product.description || "No description available."}
+                  </Paragraph>
 
-                    <div className='pd-price'>
-                      {Number(product.price || 0).toLocaleString()} đ
-                      <span className='pd-price-note'> / sản phẩm</span>
+                  <Space size={10} wrap className='pd-tags'>
+                    {inStock ? (
+                      <Tag color='green'>In stock</Tag>
+                    ) : (
+                      <Tag color='red'>Out of stock</Tag>
+                    )}
+                    <Tag color='blue'>Stock: {product.stock}</Tag>
+                  </Space>
+
+                  <Divider className='pd-divider' />
+
+                  <div className='pd-form'>
+                    <div className='pd-option-row'>
+                      <div className='pd-option-label'>Weight</div>
+                      <Select
+                        className='pd-select'
+                        placeholder='Select an option'
+                        value={weight}
+                        onChange={setWeight}
+                        options={[
+                          { value: "250g", label: "250g" },
+                          { value: "500g", label: "500g" },
+                        ]}
+                      />
                     </div>
 
-                    <Paragraph className='pd-desc'>
-                      {product.description || "Chưa có mô tả."}
-                    </Paragraph>
+                    <div className='pd-option-row'>
+                      <div className='pd-option-label'>Grind</div>
+                      <Select
+                        className='pd-select'
+                        placeholder='Select an option'
+                        value={grind}
+                        onChange={setGrind}
+                        options={[
+                          {
+                            value: "Phin drip – Medium grind",
+                            label: "Phin drip – Medium grind",
+                          },
+                          {
+                            value: "Espresso machine – Fine grind",
+                            label: "Espresso machine – Fine grind",
+                          },
+                          {
+                            value: "Cold brew – Coarse grind",
+                            label: "Cold brew – Coarse grind",
+                          },
+                          { value: "Whole beans", label: "Whole beans" },
+                        ]}
+                      />
+                    </div>
 
-                    <Space size={10} wrap className='pd-tags'>
-                      {inStock ? (
-                        <Tag color='green'>Còn hàng</Tag>
-                      ) : (
-                        <Tag color='red'>Hết hàng</Tag>
-                      )}
-                      <Tag color='blue'>Stock: {product.stock}</Tag>
-                    </Space>
+                    <div className='pd-qty-row'>
+                      <InputNumber
+                        className='pd-qty'
+                        min={1}
+                        max={product.stock || 1}
+                        value={qty}
+                        onChange={(v) => setQty(Number(v || 1))}
+                        disabled={!inStock}
+                      />
+                      <Button
+                        className='pd-add-btn'
+                        type='primary'
+                        size='large'
+                        icon={<ShoppingCartOutlined />}
+                        onClick={handleAddToCart}
+                        disabled={!inStock}>
+                        Add to cart
+                      </Button>
+                    </div>
 
-                    <Divider className='pd-divider' />
-
-                    <div className='pd-form'>
-                      <div className='pd-row'>
-                        <div className='pd-label'>Khối lượng</div>
-                        <Select
-                          className='pd-select'
-                          placeholder='Chọn một tùy chọn'
-                          value={weight}
-                          onChange={setWeight}
-                          options={[
-                            { value: "250gr", label: "250gr" },
-                            { value: "500gr", label: "500gr" },
-                          ]}
-                        />
-                      </div>
-
-                      <div className='pd-row'>
-                        <div className='pd-label'>Phân loại</div>
-                        <Select
-                          className='pd-select'
-                          placeholder='Chọn một tùy chọn'
-                          value={grind}
-                          onChange={setGrind}
-                          options={[
-                            {
-                              value: "Pha phin – Xay vừa",
-                              label: "Pha phin – Xay vừa",
-                            },
-                            {
-                              value: "Pha máy – Xay mịn",
-                              label: "Pha máy – Xay mịn",
-                            },
-                            {
-                              value: "Cold brew – Xay thô",
-                              label: "Cold brew – Xay thô",
-                            },
-                            { value: "Nguyên hạt", label: "Nguyên hạt" },
-                          ]}
-                        />
-                      </div>
-
-                      <div className='pd-actions'>
-                        <InputNumber
-                          className='pd-qty'
-                          min={1}
-                          max={product.stock || 1}
-                          value={qty}
-                          onChange={(v) => setQty(Number(v || 1))}
-                          disabled={!inStock}
-                        />
-                        <Button
-                          className='pd-btn'
-                          type='primary'
-                          size='large'
-                          icon={<ShoppingCartOutlined />}
-                          onClick={handleAddToCart}
-                          disabled={!inStock}>
-                          Thêm vào giỏ hàng
-                        </Button>
-                      </div>
+                    <div className='pd-shipping-note'>
+                      <span className='pd-shipping-dot' />
+                      <span className='pd-shipping-text'>
+                        Free shipping on orders over 2,000,000 ₫. Beans are
+                        roasted fresh every Tuesday for peak flavor.
+                      </span>
                     </div>
                   </div>
-                </Col>
-              </Row>
+                </div>
+              </div>
             )}
           </Card>
         </div>
       </Content>
+      <FooterPage />
       <Chatbox />
     </Layout>
   );
