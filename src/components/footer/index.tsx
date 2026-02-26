@@ -1,132 +1,71 @@
 import React from "react";
 import { Layout, Row, Col, Typography } from "antd";
-import {
-  FacebookOutlined,
-  InstagramOutlined,
-  YoutubeOutlined,
-  TikTokOutlined,
-  HomeOutlined,
-  PhoneOutlined,
-  MailOutlined,
-} from "@ant-design/icons";
 import { Link } from "react-router-dom";
-
 import "./index.scss";
+import { useTranslation } from "react-i18next";
+
+const logo = `${process.env.PUBLIC_URL || ""}/logo_Web_Phan_Coffeess.png`;
 
 const { Footer } = Layout;
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const FooterPage: React.FC = () => {
   const year = new Date().getFullYear();
+  const { t } = useTranslation();
 
   return (
     <Footer className='app-footer'>
       <div className='app-footer__inner'>
-        {/* 3 columns */}
-        <Row gutter={[48, 32]}>
-          {/* Column 1: About */}
-          <Col xs={24} md={8} className='footer-column'>
-            <Title level={4} className='footer-heading'>
-              ABOUT PHAN COFFEE
-            </Title>
+        <Row gutter={[48, 32]} className='footer-top'>
+          {/* Brand */}
+          <Col xs={24} md={10} className='footer-column footer-brand'>
+            <div className='footer-brand__head'>
+              <div className='footer-mark'><img src={logo} alt="" /></div>
+              <div className='footer-brand__name'>{t("common.brandName")}</div>
+            </div>
             <p className='footer-text'>
-              Phan Coffee is a place for people who love pure, freshly roasted
-              coffee. Here, you can enjoy bold flavors in a warm, friendly space
-              in the heart of Ho Chi Minh City.
+              {t("footer.brandDescription")}
             </p>
-            <p className='footer-signature'>– Phan Coffee</p>
           </Col>
 
-          {/* Column 2: Social */}
-          <Col xs={24} md={8} className='footer-column'>
-            <Title level={4} className='footer-heading'>
-              CONNECT WITH US
+          {/* SHOP */}
+          <Col xs={24} sm={12} md={7} className='footer-column'>
+            <Title level={5} className='footer-heading'>
+              {t("footer.shopTitle")}
             </Title>
-            <ul className='footer-list footer-list--social'>
+            <ul className='footer-list'>
               <li>
-                <span className='icon-circle icon-circle--facebook'>
-                  <FacebookOutlined />
-                </span>
-                <a
-                  href='https://web.facebook.com/phancoffee.vn'
-                  target='_blank'
-                  rel='noopener noreferrer'>
-                  Like us on Facebook
-                </a>
+                <Link to='/products'>{t("footer.shopAllCoffee")}</Link>
               </li>
               <li>
-                <span className='icon-circle icon-circle--instagram'>
-                  <InstagramOutlined />
-                </span>
-                <a
-                  href='https://instagram.com'
-                  target='_blank'
-                  rel='noopener noreferrer'>
-                  Follow us on Instagram
-                </a>
+                <Link to='/products/brewing-gear'>{t("footer.shopBrewingGear")}</Link>
               </li>
               <li>
-                <span className='icon-circle icon-circle--youtube'>
-                  <YoutubeOutlined />
-                </span>
-                <a
-                  href='https://youtube.com'
-                  target='_blank'
-                  rel='noopener noreferrer'>
-                  Subscribe on YouTube
-                </a>
+                <Link to='/products/merchandise'>{t("footer.shopMerchandise")}</Link>
               </li>
               <li>
-                <span className='icon-circle icon-circle--tiktok'>
-                  <TikTokOutlined />
-                </span>
-                <a
-                  href='https://tiktok.com'
-                  target='_blank'
-                  rel='noopener noreferrer'>
-                  Follow us on TikTok
-                </a>
+                <Link to='/products/subscription'>{t("footer.shopSubscription")}</Link>
               </li>
             </ul>
           </Col>
 
-          {/* Column 3: Contact */}
-          <Col xs={24} md={8} className='footer-column'>
-            <Title level={4} className='footer-heading'>
-              CONTACT INFORMATION
+          {/* SUPPORT */}
+          <Col xs={24} sm={12} md={7} className='footer-column'>
+            <Title level={5} className='footer-heading'>
+              {t("footer.supportTitle")}
             </Title>
-            <ul className='footer-list footer-list--contact'>
+            <ul className='footer-list'>
               <li>
-                <HomeOutlined className='contact-icon' />
-                <div>
-                  <Text className='footer-contact-line'>
-                    82–84 Bui Thi Xuan St., Ben Thanh Ward
-                  </Text>
-                  <br />
-                  <Text className='footer-contact-line'>
-                    District 1, Ho Chi Minh City, Vietnam
-                  </Text>
-                </div>
+                <Link to='/shipping'>{t("footer.supportShipping")}</Link>
               </li>
               <li>
-                <PhoneOutlined className='contact-icon' />
-                <div>
-                  <Text className='footer-contact-line'>
-                    Hotline: 1900 6011
-                  </Text>
-                  <br />
-                  <Text className='footer-contact-line'>
-                    Tel: (+84 28) 3925 1852
-                  </Text>
-                </div>
+                <Link to='/wholesale'>{t("footer.supportWholesale")}</Link>
               </li>
               <li>
-                <MailOutlined className='contact-icon' />
-                <div>
-                  <Text className='footer-contact-line'>
-                    contact@phancoffee.vn
-                  </Text>
-                </div>
+                <Link to='/returns'>{t("footer.supportReturns")}</Link>
+              </li>
+              <li>
+                <Link to='/privacy'>{t("footer.supportPrivacy")}</Link>
               </li>
             </ul>
           </Col>
@@ -136,14 +75,21 @@ const FooterPage: React.FC = () => {
       {/* Bottom bar */}
       <div className='app-footer__bottom'>
         <div className='footer-bottom-left'>
-          © {year} Phan Coffee. All rights reserved.
+          {t("footer.copyright", { year })}
         </div>
         <div className='footer-bottom-right'>
-          <Link to='/about'>Company Information</Link>
-          <span className='divider'>|</span>
-          <Link to='/privacy'>Privacy Policy</Link>
-          <span className='divider'>|</span>
-          <Link to='/terms'>Terms &amp; Conditions</Link>
+          <a
+            href='https://web.facebook.com/phancoffee.vn'
+            target='_blank'
+            rel='noopener noreferrer'>
+            {t("footer.facebook")}
+          </a>
+          <a
+            href='https://instagram.com'
+            target='_blank'
+            rel='noopener noreferrer'>
+            {t("footer.instagram")}
+          </a>
         </div>
       </div>
     </Footer>

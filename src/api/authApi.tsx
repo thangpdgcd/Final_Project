@@ -11,6 +11,8 @@ export interface LoginPayload {
 
 export interface LoginResponse {
   token: string;
+  // Backend also returns the logged-in user object (shape may vary)
+  user?: any;
 }
 
 export interface RegisterPayload {

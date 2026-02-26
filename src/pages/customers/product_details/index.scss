@@ -3,7 +3,7 @@
 ========================= */
 .pd-layout {
   min-height: 100vh;
-  background: #fbf8f3;
+  background: var(--bg-main);
 }
 
 .pd-content {
@@ -20,7 +20,7 @@
   --latte-100: #f5f0e8;
   --shadow-1: 0 20px 60px rgba(15, 23, 42, 0.14);
 
-  max-width: 1080px;
+  width: 1080px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -56,7 +56,7 @@
 .pd-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 32px;
+  gap: 24px;
   align-items: flex-start;
 
   @media (max-width: 992px) {
@@ -68,17 +68,20 @@
    LEFT: IMAGE
 ========================= */
 .pd-media {
-  border-radius: 14px;
+  border-radius: 22px;
   overflow: hidden;
-  background: radial-gradient(circle at top, #f3e6d6, #e2cfb6);
+  background: #ffffff;
   position: relative;
+  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.22);
 }
 
 .pd-image {
   width: 100%;
   height: 460px;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
+  border-radius: 18px;
+  border: 2px solid #111827;
 
   @media (max-width: 992px) {
     height: 380px;
@@ -126,7 +129,7 @@
 .pd-info {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .pd-title {
@@ -137,7 +140,7 @@
 }
 
 .pd-price {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   font-size: 22px;
   font-weight: 700;
   color: #111827;
@@ -150,7 +153,7 @@
 }
 
 .pd-desc {
-  margin-top: 6px;
+  margin-top: 4px;
   color: #4b5563;
 }
 
@@ -159,7 +162,7 @@
 }
 
 .pd-divider {
-  margin: 16px 0 14px;
+  margin: 12px 0;
 }
 
 /* =========================
@@ -168,7 +171,7 @@
 .pd-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .pd-option-row {
@@ -284,6 +287,87 @@
   align-items: center;
   justify-content: center;
   color: #6b7280;
+}
+
+/* =========================
+   EXTRA DESCRIPTION SECTION
+========================= */
+.pd-extra {
+  margin-top: 32px;
+}
+
+.pd-tabs {
+  display: flex;
+  gap: 32px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+}
+
+.pd-tab {
+  position: relative;
+  padding: 8px 0 14px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: color 0.16s ease;
+}
+
+.pd-tab.active {
+  color: #ea580c;
+}
+
+.pd-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: #ea580c;
+}
+
+.pd-extra-text {
+  font-size: 14px;
+  color: #4b5563;
+  width: 900px;
+}
+
+.pd-extra-grid {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pd-extra-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 18px 18px 16px;
+}
+
+.pd-extra-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.pd-extra-value {
+  font-size: 14px;
+  color: #111827;
+  line-height: 1.6;
 }
 
 /* Dropdown menu tone */

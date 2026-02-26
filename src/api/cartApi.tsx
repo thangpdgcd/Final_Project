@@ -1,12 +1,23 @@
 import axios from "axios";
 
 /**
- * Vite env phải dùng import.meta.env
- * .env: VITE_API_URL=http://localhost:8080
+ * Base URL cho API giỏ hàng
+ * Ưu tiên:
+ *   1. VITE_API_URL hoặc REACT_APP_API_URL
+ *   2. Mặc định: http://localhost:8080 hoặc http://localhost:8080/api
+ *
+ * Nếu biến môi trường đã chứa "/api" thì KHÔNG cộng thêm lần nữa.
+ * .env gợi ý:
+ *   VITE_API_URL=http://localhost:8080
+ *   hoặc REACT_APP_API_URL=http://localhost:8080
  */
-const API_HOST =
-  (import.meta as any).env?.VITE_API_URL || "http://localhost:8080";
-const apiBase = `${String(API_HOST).replace(/\/$/, "")}/api`;
+const RAW_API_HOST =
+  (import.meta as any).env?.VITE_API_URL ||
+  process.env.REACT_APP_API_URL ||
+  "http://localhost:8080/api";
+
+const _host = String(RAW_API_HOST).replace(/\/+$/, "");
+const apiBase = _host.endsWith("/api") ? _host : `${_host}/api`;
 
 export interface CartProduct {
   name: string;

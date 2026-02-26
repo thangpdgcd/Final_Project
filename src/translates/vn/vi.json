@@ -1,0 +1,143 @@
+{
+  "common": {
+    "brandName": "Phan Coffee",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "back": "Quay lại"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "coffee": "Cà phê",
+    "contact": "Liên hệ",
+    "about": "Giới thiệu",
+    "cart": "Giỏ hàng",
+    "user": "Tài khoản",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "darkMode": "Chế độ tối",
+    "lightMode": "Chế độ sáng"
+  },
+  "home": {
+    "introRoastedTitle": "RANG TẠI KONTUM",
+    "introRoastedSubtitle": "86 Lâm Tùng, Ia Chim, TP. Kon Tum, Kon Tum",
+    "introExperimentalTitle": "RANG THỬ NGHIỆM",
+    "introExperimentalSubtitle": "Cà phê nguyên bản, chế biến honey & natural.",
+    "introShippingTitle": "GIAO HÀNG TOÀN CẦU",
+    "introShippingSubtitle": "Từ Phan Coffee đến tận tay bạn.",
+    "aboutTitle": "Về Phan Coffee",
+    "aboutDescription": "Chúng tôi chọn lọc hạt từ Tây Nguyên và rang mẻ nhỏ để hương vị luôn tươi mới, sạch và rõ ràng.",
+    "aboutReadMore": "Xem thêm",
+    "aboutMoreAria": "Xem thêm về Phan Coffee",
+    "updateNews": {
+      "title": "CẬP NHẬT TIN TỨC",
+      "subtitle": "Mỗi tách cà phê pha phin có thể đóng góp tới 1.8g chất xơ trong khẩu phần khuyến nghị hằng ngày.",
+      "learnMore": "Xem thêm"
+    }
+  },
+  "footer": {
+    "brandDescription": "Tôn vinh truyền thống cà phê Việt Nam từ năm 2010. Chúng tôi hợp tác trực tiếp với nông hộ tại Tây Nguyên để mang đến những hạt cà phê bền vững, chất lượng.",
+    "shopTitle": "MUA SẮM",
+    "shopAllCoffee": "Tất cả cà phê",
+    "shopBrewingGear": "Dụng cụ pha",
+    "shopMerchandise": "Phụ kiện",
+    "shopSubscription": "Gói định kỳ",
+    "supportTitle": "HỖ TRỢ",
+    "supportShipping": "Thông tin giao hàng",
+    "supportWholesale": "Bán sỉ",
+    "supportReturns": "Đổi trả",
+    "supportPrivacy": "Chính sách bảo mật",
+    "copyright": "© {{year}} Phan Coffee. Bảo lưu mọi quyền.",
+    "facebook": "Facebook",
+    "instagram": "Instagram"
+  },
+  "auth": {
+    "loginWelcome": "CHÀO MỪNG TRỞ LẠI",
+    "loginSocialFacebook": "Tiếp tục với Facebook",
+    "loginSocialGoogle": "Tiếp tục với Google",
+    "loginSocialInstagram": "Tiếp tục với Instagram",
+    "loginSocialInfo": "Tiếp tục với {{provider}} (giao diện minh hoạ)",
+    "loginDivider": "hoặc đăng nhập bằng email",
+    "loginEmailLabel": "Email",
+    "loginEmailRequired": "Vui lòng nhập email.",
+    "loginEmailInvalid": "Định dạng email không hợp lệ.",
+    "loginPasswordLabel": "Mật khẩu",
+    "loginPasswordRequired": "Vui lòng nhập mật khẩu.",
+    "loginPasswordPlaceholder": "••••••••",
+    "loginEmailPlaceholder": "ban@example.com",
+    "loginRememberMe": "Ghi nhớ đăng nhập",
+    "loginForgotPassword": "Quên mật khẩu?",
+    "loginSubmit": "Đăng nhập",
+    "loginNoAccount": "Chưa có tài khoản?",
+    "loginRegister": "Đăng ký",
+    "loginSuccess": "Đăng nhập thành công!",
+    "loginError": "Email hoặc mật khẩu không chính xác!",
+
+    "registerTitle": "TẠO TÀI KHOẢN",
+    "registerDivider": "Đăng ký bằng email",
+    "registerFullNameLabel": "Họ và tên",
+    "registerFullNameRequired": "Vui lòng nhập họ và tên!",
+    "registerEmailLabel": "Email",
+    "registerEmailRequired": "Vui lòng nhập email!",
+    "registerEmailInvalid": "Địa chỉ email không hợp lệ!",
+    "registerPhoneLabel": "Số điện thoại",
+    "registerAddressLabel": "Địa chỉ",
+    "registerPasswordLabel": "Mật khẩu",
+    "registerPasswordRequired": "Vui lòng nhập mật khẩu!",
+    "registerConfirmPasswordLabel": "Xác nhận mật khẩu",
+    "registerConfirmPasswordRequired": "Vui lòng xác nhận mật khẩu!",
+    "registerConfirmPasswordNotMatch": "Mật khẩu không trùng khớp!",
+    "registerAgreeLabel": "Tôi đồng ý với điều khoản và điều kiện",
+    "registerAgreeRequired": "Bạn phải đồng ý với điều khoản và điều kiện",
+    "registerAlreadyHaveAccount": "Đã có tài khoản?",
+    "registerSubmit": "Đăng ký",
+    "registerGotoLogin": "Đăng nhập",
+    "registerSuccess": "Đăng ký thành công! Vui lòng đăng nhập.",
+    "registerError": "Đăng ký thất bại. Vui lòng thử lại!"
+  },
+  "profile": {
+    "missingUserId": "Không có ID người dùng trong URL",
+    "loadErrorFallback": "Lỗi khi tải thông tin người dùng",
+    "loading": "Đang tải thông tin người dùng...",
+    "alertTitle": "Lỗi",
+    "back": "Quay lại",
+    "changeAvatarAria": "Đổi ảnh đại diện",
+    "changeAvatarLabel": "Đổi ảnh",
+    "accountBadge": "Tài khoản",
+    "noName": "Không có tên",
+    "emptyField": "—",
+    "notFound": "Không tìm thấy thông tin người dùng.",
+    "fieldId": "ID",
+    "fieldName": "Tên",
+    "fieldEmail": "Email",
+    "fieldAddress": "Địa chỉ",
+    "fieldPhone": "Số điện thoại"
+  },
+  "products": {
+    "kicker": "BỘ SƯU TẬP HẠT",
+    "title": "Danh mục sản phẩm",
+    "searchPlaceholder": "Tìm theo tên hoặc mô tả...",
+    "tabs": {
+      "all": "Tất cả"
+    },
+    "sort": {
+      "default": "Mặc định",
+      "priceAsc": "Giá tăng dần",
+      "priceDesc": "Giá giảm dần",
+      "nameAsc": "Tên A → Z",
+      "nameDesc": "Tên Z → A"
+    },
+    "itemsLabel": "sản phẩm",
+    "empty": "Không có sản phẩm",
+    "defaultDescription": "Hương vị cân bằng, hậu vị êm dịu.",
+    "mediumRoast": "Rang vừa",
+    "descById": {
+      "1": "Cà phê rang mộc",
+      "2": "Cà phê honey, hương mật ong dịu",
+      "3": "Cà phê blend, hậu vị socola",
+      "4": "Nguyên chất Kon Tum rang vừa",
+      "5": "Nguyên chất Kon Tum rang đậm",
+      "6": "Nguyên chất Kon Tum rang nhạt"
+    }
+  }
+}
+

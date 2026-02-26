@@ -1,24 +1,26 @@
 import React from "react";
-import { Layout, Button, Card, Carousel, Form, Input } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Layout, Button, Card } from "antd";
+import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-import Contact from "../contact";
-import bannerImage from "../../../assets/img/backgroud_PhanCoffee.png";
-
+import Contact from "../../customers/contact";
 import aboutImage from "../../../assets/img/robustakontum.jpg";
 
 import "./index.scss";
-import BannerCarousel from "../service";
+import BannerCarousel from "../banner";
 import FooterPage from "../../../components/footer";
 import HeaderPage from "../../../components/header";
 import ContentBanner from "../content_banner";
 import Chatbox from "../../../components/chatbox";
 
+const bannerImage =
+  "https://res.cloudinary.com/dfjecxrnl/image/upload/v1772095630/vn-11134210-7ras8-mdenqmstth3970_resize_ss700x700sssss_bett8q.jpg";
+
 const { Content } = Layout;
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const galleryImages: string[] = [
     "https://res.cloudinary.com/dfjecxrnl/image/upload/v1768211093/518290335_780416141172650_7724989381247019356_n_danpue.jpg",
     "https://res.cloudinary.com/dfjecxrnl/image/upload/v1768823885/485279782_695975656283366_2260645432310935248_n_sncinx.jpg",
@@ -30,9 +32,6 @@ const HomePage: React.FC = () => {
     "https://res.cloudinary.com/dfjecxrnl/image/upload/v1768823883/485144388_696963506184581_8177906150215252834_n_d8ejaz.jpg",
   ];
 
-  const handleContactSubmit = (values: any) => {
-    console.log("Contact form:", values);
-  };
 
   return (
     <Layout className='homepage'>
@@ -49,16 +48,16 @@ const HomePage: React.FC = () => {
         {/* INTRO STRIP */}
         <section className='homepage__intro-strip'>
           <div className='intro-item'>
-            <h4>ROASTED IN KONTUM</h4>
-            <p>86 Lam Tung, Ia Chim, Kon Tum City, Kon Tum</p>
+            <h4>{t("home.introRoastedTitle")}</h4>
+            <p>{t("home.introRoastedSubtitle")}</p>
           </div>
           <div className='intro-item'>
-            <h4>EXPERIMENTAL ROASTS</h4>
-            <p>Single-origin, honey & natural processed coffees.</p>
+            <h4>{t("home.introExperimentalTitle")}</h4>
+            <p>{t("home.introExperimentalSubtitle")}</p>
           </div>
           <div className='intro-item'>
-            <h4>WORLDWIDE SHIPPING</h4>
-            <p>From the Phan Coffee to your doorstep.</p>
+            <h4>{t("home.introShippingTitle")}</h4>
+            <p>{t("home.introShippingSubtitle")}</p>
           </div>
         </section>
 
@@ -67,20 +66,24 @@ const HomePage: React.FC = () => {
         <ContentBanner />
 
         {/* ABOUT */}
-        <section 
+        <section
           className='about-us'
-          style={{ backgroundImage: `url(${bannerImage})` }}>
+        >
           <div className='about-container'>
             <div className='about-text'>
-              <h2>About Phan Coffee</h2>
-              <p>
-                We source beans from the Central Highlands and roast in small
-                batches to keep flavors vibrant and clean.
-              </p>
-              <Button onClick={() => navigate("/about")}>Read more</Button>
+              <h2>{t("home.aboutTitle")}</h2>
+              <p>{t("home.aboutDescription")}</p>
+              <Button onClick={() => navigate("/about")}>
+                {t("home.aboutReadMore")}
+              </Button>
             </div>
             <div className='about-image'>
-              <img src={aboutImage} alt='About Phan Coffee' />
+              <Link
+                to='/about'
+                aria-label={t("home.aboutMoreAria")}
+              >
+                <img src={aboutImage} alt='About Phan Coffee' />
+              </Link>
             </div>
           </div>
         </section>
@@ -100,8 +103,9 @@ const HomePage: React.FC = () => {
 
         <BannerCarousel />
 
-        {/* ✅ CONTACT (đã bọc container + 2 card) */}
-        <Contact />
+        {/* CONTACT SECTION (không lấy header/footer) */}
+        {/* using embedded to not show footer */}
+        <Contact embedded />
       </Content>
 
       <FooterPage />

@@ -1,15 +1,21 @@
 import axios from "axios";
 
 /**
- * ✅ Vite env đúng: import.meta.env
- * .env nên có:
- *   VITE_API_URL=http://localhost:8080
- * Backend mount /api => base = http://localhost:8080/api
+ * Cấu hình base URL cho API categories
+ * Ưu tiên:
+ *   1. VITE_API_URL (Vite)
+ *   2. REACT_APP_API_URL (CRA)
+ *   3. Mặc định: http://localhost:8080 hoặc http://localhost:8080/api
+ *
+ * Nếu biến môi trường đã chứa "/api" thì KHÔNG cộng thêm lần nữa.
  */
-const API_HOST =
-  (import.meta as any).env?.VITE_API_URL || "http://localhost:8080";
+const RAW_API_HOST =
+  (import.meta as any).env?.VITE_API_URL ||
+  process.env.REACT_APP_API_URL ||
+  "http://localhost:8080/api";
 
-const apiBase = `${String(API_HOST).replace(/\/$/, "")}/api`;
+const _host = String(RAW_API_HOST).replace(/\/+$/, "");
+const apiBase = _host.endsWith("/api") ? _host : `${_host}/api`;
 
 /* --------- TYPES --------- */
 export interface Category {

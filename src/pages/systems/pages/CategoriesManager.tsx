@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Table,
-  Card,
   Button,
   Space,
   Modal,
@@ -9,12 +8,14 @@ import {
   Input,
   Popconfirm,
   message,
+  Card,
 } from "antd";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 
@@ -26,168 +27,140 @@ import {
   filterCategories,
   toCategoryFormValues,
   normalizeCategory,
-  getCategoryId, // ✅ FIX: THIẾU IMPORT NÀY
+  getCategoryId,
   type CategoryFormValues,
 } from "../../../pages/systems/services/categoryservicesSystem";
 
 const { TextArea } = Input;
 
 const CategoryManager: React.FC = () => {
-  const [categories, setCategories] = useState<any[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any | null>(null);
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<any | null>(null);
+  const [search, setSearch] = useState("");
+
   const [form] = Form.useForm<CategoryFormValues>();
+  const fetched = useRef(false);
 
-  const [searchText, setSearchText] = useState("");
-  const didFetchRef = useRef(false);
-
-  const fetchCategories = async () => {
+  /* ================= FETCH ================= */
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await fetchCategoriesService();
-      setCategories(data);
-    } catch (error: any) {
-      console.error(
-        "Fetch categories error:",
-        error?.response?.data || error?.message || error,
-      );
-      message.error("Không thể tải danh sách danh mục.");
+      const res = await fetchCategoriesService();
+      setData(res);
+    } catch {
+      message.error("Failed to load categories");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (didFetchRef.current) return;
-    didFetchRef.current = true;
-    fetchCategories();
+    if (fetched.current) return;
+    fetched.current = true;
+    fetchData();
   }, []);
 
-  const filteredCategories = useMemo(
-    () => filterCategories(categories, searchText),
-    [categories, searchText],
+  const filteredData = useMemo(
+    () => filterCategories(data, search),
+    [data, search],
   );
 
-  const handleAddCategory = () => {
-    setEditingCategory(null);
+  /* ================= ACTION ================= */
+  const openCreate = () => {
+    setEditing(null);
     form.resetFields();
-    setIsModalOpen(true);
+    setOpen(true);
   };
 
-  const handleEditCategory = (record: any) => {
-    const id = getCategoryId(record);
-    if (!id) {
-      message.error("Danh mục không có ID hợp lệ.");
-      console.log("Record:", record);
-      return;
-    }
-
-    setEditingCategory(record);
+  const openEdit = (record: any) => {
+    setEditing(record);
     form.setFieldsValue(toCategoryFormValues(record));
-    setIsModalOpen(true);
+    setOpen(true);
   };
 
-  const handleDeleteCategory = async (record: any) => {
+  const handleDelete = async (record: any) => {
     const id = getCategoryId(record);
-    if (!id) {
-      message.error("Không tìm thấy ID danh mục để xoá.");
-      return;
-    }
+    if (!id) return;
 
-    try {
-      await deleteCategoryService(id);
-      setCategories((prev) => prev.filter((c) => getCategoryId(c) !== id));
-      message.success("Đã xoá danh mục.");
-    } catch (error: any) {
-      console.error(error);
-      message.error(error?.response?.data?.message || "Xoá danh mục thất bại.");
-    }
+    await deleteCategoryService(id);
+    setData((prev) => prev.filter((i) => getCategoryId(i) !== id));
+    message.success("Category deleted");
   };
 
-  const handleSubmit = async (values: CategoryFormValues) => {
+  const onSubmit = async (values: CategoryFormValues) => {
     try {
       setSaving(true);
 
-      if (editingCategory) {
-        const id = getCategoryId(editingCategory);
-        if (!id) {
-          message.error("ID danh mục không hợp lệ.");
-          return;
-        }
+      if (editing) {
+        const id = getCategoryId(editing);
+        const updated = await updateCategoryService(id ?? 0, values);
+        const normalized = normalizeCategory(updated ?? {});  
 
-        const updated = await updateCategoryService(id, values);
-        const normalized = normalizeCategory(updated ?? {});
-
-        setCategories((prev) =>
-          prev.map((c) =>
-            getCategoryId(c) === id ? { ...c, ...normalized } : c,
+        setData((prev) =>
+          prev.map((i) =>
+            getCategoryId(i) === id ? { ...i, ...normalized } : i,
           ),
         );
-
-        message.success("Cập nhật danh mục thành công.");
+        message.success("Updated successfully");
       } else {
         const created = await createCategoryService(values);
-        const normalized = normalizeCategory(created ?? {});
-
-        setCategories((prev) => [normalized, ...prev]);
-        message.success("Tạo danh mục mới thành công.");
+        setData((prev) => [normalizeCategory(created ?? {}), ...prev]);
+        message.success("Category created successfully");
       }
 
-      setIsModalOpen(false);
-      setEditingCategory(null);
+      setOpen(false);
+      setEditing(null);
       form.resetFields();
-    } catch (error: any) {
-      console.error(error);
-      message.error(error?.response?.data?.message || "Lưu danh mục thất bại.");
+    } catch {
+      message.error("Save failed");
     } finally {
       setSaving(false);
     }
   };
 
+  /* ================= TABLE ================= */
   const columns: ColumnsType<any> = [
     {
       title: "ID",
       width: 80,
-      sorter: (a, b) => (getCategoryId(a) ?? 0) - (getCategoryId(b) ?? 0),
-      render: (_, record) =>
-        getCategoryId(record) ?? <span style={{ opacity: 0.5 }}>—</span>,
+      align: "center",
+      render: (_, r) => getCategoryId(r) ?? "—",
     },
     {
-      title: "Tên danh mục",
+      title: "Name",
       dataIndex: "name",
-      width: 240,
-      render: (_, record) => record?.name ?? "—",
     },
     {
-      title: "Mô tả",
+      title: "Description",
       dataIndex: "description",
       ellipsis: true,
-      render: (_, record) =>
-        record?.description ?? <span style={{ opacity: 0.5 }}>—</span>,
     },
     {
-      title: "Hành động",
+      title: "Actions",
       width: 160,
+      align: "center",
       render: (_, record) => (
         <Space>
           <Button
-            size='small'
+            size="small"
             icon={<EditOutlined />}
-            onClick={() => handleEditCategory(record)}>
-            Sửa
+            onClick={() => openEdit(record)}
+          >
+            Edit
           </Button>
 
           <Popconfirm
-            title='Xóa danh mục'
-            description='Bạn chắc chắn muốn xóa?'
-            okText='Xóa'
-            cancelText='Hủy'
-            onConfirm={() => handleDeleteCategory(record)}>
-            <Button danger size='small' icon={<DeleteOutlined />}>
-              Xóa
+            title="Delete category?"
+            okText="Delete"
+            cancelText="Cancel"
+            onConfirm={() => handleDelete(record)}
+          >
+            <Button danger size="small" icon={<DeleteOutlined />}>
+              Delete
             </Button>
           </Popconfirm>
         </Space>
@@ -196,59 +169,69 @@ const CategoryManager: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: 24 }}>
+    <div className="system-manager">
+      <h2 className="system-manager__title">
+        <AppstoreOutlined /> Category Management
+      </h2>
+
       <Card
-        title='Category Management'
+        className="system-manager__panel"
+        title={
+          <span className="system-manager__toolbar-label">
+            <AppstoreOutlined /> Categories
+          </span>
+        }
         extra={
-          <Space>
+          <Space className="system-manager__toolbar-actions">
             <Input
-              placeholder='Tìm theo ID hoặc tên...'
+              className="system-manager__search"
               allowClear
               prefix={<SearchOutlined />}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 260 }}
+              placeholder="Search by ID or name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
             <Button
-              type='primary'
+              type="primary"
               icon={<PlusOutlined />}
-              onClick={handleAddCategory}>
-              Thêm danh mục
+              className="system-manager__btn-add"
+              onClick={openCreate}
+            >
+              Add category
             </Button>
           </Space>
-        }>
-        <Table
-          rowKey={(record) =>
-            String(getCategoryId(record) ?? record?.name ?? Math.random())
-          }
-          columns={columns}
-          dataSource={filteredCategories}
-          loading={loading}
-          pagination={{ pageSize: 10 }}
-        />
+        }
+      >
+        <div className="system-manager__table">
+          <Table
+            rowKey={(r) => String(getCategoryId(r))}
+            columns={columns}
+            dataSource={filteredData}
+            loading={loading}
+            pagination={{ pageSize: 10 }}
+          />
+        </div>
       </Card>
 
+      {/* MODAL */}
       <Modal
-        title={editingCategory ? "Cập nhật danh mục" : "Thêm danh mục"}
-        open={isModalOpen}
-        onCancel={() => {
-          setIsModalOpen(false);
-          setEditingCategory(null);
-          form.resetFields();
-        }}
+        title={editing ? "Edit category" : "Add category"}
+        open={open}
+        onCancel={() => setOpen(false)}
         onOk={() => form.submit()}
         confirmLoading={saving}
-        okText={editingCategory ? "Lưu" : "Tạo"}
-        destroyOnClose>
-        <Form form={form} layout='vertical' onFinish={handleSubmit}>
+        okText={editing ? "Save" : "Create"}
+      >
+        <Form layout="vertical" form={form} onFinish={onSubmit}>
           <Form.Item
-            label='Tên danh mục'
-            name='name'
-            rules={[{ required: true, message: "Nhập tên danh mục!" }]}>
+            label="Category name"
+            name="name"
+            rules={[{ required: true, message: "Enter category name" }]}
+          >
             <Input />
           </Form.Item>
 
-          <Form.Item label='Mô tả' name='description'>
+          <Form.Item label="Description" name="description">
             <TextArea rows={3} />
           </Form.Item>
         </Form>

@@ -1,0 +1,143 @@
+{
+  "common": {
+    "brandName": "Phan Coffee",
+    "loading": "Loading...",
+    "error": "Error",
+    "back": "Back"
+  },
+  "nav": {
+    "home": "Home",
+    "coffee": "Coffee",
+    "contact": "Contact",
+    "about": "About",
+    "cart": "Cart",
+    "user": "User",
+    "login": "Login",
+    "logout": "Logout",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "home": {
+    "introRoastedTitle": "ROASTED IN KONTUM",
+    "introRoastedSubtitle": "86 Lam Tung, Ia Chim, Kon Tum City, Kon Tum",
+    "introExperimentalTitle": "EXPERIMENTAL ROASTS",
+    "introExperimentalSubtitle": "Single-origin, honey & natural processed coffees.",
+    "introShippingTitle": "WORLDWIDE SHIPPING",
+    "introShippingSubtitle": "From the Phan Coffee to your doorstep.",
+    "aboutTitle": "About Phan Coffee",
+    "aboutDescription": "We source beans from the Central Highlands and roast in small batches to keep flavors vibrant and clean.",
+    "aboutReadMore": "Read more",
+    "aboutMoreAria": "View more about Phan Coffee",
+    "updateNews": {
+      "title": "UPDATE NEWS",
+      "subtitle": "A cup of brewed coffee represents a contribution of up to 1.8 grams of fiber of the recommended.",
+      "learnMore": "Learn More"
+    }
+  },
+  "footer": {
+    "brandDescription": "Honoring the rich tradition of Vietnamese coffee since 2010. We partner directly with farmers in the Central Highlands to bring you the finest sustainably sourced beans.",
+    "shopTitle": "SHOP",
+    "shopAllCoffee": "All Coffee",
+    "shopBrewingGear": "Brewing Gear",
+    "shopMerchandise": "Merchandise",
+    "shopSubscription": "Subscription",
+    "supportTitle": "SUPPORT",
+    "supportShipping": "Shipping Info",
+    "supportWholesale": "Wholesale",
+    "supportReturns": "Returns",
+    "supportPrivacy": "Privacy Policy",
+    "copyright": "© {{year}} Phan Coffee. All rights reserved.",
+    "facebook": "Facebook",
+    "instagram": "Instagram"
+  },
+  "auth": {
+    "loginWelcome": "WELCOME BACK",
+    "loginSocialFacebook": "Continue with Facebook",
+    "loginSocialGoogle": "Continue with Google",
+    "loginSocialInstagram": "Continue with Instagram",
+    "loginSocialInfo": "Continue with {{provider}} (UI demo)",
+    "loginDivider": "or sign in with email",
+    "loginEmailLabel": "Email",
+    "loginEmailRequired": "Please enter your email.",
+    "loginEmailInvalid": "Invalid email format.",
+    "loginPasswordLabel": "Password",
+    "loginPasswordRequired": "Please enter your password.",
+    "loginPasswordPlaceholder": "••••••••",
+    "loginEmailPlaceholder": "you@example.com",
+    "loginRememberMe": "Remember me",
+    "loginForgotPassword": "Forgot password?",
+    "loginSubmit": "Log in",
+    "loginNoAccount": "No account yet?",
+    "loginRegister": "Register",
+    "loginSuccess": "Logged in successfully!",
+    "loginError": "Incorrect email or password!",
+
+    "registerTitle": "CREATE ACCOUNT",
+    "registerDivider": "sign up with email",
+    "registerFullNameLabel": "Full Name",
+    "registerFullNameRequired": "Please enter your full name!",
+    "registerEmailLabel": "Email",
+    "registerEmailRequired": "Please enter your email!",
+    "registerEmailInvalid": "Invalid email address!",
+    "registerPhoneLabel": "Phone Number",
+    "registerAddressLabel": "Address",
+    "registerPasswordLabel": "Password",
+    "registerPasswordRequired": "Please enter your password!",
+    "registerConfirmPasswordLabel": "Confirm Password",
+    "registerConfirmPasswordRequired": "Please confirm your password!",
+    "registerConfirmPasswordNotMatch": "Passwords do not match!",
+    "registerAgreeLabel": "I agree to the terms and conditions",
+    "registerAgreeRequired": "You must agree to the terms and conditions",
+    "registerAlreadyHaveAccount": "Already have an account?",
+    "registerSubmit": "Sign Up",
+    "registerGotoLogin": "Log In",
+    "registerSuccess": "Registration successful! Please log in.",
+    "registerError": "Registration failed. Please try again!"
+  },
+  "profile": {
+    "missingUserId": "No user ID in URL",
+    "loadErrorFallback": "Error loading user information",
+    "loading": "Loading user information...",
+    "alertTitle": "Error",
+    "back": "Back",
+    "changeAvatarAria": "Change avatar",
+    "changeAvatarLabel": "Change avatar",
+    "accountBadge": "Account",
+    "noName": "No name",
+    "emptyField": "—",
+    "notFound": "User information not found.",
+    "fieldId": "ID",
+    "fieldName": "Name",
+    "fieldEmail": "Email",
+    "fieldAddress": "Address",
+    "fieldPhone": "Phone number"
+  },
+  "products": {
+    "kicker": "BEAN COLLECTION",
+    "title": "Product catalog",
+    "searchPlaceholder": "Search by name or description...",
+    "tabs": {
+      "all": "All"
+    },
+    "sort": {
+      "default": "Default",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "nameAsc": "Name A \u2192 Z",
+      "nameDesc": "Name Z \u2192 A"
+    },
+    "itemsLabel": "products",
+    "empty": "No products",
+    "defaultDescription": "Balanced flavor with a smooth aftertaste.",
+    "mediumRoast": "Medium Roast",
+    "descById": {
+      "1": "Natural roast coffee",
+      "2": "Honey-processed coffee with gentle sweetness",
+      "3": "Blend coffee with chocolatey finish",
+      "4": "Single-origin Kon Tum, medium roast",
+      "5": "Single-origin Kon Tum, dark roast",
+      "6": "Single-origin Kon Tum, light roast"
+    }
+  }
+}
+

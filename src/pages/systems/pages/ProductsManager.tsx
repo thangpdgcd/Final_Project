@@ -446,35 +446,49 @@ const ProductManager: React.FC = () => {
 
   // ---------- UI ----------
   return (
-    <div style={{ padding: 24 }}>
+    <div className="system-manager">
+      <h2 className="system-manager__title">
+        📦 System - Product Management
+      </h2>
+
       <Card
-        title='Product Management'
+        className="system-manager__panel"
+        title={
+          <span className="system-manager__toolbar-label">
+            📦 Products
+          </span>
+        }
         extra={
-          <Space>
+          <Space className="system-manager__toolbar-actions">
             <Input
-              placeholder='Search by ID or name...'
+              className="system-manager__search"
+              placeholder="Search by ID or name..."
               allowClear
-              style={{ width: 320 }}
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
             <Button
-              type='primary'
+              type="primary"
               icon={<PlusOutlined />}
-              onClick={() => openModal()}>
+              className="system-manager__btn-add"
+              onClick={() => openModal()}
+            >
               Add product
             </Button>
           </Space>
-        }>
-        <Table
-          rowKey='product_ID'
-          columns={columns}
-          dataSource={filteredProducts}
-          loading={loading}
-          pagination={{ pageSize: 10 }}
-          scroll={{ x: 980 }}
-        />
+        }
+      >
+        <div className="system-manager__table">
+          <Table
+            rowKey="product_ID"
+            columns={columns}
+            dataSource={filteredProducts}
+            loading={loading}
+            pagination={{ pageSize: 10 }}
+            scroll={{ x: 980 }}
+          />
+        </div>
       </Card>
 
       <Modal

@@ -14,7 +14,7 @@ body {
 
 #root {
   background: var(--bg-main, #f7f4ef);
-  min-height: 100vh;
+  height: 100vh;
 }
 
 code {

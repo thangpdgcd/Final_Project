@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./index.scss";
 
-import { Layout, Card, Typography, Tag, Space, Divider, Select, InputNumber, Button, message, Breadcrumb } from "antd";
+import { Layout, Card, Typography, Tag, Space, Divider, Select, InputNumber, Button, message } from "antd";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 
@@ -58,6 +58,7 @@ const ProductDetailPage: React.FC = () => {
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartLoading, setCartLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"description" | "reviews" | "brewing">("description");
 
   const user_ID = useMemo(() => getUserIdFromStorage(), []);
 
@@ -176,19 +177,7 @@ const ProductDetailPage: React.FC = () => {
 
       <Content className='pd-content'>
         <div className='product-detail'>
-          <Breadcrumb className='pd-breadcrumb'>
-            <Breadcrumb.Item>
-              <span className='pd-link' onClick={() => navigate("/")}>
-                Home
-              </span>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              <span className='pd-link' onClick={() => navigate("/products")}>
-                Coffee
-              </span>
-            </Breadcrumb.Item>
-            <Breadcrumb.Item>{product?.name || "Details"}</Breadcrumb.Item>
-          </Breadcrumb>
+
 
           <Card className='pd-card' bordered={false}>
             {loading ? (
@@ -312,6 +301,80 @@ const ProductDetailPage: React.FC = () => {
               </div>
             )}
           </Card>
+
+          {/* extra detail section */}
+          {!loading && product && (
+            <div className='pd-extra'>
+              <div className='pd-tabs'>
+                <button
+                  className={`pd-tab ${activeTab === "description" ? "active" : ""}`}
+                  type='button'
+                  onClick={() => setActiveTab("description")}>
+                  DESCRIPTION
+                </button>
+                <button
+                  className={`pd-tab ${activeTab === "reviews" ? "active" : ""}`}
+                  type='button'
+                  onClick={() => setActiveTab("reviews")}>
+                  REVIEWS (12)
+                </button>
+                <button
+                  className={`pd-tab ${activeTab === "brewing" ? "active" : ""}`}
+                  type='button'
+                  onClick={() => setActiveTab("brewing")}>
+                  BREWING GUIDE
+                </button>
+              </div>
+
+              {activeTab === "description" && (
+                <>
+                  <Paragraph className='pd-extra-text'>
+                    Sourced from the high-altitude volcanic soils of Kon Tum, our
+                    Arabica Blend represents the pinnacle of Vietnamese coffee
+                    craftsmanship. This meticulously selected lot is
+                    dry-processed to enhance its natural sweetness and complex
+                    fruit profile.
+                  </Paragraph>
+
+                  <div className='pd-extra-grid'>
+                    <div className='pd-extra-card'>
+                      <div className='pd-extra-label'>ORIGIN</div>
+                      <div className='pd-extra-value'>
+                        Kon Tum, Central Highlands, Vietnam
+                        <br />
+                        (1,500m ASL)
+                      </div>
+                    </div>
+
+                    <div className='pd-extra-card'>
+                      <div className='pd-extra-label'>NOTES</div>
+                      <div className='pd-extra-value'>
+                        Dark chocolate, roasted hazelnut, Meyer lemon
+                      </div>
+                    </div>
+
+                    <div className='pd-extra-card'>
+                      <div className='pd-extra-label'>ROAST</div>
+                      <div className='pd-extra-value'>Medium-light (City+)</div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {activeTab === "reviews" && (
+                <Paragraph className='pd-extra-text'>
+                  Customer reviews will be available here soon.
+                </Paragraph>
+              )}
+
+              {activeTab === "brewing" && (
+                <Paragraph className='pd-extra-text'>
+                  Brewing guide coming soon. We recommend starting with a 1:15
+                  coffee-to-water ratio and adjusting to taste.
+                </Paragraph>
+              )}
+            </div>
+          )}
         </div>
       </Content>
       <FooterPage />

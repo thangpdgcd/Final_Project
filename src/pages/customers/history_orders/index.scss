@@ -43,7 +43,7 @@
     .search-component,
     .search {
       flex: 1;
-      max-width: 560px;
+      width: 560px;
     }
 
     .menu-home {
@@ -69,17 +69,77 @@
 
   /* ===== Content ===== */
   .orders-content {
-
     margin: 0 auto;
     padding: 18px 16px 28px;
 
-    /* Top bar (title + buttons) */
-    > div:first-child {
+    /* Thẻ filter (tabs + search) giống Shopee */
+    .orders-filter-card {
       background: #fff;
       border: 1px solid rgba(0, 0, 0, 0.06);
       border-radius: 14px;
       padding: 14px 14px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    .orders-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-bottom: 1px solid #f2f2f2;
+      margin-bottom: 8px;
+    }
+
+    .orders-tabs__item {
+      border: none;
+      background: none;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: rgba(0, 0, 0, 0.75);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+
+      &:hover {
+        color: #ee4d2d;
+      }
+    }
+
+    .orders-tabs__item--active {
+      color: #ee4d2d;
+      font-weight: 500;
+      border-bottom-color: #ee4d2d;
+    }
+
+    .orders-search-row {
+      margin-top: 10px;
+    }
+
+    .orders-search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 2px;
+      border: 1px solid #ddd;
+      font-size: 12px;
+
+      &:focus {
+        outline: none;
+        border-color: #ee4d2d;
+      }
+    }
+
+    .orders-list-wrapper {
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+
+    .orders-top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .orders-top-actions__title {
+      margin: 0;
     }
 
     /* Card / Alert block */
@@ -125,42 +185,6 @@
       }
     }
 
-    /* Total area */
-    .orders-total {
-      margin-top: 14px;
-      padding: 12px 14px;
-      background: #fff;
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-
-      .total-row {
-        display: flex;
-        justify-content: flex-end;
-        align-items: baseline;
-        gap: 10px;
-
-        .label {
-          font-weight: 600;
-          color: #374151;
-        }
-
-        .value {
-          font-weight: 800;
-          font-size: 18px;
-          color: #111827;
-        }
-      }
-
-      .usd-hint {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 2px;
-        color: #6b7280;
-        font-size: 13px;
-      }
-    }
-
     /* Empty state */
     .ant-empty {
       background: #fff;
@@ -169,6 +193,179 @@
       padding: 18px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
       margin-top: 12px;
+    }
+
+    /* Card đơn hàng giống Shopee */
+    .orders-card-list {
+      margin-top: 12px;
+    }
+
+    .order-card {
+      border-radius: 2px;
+      border: 1px solid #e1e1e1;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .order-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: #fafafa;
+      border-bottom: 1px solid #f2f2f2;
+    }
+
+    .order-card__shop {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .order-card__shopName {
+      font-weight: 500;
+    }
+
+    .order-card__shopAction {
+      border-radius: 2px;
+      border: 1px solid #e1e1e1;
+      padding: 4px 8px;
+      background: #fff;
+      font-size: 12px;
+      cursor: pointer;
+
+      &:hover {
+        border-color: #ee4d2d;
+        color: #ee4d2d;
+      }
+    }
+
+    .order-card__status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .order-card__statusShipping {
+      color: #00bfa5;
+    }
+
+    .order-card__statusMain {
+      color: #ee4d2d;
+      font-weight: 500;
+    }
+
+    .order-card__body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: flex-start;
+      }
+    }
+
+    .order-card__product {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .order-card__thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 2px;
+      background: url("../../../assets/img/310-1920x1080.jpg") center/cover
+        no-repeat;
+      border: 1px solid #f0f0f0;
+    }
+
+    .order-card__info {
+      min-width: 0;
+    }
+
+    .order-card__name {
+      font-size: 13px;
+      color: rgba(0, 0, 0, 0.85);
+      margin-bottom: 4px;
+    }
+
+    .order-card__meta {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .order-card__qty {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .order-card__price {
+      font-size: 14px;
+      color: #111;
+    }
+
+    .order-card__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px 12px;
+      border-top: 1px solid #f2f2f2;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+    }
+
+    .order-card__total {
+      font-size: 13px;
+
+      span:first-child {
+        margin-right: 4px;
+      }
+    }
+
+    .order-card__totalValue {
+      font-size: 16px;
+      color: #ee4d2d;
+      font-weight: 500;
+    }
+
+    .order-card__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .order-card__button {
+      min-width: 120px;
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 2px;
+      cursor: pointer;
+      border: 1px solid #e1e1e1;
+      background: #fff;
+
+      &--primary {
+        border-color: #ee4d2d;
+        color: #ee4d2d;
+        background: #fff7f5;
+      }
+
+      &--secondary {
+        color: #555;
+
+        &:hover {
+          border-color: #ccc;
+        }
+      }
     }
   }
 

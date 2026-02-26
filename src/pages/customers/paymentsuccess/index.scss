@@ -18,7 +18,7 @@
 
 .pp-card {
   width: 100%;
-  max-width: 560px;
+  width: 560px;
   border-radius: 18px;
   padding: 20px;
   background: rgba(255, 255, 255, 0.92);
@@ -28,7 +28,7 @@
 
 /* success page rộng hơn */
 .pp-cardWide {
-  max-width: 720px;
+  width: 720px;
 }
 
 .pp-headerRow {
@@ -79,7 +79,7 @@
   overflow: auto;
   font-size: 12px;
   line-height: 1.45;
-  max-height: 420px;
+  height: 420px;
 }
 
 .pp-link {

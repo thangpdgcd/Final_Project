@@ -18,6 +18,7 @@ export type UserFormValues = {
   name: string; // bạn đang dùng name trong form
   email: string;
   password?: string;
+  phoneNumber?: string;
   roleID: RoleID; // 1 | 2
 };
 
@@ -66,7 +67,7 @@ export async function createUserService(values: UserFormValues) {
     email: values.email,
     password: values.password || "",
     address: "",
-    phoneNumber: "",
+    phoneNumber: values.phoneNumber,
     roleID: String(role),
   };
 

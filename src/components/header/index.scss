@@ -64,10 +64,58 @@ $accent: #c7a26d;
 /* =================================
    NAV MENU
 ================================= */
+.coffee-nav-wrapper {
+  z-index: 1100 !important;
+}
+
 .coffee-nav {
   display: flex;
   align-items: center;
   gap: 26px;
+}
+
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: 16px;
+  padding: 3px;
+  border-radius: 999px;
+  background: #f4f0e7;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+}
+
+.lang-btn {
+  flex: 1 1 0;
+  min-width: 44px;
+  height: 24px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #5b4633;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.active {
+    background: #6b4a30;
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  }
+
+  &:not(.active):hover {
+    background: rgba(107, 74, 48, 0.06);
+    color: #6b4a30;
+  }
 }
 
 .nav-item {
@@ -151,7 +199,7 @@ $accent: #c7a26d;
 
 /* inner */
 .submenu-inner {
-  max-width: 1100px;
+  width: 1100px;
   margin: 0 auto;
   padding: 26px 48px;
 

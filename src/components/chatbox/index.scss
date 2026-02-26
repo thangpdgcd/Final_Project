@@ -6,26 +6,39 @@
 
     // ===== TOGGLE BUTTON =====
     &__toggle {
-        width: 56px;
-        height: 56px;
-        box-shadow: 0 4px 16px rgba(139, 90, 43, 0.3);
-        background: linear-gradient(135deg, #8b5a2b, #a3723a);
-        border: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+               height: 40px;
+        border-radius: 999px;
+        border: 2px solid #ffffff;
+        background: radial-gradient(circle at 30% 20%, #fbead8, #b2743b) !important;
+        color: #ffffff;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 
         &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(139, 90, 43, 0.4);
-            background: linear-gradient(135deg, #a3723a, #b8844f);
+            transform: translateY(-3px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+            background: radial-gradient(circle at 30% 20%, #fff3e1, #c27d40) !important;
         }
 
         &:active {
             transform: translateY(0);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.26);
         }
 
         .anticon {
-            font-size: 20px;
+            font-size: 26px;
         }
+    }
+
+    // Đảm bảo ghi đè màu mặc định của Ant Design
+    &__toggle.ant-btn-primary {
+        background: radial-gradient(circle at 30% 20%, #fbead8, #b2743b) !important;
+        border-color: #ffffff !important;
+        color: #ffffff !important;
     }
 
     // ===== CHAT WINDOW =====
@@ -120,7 +133,7 @@
         background: #f7f4ef;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 14px;
 
         // Custom scrollbar
         &::-webkit-scrollbar {
@@ -143,7 +156,8 @@
 
     &__message {
         display: flex;
-        max-width: 75%;
+        width: auto;
+        max-width: 80%;
 
         &--user {
             align-self: flex-end;
@@ -151,7 +165,7 @@
             .chatbox__message-content {
                 background: linear-gradient(135deg, #8b5a2b, #a3723a);
                 color: #ffffff;
-                border-radius: 18px 18px 4px 18px;
+                border-radius: 22px 22px 6px 22px;
             }
         }
 
@@ -162,18 +176,18 @@
                 background: #ffffff;
                 color: #2b1b16;
                 border: 1px solid rgba(139, 90, 43, 0.15);
-                border-radius: 18px 18px 18px 4px;
+                border-radius: 22px 22px 22px 6px;
             }
         }
 
         &-content {
-            padding: 10px 14px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 12px 16px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 
             p {
                 margin: 0;
-                font-size: 14px;
-                line-height: 1.5;
+                font-size: 15px;
+                line-height: 1.6;
                 word-wrap: break-word;
             }
         }
@@ -239,14 +253,14 @@
         right: 16px;
 
         &__toggle {
-            width: 52px;
-            height: 52px;
+            width: 64px;
+            height: 64px;
         }
 
         &__window {
             width: calc(100vw - 32px);
             height: calc(100vh - 100px);
-            max-height: 600px;
+            height: 600px;
             bottom: 68px;
             right: 0;
             left: 0;

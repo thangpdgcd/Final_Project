@@ -1,7 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
 
 .homepage {
-  // ===== HEADER =====
   &__header {
     position: sticky;
     top: 0;
@@ -81,14 +80,16 @@
   &__content {
     background: var(--bg-main);
     color: var(--text-main);
+    padding: 0;
   }
 
-  // ===== HERO BANNER =====
   .hero-banner {
     position: relative;
-    height: 520px;
-    background-size: cover;
-    background-position: center;
+    min-height: 520px;
+    background-size: contain;
+    background-position: center 29px;
+    background-repeat: no-repeat;
+    background-color: #e2c19a;
     color: #fff;
     display: flex;
     align-items: center;
@@ -99,14 +100,20 @@
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(to bottom, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.35)),
-        radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.4), transparent 60%);
-      mix-blend-mode: multiply;
+        linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.16) 0%,
+          rgba(0, 0, 0, 0.08) 40%,
+          rgba(0, 0, 0, 0.02) 70%,
+          rgba(0, 0, 0, 0) 100%
+        ),
+        radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.1), transparent 60%);
+      mix-blend-mode: normal;
     }
 
     &__content {
       position: relative;
-      max-width: 760px;
+    width: 760px;
       z-index: 1;
     }
 
@@ -130,7 +137,7 @@
     &__subtitle {
       font-size: 15px;
       line-height: 1.8;
-      max-width: 520px;
+      width: 520px;
       opacity: 0.9;
       margin-bottom: 24px;
     }
@@ -188,7 +195,7 @@
     }
   }
 
-  // ===== INTRO STRIP =====
+  // ===== QUICK INTRO STRIP =====
   &__intro-strip {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -214,7 +221,7 @@
     }
   }
 
-  // ===== SECTIONS COMMON =====
+  // ===== SHARED SECTION TITLES =====
   .section-title {
     font-size: 26px;
     font-weight: 700;
@@ -229,7 +236,7 @@
     font-size: 14px;
     color: var(--text-muted);
     text-align: center;
-    max-width: 540px;
+    width: 540px;
     margin: 0 auto 26px;
   }
 
@@ -281,29 +288,22 @@
     }
   }
 
-  // ===== ABOUT US =====
+  // ===== ABOUT US SECTION =====
   .about-us {
     padding: 80px 40px;
-    // ===== BACKGROUND OPTIONS =====
-    // Option 1: Sử dụng ảnh background với overlay (đang dùng)
+    // ===== BACKGROUND OPTIONS (DESIGN) =====
+    // Option 1: Photo background with overlay (current)
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed; // Tạo hiệu ứng parallax
-    
-    // Option 2: Cream gradient với texture pattern (uncomment để dùng)
-    // background: linear-gradient(135deg, #faf8f5 0%, #f7f4ef 50%, #f5f1ea 100%);
-    
-    // Option 3: Trắng tinh khiết (uncomment để dùng)
-    // background: #fff;
-    
-    // Option 4: Coffee brown gradient nhẹ (uncomment để dùng)
-    // background: linear-gradient(135deg, #fefcf9 0%, #f9f5f0 50%, #f5ede3 100%);
+    background-attachment: fixed; 
+
+  
     
     position: relative;
     overflow: hidden;
     
-    // Overlay để text dễ đọc hơn
+    // Overlay to keep text readable
     &::before {
       content: "";
       position: absolute;
@@ -319,7 +319,7 @@
       z-index: 0;
     }
 
-    // Subtle coffee bean pattern texture (nằm trên overlay)
+    // Subtle coffee-bean texture layered above overlay
     &::after {
       content: "";
       position: absolute;
@@ -339,7 +339,7 @@
 
     .about-container {
       margin: 0 auto;
-      max-width: 1200px;
+    width: 1200px;
       display: grid;
       grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
       gap: 60px;
@@ -365,7 +365,7 @@
         line-height: 1.85;
         color: var(--text-muted);
         margin-bottom: 28px;
-        max-width: 520px;
+        width: 520px;
       }
 
       .read-more {
@@ -400,6 +400,12 @@
     .about-image {
       position: relative;
 
+      a {
+        display: block;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
       &::before {
         content: "";
         position: absolute;
@@ -407,7 +413,7 @@
         right: -12px;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(163, 49, 15, 0.1), rgba(139, 90, 43, 0.05));
+     
         border-radius: 20px;
         z-index: -1;
       }
@@ -431,14 +437,14 @@
     }
   }
 
-  // ===== GALLERY =====
+  // ===== BỘ SƯU TẬP HÌNH ẢNH =====
   .gallery-section {
     padding: 60px 40px;
     text-align: center;
     background: #fdf9f4;
 
     .gallery-header {
-      max-width: 800px;
+    width: 800px;
       margin: 0 auto 40px;
 
       h2 {
@@ -457,7 +463,8 @@
 
     .gallery-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      // Luôn hiển thị tối đa 4 ảnh trên 1 hàng ở desktop
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 20px;
       margin-bottom: 30px;
       cursor: pointer;
@@ -470,7 +477,7 @@
 
         img {
           width: 100%;
-          height: 350px;
+          height: 550px;
           border-radius: 10px;
           object-fit: cover;
           transition: transform 0.4s ease;
@@ -503,7 +510,7 @@
     }
   }
 
-  // ===== CONTACT =====
+  // ===== LIÊN HỆ =====
   &__contact-section {
     padding: 60px 40px 60px;
     background: var(--bg-main);
@@ -725,7 +732,7 @@
     }
   }
 
-  // ===== RESPONSIVE =====
+  // ===== RESPONSIVE (TƯƠNG THÍCH MÀN HÌNH) =====
   @media (max-width: 992px) {
     &__header {
       padding: 0 16px;
@@ -738,7 +745,8 @@
     }
 
     .hero-banner {
-      height: 420px;
+      // Chiều cao thoáng hơn trên tablet
+      min-height: 440px;
       padding: 0 24px;
 
       &__title {
@@ -758,7 +766,7 @@
 
     .about-us {
       padding: 50px 24px;
-      // Tắt parallax trên mobile để tối ưu performance
+      // Disable parallax on mobile for performance
       background-attachment: scroll;
 
       .about-container {
@@ -775,7 +783,7 @@
         }
 
         p {
-          max-width: 100%;
+          width: 100%;
         }
       }
 
@@ -789,6 +797,11 @@
     .gallery-section,
     &__services {
       padding: 40px 24px;
+    }
+
+    // Tablet: 3 ảnh trên 1 hàng
+    .gallery-section .gallery-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     &__contact-section {
@@ -828,7 +841,8 @@
     }
 
     .hero-banner {
-      height: 360px;
+      // Hero vẫn thoáng trên mobile
+      min-height: 360px;
       padding: 0 16px;
 
       &__title {
@@ -855,8 +869,13 @@
       row-gap: 14px;
     }
 
-    .gallery-section .gallery-grid img {
-      height: 260px;
+    // Mobile: 2 ảnh trên 1 hàng
+    .gallery-section .gallery-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+
+      img {
+        height: 260px;
+      }
     }
 
     &__contact-section {
@@ -876,7 +895,7 @@
   }
 }
 
-// ảnh trong card
+// Image inside card banners
 .img-banner {
   width: 100%;
   display: block;

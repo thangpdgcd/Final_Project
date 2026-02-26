@@ -8,34 +8,28 @@ import {
   type UpdateUserPayload,
 } from "../../../api/userApi";
 
-// ==================== TYPES ====================
 export type AdminFormValues = {
   name: string;
   email: string;
   address?: string;
   phoneNumber?: string;
-  roleID: string; // "1" | "2" | "3"
+  roleID: string;
   status?: "active" | "inactive";
 };
 
-// ==================== HELPERS ====================
-
-// ✅ Lấy đúng user_ID từ backend
 export const getDisplayId = (record: any): number => {
-  if (!record) throw new Error("Record không hợp lệ.");
+  if (!record) throw new Error("Invalid record.");
 
-  // ưu tiên mọi key có thể chứa ID
   const id = Number(record?.user_ID ?? 0);
 
   if (!id || isNaN(id)) {
-    console.warn("⚠️ Không tìm thấy user_ID hợp lệ trong record:", record);
-    throw new Error("Không tìm thấy user_ID hợp lệ.");
+    console.warn("Invalid user_ID in record:", record);
+    throw new Error("Invalid user_ID.");
   }
 
   return id;
 };
 
-// ✅ Chuẩn hóa roleID về dạng số
 export const normalizeRoleID = (raw: any): number => {
   const r = String(raw ?? "")
     .trim()
@@ -49,11 +43,10 @@ export const normalizeRoleID = (raw: any): number => {
   return 1;
 };
 
-// ✅ Chuẩn hóa dữ liệu user từ BE trả về
 export const normalizeUser = (u: any): User & any => ({
   ...u,
   user_ID: Number(u?.user_ID ?? 0),
-  id: Number(u?.user_ID ?? 0), // để Table hiển thị key
+  id: Number(u?.user_ID ?? 0),
   username: u?.username ?? u?.name ?? "",
   roleID: normalizeRoleID(u?.roleID ?? u?.role ?? 1),
   status: u?.status ?? "inactive",
@@ -61,26 +54,21 @@ export const normalizeUser = (u: any): User & any => ({
   phoneNumber: u?.phoneNumber ?? "",
 });
 
-// ==================== SERVICE ====================
-
-// ✅ Lấy danh sách user
 export async function fetchUsers(): Promise<User[]> {
   const list = await getAllUsers();
   return Array.isArray(list) ? list.map(normalizeUser) : [];
 }
 
-// ✅ Tạo user mới
 export async function createUser(values: AdminFormValues) {
   const payload: CreateUserPayload = {
     username: values.name,
     email: values.email,
-    password: "123456", // mặc định
+    password: "123456",
     roleID: normalizeRoleID(values.roleID),
   };
   return apiCreateUser(payload);
 }
 
-// ✅ Cập nhật user
 export async function editUser(
   idOrUser: any,
   values: Partial<AdminFormValues>
@@ -94,7 +82,6 @@ export async function editUser(
       values.roleID !== undefined ? normalizeRoleID(values.roleID) : undefined,
   };
 
-  // xóa field undefined để không ghi đè
   Object.keys(payload).forEach((k) => {
     const key = k as keyof UpdateUserPayload;
     if (payload[key] === undefined) delete payload[key];
@@ -104,14 +91,12 @@ export async function editUser(
   return apiUpdateUser(id, payload);
 }
 
-// ✅ Xóa user
 export async function removeUser(idOrUser: any) {
   const id = getDisplayId(idOrUser);
   console.log("🔴 DELETE /users/:id", id);
   return apiDeleteUser(id);
 }
 
-// ✅ UI Role label
 export function roleToLabel(roleID: any) {
   const r = normalizeRoleID(roleID);
   if (r === 1) return { color: "blue", text: "User" };

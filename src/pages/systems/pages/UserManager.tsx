@@ -8,16 +8,23 @@ import {
   Modal,
   Form,
   Input,
+  Select,
   Popconfirm,
   message,
   Typography,
-  Select,
+  Row,
+  Col,
+  Statistic,
 } from "antd";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   SearchOutlined,
+  UserOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 
@@ -26,107 +33,34 @@ import {
   createUserService,
   updateUserService,
   deleteUserService,
-  type RoleID,
   getIdString,
   getRoleId,
+  ROLE,
 } from "../services/userservicesSystem";
 
 const { Text } = Typography;
 
-type StatusType = "active" | "inactive";
-
-type AdminFormValues = {
-  username: string;
-  name: string;
-  email: string;
-  password?: string;
-  phoneNumber: string;
-  address: string;
-  roleID: RoleID;
-  status: StatusType;
-};
-
-const ROLE_OPTIONS = [
-  { value: 1 as RoleID, label: "User" },
-  { value: 2 as RoleID, label: "Admin" },
-];
-
-/** ✅ FIX: username phải lấy từ username (không lấy name) */
-const getUsernameFromRecord = (record: any): string => {
-  const raw = record?.name ?? "";
-  return String(raw ?? "").trim();
-};
-
-const getPhoneFromRecord = (record: any): string =>
-  String(record?.phoneNumber ?? record?.phone ?? "").trim();
-
-const getEmailFromRecord = (record: any): string =>
-  String(record?.email ?? "").trim();
-
-const getNameFromRecord = (record: any): string =>
-  String(
-    record?.name ??
-      record?.fullName ??
-      record?.displayName ??
-      record?.user?.name ??
-      ""
-  ).trim();
-
-const getAddressFromRecord = (record: any): string =>
-  String(record?.address ?? record?.user?.address ?? "").trim();
-
-const normalizeStatus = (v: any): StatusType =>
-  v === "active" ? "active" : "inactive";
-
-const normalizeUserRow = (u: any) => {
-  const idString = getIdString(u);
-  const role = getRoleId(u);
-
-  const username = getUsernameFromRecord(u);
-  const name = getNameFromRecord(u) || username;
-
-  return {
-    ...u,
-    _idString: idString,
-    username,
-    name,
-    email: getEmailFromRecord(u),
-    address: getAddressFromRecord(u),
-    phoneNumber: getPhoneFromRecord(u),
-    status: normalizeStatus(u?.status ?? u?.user?.status),
-    roleID: role,
-  };
-};
-
 const UserManager: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<any | null>(null);
-
-  /** ✅ id thật để update/delete (string) */
-  const [editingId, setEditingId] = useState<string>("");
-
-  const [form] = Form.useForm<AdminFormValues>();
   const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [createLoading, setCreateLoading] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+  const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
 
+  /* ================= LOAD DATA ================= */
   const loadUsers = async () => {
     try {
       setLoading(true);
       const list = await fetchUsersService();
-      const normalized = (Array.isArray(list) ? list : []).map(
-        normalizeUserRow
-      );
-      setUsers(normalized);
-    } catch (err: any) {
-      console.error("Fetch users error:", err?.response?.data || err);
-      message.error(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Không thể tải danh sách người dùng."
-      );
+      setUsers(list || []);
+    } catch {
+      message.error("Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -136,383 +70,334 @@ const UserManager: React.FC = () => {
     loadUsers();
   }, []);
 
+  /* ================= SEARCH & FILTER ================= */
   const filteredUsers = useMemo(() => {
-    if (!searchText.trim()) return users;
-    const kw = searchText.trim().toLowerCase();
+    let list = users;
+    if (statusFilter === "active") list = list.filter((u) => u.status === "active");
+    else if (statusFilter === "inactive") list = list.filter((u) => u.status !== "active");
+    if (!searchText) return list;
+    const kw = searchText.toLowerCase();
+    return list.filter((u) =>
+      Object.values(u).some((v) =>
+        String(v ?? "").toLowerCase().includes(kw)
+      )
+    );
+  }, [users, searchText, statusFilter]);
 
-    return users.filter((u: any) => {
-      const idString = String(u._idString ?? "").toLowerCase();
-      const nameValue = String(u.name ?? "").toLowerCase();
-      const usernameValue = String(u.username ?? "").toLowerCase();
-      const phoneValue = String(u.phoneNumber ?? "").toLowerCase();
-      const statusValue = String(u.status ?? "").toLowerCase();
-      const roleText = u.roleID === 2 ? "admin" : "user";
-      const roleNum = String(u.roleID ?? "").toLowerCase();
-
-      return (
-        idString.includes(kw) ||
-        nameValue.includes(kw) ||
-        usernameValue.includes(kw) ||
-        phoneValue.includes(kw) ||
-        statusValue.includes(kw) ||
-        roleText.includes(kw) ||
-        roleNum.includes(kw)
-      );
-    });
-  }, [users, searchText]);
-
-  const handleAddUser = () => {
-    setEditingUser(null);
-    setEditingId("");
-    setIsModalOpen(true);
-  };
-
-  const handleEditUser = (record: any) => {
-    const r = normalizeUserRow(record);
-
-    const idStr = String(r._idString ?? "").trim();
-    if (!idStr) {
-      message.error(
-        "Không tìm thấy ID người dùng để cập nhật (backend không trả id)."
-      );
-      return;
-    }
-
-    setEditingUser(r);
-    setEditingId(idStr);
-    setIsModalOpen(true);
-  };
-
-  useEffect(() => {
-    if (!isModalOpen) return;
-
-    if (editingUser) {
-      const r = normalizeUserRow(editingUser);
-      form.resetFields();
-      form.setFieldsValue({
-        username: r.username ?? "",
-        name: r.name ?? "",
-        email: r.email ?? "",
-        address: r.address ?? "",
-        phoneNumber: r.phoneNumber ?? "",
-        status: normalizeStatus(r.status),
-        roleID: r.roleID,
-      });
-    } else {
-      form.resetFields();
-      form.setFieldsValue({
-        roleID: 1 as RoleID,
-        status: "active",
-        address: "",
-        phoneNumber: "",
-        username: "",
-        name: "",
-        email: "",
-        password: "",
-      });
-    }
-  }, [isModalOpen, editingUser, form]);
-
-  const handleDeleteUser = async (record: any) => {
+  /* ================= CREATE ================= */
+  const handleCreate = async () => {
     try {
-      const r = normalizeUserRow(record);
-      const idStr = String(r._idString ?? "").trim();
-      if (!idStr) {
-        message.error("Không tìm thấy ID người dùng để xóa.");
-        return;
-      }
-
-      await deleteUserService(idStr);
-      message.success("Đã xóa người dùng.");
-      await loadUsers();
-    } catch (err: any) {
-      console.error("Delete user error:", err?.response?.data || err);
-      message.error(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Xóa người dùng thất bại."
-      );
-    }
-  };
-
-  const handleSubmit = async (values: AdminFormValues) => {
-    try {
-      setSaving(true);
-
-      const roleID: RoleID =
-        Number(values.roleID) === 2 ? (2 as RoleID) : (1 as RoleID);
-
-      if (editingUser) {
-        if (!editingId) {
-          message.error("Không tìm thấy ID người dùng để cập nhật.");
-          return;
-        }
-
-        const updatePayload = {
-          name: values.name?.trim(),
-          username: values.username?.trim(),
-          email: values.email?.trim(),
-          phoneNumber: values.phoneNumber?.trim(),
-          address: values.address?.trim(),
-          status: values.status,
-          roleID: roleID,
-        };
-
-        await updateUserService(editingId, updatePayload);
-        message.success("Cập nhật người dùng thành công.");
-      } else {
-        // ✅ CREATE đầy đủ
-        const createPayload: any = {
-          username: values.username?.trim(),
-          email: values.email?.trim(),
-          password: values.password || "",
-          roleID: roleID,
-          // các field khác nếu backend register cần
-          name: values.name?.trim(),
-          phoneNumber: values.phoneNumber?.trim(),
-          address: values.address?.trim(),
-          status: values.status,
-        };
-
-        await createUserService(createPayload);
-        message.success("Tạo người dùng thành công.");
-      }
-
-      setIsModalOpen(false);
-      setEditingUser(null);
-      setEditingId("");
+      const values = await form.validateFields();
+      setCreateLoading(true);
+      await createUserService({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        roleID: values.roleID,
+      });
+      message.success("User created successfully");
+      setModalOpen(false);
       form.resetFields();
-      await loadUsers();
+      loadUsers();
     } catch (err: any) {
-      console.error("Save user error:", err?.response?.data || err);
-      message.error(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Lưu người dùng thất bại."
-      );
+      if (err?.errorFields) return;
+      message.error(err?.message || "Create user failed");
     } finally {
-      setSaving(false);
+      setCreateLoading(false);
     }
   };
 
+  /* ================= EDIT ================= */
+  const handleEditOpen = (row: any) => {
+    setEditingUser(row);
+    editForm.setFieldsValue({
+      name: row.name || row.username,
+      email: row.email,
+      roleID: getRoleId(row),
+      status: row.status === "active" ? "active" : "inactive",
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEdit = async () => {
+    if (!editingUser) return;
+    try {
+      const values = await editForm.validateFields();
+      setEditLoading(true);
+      await updateUserService(getIdString(editingUser), {
+        name: values.name,
+        email: values.email,
+        roleID: values.roleID,
+        status: values.status,
+      });
+      message.success("User updated");
+      setEditModalOpen(false);
+      setEditingUser(null);
+      editForm.resetFields();
+      loadUsers();
+    } catch (err: any) {
+      if (err?.errorFields) return;
+      message.error(err?.message || "Update failed");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  /* ================= DELETE ================= */
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteUserService(id);
+      message.success("User deleted");
+      loadUsers();
+    } catch {
+      message.error("Delete failed");
+    }
+  };
+
+  /* ================= TABLE ================= */
   const columns: ColumnsType<any> = [
     {
-      title: "Tên",
-      dataIndex: "name",
-      width: 260,
-      align: "center",
-      render: (_: any, record: any) => {
-        const displayName = record.name ?? record.username ?? "-";
-        return <Text strong>{displayName}</Text>;
-      },
+      title: "User",
+      render: (_, r) => (
+        <Space align="start">
+          <UserOutlined className="system-manager__user-icon" />
+          <div>
+            <Text strong>{r.name || r.username}</Text>
+            <br />
+            <Text type="secondary">
+              <MailOutlined /> {r.email}
+            </Text>
+            <br />
+            <Text type="secondary">
+              <PhoneOutlined /> {r.phoneNumber || "N/A"}
+            </Text>
+          </div>
+        </Space>
+      ),
     },
     {
-      title: "Trạng thái",
-      dataIndex: "status",
-      width: 200,
+      title: "Status",
       align: "center",
-      render: (_: any, record: any) => {
-        const s: StatusType = normalizeStatus(record.status);
-        return (
-          <Tag
-            color={s === "active" ? "green" : "volcano"}
-            style={{
-              minWidth: 120,
-              textAlign: "center",
-              borderRadius: 10,
-              padding: "5px 14px",
-              fontWeight: 600,
-            }}>
-            {s === "active" ? "Active" : "Inactive"}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: "Số điện thoại",
-      dataIndex: "phoneNumber",
-      width: 220,
-      align: "center",
-      render: (_: any, record: any) => record.phoneNumber || "-",
+      render: (_, r) => (
+        <Tag
+          color={r.status === "active" ? "green" : "magenta"}
+          className="system-manager__tag system-manager__tag--status"
+        >
+          {r.status === "active" ? "ACTIVE" : "INACTIVE"}
+        </Tag>
+      ),
     },
     {
       title: "Role",
-      dataIndex: "roleID",
-      width: 180,
       align: "center",
-      render: (_: any, record: any) => {
-        const role: RoleID = getRoleId(record);
-        return (
-          <Tag
-            color={role === 2 ? "red" : "blue"}
-            style={{
-              minWidth: 90,
-              textAlign: "center",
-              borderRadius: 999,
-              padding: "6px 18px",
-              fontWeight: 700,
-              textTransform: "capitalize",
-            }}>
-            {role === 2 ? "Admin" : "User"}
-          </Tag>
-        );
-      },
+      render: (_, r) => (
+        <Tag className="system-manager__tag system-manager__tag--role">
+          {getRoleId(r) === 2 ? "ADMIN" : "USER"}
+        </Tag>
+      ),
     },
     {
-      title: "Hành động",
-      key: "actions",
-      fixed: "right",
-      width: 200,
+      title: "Actions",
       align: "center",
-      render: (_: any, record: any) => (
+      render: (_, r) => (
         <Space>
-          <Button
-            size='small'
-            icon={<EditOutlined />}
-            onClick={() => handleEditUser(record)}>
-            Sửa
-          </Button>
-
+          <Button icon={<EditOutlined />} onClick={() => handleEditOpen(r)} />
           <Popconfirm
-            title='Xóa người dùng'
-            description='Bạn chắc chắn muốn xóa người dùng này?'
-            okText='Xóa'
-            cancelText='Hủy'
-            onConfirm={() => handleDeleteUser(record)}>
-            <Button danger size='small' icon={<DeleteOutlined />}>
-              Xóa
-            </Button>
+            title="Delete user?"
+            onConfirm={() => handleDelete(getIdString(r))}
+          >
+            <Button danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       ),
     },
   ];
 
+  const stats = [
+    { title: "Total Users", value: users.length, primary: true },
+    { title: "Active", value: users.filter((u) => u.status === "active").length, primary: false },
+    { title: "Admins", value: users.filter((u) => getRoleId(u) === 2).length, primary: false },
+    { title: "Inactive", value: users.filter((u) => u.status !== "active").length, primary: false },
+  ];
+
+  /* ================= UI ================= */
   return (
-    <div style={{ padding: 24 }}>
+    <div className="system-manager">
+      <h2 className="system-manager__title">
+        <SettingOutlined /> System - User Management
+      </h2>
+
+      <Row gutter={16} className="system-manager__stats">
+        {stats.map((s, i) => (
+          <Col xs={24} sm={12} lg={6} key={i}>
+            <Card
+              className={s.primary ? "system-manager__stat-card system-manager__stat-card--primary" : "system-manager__stat-card system-manager__stat-card--light"}
+            >
+              <Statistic
+                title={s.title}
+                value={s.value}
+                valueStyle={{ color: "#fff", fontSize: 28 }}
+              />
+            </Card>
+          </Col>
+        ))}
+      </Row>
+
       <Card
-        title='User Management'
+        className="system-manager__panel"
+        title={
+          <span className="system-manager__toolbar-label">
+            <UserOutlined /> Users
+          </span>
+        }
         extra={
-          <Space>
+          <Space className="system-manager__toolbar-actions">
+            <Select
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { value: "all", label: "All" },
+                { value: "active", label: "Active" },
+                { value: "inactive", label: "Inactive" },
+              ]}
+              style={{ width: 110 }}
+            />
             <Input
-              placeholder='Tìm theo ID / Tên / Username / SĐT / Trạng thái / Role...'
-              allowClear
-              style={{ width: 460 }}
+              className="system-manager__search"
               prefix={<SearchOutlined />}
+              placeholder="Search users..."
+              allowClear
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
             />
             <Button
-              type='primary'
+              type="primary"
               icon={<PlusOutlined />}
-              onClick={handleAddUser}>
-              Thêm người dùng
+              className="system-manager__btn-add"
+              onClick={() => setModalOpen(true)}
+            >
+              Add user
             </Button>
           </Space>
-        }>
-        <Table
-          rowKey={(record: any) =>
-            String(
-              record._idString ||
-                getIdString(record) ||
-                record.email ||
-                record.username
-            )
-          }
-          columns={columns}
-          dataSource={filteredUsers}
-          loading={loading}
-          pagination={{ pageSize: 10 }}
-          scroll={{ x: 1100 }}
-        />
+        }
+      >
+        <div className="system-manager__table">
+          <Table
+            rowKey={(r) => getIdString(r)}
+            loading={loading}
+            columns={columns}
+            dataSource={filteredUsers}
+            pagination={{ pageSize: 6 }}
+          />
+        </div>
       </Card>
 
       <Modal
-        title={editingUser ? "Cập nhật người dùng" : "Thêm người dùng mới"}
-        open={isModalOpen}
+        title="Add user"
+        open={modalOpen}
+        onOk={handleCreate}
         onCancel={() => {
-          setIsModalOpen(false);
-          setEditingUser(null);
-          setEditingId("");
+          setModalOpen(false);
           form.resetFields();
         }}
-        okText={editingUser ? "Lưu" : "Tạo mới"}
-        onOk={() => form.submit()}
-        confirmLoading={saving}
-        destroyOnClose>
-        <Form form={form} layout='vertical' onFinish={handleSubmit}>
+        confirmLoading={createLoading}
+        destroyOnClose
+      >
+        <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item
-            label='Tên (name)'
-            name='name'
-            rules={[{ required: true, message: "Vui lòng nhập tên!" }]}>
-            <Input placeholder='Nguyễn Văn A' />
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please enter name" }]}
+          >
+            <Input placeholder="Full name" />
           </Form.Item>
-
           <Form.Item
-            label='Username'
-            name='username'
-            rules={[{ required: true, message: "Vui lòng nhập username!" }]}>
-            <Input placeholder='Nhập username' />
-          </Form.Item>
-
-          <Form.Item
-            label='Số điện thoại'
-            name='phoneNumber'
+            name="email"
+            label="Email"
             rules={[
-              { required: true, message: "Vui lòng nhập số điện thoại!" },
-              {
-                pattern: /^(0|\+84)\d{9,10}$/,
-                message: "SĐT không hợp lệ (vd: 0123456789 hoặc +84123456789)",
-              },
-            ]}>
-            <Input placeholder='0123456789' />
+              { required: true, message: "Please enter email" },
+              { type: "email", message: "Invalid email" },
+            ]}
+          >
+            <Input placeholder="Email" />
           </Form.Item>
-
           <Form.Item
-            label='Trạng thái'
-            name='status'
-            rules={[{ required: true, message: "Vui lòng chọn trạng thái!" }]}>
-            <Select placeholder='Chọn trạng thái'>
-              <Select.Option value='active'>Active</Select.Option>
-              <Select.Option value='inactive'>Inactive</Select.Option>
-            </Select>
+            name="password"
+            label="Password"
+            rules={[{ required: true, message: "Please enter password" }]}
+          >
+            <Input.Password placeholder="Password" />
           </Form.Item>
-
           <Form.Item
-            label='Role'
-            name='roleID'
-            rules={[{ required: true, message: "Vui lòng chọn role!" }]}>
-            <Select placeholder='Chọn role' options={ROLE_OPTIONS} />
+            name="roleID"
+            label="Role"
+            initialValue={ROLE.USER}
+            rules={[{ required: true }]}
+          >
+            <Select
+              options={[
+                { value: ROLE.USER, label: "User" },
+                { value: ROLE.ADMIN, label: "Admin" },
+              ]}
+            />
           </Form.Item>
+        </Form>
+      </Modal>
 
+      <Modal
+        title="Edit user"
+        open={editModalOpen}
+        onOk={handleEdit}
+        onCancel={() => {
+          setEditModalOpen(false);
+          setEditingUser(null);
+          editForm.resetFields();
+        }}
+        confirmLoading={editLoading}
+        destroyOnClose
+      >
+        <Form form={editForm} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item
-            label='Email'
-            name='email'
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please enter name" }]}
+          >
+            <Input placeholder="Full name" />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email"
             rules={[
-              { required: true, message: "Vui lòng nhập email!" },
-              { type: "email", message: "Email không hợp lệ!" },
-            ]}>
-            <Input placeholder='you@example.com' />
+              { required: true, message: "Please enter email" },
+              { type: "email", message: "Invalid email" },
+            ]}
+          >
+            <Input placeholder="Email" />
           </Form.Item>
-
           <Form.Item
-            label='Địa chỉ'
-            name='address'
-            rules={[{ required: true, message: "Vui lòng nhập địa chỉ!" }]}>
-            <Input placeholder='Nhập địa chỉ' />
+            name="roleID"
+            label="Role"
+            rules={[{ required: true }]}
+          >
+            <Select
+              options={[
+                { value: ROLE.USER, label: "User" },
+                { value: ROLE.ADMIN, label: "Admin" },
+              ]}
+            />
           </Form.Item>
-
-          {!editingUser && (
-            <Form.Item
-              label='Mật khẩu'
-              name='password'
-              rules={[
-                { required: true, message: "Vui lòng nhập mật khẩu!" },
-                { min: 6, message: "Mật khẩu tối thiểu 6 ký tự!" },
-              ]}>
-              <Input.Password placeholder='••••••••' />
-            </Form.Item>
-          )}
+          <Form.Item
+            name="status"
+            label="Status"
+            rules={[{ required: true }]}
+          >
+            <Select
+              options={[
+                { value: "active", label: "Active" },
+                { value: "inactive", label: "Inactive" },
+              ]}
+            />
+          </Form.Item>
         </Form>
       </Modal>
     </div>

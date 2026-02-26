@@ -1,0 +1,99 @@
+.services-section {
+  text-align: center;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  box-sizing: border-box;
+  padding: 60px 40px 80px;
+
+  background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+    url("https://res.cloudinary.com/dfjecxrnl/image/upload/v1768211094/background-contact_u3ofzv.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  .title {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    opacity: 0.9;
+    margin-bottom: 50px;
+    color: #fff;
+  }
+
+  .service-card {
+    padding: 30px 20px;
+    border-radius: 6px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    color: #fff;
+    border: none;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
+      rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+    &:hover {
+      transform: translateY(-8px);
+    }
+
+    .icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+      color: #00ffaa;
+    }
+
+    h3 {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 15px;
+      margin-bottom: 25px;
+    }
+
+    .btn {
+      border: none;
+      background: #000;
+      color: #fff;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 4px;
+
+      &:hover {
+        background: #ff6f3c !important;
+        color: #fff !important;
+      }
+    }
+
+    &.brown {
+      background: #a3310f;
+    }
+
+    &.dark {
+      background: #a3310f;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .services-section {
+    position: static;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 40px 16px 60px;
+    background-attachment: scroll;
+  }
+}

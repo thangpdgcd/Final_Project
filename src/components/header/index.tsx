@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Layout, Dropdown } from "antd";
 import type { MenuProps } from "antd";
+import { useTheme } from "../contexts/ThemeContext";
+import "./index.scss";
 import {
   DownOutlined,
   ShoppingCartOutlined,
@@ -10,11 +12,10 @@ import {
   LoginOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-import logo from "../../assets/img/logo_PhanCoffee.jpg";
-import { useTheme } from "../../contexts/ThemeContext";
-import "./index.scss";
+const logo = `${process.env.PUBLIC_URL || ""}/logo_Web_Phan_Coffeess.png`;
 
 const { Header } = Layout;
 
@@ -26,41 +27,25 @@ type NavChild = {
 
 type NavItem =
   | { label: string; href: string }
-  | { label: string; children: NavChild[] }
-  | { label: ""; kind: "quick"; icon: React.ReactNode };
+  | { label: string; children: NavChild[] };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Home", href: "/" },
-  {
-    label: "Coffee",
-    children: [
-      { label: "All Products", href: "/products", desc: "All coffee products" },
-      { label: "Espresso", href: "/products/espresso", desc: "Bold & rich" },
-      {
-        label: "Cold Brew",
-        href: "/products/cold-brew",
-        desc: "Smooth & fresh",
-      },
-      {
-        label: "Specialty",
-        href: "/products/specialty",
-        desc: "Premium beans",
-      },
-    ],
-  },
-  { label: "Contact", href: "/contacts" },
-  { label: "About", href: "/about" },
-  { label: "", kind: "quick", icon: <DownOutlined /> },
+  { label: "home", href: "/" },
+  { label: "coffee", href: "/products" },
+  { label: "contact", href: "/contacts" },
+  { label: "about", href: "/about" },
 ];
 
 const HeaderPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [openKey, setOpenKey] = useState<string | null>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const { dark, toggleDark } = useTheme();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const { t, i18n } = useTranslation();
 
-  // Kiểm tra login status
+  // Check login status
   useEffect(() => {
     const checkLoginStatus = () => {
       const token = localStorage.getItem("token");
@@ -69,17 +54,17 @@ const HeaderPage: React.FC = () => {
     };
 
     checkLoginStatus();
-    // Lắng nghe sự kiện storage để cập nhật khi login/logout ở tab khác
+    // Listen for storage event to update when login/logout in another tab
     window.addEventListener("storage", checkLoginStatus);
     return () => window.removeEventListener("storage", checkLoginStatus);
   }, []);
 
-  // Kiểm tra lại khi component mount hoặc khi navigate
+  // Re-check when route changes (e.g. after login redirect)
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
     setIsLoggedIn(!!(token && user));
-  }, [navigate]);
+  }, [location.pathname]);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -96,7 +81,7 @@ const HeaderPage: React.FC = () => {
     localStorage.removeItem("user");
     setIsLoggedIn(false);
     navigate("/");
-    window.location.reload(); // Reload để cập nhật UI
+    window.location.reload(); // Reload to update UI
   };
 
   const quickOptions: MenuProps["items"] = [
@@ -106,7 +91,7 @@ const HeaderPage: React.FC = () => {
         <div className='quick-item'>
           {dark ? <SunOutlined /> : <MoonOutlined />}
           <span className='quick-item-label'>
-            {dark ? "Light Mode" : "Dark Mode"}
+            {dark ? t("nav.lightMode") : t("nav.darkMode")}
           </span>
         </div>
       ),
@@ -117,7 +102,7 @@ const HeaderPage: React.FC = () => {
       label: (
         <div className='quick-item'>
           <ShoppingCartOutlined />
-          <span className='quick-item-label'>Cart</span>
+          <span className='quick-item-label'>{t("nav.cart")}</span>
         </div>
       ),
       onClick: () => navigate("/carts"),
@@ -127,14 +112,23 @@ const HeaderPage: React.FC = () => {
       label: (
         <div className='quick-item'>
           <UserOutlined />
-          <span className='quick-item-label'>User</span>
+          <span className='quick-item-label'>{t("nav.user")}</span>
         </div>
       ),
       onClick: () => {
         if (isLoggedIn) {
           const user = JSON.parse(localStorage.getItem("user") || "{}");
-          if (user.user_ID) {
-            navigate(`/profiles/${user.user_ID}`);
+          const storedId = localStorage.getItem("user_ID");
+          const userId =
+            storedId ||
+            user?.user_ID ||
+            user?.id ||
+            user?.userId ||
+            user?.data?.user_ID ||
+            user?.user?.user_ID;
+
+          if (userId) {
+            navigate(`/profiles/${userId}`);
           } else {
             navigate("/login");
           }
@@ -150,29 +144,29 @@ const HeaderPage: React.FC = () => {
     // Login/Logout buttons
     ...(isLoggedIn
       ? [
-          {
-            key: "logout",
-            label: (
-              <div className='quick-item quick-item--logout'>
-                <LogoutOutlined />
-                <span className='quick-item-label'>Logout</span>
-              </div>
-            ),
-            onClick: handleLogout,
-          },
-        ]
+        {
+          key: "logout",
+          label: (
+            <div className='quick-item quick-item--logout'>
+              <LogoutOutlined />
+              <span className='quick-item-label'>Logout</span>
+            </div>
+          ),
+          onClick: handleLogout,
+        },
+      ]
       : [
-          {
-            key: "login",
-            label: (
-              <div className='quick-item quick-item--login'>
-                <LoginOutlined />
-                <span className='quick-item-label'>Login</span>
-              </div>
-            ),
-            onClick: () => navigate("/login"),
-          },
-        ]),
+        {
+          key: "login",
+          label: (
+            <div className='quick-item quick-item--login'>
+              <LoginOutlined />
+              <span className='quick-item-label'>{t("nav.login")}</span>
+            </div>
+          ),
+          onClick: () => navigate("/login"),
+        },
+      ]),
   ];
 
   return (
@@ -181,75 +175,73 @@ const HeaderPage: React.FC = () => {
         {/* LOGO */}
         <div className='coffee-logo' onClick={() => navigate("/")}>
           <img src={logo} alt='Phan Coffee' />
-          <span>Phan Coffee</span>
+          <span>{t("common.brandName")}</span>
         </div>
 
-        {/* MENU */}
-        <nav className='coffee-nav'>
-          {NAV_ITEMS.map((item, idx) => {
-            if ("kind" in item) {
-              return (
-                <Dropdown
-                  key={idx}
-                  trigger={["click"]}
-                  placement='bottomRight'
-                  overlayClassName='quick-dropdown'
-                  menu={{
-                    items: quickOptions,
-                    selectable: false,
-                  }}>
-                  <button className='nav-item icon-only quick-trigger'>
-                    {item.icon}
+        {/* MENU + LANGUAGE SWITCH */}
+        <div className="coffee-nav-wrapper">
+          <div className='coffee-nav'>
+            {NAV_ITEMS.map((item, idx) => {
+              if ("children" in item) {
+                return (
+                  <button
+                    key={item.label}
+                    className={`nav-item ${openKey === item.label ? "active" : ""}`}
+                    onMouseEnter={() => setOpenKey(item.label)}
+                    onClick={() =>
+                      setOpenKey(openKey === item.label ? null : item.label)
+                    }>
+                    {t(`nav.${item.label}`)}
+                    <DownOutlined className='arrow' />
                   </button>
-                </Dropdown>
-              );
-            }
+                );
+              }
 
-            if ("children" in item) {
               return (
                 <button
                   key={item.label}
-                  className={`nav-item ${openKey === item.label ? "active" : ""}`}
-                  onMouseEnter={() => setOpenKey(item.label)}
-                  onClick={() =>
-                    setOpenKey(openKey === item.label ? null : item.label)
-                  }>
-                  {item.label}
-                  <DownOutlined className='arrow' />
+                  className='nav-item'
+                  onClick={() => navigate(item.href!)}>
+                  {item.label ? t(`nav.${item.label}`) : ""}
                 </button>
               );
-            }
+            })}
 
-            return (
+            <div className='lang-switch'>
               <button
-                key={item.label}
-                className='nav-item'
-                onClick={() => navigate(item.href!)}>
-                {item.label}
+                type='button'
+                className={`lang-btn ${i18n.language === "en" ? "active" : ""}`}
+                onClick={() => i18n.changeLanguage("en")}
+              >
+                EN
               </button>
-            );
-          })}
-        </nav>
+              <button
+                type='button'
+                className={`lang-btn ${i18n.language === "vi" ? "active" : ""}`}
+                onClick={() => i18n.changeLanguage("vi")}
+              >
+                VN
+              </button>
+            </div>
+
+            <Dropdown
+              trigger={["click"]}
+              placement='bottomRight'
+              menu={{
+                items: quickOptions,
+                selectable: false,
+              }}>
+              <button className='nav-item icon-only quick-trigger'>
+                <DownOutlined />
+              </button>
+            </Dropdown>
+          </div>
+        </div>
       </Header>
 
       {/* SUBMENU */}
-      <div
-        className={`coffee-submenu ${openKey === "Coffee" ? "open" : ""}`}
-        onMouseEnter={() => setOpenKey("Coffee")}
-        onMouseLeave={() => setOpenKey(null)}>
-        <div className='submenu-inner'>
-          {NAV_ITEMS.find((i) => "children" in i && i.label === "Coffee") &&
-            (NAV_ITEMS[1] as any).children.map((c: NavChild) => (
-              <button
-                key={c.href}
-                className='submenu-card'
-                onClick={() => navigate(c.href)}>
-                <div className='title'>{c.label}</div>
-                <div className='desc'>{c.desc}</div>
-              </button>
-            ))}
-        </div>
-      </div>
+      
+
     </div>
   );
 };

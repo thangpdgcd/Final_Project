@@ -1,13 +1,16 @@
 .app-footer {
-  background: #202226; // nền tối giống hình
-  color: #f5f5f5;
-  padding: 48px 0 0;
-  border-top: none;
   width: 100%;
+  border-top: none;
+  padding: 64px 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  background: radial-gradient(900px 420px at 20% 0%, rgba(199, 162, 109, 0.16), transparent 55%),
+    radial-gradient(900px 420px at 80% 0%, rgba(56, 189, 248, 0.08), transparent 55%),
+    linear-gradient(180deg, #1a1512 0%, #0f0d0c 100%);
 
   .app-footer__inner {
     margin: 0 auto;
-    padding: 0 32px 32px;
+    width: 1200px;
+    padding: 0 40px 44px;
   }
 
   .footer-column {
@@ -16,26 +19,57 @@
     align-items: flex-start;
   }
 
+  .footer-top {
+    padding-top: 10px;
+  }
+
+  .footer-brand__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .footer-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 999px;
+      display: block;
+    }
+  }
+
+  .footer-brand__name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
   .footer-heading {
     color: #ffffff;
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    margin-bottom: 16px;
+    margin: 0 0 14px !important;
   }
 
   .footer-text {
-    font-size: 14px;
-    line-height: 1.8;
-    color: #c7c7c7;
-    margin-bottom: 12px;
-    max-width: 360px;
-  }
-
-  .footer-signature {
     font-size: 13px;
-    color: #a3a3a3;
-    margin-top: 8px;
+    line-height: 1.7;
+    color: rgba(147, 197, 253, 0.65);
+    width: 420px;
+    margin: 0;
   }
 
   .footer-list {
@@ -46,14 +80,12 @@
     li {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-      font-size: 14px;
-      color: #d4d4d4;
+      margin-bottom: 9px;
+      font-size: 13px;
     }
 
     a {
-      color: #d4d4d4;
+      color: rgba(147, 197, 253, 0.75);
       text-decoration: none;
       transition: color 0.25s ease;
 
@@ -63,58 +95,16 @@
     }
   }
 
-  /* Icon tròn cho social giống demo */
-  .icon-circle {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    background: #34363b;
-  }
-
-  .icon-circle--facebook {
-    background: #3b5998;
-  }
-
-  .icon-circle--instagram {
-    background: #c13584;
-  }
-
-  .icon-circle--youtube {
-    background: #ff0000;
-  }
-
-  .icon-circle--tiktok {
-    background: #121212;
-  }
-
-  .footer-list--contact {
-    .contact-icon {
-      font-size: 18px;
-      margin-right: 4px;
-      color: #f5f5f5;
-    }
-
-    .footer-contact-line {
-      color: #d4d4d4;
-      font-size: 14px;
-    }
-  }
-
   /* Thanh dưới cùng */
   .app-footer__bottom {
     border-top: 1px solid rgba(255, 255, 255, 0.06);
-    background: #18191c;
-    margin-top: 16px;
-    padding: 12px 32px;
+    background: rgba(0, 0, 0, 0.12);
+    padding: 14px 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     font-size: 12px;
-    color: #a3a3a3;
+    color: rgba(255, 255, 255, 0.55);
 
     .footer-bottom-left {
       white-space: nowrap;
@@ -123,20 +113,16 @@
     .footer-bottom-right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 18px;
       flex-wrap: wrap;
 
       a {
-        color: #a3a3a3;
+        color: rgba(147, 197, 253, 0.7);
         text-decoration: none;
 
         &:hover {
           color: #ffffff;
         }
-      }
-
-      .divider {
-        color: #6b7280;
       }
     }
   }
@@ -144,7 +130,7 @@
   /* Responsive */
   @media (max-width: 992px) {
     .app-footer__inner {
-      padding: 0 24px 24px;
+      padding: 0 24px 34px;
     }
 
     .app-footer__bottom {
@@ -159,7 +145,7 @@
     padding-top: 40px;
 
     .app-footer__inner {
-      padding: 0 20px 24px;
+      padding: 0 20px 28px;
     }
 
     .footer-column {

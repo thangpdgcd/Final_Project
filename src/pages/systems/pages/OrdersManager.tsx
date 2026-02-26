@@ -1,5 +1,5 @@
 // src/pages/systems/pages/OrderManager.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   Button,
@@ -25,7 +25,6 @@ import type { ColumnsType } from "antd/es/table";
 import type { Order } from "../../../api/orderApi";
 import {
   getAllOrdersService,
-  searchOrderByIdService,
   createOrderService,
   updateOrderService,
   deleteOrderService,
@@ -46,7 +45,7 @@ const ORDER_STATUS_OPTIONS = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
-// ✅ lấy tên user
+// Get display name for order user
 function getUserDisplayName(order: any): string {
   return (
     order?.users?.name ??
@@ -72,7 +71,7 @@ const OrderManager: React.FC = () => {
       const data = await getAllOrdersService();
       setOrders(data);
     } catch (err) {
-      message.error("Không thể tải danh sách đơn hàng.");
+      message.error("Failed to load orders.");
     } finally {
       setLoading(false);
     }
@@ -96,8 +95,8 @@ const OrderManager: React.FC = () => {
     setOrders(filtered);
 
     if (filtered.length)
-      message.success(`Tìm thấy ${filtered.length} đơn hàng`);
-    else message.info("Không tìm thấy đơn hàng theo tên.");
+      message.success(`Found ${filtered.length} order(s)`);
+    else message.info("No orders found for that name.");
   };
 
   const handleClearSearch = () => {
@@ -113,40 +112,40 @@ const OrderManager: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleEditOrder = (record: Order) => {
+  const handleEditOrder = useCallback((record: Order) => {
     setEditingOrder(record);
     form.resetFields();
     form.setFieldsValue(toOrderFormValues(record) as any);
     setIsModalOpen(true);
-  };
+  }, [form]);
 
-  const handleDeleteOrder = async (id: number) => {
+  const handleDeleteOrder = useCallback(async (id: number) => {
     try {
       setLoading(true);
       await deleteOrderService(id);
-      message.success("Đã xóa đơn hàng.");
+      message.success("Order deleted.");
       await loadAllOrders();
     } catch {
-      message.error("Xóa đơn hàng thất bại.");
+      message.error("Failed to delete order.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleSubmit = async (values: OrderFormValues) => {
     try {
       setSaving(true);
       if (editingOrder) {
         await updateOrderService(editingOrder.order_ID, values);
-        message.success("Cập nhật đơn hàng thành công.");
+        message.success("Updated successfully!.");
       } else {
         await createOrderService(values);
-        message.success("Tạo đơn hàng thành công.");
+        message.success("Order created successfully.");
       }
       setIsModalOpen(false);
       await loadAllOrders();
     } catch {
-      message.error("Lưu đơn hàng thất bại.");
+      message.error("Failed to save order.");
     } finally {
       setSaving(false);
     }
@@ -156,17 +155,17 @@ const OrderManager: React.FC = () => {
   const columns: ColumnsType<Order> = useMemo(
     () => [
       {
-        title: "Khách hàng",
+        title: "Customer",
         key: "user_name",
         render: (_: any, record: any) => getUserDisplayName(record),
       },
       {
-        title: "Tổng tiền",
+        title: "Total",
         dataIndex: "total_Amount",
         render: (value: number) => formatVND(value),
       },
       {
-        title: "Trạng thái",
+        title: "Status",
         dataIndex: "status",
         render: (status?: string) => {
           const { color, label } = getStatusTagInfo(status);
@@ -174,13 +173,13 @@ const OrderManager: React.FC = () => {
         },
       },
       {
-        title: "Địa chỉ giao hàng",
+        title: "Shipping address",
         dataIndex: "shipping_Address",
         ellipsis: true,
         render: (v?: string) => v || "-",
       },
       {
-        title: "Hành động",
+        title: "Actions",
         key: "actions",
         width: 160,
         render: (_: any, record: Order) => (
@@ -189,98 +188,112 @@ const OrderManager: React.FC = () => {
               size='small'
               icon={<EditOutlined />}
               onClick={() => handleEditOrder(record)}>
-              Sửa
+              Edit
             </Button>
             <Popconfirm
-              title='Xóa đơn hàng'
-              okText='Xóa'
-              cancelText='Hủy'
+              title="Delete order?"
+              okText="Delete"
+              cancelText="Cancel"
               onConfirm={() => handleDeleteOrder(record.order_ID)}>
               <Button danger size='small' icon={<DeleteOutlined />}>
-                Xóa
+                Delete
               </Button>
             </Popconfirm>
           </Space>
         ),
       },
     ],
-    [orders]
+    [handleEditOrder, handleDeleteOrder]
   );
 
   return (
-    <div style={{ padding: 24 }}>
+    <div className="system-manager">
+      <h2 className="system-manager__title">
+        🛒 System - Order Management
+      </h2>
+
       <Card
-        title={`Quản lý đơn hàng (${orders.length})`}
+        className="system-manager__panel"
+        title={
+          <span className="system-manager__toolbar-label">
+            Order management ({orders.length})
+          </span>
+        }
         extra={
-          <Space>
+          <Space className="system-manager__toolbar-actions">
             <Input
-              placeholder='Tìm theo tên khách hàng...'
+              className="system-manager__search"
+              placeholder="Search by customer name..."
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
-              style={{ width: 220 }}
               allowClear
             />
             <Button icon={<SearchOutlined />} onClick={handleSearch}>
-              Tìm
+              Search
             </Button>
-            <Button onClick={handleClearSearch}>Xóa tìm</Button>
+            <Button onClick={handleClearSearch}>Clear</Button>
             <Button icon={<ReloadOutlined />} onClick={loadAllOrders}>
-              Làm mới
+              Refresh
             </Button>
             <Button
-              type='primary'
+              type="primary"
               icon={<PlusOutlined />}
-              onClick={handleAddOrder}>
-              Thêm đơn hàng
+              className="system-manager__btn-add"
+              onClick={handleAddOrder}
+            >
+              Add order
             </Button>
           </Space>
-        }>
-        <Table
-          rowKey='order_ID'
-          columns={columns}
-          dataSource={orders}
-          loading={loading}
-          pagination={{ pageSize: 10 }}
-        />
+        }
+      >
+        <div className="system-manager__table">
+          <Table
+            rowKey="order_ID"
+            columns={columns}
+            dataSource={orders}
+            loading={loading}
+            pagination={{ pageSize: 10 }}
+          />
+        </div>
       </Card>
 
       <Modal
-        title={editingOrder ? "Cập nhật đơn hàng" : "Tạo đơn hàng"}
+        title={editingOrder ? "Edit order" : "Create order"}
         open={isModalOpen}
         onCancel={() => {
           if (!saving) setIsModalOpen(false);
         }}
-        okText={editingOrder ? "Lưu" : "Tạo mới"}
+        okText={editingOrder ? "Save" : "Create"}
         onOk={() => form.submit()}
         confirmLoading={saving}>
         <Form form={form} layout='vertical' onFinish={handleSubmit}>
-          <Form.Item label='Khách hàng'>
+          <Form.Item label="Customer">
             <Input
               value={getUserDisplayName(editingOrder)}
               disabled
-              placeholder='Tên khách hàng'
+              placeholder="Customer name"
             />
           </Form.Item>
 
           <Form.Item
-            label='Tổng tiền (VND)'
-            name='total_Amount'
-            rules={[{ required: true, message: "Nhập tổng tiền!" }]}>
+            label="Total (VND)"
+            name="total_Amount"
+            rules={[{ required: true, message: "Enter total amount" }]}>
             <InputNumber min={0} style={{ width: "100%" }} />
           </Form.Item>
 
           <Form.Item
-            label='Trạng thái'
-            name='status'
-            rules={[{ required: true, message: "Chọn trạng thái!" }]}>
+            label="Status"
+            name="status"
+            rules={[{ required: true, message: "Select status" }]}>
             <Select
               options={ORDER_STATUS_OPTIONS}
-              placeholder='Chọn trạng thái...'
+              placeholder="Select status..."
             />
           </Form.Item>
 
-          <Form.Item label='Địa chỉ giao hàng' name='shipping_Address'>
-            <TextArea rows={3} placeholder='Nhập địa chỉ...' />
+          <Form.Item label="Shipping address" name="shipping_Address">
+            <TextArea rows={3} placeholder="Enter address..." />
           </Form.Item>
         </Form>
       </Modal>
