@@ -1,10 +1,11 @@
 import React from "react";
-import { Layout, Button, Card } from "antd";
-import { useNavigate, Link } from "react-router-dom";
+import { Layout, Card } from "antd";
+// import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import Contact from "../../customers/contact";
-import aboutImage from "../../../assets/img/robustakontum.jpg";
+// Legacy about image kept for potential future use
+// import aboutImage from "../../../assets/img/robustakontum.jpg";
 
 import "./index.scss";
 import BannerCarousel from "../banner";
@@ -19,7 +20,6 @@ const bannerImage =
 const { Content } = Layout;
 
 const HomePage: React.FC = () => {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const galleryImages: string[] = [
     "https://res.cloudinary.com/dfjecxrnl/image/upload/v1768211093/518290335_780416141172650_7724989381247019356_n_danpue.jpg",
@@ -65,26 +65,47 @@ const HomePage: React.FC = () => {
 
         <ContentBanner />
 
-        {/* ABOUT */}
-        <section
-          className='about-us'
-        >
-          <div className='about-container'>
-            <div className='about-text'>
-              <h2>{t("home.aboutTitle")}</h2>
-              <p>{t("home.aboutDescription")}</p>
-              <Button onClick={() => navigate("/about")}>
-                {t("home.aboutReadMore")}
-              </Button>
-            </div>
-            <div className='about-image'>
-              <Link
-                to='/about'
-                aria-label={t("home.aboutMoreAria")}
-              >
-                <img src={aboutImage} alt='About Phan Coffee' />
-              </Link>
-            </div>
+        {/* CUSTOMER REVIEWS */}
+        <section className='customer-reviews'>
+          <div className='customer-reviews__header'>
+            <h2 className='customer-reviews__title'>
+              {t("home.reviewsTitle")}
+            </h2>
+            <p className='customer-reviews__subtitle'>
+              {t("home.reviewsSubtitle")}
+            </p>
+          </div>
+
+          <div className='customer-reviews__grid'>
+            <article className='customer-reviews__item'>
+              <div className='customer-reviews__stars'>★★★★★</div>
+              <p className='customer-reviews__content'>
+                {t("home.reviews1Content")}
+              </p>
+              <div className='customer-reviews__author'>
+                {t("home.reviews1Author")}
+              </div>
+            </article>
+
+            <article className='customer-reviews__item'>
+              <div className='customer-reviews__stars'>★★★★★</div>
+              <p className='customer-reviews__content'>
+                {t("home.reviews2Content")}
+              </p>
+              <div className='customer-reviews__author'>
+                {t("home.reviews2Author")}
+              </div>
+            </article>
+
+            <article className='customer-reviews__item'>
+              <div className='customer-reviews__stars'>★★★★★</div>
+              <p className='customer-reviews__content'>
+                {t("home.reviews3Content")}
+              </p>
+              <div className='customer-reviews__author'>
+                {t("home.reviews3Author")}
+              </div>
+            </article>
           </div>
         </section>
 

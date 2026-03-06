@@ -1,5 +1,6 @@
 import React from "react";
 import { Layout } from "antd";
+import { useTranslation } from "react-i18next";
 
 import mainAboutImage from "../../../assets/img/rangxay.jpg";
 import secondaryAboutImage from "../../../assets/img/coffee_arabica_vn.png";
@@ -12,38 +13,36 @@ import FooterPage from "../../../components/footer";
 const { Content } = Layout;
 
 const About: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <Layout className='about-page'>
       <HeaderPage />
 
       <Content className='about-page__content'>
         <section className='about-section'>
-          <h2 className='about-section__label'>Về chúng tôi</h2>
+          <h2 className='about-section__label'>{t("about.sectionLabel")}</h2>
 
           <div className='about-section__body'>
             <div className='about-section__images'>
               <div className='about-section__image about-section__image--main'>
-                <img src={mainAboutImage} alt='Roasting coffee beans' />
+                <img src={mainAboutImage} alt={t("about.images.mainAlt")} />
               </div>
 
               <div className='about-section__image about-section__image--secondary'>
-                <img src={secondaryAboutImage} alt='Phan Coffee sản phẩm' />
+                <img src={secondaryAboutImage} alt={t("about.images.secondaryAlt")} />
               </div>
             </div>
 
             <div className='about-section__content'>
-              <h3 className='about-section__title'>
-                Hương vị thuần khiết từ Tây Nguyên
-              </h3>
+              <h3 className='about-section__title'>{t("about.heroTitle")}</h3>
               <p className='about-section__description'>
-                Phan Coffee Roaster tự tin mang đến cho bạn một thương hiệu cà phê sạch
-                nguyên chất mang đậm hương vị Tây Nguyên với các dòng sản phẩm chính
-                thức đang phân phối:
+                {t("about.heroDescription")}
               </p>
               <ul className='about-section__list'>
-                <li>Robusta sơ chế Natural</li>
-                <li>Robusta sơ chế Honey</li>
-                <li>Arabica, Culi Robusta sơ chế Wash</li>
+                <li>{t("about.products.natural")}</li>
+                <li>{t("about.products.honey")}</li>
+                <li>{t("about.products.wash")}</li>
               </ul>
             </div>
           </div>
@@ -52,46 +51,50 @@ const About: React.FC = () => {
         <section className='processing-methods'>
           <div className='processing-methods__header'>
             <h2 className='processing-methods__title'>
-              Quy trình chế biến &amp; chất lượng
+              {t("about.process.title")}
             </h2>
             <h3 className='processing-methods__heading'>
-              Từ hạt cà phê đến tách cà phê hoàn hảo
+              {t("about.process.heading")}
             </h3>
           </div>
 
           <div className='processing-methods__grid'>
             <article className='processing-methods__card'>
               <div className='processing-methods__image-wrapper'>
-                <img src={mainAboutImage} alt='Quy trình chế biến Natural' />
+                <img
+                  src={mainAboutImage}
+                  alt={t("about.images.processNaturalAlt")}
+                />
               </div>
-              <h4 className='processing-methods__title'>Quy trình chế biến Natural</h4>
+              <h4 className='processing-methods__title'>
+                {t("about.cards.natural.title")}
+              </h4>
               <p className='processing-methods__description'>
-                Hạt cà phê được tuyển chọn kỹ lưỡng với tỉ lệ trái chín &gt; 99%,
-                được sơ chế trực tiếp tại xưởng để giữ trọn hương vị tự nhiên.
+                {t("about.cards.natural.description")}
               </p>
             </article>
 
             <article className='processing-methods__card'>
               <div className='processing-methods__image-wrapper'>
-                <img src={secondaryAboutImage} alt='Tươi mới mỗi ngày' />
+                <img src={secondaryAboutImage} alt={t("about.images.freshAlt")} />
               </div>
-              <h4 className='processing-methods__title'>Tươi mới mỗi ngày</h4>
+              <h4 className='processing-methods__title'>
+                {t("about.cards.fresh.title")}
+              </h4>
               <p className='processing-methods__description'>
-                Cà phê ở Phan luôn được rang xay mới mỗi ngày, rang mộc không tẩm
-                ướp và ủ kín 48h trước khi đóng gói để đảm bảo sự tươi mới của
-                từng gói cà phê khi đến tay bạn.
+                {t("about.cards.fresh.description")}
               </p>
             </article>
 
             <article className='processing-methods__card'>
               <div className='processing-methods__image-wrapper'>
-                <img src={mainAboutImage} alt='Uy tín và chất lượng' />
+                <img src={mainAboutImage} alt={t("about.images.qualityAlt")} />
               </div>
-              <h4 className='processing-methods__title'>Uy tín &amp; chất lượng</h4>
+              <h4 className='processing-methods__title'>
+                {t("about.cards.quality.title")}
+              </h4>
               <p className='processing-methods__description'>
-                Cà phê tại Phan được cấp đầy đủ chứng nhận an toàn thực phẩm, công
-                bố chất lượng, kiểm nghiệm sản phẩm và chứng nhận thương hiệu độc
-                quyền, mang lại sự an tâm cho mỗi khách hàng.
+                {t("about.cards.quality.description")}
               </p>
             </article>
           </div>

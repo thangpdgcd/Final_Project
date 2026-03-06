@@ -84,6 +84,27 @@ const HeaderPage: React.FC = () => {
     window.location.reload(); // Reload to update UI
   };
 
+  const goToProfileOrLogin = () => {
+    if (isLoggedIn) {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const storedId = localStorage.getItem("user_ID");
+      const userId =
+        storedId ||
+        user?.user_ID ||
+        user?.id ||
+        user?.userId ||
+        user?.data?.user_ID ||
+        user?.user?.user_ID;
+
+      if (userId) {
+        navigate(`/profiles/${userId}`);
+        return;
+      }
+    }
+
+    navigate("/login");
+  };
+
   const quickOptions: MenuProps["items"] = [
     {
       key: "theme",
@@ -115,27 +136,7 @@ const HeaderPage: React.FC = () => {
           <span className='quick-item-label'>{t("nav.user")}</span>
         </div>
       ),
-      onClick: () => {
-        if (isLoggedIn) {
-          const user = JSON.parse(localStorage.getItem("user") || "{}");
-          const storedId = localStorage.getItem("user_ID");
-          const userId =
-            storedId ||
-            user?.user_ID ||
-            user?.id ||
-            user?.userId ||
-            user?.data?.user_ID ||
-            user?.user?.user_ID;
-
-          if (userId) {
-            navigate(`/profiles/${userId}`);
-          } else {
-            navigate("/login");
-          }
-        } else {
-          navigate("/login");
-        }
-      },
+      onClick: goToProfileOrLogin,
     },
     // Divider
     {
@@ -223,18 +224,26 @@ const HeaderPage: React.FC = () => {
                 VN
               </button>
             </div>
+            <div className='quick-user-group'>
+              <Dropdown
+                trigger={["click"]}
+                placement='bottomRight'
+                menu={{
+                  items: quickOptions,
+                  selectable: false,
+                }}>
+                <button type='button' className='nav-item icon-only quick-trigger'>
+                  <DownOutlined />
+                </button>
+              </Dropdown>
 
-            <Dropdown
-              trigger={["click"]}
-              placement='bottomRight'
-              menu={{
-                items: quickOptions,
-                selectable: false,
-              }}>
-              <button className='nav-item icon-only quick-trigger'>
-                <DownOutlined />
+              <button
+                type='button'
+                className='nav-item icon-only quick-user'
+                onClick={goToProfileOrLogin}>
+                <UserOutlined />
               </button>
-            </Dropdown>
+            </div>
           </div>
         </div>
       </Header>

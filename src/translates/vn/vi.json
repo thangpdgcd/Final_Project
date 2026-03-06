@@ -1,3 +1,4 @@
+
 {
   "common": {
     "brandName": "Phan Coffee",
@@ -28,10 +29,53 @@
     "aboutDescription": "Chúng tôi chọn lọc hạt từ Tây Nguyên và rang mẻ nhỏ để hương vị luôn tươi mới, sạch và rõ ràng.",
     "aboutReadMore": "Xem thêm",
     "aboutMoreAria": "Xem thêm về Phan Coffee",
+    "reviewsTitle": "Khách hàng đánh giá",
+    "reviewsSubtitle": "Một vài chia sẻ thật lòng từ những khách hàng đã đồng hành cùng Phan Coffee trong suốt thời gian qua.",
+    "reviews1Content": "Mình là khách hàng của nhà Phan được hơn 5 năm rồi. Chất lượng cà phê vẫn như ngày đầu chuẩn rang mộc, rất phù hợp uống sữa đá hoặc Americano. Shop đóng gói hàng rất cẩn thận.",
+    "reviews1Author": "b****n – đã tin dùng Măng Đen Blend",
+    "reviews2Content": "Shop vô cùng chỉn chu và tinh tế trong khâu bán hàng, đóng gói sản phẩm. Cắt gói cà phê ra đã thơm lừng cả gian bếp, pha phin thì thơm cả nhà luôn. Cà phê ngon, đậm vị đúng gu của mình.",
+    "reviews2Author": "quynhanhnguyen3990 – đã tin dùng Robusta Kon Tum",
+    "reviews3Content": "Từ ngày chơi cold brew mình có mua thử vài loại cà phê của nhiều shop nhưng bên này mình ưng nhất nên cứ mua hoài. Cold brew ủ rất đậm đà, thơm chuẩn gout, pha loãng ra với nước đá hay nước lọc nhâm nhi được cả ngày mà không bị say, cảm giác rất dễ chịu.",
+    "reviews3Author": "vietngan189 – đã tin dùng Culi Robusta",
     "updateNews": {
       "title": "CẬP NHẬT TIN TỨC",
       "subtitle": "Mỗi tách cà phê pha phin có thể đóng góp tới 1.8g chất xơ trong khẩu phần khuyến nghị hằng ngày.",
       "learnMore": "Xem thêm"
+    }
+  },
+  "about": {
+    "sectionLabel": "Về chúng tôi",
+    "heroTitle": "Hương vị thuần khiết từ Tây Nguyên",
+    "heroDescription": "Phan Coffee Roaster tự tin mang đến cho bạn một thương hiệu cà phê sạch nguyên chất mang đậm hương vị Tây Nguyên với các dòng sản phẩm chính thức đang phân phối:",
+    "products": {
+      "natural": "Robusta sơ chế Natural",
+      "honey": "Robusta sơ chế Honey",
+      "wash": "Arabica, Culi Robusta sơ chế Wash"
+    },
+    "process": {
+      "title": "Quy trình chế biến & chất lượng",
+      "heading": "Từ hạt cà phê đến tách cà phê hoàn hảo"
+    },
+    "cards": {
+      "natural": {
+        "title": "Quy trình chế biến Natural",
+        "description": "Hạt cà phê được tuyển chọn kỹ lưỡng với tỉ lệ trái chín > 99%, được sơ chế trực tiếp tại xưởng để giữ trọn hương vị tự nhiên."
+      },
+      "fresh": {
+        "title": "Tươi mới mỗi ngày",
+        "description": "Cà phê ở Phan luôn được rang xay mới mỗi ngày, rang mộc không tẩm ướp và ủ kín 48h trước khi đóng gói để đảm bảo sự tươi mới của từng gói cà phê khi đến tay bạn."
+      },
+      "quality": {
+        "title": "Uy tín & chất lượng",
+        "description": "Cà phê tại Phan được cấp đầy đủ chứng nhận an toàn thực phẩm, công bố chất lượng, kiểm nghiệm sản phẩm và chứng nhận thương hiệu độc quyền, mang lại sự an tâm cho mỗi khách hàng."
+      }
+    },
+    "images": {
+      "mainAlt": "Rang hạt cà phê",
+      "secondaryAlt": "Sản phẩm cà phê Phan Coffee",
+      "processNaturalAlt": "Quy trình chế biến Natural",
+      "freshAlt": "Cà phê tươi mới mỗi ngày",
+      "qualityAlt": "Uy tín và chất lượng cà phê"
     }
   },
   "footer": {
@@ -139,5 +183,6 @@
       "6": "Nguyên chất Kon Tum rang nhạt"
     }
   }
-}
 
+
+}

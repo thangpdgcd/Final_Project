@@ -1,4 +1,14 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+/* PAGE LAYOUT TO MATCH OTHER PAGES */
+.contact-page {
+  min-height: 100vh;
+  background: var(--bg-main);
+
+  &__content {
+    background: transparent;
+    /* top padding nhỏ vì header đã fixed, tránh tạo khoảng trắng lớn */
+    padding: 16px 0 60px;
+  }
+}
 
 .contact {
   position: relative;
@@ -6,7 +16,6 @@
   padding: 90px 6vw;
   display: flex;
   align-items: center;
-  font-family: "Inter", system-ui, sans-serif;
   overflow: hidden;
 
   background-color: #050505;

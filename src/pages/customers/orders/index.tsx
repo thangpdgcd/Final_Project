@@ -180,6 +180,7 @@ const OrderPage: React.FC = () => {
   };
 
   const handleConfirmOrder = async () => {
+    ///check
     if (!cartItems?.length) {
       message.error("Cart is empty!");
       return;

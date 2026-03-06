@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Form, Input, Button } from "antd";
+import { Layout, Row, Col, Form, Input, Button } from "antd";
 import {
   UserOutlined,
   MailOutlined,
@@ -18,6 +18,7 @@ type ContactProps = {
 };
 
 const { TextArea } = Input;
+const { Content } = Layout;
 
 const Contact: React.FC<ContactProps> = ({ embedded = false }) => {
   const [form] = Form.useForm();
@@ -26,13 +27,11 @@ const Contact: React.FC<ContactProps> = ({ embedded = false }) => {
     console.log("Contact form:", values);
   };
 
-  return (
-    <>
-      {!embedded && <HeaderPage />}
-      <section className='contact'>
-        <div className='contact__overlay' />
+  const section = (
+    <section className='contact'>
+      <div className='contact__overlay' />
 
-        <div className='contact__inner'>
+      <div className='contact__inner'>
           {/* INTRO SECTION */}
           <div className='contact__intro'>
             <div className='contact__eyebrow'>CONNECT WITH US</div>
@@ -228,12 +227,23 @@ const Contact: React.FC<ContactProps> = ({ embedded = false }) => {
               </div>
             </Col>
           </Row>
-        </div>
+      </div>
+    </section>
+  );
 
-        {!embedded && <Chatbox />}
-      </section>
-      {!embedded && <FooterPage />}
-    </>
+  if (embedded) {
+    return section;
+  }
+
+  return (
+    <Layout className='contact-page'>
+      <HeaderPage />
+      <Content className='contact-page__content'>
+        {section}
+        <Chatbox />
+      </Content>
+      <FooterPage />
+    </Layout>
   );
 };
 

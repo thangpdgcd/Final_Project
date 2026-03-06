@@ -28,10 +28,53 @@
     "aboutDescription": "We source beans from the Central Highlands and roast in small batches to keep flavors vibrant and clean.",
     "aboutReadMore": "Read more",
     "aboutMoreAria": "View more about Phan Coffee",
+    "reviewsTitle": "Customer Reviews",
+    "reviewsSubtitle": "A few honest words from customers who have been enjoying Phan Coffee over the years.",
+    "reviews1Content": "I have been a loyal customer of Phan for over 5 years. The coffee quality is still as good as the first day – clean, pure roast that works great with milk coffee or Americano. Packaging is always very careful.",
+    "reviews1Author": "b****n – trusted Măng Đen Blend",
+    "reviews2Content": "The shop is extremely thoughtful and professional in sales and packaging. Opening the bag already fills the whole kitchen with aroma; brewing with phin makes the whole house smell amazing. The coffee is delicious and strong, exactly my taste.",
+    "reviews2Author": "quynhanhnguyen3990 – trusted Robusta Kon Tum",
+    "reviews3Content": "Since getting into cold brew I have tried many brands, but this is the one I keep coming back to. The cold brew is rich, fragrant and smooth; I can dilute with ice water and sip all day without feeling jittery.",
+    "reviews3Author": "vietngan189 – trusted Culi Robusta",
     "updateNews": {
       "title": "UPDATE NEWS",
       "subtitle": "A cup of brewed coffee represents a contribution of up to 1.8 grams of fiber of the recommended.",
       "learnMore": "Learn More"
+    }
+  },
+  "about": {
+    "sectionLabel": "About us",
+    "heroTitle": "Pure flavors from the Central Highlands",
+    "heroDescription": "Phan Coffee Roaster proudly brings you clean, pure coffee that captures the authentic taste of the Central Highlands with our main product lines:",
+    "products": {
+      "natural": "Robusta, Natural process",
+      "honey": "Robusta, Honey process",
+      "wash": "Arabica & Culi Robusta, Washed process"
+    },
+    "process": {
+      "title": "Processing & quality",
+      "heading": "From coffee cherry to the perfect cup"
+    },
+    "cards": {
+      "natural": {
+        "title": "Natural processing",
+        "description": "Coffee cherries are carefully selected with a ripe rate of over 99%, processed directly at the mill to preserve their natural flavors."
+      },
+      "fresh": {
+        "title": "Fresh every day",
+        "description": "At Phan, coffee is roasted and ground fresh every day, with no additives, then rested in sealed bags for 48 hours before packaging to ensure maximum freshness."
+      },
+      "quality": {
+        "title": "Reputation & quality",
+        "description": "Phan Coffee products are fully certified for food safety, quality declaration, product testing and trademark registration, giving peace of mind to every customer."
+      }
+    },
+    "images": {
+      "mainAlt": "Roasting coffee beans",
+      "secondaryAlt": "Phan Coffee products",
+      "processNaturalAlt": "Natural processing method",
+      "freshAlt": "Fresh coffee every day",
+      "qualityAlt": "Reputable and high-quality coffee"
     }
   },
   "footer": {
@@ -71,7 +114,6 @@
     "loginRegister": "Register",
     "loginSuccess": "Logged in successfully!",
     "loginError": "Incorrect email or password!",
-
     "registerTitle": "CREATE ACCOUNT",
     "registerDivider": "sign up with email",
     "registerFullNameLabel": "Full Name",
