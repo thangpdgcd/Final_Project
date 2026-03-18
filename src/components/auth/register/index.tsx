@@ -2,11 +2,15 @@
 import React, { useState } from "react";
 import { Layout, Form, Input, Button, Checkbox, message, Divider } from "antd";
 import { useNavigate } from "react-router-dom";
-import { register, RegisterPayload, RegisterResponse } from "../../../api/authApi";
+import {
+  register,
+  RegisterPayload,
+  RegisterResponse,
+} from "../../../api/authApi";
 import "./index.scss";
-import HeaderPage from "../../header";
+import HeaderPage from "../../../components/layout/Header";
 // ✅ Footer same as Home/Login
-import FooterPage from "../../footer";
+import FooterPage from "../../../components/layout/Footer";
 import { useTranslation } from "react-i18next";
 
 const logo = `${process.env.PUBLIC_URL || ""}/logo_Web_Phan_Coffeess.png`;

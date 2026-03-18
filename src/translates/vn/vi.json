@@ -16,7 +16,8 @@
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
     "darkMode": "Chế độ tối",
-    "lightMode": "Chế độ sáng"
+    "lightMode": "Chế độ sáng",
+    "searchPlaceholder": "Tìm kiếm cà phê..."
   },
   "home": {
     "introRoastedTitle": "RANG TẠI KONTUM",
@@ -40,7 +41,24 @@
     "updateNews": {
       "title": "CẬP NHẬT TIN TỨC",
       "subtitle": "Mỗi tách cà phê pha phin có thể đóng góp tới 1.8g chất xơ trong khẩu phần khuyến nghị hằng ngày.",
-      "learnMore": "Xem thêm"
+      "learnMore": "Xem thêm",
+      "products": {
+        "dalat": {
+          "title": "Phối trộn cao nguyên Đà Lạt",
+          "notes": "Mật ong • Cam chanh • Socola",
+          "alt": "Gói cà phê phối trộn cao nguyên Đà Lạt"
+        },
+        "goldenRobusta": {
+          "title": "Golden Robusta đậm đà",
+          "notes": "Đậm đà • Hạt • Thân đầy",
+          "alt": "Gói cà phê Golden Robusta đậm đà"
+        },
+        "phanSelect": {
+          "title": "Phan Select nguyên bản đơn vùng",
+          "notes": "Hương hoa • Nhài • Nhẹ như trà",
+          "alt": "Gói cà phê Phan Select nguyên bản đơn vùng"
+        }
+      }
     }
   },
   "about": {
@@ -182,7 +200,53 @@
       "5": "Nguyên chất Kon Tum rang đậm",
       "6": "Nguyên chất Kon Tum rang nhạt"
     }
+  },
+  "services": {
+    "title": "Dịch vụ Phan Coffee",
+    "subtitle": "Người dân Phan Coffee tại Kon Tum, đặc biệt là làng Dak Ha, là những người trồng nên những cây cà phê cho thương hiệu Phan Coffee. Sau khoảng năm năm canh tác, cà phê sẽ được thu hoạch. Xưởng Phan Coffee sau đó sẽ sơ chế, rang xay để tạo nên những sản phẩm tốt nhất cho khách hàng.",
+    "cards": {
+      "originalCoffee": {
+        "title": "Cà phê nguyên bản",
+        "desc": "Exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea"
+      },
+      "twentyFlavors": {
+        "title": "20 hương vị cà phê",
+        "desc": "Exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea"
+      },
+      "pleasantAmbient": {
+        "title": "Không gian dễ chịu",
+        "desc": "Exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea"
+      }
+    },
+    "readMore": "XEM THÊM"
+  },
+  "contact": {
+    "heroKicker": "KẾT NỐI VỚI CHÚNG TÔI",
+    "heroTitle": "Hãy cùng pha nên điều tuyệt vời.",
+    "heroDescription": "Hãy gia nhập cộng đồng Phan Coffee. Chúng tôi luôn sẵn sàng lắng nghe phản hồi, yêu cầu mua sỉ, hoặc đơn giản là trò chuyện về những mẻ rang hoàn hảo.",
+    "callUsTitle": "GỌI CHO CHÚNG TÔI",
+    "callUsLabel": "Thứ 2 – Thứ 6 · 08:00–18:00",
+    "emailUsTitle": "GỬI EMAIL CHO CHÚNG TÔI",
+    "emailUsLabel": "Hỗ trợ trực tuyến 24/7",
+    "visitUsTitle": "ĐẾN THĂM CHÚNG TÔI",
+    "visitUsAddress": "86 Lâm Tùng, Ia Chim, Kon Tum",
+    "visitUsLabel": "Mở cửa 7 ngày trong tuần",
+    "formTitle": "Liên hệ Phan Coffee",
+    "formSubtitle": "Vui lòng để lại thông tin, chúng tôi sẽ liên hệ lại với bạn sớm nhất có thể.",
+    "nameLabel": "Họ và tên",
+    "namePlaceholder": "Tên của bạn",
+    "emailLabel": "Email",
+    "emailPlaceholder": "ban@vidu.com",
+    "phoneLabel": "Số điện thoại",
+    "phonePlaceholder": "(+84) 123 456 789",
+    "messageLabel": "Lời nhắn",
+    "messagePlaceholder": "Lời nhắn của bạn...",
+    "sendMessage": "Gửi lời nhắn",
+    "getDirections": "Xem đường đi",
+    "roastersTitle": "Nhà rang Phan Coffee",
+    "openingHoursTitle": "GIỜ MỞ CỬA",
+    "openingHoursWeekdays": "Thứ 2 – Thứ 6",
+    "openingHoursWeekend": "Thứ 7 – Chủ nhật",
+    "openingHoursNote": "*Giờ mở cửa có thể thay đổi vào một số ngày lễ."
   }
-
-
 }

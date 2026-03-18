@@ -11,8 +11,8 @@ import { useTranslation } from "react-i18next";
 
 import "./index.scss";
 
-import HeaderPage from "../../header";
-import FooterPage from "../../footer";
+import HeaderPage from "../../../components/layout/Header";
+import FooterPage from "../../../components/layout/Footer";
 
 const { Content } = Layout;
 

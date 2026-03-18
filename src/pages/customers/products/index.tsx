@@ -13,11 +13,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import "./index.scss";
 
-import HeaderPage from "../../../components/header";
+import HeaderPage from "../../../components/layout/Header";
 import { getAllProducts, Product } from "../../../api/productApi";
 import { getAllCategories, type Category } from "../../../api/categoriesApi";
 
-import FooterPage from "../../../components/footer";
+import FooterPage from "../../../components/layout/Footer";
 import Chatbox from "../../../components/chatbox";
 import { useTranslation } from "react-i18next";
 

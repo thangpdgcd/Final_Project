@@ -15,7 +15,8 @@
     "login": "Login",
     "logout": "Logout",
     "darkMode": "Dark Mode",
-    "lightMode": "Light Mode"
+    "lightMode": "Light Mode",
+    "searchPlaceholder": "Search coffee..."
   },
   "home": {
     "introRoastedTitle": "ROASTED IN KONTUM",
@@ -39,7 +40,24 @@
     "updateNews": {
       "title": "UPDATE NEWS",
       "subtitle": "A cup of brewed coffee represents a contribution of up to 1.8 grams of fiber of the recommended.",
-      "learnMore": "Learn More"
+      "learnMore": "Learn More",
+      "products": {
+        "dalat": {
+          "title": "Dalat Highlands Blend",
+          "notes": "Honey • Citrus • Chocolate",
+          "alt": "Dalat Highlands Blend coffee bag"
+        },
+        "goldenRobusta": {
+          "title": "Golden Robusta",
+          "notes": "Earthy • Nutty • Full Body",
+          "alt": "Golden Robusta coffee bag"
+        },
+        "phanSelect": {
+          "title": "Phan Select Single Origin",
+          "notes": "Floral • Jasmine • Tea-like",
+          "alt": "Phan Select Single Origin coffee bag"
+        }
+      }
     }
   },
   "about": {
@@ -180,6 +198,54 @@
       "5": "Single-origin Kon Tum, dark roast",
       "6": "Single-origin Kon Tum, light roast"
     }
+  },
+  "services": {
+    "title": "Services Phan Coffee",
+    "subtitle": "The people in the Phan Coffee of Kon Tum, especially my village of Dak Ha Commune, are the ones that grow the coffee trees for the Phan Coffee brand. After roughly five years of cultivation, the coffee is often picked by the public. The Phan Coffee plant then processes the coffee to create the greatest goods for consumers.",
+    "cards": {
+      "originalCoffee": {
+        "title": "Original Coffee",
+        "desc": "Exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea"
+      },
+      "twentyFlavors": {
+        "title": "20 Coffee Flavors",
+        "desc": "Exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea"
+      },
+      "pleasantAmbient": {
+        "title": "Pleasant Ambient",
+        "desc": "Exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea"
+      }
+    },
+    "readMore": "READ MORE"
+  },
+  "contact": {
+    "heroKicker": "CONNECT WITH US",
+    "heroTitle": "Let's brew something amazing together.",
+    "heroDescription": "Join the Phan Coffee community. We are always ready to hear your feedback, wholesale inquiries, or just chat about the perfect roast.",
+    "callUsTitle": "CALL US",
+    "callUsLabel": "Mon – Fri · 08:00–18:00",
+    "emailUsTitle": "EMAIL US",
+    "emailUsLabel": "Online support 24/7",
+    "visitUsTitle": "VISIT US",
+    "visitUsAddress": "86 Lam Tung, Ia Chim, Kon Tum",
+    "visitUsLabel": "Open 7 days a week",
+    "formTitle": "Contact Phan Coffee",
+    "formSubtitle": "Leave your information and we will get back to you as soon as possible.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "(+84) 123 456 789",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Your message...",
+    "sendMessage": "Send message",
+    "getDirections": "Get directions",
+    "roastersTitle": "Phan Coffee Roasters",
+    "openingHoursTitle": "OPENING HOURS",
+    "openingHoursWeekdays": "Mon–Fri",
+    "openingHoursWeekend": "Sat–Sun",
+    "openingHoursNote": "*Timing may vary on select holidays."
   }
 }
 

@@ -1,0 +1,81 @@
+.club-cta {
+  padding: 80px 40px;
+  background: #a0645a;
+  color: #fff;
+
+  &__container {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  &__title {
+    font-size: 36px;
+    font-weight: 900;
+    margin: 0 0 12px;
+  }
+
+  &__subtitle {
+    margin: 0 auto 26px;
+    max-width: 620px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  &__form {
+    max-width: 520px;
+    margin: 0 auto;
+    display: flex;
+    gap: 12px;
+  }
+
+  &__input {
+    flex: 1;
+    border-radius: 16px;
+    padding: 14px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    outline: none;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    &:focus {
+      border-color: rgba(255, 255, 255, 0.38);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
+    }
+  }
+
+  &__btn {
+    border: 0;
+    cursor: pointer;
+    border-radius: 16px;
+    padding: 14px 22px;
+    background: #ffffff;
+    color: #a0645a;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    transition: transform 0.15s ease, background 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      background: #f1f5f9;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .club-cta {
+    padding: 64px 16px;
+
+    &__form {
+      flex-direction: column;
+    }
+  }
+}
+

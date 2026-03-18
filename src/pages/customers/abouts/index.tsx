@@ -2,18 +2,17 @@ import React from "react";
 import { Layout } from "antd";
 import { useTranslation } from "react-i18next";
 
-import mainAboutImage from "../../../assets/img/rangxay.jpg";
-import secondaryAboutImage from "../../../assets/img/coffee_arabica_vn.png";
-
 import "./index.scss";
 import Chatbox from "../../../components/chatbox";
-import HeaderPage from "../../../components/header";
-import FooterPage from "../../../components/footer";
+import HeaderPage from "../../../components/layout/Header";
+import FooterPage from "../../../components/layout/Footer";
 
 const { Content } = Layout;
 
 const About: React.FC = () => {
   const { t } = useTranslation();
+  const mainAboutImage = "/assets/img/rangxay.jpg";
+  const secondaryAboutImage = "/assets/img/coffee_arabica_vn.png";
 
   return (
     <Layout className='about-page'>

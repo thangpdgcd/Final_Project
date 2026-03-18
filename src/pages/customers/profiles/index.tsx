@@ -18,8 +18,8 @@ import {
   EyeInvisibleOutlined,
   ShoppingCartOutlined,
 } from "@ant-design/icons";
-import HeaderPage from "../../../components/header";
-import FooterPage from "../../../components/footer";
+import HeaderPage from "../../../components/layout/Header";
+import FooterPage from "../../../components/layout/Footer";
 import Chatbox from "../../../components/chatbox";
 import "./index.scss";
 import { useTranslation } from "react-i18next";

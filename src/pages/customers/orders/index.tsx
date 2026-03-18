@@ -3,9 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Layout, Table, Button, Typography, message, Alert, Spin } from "antd";
 import { ShoppingCartOutlined } from "@ant-design/icons";
 
-import FooterPage from "../../../components/footer";
+import FooterPage from "../../../components/layout/Footer";
 import "./index.scss";
-import HeaderPage from "../../../components/header";
+import HeaderPage from "../../../components/layout/Header";
 import Chatbox from "../../../components/chatbox";
 
 const { Content } = Layout;

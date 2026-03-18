@@ -10,7 +10,7 @@ import {
 } from "antd";
 import { useNavigate } from "react-router-dom";
 
-import HeaderPage from "../../../components/header/index"; // ✅ HEADER DÙNG CHUNG
+import HeaderPage from "../../../components/layout/Header"; // ✅ HEADER DÙNG CHUNG
 import {
   getCartByUserId,
   updateCartItem,

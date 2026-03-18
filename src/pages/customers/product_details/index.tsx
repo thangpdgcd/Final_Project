@@ -8,8 +8,8 @@ import { ShoppingCartOutlined } from "@ant-design/icons";
 import { getProductById, Product } from "../../../api/productApi";
 import { addToCart, getCartByUserId, CartItem } from "../../../api/cartApi";
 import Chatbox from "../../../components/chatbox";
-import HeaderPage from "../../../components/header";
-import FooterPage from "../../../components/footer";
+import HeaderPage from "../../../components/layout/Header";
+import FooterPage from "../../../components/layout/Footer";
 
 const { Content } = Layout;
 const { Title, Text, Paragraph } = Typography;

@@ -11,9 +11,9 @@ import {
   Space,
 } from "antd";
 import { ShoppingCartOutlined } from "@ant-design/icons";
-import logo from "../../../assets/img/logo_PhanCoffee.jpg";
+const logo = "/assets/img/logo_PhanCoffee.jpg";
 
-import FooterPage from "../../../components/footer";
+import FooterPage from "../../../components/layout/Footer";
 import "./index.scss";
 import Chatbox from "../../../components/chatbox";
 
