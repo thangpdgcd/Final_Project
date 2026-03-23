@@ -45,7 +45,7 @@
       <tbody>
         <% orders.forEach(order => { %>
         <tr>
-          <td><%= order.order_ID %></td>
+          <td><%= order.orderId %></td>
           <td><%= order.users ? order.users.Name : "Không rõ" %></td>
           <td><%= order.Shipping_Address || "Không có" %></td>
           <td><%= Number(order.Total_Amount).toLocaleString("en-EN") %> đ</td>

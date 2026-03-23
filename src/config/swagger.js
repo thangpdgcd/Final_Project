@@ -1,4 +1,16 @@
 import swaggerJSDoc from "swagger-jsdoc";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// swagger-jsdoc resolves `apis` relative to the current working directory (CWD),
+// so make it deterministic regardless of how we start the server.
+// We only scan route files (where `@swagger` comments live).
+const routesGlob = path
+  .join(__dirname, "..", "routes", "**", "*.js")
+  .replace(/\\/g, "/");
 
 const swaggerOptions = {
   definition: {
@@ -6,7 +18,7 @@ const swaggerOptions = {
     info: {
       title: "API Documentation",
       version: "1.0.0",
-      description: "Swagger API for system",
+      description: "Swagger API for system. **Bấm Authorize** (góc trên phải) → dán token từ POST /api/login → Authorize.",
     },
     tags: [
       {
@@ -40,8 +52,19 @@ const swaggerOptions = {
         url: "http://localhost:8080",
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Dán token (chỉ token, không cần chữ Bearer). Lấy từ POST /api/login → response.token",
+        },
+      },
+    },
+    security: [{ bearerAuth: [] }],
   },
-  apis: ["./**/*.js"], // nơi viết comment swagger
+  apis: [routesGlob], // nơi viết comment swagger
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);

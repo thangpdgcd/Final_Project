@@ -8,9 +8,9 @@ const getAllUsers = async () => {
       include: {
         model: Orders,
         as: "orders", // phải trùng alias khi khai báo quan hệ
-        attributes: ["order_ID", "total_Amount", "status"],
+        attributes: ["orderId", "total_Amount", "status"],
       },
-      attributes: ["user_ID", "name", "email", "address", "phoneNumber"], // lấy info user
+      attributes: ["userId", "name", "email", "address", "phoneNumber"], // lấy info user
     });
     return usersList;
   } catch (error) {

@@ -12,7 +12,7 @@ let registerUser = async (req, res) => {
     const finalRoleID =
       roleID !== undefined && roleID !== null && `${roleID}`.trim() !== ""
         ? String(roleID)
-        : "1";
+        : "1"; // role.user , roleId.user
 
     const userData = await authService.registerUser({
       name,
@@ -42,10 +42,26 @@ let login = async (req, res) => {
   console.log("🔑 Thông tin đăng nhập:", { email, password: "[Đã ẩn]" });
   try {
     const result = await authService.login(email, password);
-    return res.status(200).json({ message: "Đăng nhập thành công", ...result });
+    const { token, user } = result;
+
+    // HttpOnly cookie - JavaScript không đọc được, không lưu localStorage
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "strict" : "lax",
+      maxAge: 60 * 60 * 1000, // 1 hour
+      path: "/",
+    });
+
+    // Trả user. Token KHÔNG trả trong body → frontend không lưu localStorage được.
+    // Chỉ trả token khi có header X-Auth-Mode: bearer (Swagger/Postman test)
+    const useCookieOnly = req.get("X-Auth-Mode") !== "bearer";
+    const response = { message: "Đăng nhập thành công", user };
+    if (!useCookieOnly) response.token = token;
+    return res.status(200).json(response);
   } catch (error) {
     console.error("❌ Lỗi login:", error);
-
     return res.status(401).json({ message: error.message });
   }
 };
@@ -85,26 +101,38 @@ let registerEJS = async (req, res) => {
 
     if (!name || !email || !password) {
       return res.render("register", {
-        message: "Vui lòng nhập đầy đủ thông tin.",
+        message: "Please fill in all the information.",
       });
     }
 
     const allowedRoles = ["1", "2", "3"];
     const validatedRole = allowedRoles.includes(roleID) ? roleID : "1"; // default là "1" (user)
 
-    await authService.register({
+    await authService.registerUser({
       name,
       email,
       address,
       phoneNumber,
       password,
-      role: validatedRole,
+      roleID: validatedRole,
     });
 
     return res.redirect("/login"); // Chuyển đến trang login sau khi đăng ký
   } catch (error) {
     return res.render("register", { message: error.message });
   }
+};
+
+let getMe = (req, res) => {
+  return res.status(200).json({ user: req.user });
+};
+
+let logout = (req, res) => {
+  res.clearCookie("access_token", { path: "/" });
+  if (req.session) {
+    req.session.destroy();
+  }
+  return res.status(200).json({ message: "Đăng xuất thành công." });
 };
 
 export default {
@@ -114,4 +142,6 @@ export default {
   loginEJS,
   showRegisterPage,
   registerEJS,
+  getMe,
+  logout,
 };

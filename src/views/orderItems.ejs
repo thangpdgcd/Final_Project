@@ -51,8 +51,8 @@
       <tbody>
         <% orderItems.forEach(item => { %>
         <tr>
-          <td><%= item.orderitem_ID %></td>
-          <td><%= item.order_ID %></td>
+          <td><%= item.orderItemId %></td>
+          <td><%= item.orderId %></td>
           <td><%= item.products?.Name || 'N/A' %></td>
           <td><%= item.quantity %></td>
           <td><%= item.price %></td>

@@ -1,5 +1,6 @@
 import express from "express";
-import productsController from "../../src/controllers/productsController.js";
+import productsController from "../controllers/productsController.js";
+import authMiddleware from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ const router = express.Router();
  *   get:
  *     summary: Get all products
  *     tags: [Products]
+ *     security: []
  *     responses:
  *       200:
  *         description: Get products successfully
@@ -36,6 +38,7 @@ router.get("/products", productsController.getAllProducts);
  *   get:
  *     summary: Get product by ID
  *     tags: [Products]
+ *     security: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -87,7 +90,7 @@ router.get("/products/:id", productsController.getProductsById);
  *       400:
  *         description: Bad request
  */
-router.post("/create-products", productsController.createProducts);
+router.post("/create-products", authMiddleware, productsController.createProducts);
 
 /**
  * @swagger
@@ -125,7 +128,7 @@ router.post("/create-products", productsController.createProducts);
  *       404:
  *         description: Product not found
  */
-router.put("/products/:id", productsController.updateProducts);
+router.put("/products/:id", authMiddleware, productsController.updateProducts);
 
 /**
  * @swagger
@@ -145,7 +148,7 @@ router.put("/products/:id", productsController.updateProducts);
  *       404:
  *         description: Product not found
  */
-router.delete("/products/:id", productsController.deleteProducts);
+router.delete("/products/:id", authMiddleware, productsController.deleteProducts);
 
 /* ================== INIT ================== */
 const initProductsRoutes = (app) => {

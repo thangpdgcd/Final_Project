@@ -1,6 +1,7 @@
 // src/routes/ordersRoutes.js
 import express from "express";
 import OrdersController from "../controllers/ordersController.js";
+import authMiddleware from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -29,7 +30,7 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-router.get("/orders", OrdersController.getAllOrders);
+router.get("/orders", authMiddleware, OrdersController.getAllOrders);
 
 /**
  * @swagger
@@ -62,7 +63,7 @@ router.get("/orders", OrdersController.getAllOrders);
  *       400:
  *         description: Bad request
  */
-router.post("/create-orders", OrdersController.createOrders);
+router.post("/create-orders", authMiddleware, OrdersController.createOrders);
 
 /**
  * @swagger
@@ -83,7 +84,7 @@ router.post("/create-orders", OrdersController.createOrders);
  *       404:
  *         description: Order not found
  */
-router.get("/orders/:id", OrdersController.getOrderById);
+router.get("/orders/:id", authMiddleware, OrdersController.getOrderById);
 
 /**
  * @swagger
@@ -117,7 +118,7 @@ router.get("/orders/:id", OrdersController.getOrderById);
  *       404:
  *         description: Order not found
  */
-router.put("/orders/:id", OrdersController.updateOrders);
+router.put("/orders/:id", authMiddleware, OrdersController.updateOrders);
 
 /**
  * @swagger
@@ -137,7 +138,7 @@ router.put("/orders/:id", OrdersController.updateOrders);
  *       404:
  *         description: Order not found
  */
-router.delete("/orders/:id", OrdersController.deleteOrders);
+router.delete("/orders/:id", authMiddleware, OrdersController.deleteOrders);
 
 /* ================== INIT ================== */
 const initOrdersRoutes = (app) => {

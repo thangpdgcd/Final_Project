@@ -1,5 +1,7 @@
 import express from "express";
-import CategoriesController from "../../src/controllers/categoriesController.js";
+import CategoriesController from "../controllers/categoriesController.js";
+import authMiddleware from "../middlewares/auth.js";
+
 const router = express.Router();
 
 /**
@@ -15,6 +17,7 @@ const router = express.Router();
  *   get:
  *     summary: Get all categories
  *     tags: [Categories]
+ *     security: []
  *     responses:
  *       200:
  *         description: Get categories successfully
@@ -35,6 +38,7 @@ router.get("/categories", CategoriesController.getAllCategories);
  *   get:
  *     summary: Get category by ID
  *     tags: [Categories]
+ *     security: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -75,7 +79,7 @@ router.get("/categories/:id", CategoriesController.getCategoriesById);
  *       400:
  *         description: Bad request
  */
-router.post("/create-categories", CategoriesController.createCategories);
+router.post("/create-categories", authMiddleware, CategoriesController.createCategories);
 
 /**
  * @swagger
@@ -106,7 +110,7 @@ router.post("/create-categories", CategoriesController.createCategories);
  *       404:
  *         description: Category not found
  */
-router.put("/categories/:id", CategoriesController.updateCategories);
+router.put("/categories/:id", authMiddleware, CategoriesController.updateCategories);
 
 /**
  * @swagger
@@ -126,7 +130,7 @@ router.put("/categories/:id", CategoriesController.updateCategories);
  *       404:
  *         description: Category not found
  */
-router.delete("/categories/:id", CategoriesController.deleteCategories);
+router.delete("/categories/:id", authMiddleware, CategoriesController.deleteCategories);
 
 const initCategoriesRoutes = (app) => {
   app.use("/api", router);

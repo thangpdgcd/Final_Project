@@ -1,5 +1,6 @@
 import express from "express";
 import cartController from "../controllers/cartsController.js";
+import authMiddleware from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ const router = express.Router();
  *       401:
  *         description: Unauthorized
  */
-router.get("/carts", cartController.getCartByUserId);
+router.get("/carts", authMiddleware, cartController.getCartByUserId);
 
 /**
  * @swagger
@@ -53,7 +54,7 @@ router.get("/carts", cartController.getCartByUserId);
  *       400:
  *         description: Bad request
  */
-router.post("/add-to-cart", cartController.addToCart);
+router.post("/add-to-cart", authMiddleware, cartController.addToCart);
 
 /**
  * @swagger
@@ -84,7 +85,7 @@ router.post("/add-to-cart", cartController.addToCart);
  *       404:
  *         description: Cart item not found
  */
-router.put("/cart-items/:cartItemId", cartController.updateCart);
+router.put("/cart-items/:cartItemId", authMiddleware, cartController.updateCart);
 
 /**
  * @swagger
@@ -105,10 +106,10 @@ router.put("/cart-items/:cartItemId", cartController.updateCart);
  *       404:
  *         description: Cart item not found
  */
-router.delete("/cart-items/:cartItemId", cartController.removeCart);
+router.delete("/cart-items/:cartItemId", authMiddleware, cartController.removeCart);
 
 const initCartRoutes = (app) => {
   app.use("/api", router);
-};
+};  
 
 export default initCartRoutes;

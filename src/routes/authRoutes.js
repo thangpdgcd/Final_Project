@@ -1,5 +1,7 @@
 import authController from "../controllers/authController.js";
+import authMiddleware from "../middlewares/auth.js";
 import express from "express";
+
 const router = express.Router();
 /**
  * @swagger
@@ -14,6 +16,7 @@ const router = express.Router();
  *   post:
  *     summary: Đăng ký tài khoản
  *     tags: [Auth]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -47,7 +50,16 @@ router.post("/register", authController.registerUser);
  * /api/login:
  *   post:
  *     summary: Đăng nhập (API - JWT)
- *     tags: [Auth]
+ *    
+ *     security: []
+ *     parameters:
+ *       - in: header
+ *         name: X-Auth-Mode
+ *         required: false
+ *         schema:
+ *           type: string
+ *           example: bearer
+ *         description: Gửi giá trị 'bearer' để nhận token trong response (dùng cho Swagger/Postman)
  *     requestBody:
  *       required: true
  *       content:
@@ -66,7 +78,7 @@ router.post("/register", authController.registerUser);
  *                 example: 12345678
  *     responses:
  *       200:
- *         description: Đăng nhập thành công, trả về token
+ *         description: Đăng nhập thành công
  *       401:
  *         description: Sai email hoặc mật khẩu
  */
@@ -78,6 +90,7 @@ router.post("/login", authController.login);
  *   get:
  *     summary: Hiển thị trang đăng nhập (EJS)
  *     tags: [Auth - View]
+ *     security: []
  *     responses:
  *       200:
  *         description: Trang login EJS
@@ -90,6 +103,7 @@ router.get("/login", authController.showLoginPage);
  *   post:
  *     summary: Đăng nhập bằng form EJS
  *     tags: [Auth - View]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -118,6 +132,7 @@ router.post("/loginEJS", authController.loginEJS);
  *   get:
  *     summary: Hiển thị trang đăng ký (EJS)
  *     tags: [Auth - View]
+ *     security: []
  *     responses:
  *       200:
  *         description: Trang register EJS
@@ -130,6 +145,7 @@ router.get("/register", authController.showRegisterPage);
  *   post:
  *     summary: Đăng ký bằng form EJS
  *     tags: [Auth - View]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -152,6 +168,35 @@ router.get("/register", authController.showRegisterPage);
  *         description: Redirect sau khi đăng ký
  */
 router.post("/registerEJS", authController.registerEJS);
+
+/**
+ * @swagger
+ * /api/me:
+ *   get:
+ *     summary: Lấy thông tin user hiện tại (cần token)
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Thông tin user từ token
+ *       401:
+ *         description: Chưa đăng nhập
+ */
+router.get("/me", authMiddleware, authController.getMe);
+
+/**
+ * @swagger
+ * /api/logout:
+ *   post:
+ *     summary: Đăng xuất (xóa cookie)
+ *     tags: [Auth]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Đăng xuất thành công
+ */
+router.post("/logout", authController.logout);
 
 const initAuthenticated = (app) => {
   app.use("/api", router);

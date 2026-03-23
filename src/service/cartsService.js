@@ -2,17 +2,17 @@ import db from "../models/index.js";
 let { Carts, Cart_Items, Products } = db;
 
 // Add product to cart
-const addToCart = async (user_ID, product_ID, quantity, price) => {
-  const uId = Number(user_ID);
-  const pId = Number(product_ID);
+const addToCart = async (userId, productId, quantity, price) => {
+  const uId = Number(userId);
+  const pId = Number(productId);
   const qty = Number(quantity);
   const unitPrice = Number(price);
 
   if (!Number.isFinite(uId) || uId <= 0) {
-    throw new Error("Invalid user_ID");
+    throw new Error("Invalid userId");
   }
   if (!Number.isFinite(pId) || pId <= 0) {
-    throw new Error("Invalid product_ID");
+    throw new Error("Invalid productId");
   }
   if (!Number.isFinite(qty) || qty <= 0) {
     throw new Error("Invalid quantity");
@@ -21,13 +21,13 @@ const addToCart = async (user_ID, product_ID, quantity, price) => {
     throw new Error("Invalid price");
   }
 
-  let cart = await db.Carts.findOne({ where: { user_ID: uId } });
+  let cart = await db.Carts.findOne({ where: { userId: uId } });
   if (!cart) {
-    cart = await db.Carts.create({ user_ID: uId });
+    cart = await db.Carts.create({ userId: uId });
   }
 
   let cartItem = await db.Cart_Items.findOne({
-    where: { cart_ID: cart.cart_ID, product_ID: pId },
+    where: { cartId: cart.cartId, productId: pId },
   });
 
   if (cartItem) {
@@ -37,8 +37,8 @@ const addToCart = async (user_ID, product_ID, quantity, price) => {
     await cartItem.save();
   } else {
     cartItem = await db.Cart_Items.create({
-      cart_ID: cart.cart_ID,
-      product_ID: pId,
+      cartId: cart.cartId,
+      productId: pId,
       quantity: qty,
       price: unitPrice * qty,
     });
@@ -46,13 +46,13 @@ const addToCart = async (user_ID, product_ID, quantity, price) => {
 
   return cartItem;
 };
-let getCartByUserId = (user_ID) => {
+let getCartByUserId = (userId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!user_ID) return reject(new Error("User ID là bắt buộc"));
+      if (!userId) return reject(new Error("User ID là bắt buộc"));
 
       const cart = await Carts.findOne({
-        where: { user_ID },
+        where: { userId },
         include: [
           {
             model: Cart_Items,
@@ -70,13 +70,13 @@ let getCartByUserId = (user_ID) => {
   });
 };
 
-let getCartItem = (cart_ID) => {
+let getCartItem = (cartId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!cart_ID) return reject(new Error("Cart ID là bắt buộc"));
+      if (!cartId) return reject(new Error("Cart ID là bắt buộc"));
 
       let cart = await Carts.findOne({
-        where: { cart_ID: cart_ID },
+        where: { cartId: cartId },
         include: [
           {
             model: Cart_Items,
@@ -93,7 +93,7 @@ let getCartItem = (cart_ID) => {
 
       if (!cart) return resolve(null);
 
-      // Trả về riêng mảng cart_Items nếu bạn chỉ muốn cart item
+      // Trả về riêng mảng cartItems nếu bạn chỉ muốn cart item
       resolve(cart.cart_Items);
     } catch (error) {
       reject(new Error("Không thể lấy giỏ hàng: " + error.message));
@@ -111,7 +111,7 @@ let updateCart = (cartItemId, quantity) => {
       let item = await Cart_Items.findByPk(cartItemId);
       if (!item) return reject(new Error("Cart Item không tồn tại"));
 
-      item.Quantity = quantity;
+      item.quantity = quantity;
       await item.save();
       resolve(item);
     } catch (error) {

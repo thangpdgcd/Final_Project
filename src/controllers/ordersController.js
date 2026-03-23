@@ -21,10 +21,9 @@ let getOrderById = async (req, res) => {
 
 let createOrders = async (req, res) => {
   try {
-    const { user_ID } = req.body;
-    if (!user_ID) return res.status(400).json({ message: "Missing user_ID" });
+    const userId = req.user.id; // Lấy từ token (đã verify bởi authMiddleware)
 
-    const order = await ordersService.createOrders(user_ID);
+    const order = await ordersService.createOrders(userId);
     res.status(201).json({ message: "Order created  successfully", order });
   } catch (error) {
     res.status(500).json({ message: error.message });

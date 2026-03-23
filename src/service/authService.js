@@ -57,7 +57,7 @@ const registerUser = async ({
   });
 
   return {
-    id: newUser.user_ID,
+    id: newUser.userId,
     name: newUser.Name,
     email: newUser.Email,
     roleID: newUser.roleID,
@@ -78,18 +78,20 @@ const login = async (Email, password) => {
   if (!user) throw new Error("Incorrect email or password.");
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new Error("Incorrect email or password.");
+  if (!isMatch) {
+    throw new Error("Incorrect email or password.");
+  }
 
   const token = jwt.sign(
-    { id: user.user_ID, roleID: user.roleID },
+    { id: user.userId, roleID: user.roleID },
     process.env.JWT_SECRET || "SECRET_KEY",
-    { expiresIn: "1d" },
+    { expiresIn: "1h" }, // Token chỉ có hiệu lực trong 1 giờ
   );
 
   return {
     token,
     user: {
-      id: user.user_ID,
+      id: user.userId,
       name: user.Name,
       email: user.Email,
       roleID: user.roleID,

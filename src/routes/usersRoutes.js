@@ -1,6 +1,7 @@
-import userController from "../../src/controllers/usersController.js"; // Import the user controller
-// import authMiddleware from "../middlewares/auth.js";
 import express from "express";
+import userController from "../controllers/usersController.js";
+import authMiddleware from "../middlewares/auth.js";
+
 const router = express.Router();
 /**
  * @swagger
@@ -19,7 +20,7 @@ const router = express.Router();
  *       200:
  *         description: Success
  */
-router.get("/users", userController.getAllUsers);
+router.get("/users", authMiddleware, userController.getAllUsers);
 
 /**
  * @swagger
@@ -37,7 +38,7 @@ router.get("/users", userController.getAllUsers);
  *       200:
  *         description: Success
  */
-router.get("/users/:id", userController.getUsersbyID);
+router.get("/users/:id", authMiddleware, userController.getUsersbyID);
 
 /**
  * @swagger
@@ -55,7 +56,7 @@ router.get("/users/:id", userController.getUsersbyID);
  *       201:
  *         description: User created
  */
-router.post("/create-users", userController.createAdmin);
+router.post("/create-users", authMiddleware, userController.createAdmin);
 
 /**
  * @swagger
@@ -64,7 +65,7 @@ router.post("/create-users", userController.createAdmin);
  *     summary: Update user by ID
  *     tags: [Users]
  */
-router.put("/users/:id", userController.updateUsers);
+router.put("/users/:id", authMiddleware, userController.updateUsers);
 
 /**
  * @swagger
@@ -73,7 +74,7 @@ router.put("/users/:id", userController.updateUsers);
  *     summary: Delete user by ID
  *     tags: [Users]
  */
-router.delete("/users/:id", userController.deleteUsers);
+router.delete("/users/:id", authMiddleware, userController.deleteUsers);
 
 // Attach all user routes under /api
 const initUserRoutes = (app) => {

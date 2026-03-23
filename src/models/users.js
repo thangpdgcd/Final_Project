@@ -4,17 +4,18 @@ import { Model, DataTypes } from "sequelize";
 export default (sequelize) => {
   class Users extends Model {
     static associate(models) {
-      Users.hasMany(models.Orders, { foreignKey: "user_ID", as: "orders" });
-      Users.hasOne(models.Carts, { foreignKey: "user_ID", as: "carts" });
+      Users.hasMany(models.Orders, { foreignKey: "userId", as: "orders" });
+      Users.hasOne(models.Carts, { foreignKey: "userId", as: "carts" });
     }
   }
 
   Users.init(
     {
-      user_ID: {
+      userId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        field: "user_ID",
       },
       name: {
         type: DataTypes.STRING,

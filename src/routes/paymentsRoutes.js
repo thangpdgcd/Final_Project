@@ -16,6 +16,7 @@ const router = express.Router();
  *     summary: Get PayPal client ID
  *     description: Return PayPal client ID for frontend integration
  *     tags: [Payments]
+ *     security: []
  *     responses:
  *       200:
  *         description: PayPal client ID retrieved successfully

@@ -48,20 +48,20 @@ let getProductsById = (productsbyid) => {
 
 let createProducts = (data) => {
   return new Promise(async (resolve, reject) => {
-    let { name, price, stock, description, image, categories_ID, user_ID } =
+    let { name, price, stock, description, image, categoriesId, userId } =
       data;
 
     if (
       !name ||
       price === undefined ||
       price === null ||
-      categories_ID === undefined ||
-      categories_ID === null ||
-      user_ID === undefined ||
-      user_ID === null
+      categoriesId === undefined ||
+      categoriesId === null ||
+      userId === undefined ||
+      userId === null
     ) {
       return reject(
-        new Error("Please provide Name, Price, Categories_ID and Users_ID."),
+        new Error("Please provide Name, Price, CategoriesId and UserId."),
       );
     }
 
@@ -72,12 +72,12 @@ let createProducts = (data) => {
       if (nameExists) return reject(new Error("Product name already exists."));
 
       const categoryExists = await Categories.findOne({
-        where: { categories_ID: Number(categories_ID) },
+        where: { categoriesId: Number(categoriesId) },
       });
       if (!categoryExists) return reject(new Error("Category does not exist."));
 
       const userExists = await Users.findOne({
-        where: { user_ID: Number(user_ID) },
+        where: { userId: Number(userId) },
       });
       if (!userExists) return reject(new Error("User does not exist."));
 
@@ -90,8 +90,8 @@ let createProducts = (data) => {
         stock: stock === undefined || stock === null ? 0 : Number(stock),
         description: description || "",
         image: finalImage, // ✅ lưu path
-        categories_ID: Number(categories_ID),
-        user_ID: Number(user_ID),
+        categoriesId: Number(categoriesId),
+        userId: Number(userId),
       });
 
       resolve(newProducts);

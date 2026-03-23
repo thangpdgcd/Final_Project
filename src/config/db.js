@@ -3,9 +3,9 @@ const mysql = require("mysql2");
 
 const connection = mysql.createConnection({
   host: "localhost",
-  port: 3307,
+  port: 3306,
   user: "root",
-  password: "", // Mặc định XAMPP MySQL không có password
+  password: "", 
   database: "coffee",
 });
 

@@ -5,8 +5,8 @@ export default (sequelize, models) => {
     static associate(models) {
       // Mỗi giỏ hàng thuộc về 1 người dùng
       Carts.belongsTo(models.Users, {
-        foreignKey: "user_ID",
-        targetKey: "user_ID",
+        foreignKey: "userId",
+        targetKey: "userId",
         as: "users", // alias để gọi như: cart.getUser()
       });
 
@@ -14,13 +14,13 @@ export default (sequelize, models) => {
       Carts.belongsToMany(models.Products, {
         through: models.Cart_Items,
         as: "products",
-        foreignKey: "cart_ID",
-        otherKey: "product_ID",
+        foreignKey: "cartId",
+        otherKey: "productId",
       });
 
       // 1 cart có nhiều cart items
       Carts.hasMany(models.Cart_Items, {
-        foreignKey: "cart_ID",
+        foreignKey: "cartId",
         as: "cart_Items", // 👈 alias phải trùng
       });
     }
@@ -28,15 +28,17 @@ export default (sequelize, models) => {
 
   Carts.init(
     {
-      cart_ID: {
+      cartId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
+        field: "cart_ID",
       },
-      user_ID: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "user_ID",
       },
     },
     {

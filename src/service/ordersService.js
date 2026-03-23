@@ -8,7 +8,7 @@ const getAllOrders = async () => {
         include: {
           model: Users,
           as: "users",
-          attributes: ["user_ID", "name", "email"],
+          attributes: ["userId", "name", "email"],
         },
       });
       resolve(orders);
@@ -17,15 +17,15 @@ const getAllOrders = async () => {
     }
   });
 };
-const getOrderById = async (order_ID) => {
+const getOrderById = async (orderId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("🔍 Searching order_ID:", order_ID);
-      const orders = await Orders.findByPk(order_ID, {
+      console.log("🔍 Searching orderId:", orderId);
+      const orders = await Orders.findByPk(orderId, {
         include: {
           model: Users,
           as: "users",
-          attributes: ["user_ID", "name", "email"],
+          attributes: ["userId", "name", "email"],
         },
       });
 
@@ -40,9 +40,9 @@ const getOrderById = async (order_ID) => {
   });
 };
 
-const createOrders = async (user_ID, opts = {}) => {
+const createOrders = async (userId, opts = {}) => {
   return new Promise(async (resolve, reject) => {
-    if (!user_ID) throw new Error("Missing user_ID");
+    if (!userId) throw new Error("Missing userId");
     const {
       status = "Pending",
       paymentMethod = null,
@@ -50,7 +50,7 @@ const createOrders = async (user_ID, opts = {}) => {
     } = opts;
 
     const cart = await Carts.findOne({
-      where: { user_ID },
+      where: { userId },
       include: [{ model: Cart_Items, as: "cart_Items" }],
     });
 
@@ -64,7 +64,7 @@ const createOrders = async (user_ID, opts = {}) => {
     );
 
     const order = await Orders.create({
-      user_ID,
+      userId,
       total_Amount: totalAmount,
       status, // ✅ Paid hoặc Pending
       shipping_Address: "Chưa cập nhật",
@@ -77,14 +77,14 @@ const createOrders = async (user_ID, opts = {}) => {
 
     for (const item of cart.cart_Items) {
       await Order_Items.create({
-        order_ID: order.order_ID,
-        product_ID: item.product_ID,
+        orderId: order.orderId,
+        productId: item.productId,
         quantity: item.quantity,
         price: item.price,
       });
     }
 
-    await Cart_Items.destroy({ where: { cart_ID: cart.cart_ID } });
+    await Cart_Items.destroy({ where: { cartId: cart.cartId } });
 
     return order;
   });
@@ -118,16 +118,16 @@ const deleteOrder = async (deleteOrderid) => {
   }
 };
 
-let searchOrders = async ({ user_ID, status }) => {
+let searchOrders = async ({ userId, status }) => {
   return new Promise(async (resolve, reject) => {
     try {
       let whereClause = {};
-      if (user_ID) {
-        whereClause.user_ID = user_ID;
+      if (userId) {
+        whereClause.userId = userId;
       } else if (status) {
         whereClause.status = status;
       } else {
-        return reject(new Error("Please provide user_ID or status to search"));
+        return reject(new Error("Please provide userId or status to search"));
       }
       let orders = await Orders.findAll({ where: whereClause });
       resolve(orders);

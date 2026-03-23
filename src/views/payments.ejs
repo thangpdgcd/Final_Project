@@ -10,7 +10,7 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Order_Items_ID</th>
+          <th>OrderItemId</th>
           <th>Phương thức</th>
           <th>Trạng thái</th>
           <th>Số tiền</th>
@@ -22,13 +22,13 @@
         <% if (payments && payments.length > 0) { %> <%
         payments.forEach(function(payment) { %>
         <tr>
-          <td><%= payment.payment_ID %></td>
-          <td><%= payment.orderitem_ID %></td>
+          <td><%= payment.paymentId %></td>
+          <td><%= payment.orderItemId %></td>
           <td><%= payment.payments_method %></td>
           <td><%= payment.payments_status %></td>
           <td><%= payment.amount %></td>
           <td><%= payment.paid ? "Có" : "Không" %></td>
-          <td><%= payment.transaction_ID %></td>
+          <td><%= payment.transactionId %></td>
         </tr>
         <% }) %> <% } else { %>
         <tr>

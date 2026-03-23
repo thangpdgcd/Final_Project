@@ -4,30 +4,31 @@ export default (sequelize) => {
   class Products extends Model {
     static associate(models) {
       Products.belongsTo(models.Users, {
-        foreignKey: "user_ID",
+        foreignKey: "userId",
         as: "users",
       });
 
       Products.belongsTo(models.Categories, {
-        foreignKey: "categories_ID",
-        targetKey: "categories_ID",
+        foreignKey: "categoriesId",
+        targetKey: "categoriesId",
         as: "categories",
       });
 
       Products.belongsToMany(models.Carts, {
         through: models.Cart_Items,
         as: "carts",
-        foreignKey: "product_ID",
-        otherKey: "cart_ID",
+        foreignKey: "productId",
+        otherKey: "cartId",
       });
     }
   }
   Products.init(
     {
-      product_ID: {
+      productId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        field: "product_ID",
       },
       name: {
         type: DataTypes.STRING,
@@ -49,13 +50,15 @@ export default (sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      user_ID: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      categories_ID: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        field: "user_ID",
+      },
+      categoriesId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        field: "categories_ID",
       },
     },
     {

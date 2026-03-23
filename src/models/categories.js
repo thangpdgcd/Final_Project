@@ -2,15 +2,22 @@ import { Model, DataTypes } from "sequelize";
 
 export default (sequelize) => {
   class Categories extends Model {
-    static associate(models) {}
+    static associate(models) {
+      Categories.hasMany(models.CategoryDetail, {
+        foreignKey: "categoriesId",
+        sourceKey: "categoriesId",
+        as: "categoryDetails",
+      });
+    }
   }
 
   Categories.init(
     {
-      categories_ID: {
+      categoriesId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        field: "categories_ID",
       },
       name: {
         type: DataTypes.STRING,
