@@ -28,6 +28,23 @@
     "heroSubtitle": "Experience the essence of the highlands through hand-selected beans roasted with traditional expertise.",
     "heroBtnPrimary": "Explore Now",
     "heroBtnGhost": "About Us",
+    "hero": [
+      {
+        "title": "Brewing <span>Excellence.</span>",
+        "subtitle": "Pure roasted coffee from Kon Tum — rich aroma, bold flavor. Experience the source.",
+        "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=1920"
+      },
+      {
+        "title": "Highland <span>Heritage.</span>",
+        "subtitle": "Connecting directly with farmers to bring you the finest sustainably sourced beans.",
+        "image": "https://images.unsplash.com/photo-1447933682048-511d1cddf4b7?auto=format&fit=crop&q=80&w=1920"
+      },
+      {
+        "title": "Handpicked <span>Quality.</span>",
+        "subtitle": "Small-batch roasting ensures every bean reaches its maximum flavor potential.",
+        "image": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&q=80&w=1920"
+      }
+    ],
     "introRoastedTitle": "ROASTED IN KONTUM",
     "introRoastedSubtitle": "86 Lam Tung, Ia Chim, Kon Tum City, Kon Tum",
     "introExperimentalTitle": "EXPERIMENTAL ROASTS",
@@ -74,6 +91,24 @@
     "loginError": "Incorrect email or password!",
     "registerTitle": "CREATE ACCOUNT",
     "registerDivider": "sign up with email"
+  },
+  "profile": {
+    "title": "User Profile",
+    "editProfile": "Edit Profile",
+    "saveChanges": "Save Changes",
+    "avatarSuccess": "Avatar updated successfully!",
+    "avatarError": "Failed to upload avatar.",
+    "updateSuccess": "Profile updated successfully!",
+    "updateError": "Failed to update profile info.",
+    "personalInfo": "Personal Information",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "location": "Location",
+    "membership": "Membership",
+    "joinedSince": "Joined Since",
+    "accountStatus": "Account Status",
+    "points": "Coffee Points"
   },
   "footer": {
     "brandDescription": "Honoring the rich tradition of Vietnamese coffee since 2010. We partner directly with farmers in the Central Highlands to bring you the finest sustainably sourced beans.",

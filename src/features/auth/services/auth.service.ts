@@ -1,20 +1,18 @@
-import axiosInstance from '@/services/axios';
-import type { LoginPayload, LoginResponse, RegisterPayload, RegisterResponse, AuthUser } from '@/types';
+import api from '@/api/axiosInstance';
+import type { LoginPayload, RegisterPayload, RegisterResponse, AuthUser } from '@/types';
 
 /**
  * Backend login response (from authController.js):
  * {
  *   message: string,
  *   user: { id: number, name: string, email: string, roleID: string },
- *   token: string  // only present when X-Auth-Mode: bearer header is sent
+ *   accessToken: string
  * }
- *
- * Backend JWT payload: { id: number, roleID: string }
  */
 
 type RawLoginResponse = {
   message?: string;
-  token?: string;
+  accessToken?: string;
   user?: {
     id?: number;
     user_ID?: number;
@@ -46,24 +44,22 @@ const normalizeUser = (raw: RawLoginResponse['user']): AuthUser | null => {
 };
 
 export const authService = {
-  login: async (payload: LoginPayload): Promise<LoginResponse> => {
-    const res = await axiosInstance.post<RawLoginResponse>('/login', payload, {
-      headers: { 'X-Auth-Mode': 'bearer' },
-    });
+  login: async (payload: LoginPayload): Promise<{ accessToken: string; user: AuthUser }> => {
+    const res = await api.post<RawLoginResponse>('/login', payload);
 
     const data = res.data;
-    const token = data.token;
+    const accessToken = data.accessToken;
     const user = normalizeUser(data.user);
 
-    if (!token || !user) {
+    if (!accessToken || !user) {
       throw new Error('INVALID_LOGIN_RESPONSE');
     }
 
-    return { token, user };
+    return { accessToken, user };
   },
 
   register: async (payload: RegisterPayload): Promise<RegisterResponse> => {
-    const res = await axiosInstance.post<RegisterResponse>('/register', payload);
+    const res = await api.post<RegisterResponse>('/register', payload);
     return res.data;
   },
 };

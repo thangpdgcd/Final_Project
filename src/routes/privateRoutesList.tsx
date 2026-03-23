@@ -3,7 +3,8 @@ import OrderDetail from "../pages/customers/orders";
 import PageCart from "../pages/customers/cart";
 import PaymentPage from "../pages/customers/payment";
 import OrdersPageHistory from "../pages/customers/history_orders";
-// import SystemPage from "../pages/systems/pages/SystemPage";
+
+import SystemPage from "../pages/systems/pages/SystemPage";
 import { AppRoute } from "./route.type";
 
 const privateRoutes: AppRoute[] = [
@@ -13,7 +14,7 @@ const privateRoutes: AppRoute[] = [
   { path: "/carts", element: <PageCart /> },
   { path: "/paypal/config", element: <PaymentPage /> },
   { path: "/history-orders", element: <OrdersPageHistory /> },
-  // { path: "/system", element: <SystemPage /> },
+  { path: "/system", element: <SystemPage /> },
 ];
 
 export default privateRoutes;

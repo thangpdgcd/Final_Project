@@ -20,6 +20,7 @@ const publicRoutes: AppRoute[] = [
   { path: "/system", element: <SystemPage /> },
   { path: "/profiles/:userid", element: <Userprofile /> },
 
+
 ];
 
 export default publicRoutes;    

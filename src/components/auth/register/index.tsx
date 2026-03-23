@@ -43,7 +43,7 @@ const RegisterPage: React.FC = () => {
       console.log("✅ Register success:", data);
 
       message.success(`✅ ${t("auth.registerSuccess")}`);
-      navigate("/login");
+      navigate("/system");
     } catch (err: any) {
       console.error("❌ Register error:", err?.message || err);
       message.error(`❌ ${t("auth.registerError")}`);
@@ -174,10 +174,10 @@ const RegisterPage: React.FC = () => {
                           value
                             ? Promise.resolve()
                             : Promise.reject(
-                                new Error(
-                                  t("auth.registerAgreeRequired"),
-                                ),
+                              new Error(
+                                t("auth.registerAgreeRequired"),
                               ),
+                            ),
                       },
                     ]}
                     noStyle>

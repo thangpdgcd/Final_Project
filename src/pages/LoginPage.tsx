@@ -70,13 +70,13 @@ const LoginPage: React.FC = () => {
   const loginMutation = useMutation({
     mutationFn: (payload: LoginPayload) => authService.login(payload),
     onSuccess: (data) => {
-      if (!data.token || !data.user) {
+      if (!data.accessToken || !data.user) {
         messageApi.error(t('auth.loginError'));
         return;
       }
 
       const user = data.user as AuthUser;
-      login(data.token, user);
+      login(data.accessToken, user);
       messageApi.success(t('auth.loginSuccess'));
     },
     onError: (error: unknown) => {

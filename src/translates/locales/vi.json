@@ -28,6 +28,23 @@
     "heroSubtitle": "Thưởng thức tinh hoa từ đại ngàn qua từng hạt cà phê được chọn lọc thủ công và rang xay theo bí quyết truyền thống.",
     "heroBtnPrimary": "Khám phá ngay",
     "heroBtnGhost": "Về chúng tôi",
+    "hero": [
+      {
+        "title": "Đánh thức <span>Đam mê.</span>",
+        "subtitle": "Cà phê rang mộc nguyên chất từ đại ngàn Kon Tum — hương thơm nồng nàn, vị đậm đà khó quên.",
+        "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=1920"
+      },
+      {
+        "title": "Di sản <span>Tây Nguyên.</span>",
+        "subtitle": "Hợp tác trực tiếp với nông gia để mang đến những hạt cà phê hảo hạng, nguồn gốc bền vững.",
+        "image": "https://images.unsplash.com/photo-1447933682048-511d1cddf4b7?auto=format&fit=crop&q=80&w=1920"
+      },
+      {
+        "title": "Chất lượng <span>Thủ công.</span>",
+        "subtitle": "Rang mẻ nhỏ tỉ mỉ giúp mỗi hạt cà phê đạt đến độ chín muồi về hương vị.",
+        "image": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&q=80&w=1920"
+      }
+    ],
     "introRoastedTitle": "RANG TẠI KONTUM",
     "introRoastedSubtitle": "86 Lâm Tùng, Ia Chim, TP. Kon Tum, Kon Tum",
     "introExperimentalTitle": "RANG THỬ NGHIỆM",
@@ -74,6 +91,24 @@
     "loginError": "Email hoặc mật khẩu không chính xác!",
     "registerTitle": "TẠO TÀI KHOẢN",
     "registerDivider": "Đăng ký bằng email"
+  },
+  "profile": {
+    "title": "Hồ sơ cá nhân",
+    "editProfile": "Chỉnh sửa hồ sơ",
+    "saveChanges": "Lưu thay đổi",
+    "avatarSuccess": "Cập nhật ảnh đại diện thành công!",
+    "avatarError": "Không thể tải lên ảnh đại diện.",
+    "updateSuccess": "Cập nhật thông tin thành công!",
+    "updateError": "Không thể cập nhật thông tin.",
+    "personalInfo": "Thông tin cá nhân",
+    "fullName": "Họ và tên",
+    "email": "Địa chỉ email",
+    "phone": "Số điện thoại",
+    "location": "Địa chỉ",
+    "membership": "Hội viên",
+    "joinedSince": "Ngày tham gia",
+    "accountStatus": "Trạng thái",
+    "points": "Điểm Coffee"
   },
   "footer": {
     "brandDescription": "Tôn vinh truyền thống cà phê Việt Nam từ năm 2010. Chúng tôi hợp tác trực tiếp với nông hộ tại Tây Nguyên để mang đến những hạt cà phê bền vững, chất lượng.",

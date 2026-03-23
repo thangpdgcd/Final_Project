@@ -10,7 +10,7 @@ const ProductsPage = lazy(() => import('@/pages/ProductsPage'));
 const ProductDetailPage = lazy(() => import('@/pages/ProductDetailPage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
-const LoginModalRoute = lazy(() => import('@/routes/LoginModalRoute'));
+const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
 const CartPage = lazy(() => import('@/pages/CartPage'));
 const OrderPage = lazy(() => import('@/pages/OrderPage'));
@@ -28,7 +28,7 @@ const AppRoutes = () => (
       <Route path="/" element={<HomePage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/contacts" element={<ContactPage />} />
-      <Route path="/login" element={<LoginModalRoute />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
       {/* Protected customer routes */}
@@ -45,7 +45,7 @@ const AppRoutes = () => (
     </Route>
 
     {/* ── Admin Layout (protected) ── */}
-    <Route element={<ProtectedRoute />}>
+    <Route element={<ProtectedRoute allowedRoles={['admin', 1]} />}>
       <Route path="/system/*" element={<AdminLayout />}>
         <Route index element={<SystemPage />} />
         <Route path="*" element={<SystemPage />} />

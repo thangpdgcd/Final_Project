@@ -16,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { changeLanguage } from '@/translates/i18n';
 import Logo from '@/components/common/Logo';
 import UserMenu from './UserMenu';
-import AuthModal from '@/components/auth/AuthModal';
 
 // --- CONSTANTS ---
 const NAV_ITEMS = [
@@ -66,29 +65,11 @@ const HeaderPage: React.FC = () => {
   const { user } = useAuth();
   const { data: cartItems = [] } = useCart(user?.user_ID);
 
-  type RedirectState = { from?: string | { pathname: string; search?: string } };
-
-  const getRedirectPath = (state: RedirectState | null): string => {
-    const from = state?.from;
-    if (!from) return '/';
-
-    if (typeof from === 'string') {
-      return from;
-    }
-
-    if (from.pathname) {
-      return `${from.pathname}${from.search || ''}`;
-    }
-
-    return '/';
-  };
-
   // UI State
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const isLoginModalOpen = location.pathname === '/login';
 
   // Scroll Tracking
   const { scrollY } = useScroll();
@@ -118,7 +99,7 @@ const HeaderPage: React.FC = () => {
         initial={{ y: 0 }}
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-10 transition-all duration-300 ${isScrolled
+        className={`fixed top-0 left-0 right-0 z-[50] transition-all duration-300 overflow-hidden ${isScrolled
             ? 'h-20 bg-[#4B3621]/95 backdrop-blur-md shadow-2xl'
             : 'h-24 bg-transparent'
           }`}
@@ -274,15 +255,6 @@ const HeaderPage: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <AuthModal
-        open={isLoginModalOpen}
-        onClose={() => {
-          const redirectTo = getRedirectPath(location.state as RedirectState | null);
-          // Guard against closing into `/login` again.
-          const target = redirectTo === '/login' ? '/' : redirectTo;
-          navigate(target, { replace: true });
-        }}
-      />
     </>
   );
 };
