@@ -1,9 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-
-
-import vi from "../translates/vn/vi.json";
-import en from "../translates/en/en.json";
+import en from "./locales/en.json";
+import vi from "./locales/vi.json";
 
 const DEFAULT_LANG = "vi";
 const STORAGE_KEY = "app_language";
@@ -20,7 +18,7 @@ i18n.use(initReactI18next).init({
   lng: savedLang,
   fallbackLng: DEFAULT_LANG,
   interpolation: {
-    escapeValue: false,
+    escapeValue: false, // react already safes from xss
   },
 });
 
@@ -32,4 +30,3 @@ export const changeLanguage = (lang: "en" | "vi") => {
 };
 
 export default i18n;
-

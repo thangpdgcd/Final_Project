@@ -1,0 +1,96 @@
+{
+  "common": {
+    "brandName": "Phan Coffee",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "back": "Quay lại",
+    "submit": "Gửi",
+    "cancel": "Hủy",
+    "theme": "Giao diện",
+    "darkMode": "Chế độ tối",
+    "lightMode": "Chế độ sáng",
+    "search": "Tìm kiếm"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "coffee": "Cà phê",
+    "contact": "Liên hệ",
+    "about": "Giới thiệu",
+    "cart": "Giỏ hàng",
+    "user": "Tài khoản",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "searchPlaceholder": "Tìm kiếm cà phê..."
+  },
+  "home": {
+    "heroBadge": "TỪ ĐẠI NGÀN KON TUM",
+    "heroTitle": "Cà phê <br /> <span>rang mộc</span>",
+    "heroSubtitle": "Thưởng thức tinh hoa từ đại ngàn qua từng hạt cà phê được chọn lọc thủ công và rang xay theo bí quyết truyền thống.",
+    "heroBtnPrimary": "Khám phá ngay",
+    "heroBtnGhost": "Về chúng tôi",
+    "introRoastedTitle": "RANG TẠI KONTUM",
+    "introRoastedSubtitle": "86 Lâm Tùng, Ia Chim, TP. Kon Tum, Kon Tum",
+    "introExperimentalTitle": "RANG THỬ NGHIỆM",
+    "introExperimentalSubtitle": "Cà phê nguyên bản, chế biến honey & natural.",
+    "introShippingTitle": "GIAO HÀNG TOÀN CẦU",
+    "introShippingSubtitle": "Từ Phan Coffee đến tận tay bạn.",
+    "aboutTitle": "Về Phan Coffee",
+    "aboutDescription": "Chúng tôi chọn lọc hạt từ Tây Nguyên và rang mẻ nhỏ để hương vị luôn tươi mới, sạch và rõ ràng.",
+    "aboutReadMore": "Xem thêm",
+    "reviewsTitle": "Khách hàng đánh giá",
+    "reviewsSubtitle": "Một vài chia sẻ thật lòng từ những khách hàng đã đồng hành cùng Phan Coffee trong suốt thời gian qua.",
+    "updateNews": {
+      "title": "CẬP NHẬT TIN TỨC",
+      "subtitle": "Mỗi tách cà phê pha phin có thể đóng góp tới 1.8g chất xơ trong khẩu phần khuyến nghị hằng ngày.",
+      "learnMore": "Xem thêm"
+    }
+  },
+  "cart": {
+    "title": "Giỏ hàng",
+    "itemsCount": "Bạn có {{count}} sản phẩm",
+    "viewFullBasket": "XEM GIỎ HÀNG",
+    "emptyTitle": "Giỏ hàng trống",
+    "emptyDesc": "Hành trình cà phê của bạn chưa bắt đầu. Hãy khám phá các loại cà phê của chúng tôi!",
+    "shopNow": "Mua sắm ngay"
+  },
+  "auth": {
+    "loginTitle": "Đăng Nhập",
+    "loginWelcome": "CHÀO MỪNG TRỞ LẠI",
+    "loginSubtitle": "Chào mừng bạn đến với điểm đến cà phê cao cấp.",
+    "loginSocialInfo": "Tiếp tục với {{provider}}",
+    "loginDivider": "hoặc đăng nhập bằng email",
+    "emailLabel": "Email",
+    "emailPlaceholder": "ban@example.com",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "••••••••",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "forgotPassword": "Quên mật khẩu?",
+    "loginSubmit": "Đăng nhập",
+    "authenticating": "Đang xác thực...",
+    "exploreTaste": "Khám phá hương vị",
+    "noAccount": "Chưa có tài khoản?",
+    "joinNow": "Tham gia ngay",
+    "loginSuccess": "Đăng nhập thành công!",
+    "loginError": "Email hoặc mật khẩu không chính xác!",
+    "registerTitle": "TẠO TÀI KHOẢN",
+    "registerDivider": "Đăng ký bằng email"
+  },
+  "footer": {
+    "brandDescription": "Tôn vinh truyền thống cà phê Việt Nam từ năm 2010. Chúng tôi hợp tác trực tiếp với nông hộ tại Tây Nguyên để mang đến những hạt cà phê bền vững, chất lượng.",
+    "shop": {
+      "title": "MUA SẮM",
+      "allCoffee": "Tất cả cà phê",
+      "brewingGear": "Dụng cụ pha",
+      "merchandise": "Phụ kiện",
+      "subscription": "Gói định kỳ"
+    },
+    "support": {
+      "title": "HỖ TRỢ",
+      "shipping": "Thông tin giao hàng",
+      "wholesale": "Bán sỉ",
+      "returns": "Đổi trả",
+      "privacy": "Chính sách bảo mật"
+    },
+    "copyright": "© {{year}} Phan Coffee. Bảo lưu mọi quyền."
+  }
+}

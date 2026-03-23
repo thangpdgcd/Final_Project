@@ -1,69 +1,58 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ConfigProvider, theme as antdTheme } from "antd";
-import "./styles/App.scss";
-import { ThemeProvider, useTheme } from "./components/contexts/ThemeContext";
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ConfigProvider, theme as antdTheme } from 'antd';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ThemeProvider, useTheme } from '@/store/ThemeContext';
+import { AuthProvider } from '@/store/AuthContext';
+import AppRoutes from '@/routes';
+import '@/styles/globals.css';
 
-// guard
-import PrivateRoutes from "./routes/PrivateRoutes";
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
 
-// pages
-import LoginPage from "./components/auth/login";
-import RegisterPage from "./components/auth/register";
-
-import HomePage from "./pages/customers/homes";
-import ProductList from "./pages/customers/products";
-import ProductDetailPage from "./pages/customers/product_details";
-import About from "./pages/customers/abouts";
-import Contact from "./pages/customers/contact";
-
-import Userprofile from "./pages/customers/profiles";
-import OrderDetail from "./pages/customers/orders";
-import PageCart from "./pages/customers/cart";
-import NotFound from "./pages/customers/not_found";
-import SystemPage from "./pages/systems/pages/SystemPage";
-const AppContent = () => {
+const AppContent: React.FC = () => {
   const { dark } = useTheme();
-
   return (
     <ConfigProvider
       theme={{
         algorithm: dark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        token: {
+          colorPrimary: '#6f4e37',
+          colorInfo: '#c4963b',
+          borderRadius: 8,
+          fontFamily: "'Inter', system-ui, sans-serif",
+        },
       }}
     >
-      <Router>
-        <Routes>
-
-          {/* ===== PUBLIC ===== */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/products" element={<ProductList />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contacts" element={<Contact />} />
-          <Route path="/system" element={<SystemPage />} />
-           <Route path="*" element={<NotFound />} />
-           
-          {/* ===== PRIVATE (BẮT LOGIN) ===== */}
-          <Route element={<PrivateRoutes />}>
-            {/*  required login */}
-            <Route path="/products/:id" element={<ProductDetailPage />} />
-            <Route path="/profiles/:userid" element={<Userprofile />} />
-            <Route path="/carts" element={<PageCart />} />
-            <Route path="/orders" element={<OrderDetail />} />
-          </Route>
-
-        </Routes>
-      </Router>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        theme={dark ? 'dark' : 'light'}
+      />
     </ConfigProvider>
   );
 };
 
-const App = () => {
-  return (
+const App: React.FC = () => (
+  <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ThemeProvider>
-  );
-};
+  </QueryClientProvider>
+);
 
 export default App;

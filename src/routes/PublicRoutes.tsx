@@ -17,9 +17,9 @@ const publicRoutes: AppRoute[] = [
   { path: "/products/:id", element: <ProductDetailPage /> },
   { path: "/about", element: <About /> },
   { path: "/contacts", element: <Contact /> },
-   { path: "/system", element: <SystemPage /> },
+  { path: "/system", element: <SystemPage /> },
   { path: "/profiles/:userid", element: <Userprofile /> },
 
-];                  
-                        
+];
+
 export default publicRoutes;    

@@ -1,0 +1,96 @@
+{
+  "common": {
+    "brandName": "Phan Coffee",
+    "loading": "Loading...",
+    "error": "Error",
+    "back": "Back",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "theme": "Theme",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "search": "Search"
+  },
+  "nav": {
+    "home": "Home",
+    "coffee": "Coffee",
+    "contact": "Contact",
+    "about": "About",
+    "cart": "Cart",
+    "user": "User",
+    "login": "Login",
+    "logout": "Logout",
+    "searchPlaceholder": "Search coffee..."
+  },
+  "home": {
+    "heroBadge": "FROM THE CENTRAL HIGHLANDS",
+    "heroTitle": "Purely <br /> <span>Roasted Coffee</span>",
+    "heroSubtitle": "Experience the essence of the highlands through hand-selected beans roasted with traditional expertise.",
+    "heroBtnPrimary": "Explore Now",
+    "heroBtnGhost": "About Us",
+    "introRoastedTitle": "ROASTED IN KONTUM",
+    "introRoastedSubtitle": "86 Lam Tung, Ia Chim, Kon Tum City, Kon Tum",
+    "introExperimentalTitle": "EXPERIMENTAL ROASTS",
+    "introExperimentalSubtitle": "Single-origin, honey & natural processed coffees.",
+    "introShippingTitle": "WORLDWIDE SHIPPING",
+    "introShippingSubtitle": "From Phan Coffee to your doorstep.",
+    "aboutTitle": "About Phan Coffee",
+    "aboutDescription": "We source beans from the Central Highlands and roast in small batches to keep flavors vibrant and clean.",
+    "aboutReadMore": "Read more",
+    "reviewsTitle": "Customer Reviews",
+    "reviewsSubtitle": "A few honest words from customers who have been enjoying Phan Coffee over the years.",
+    "updateNews": {
+      "title": "UPDATE NEWS",
+      "subtitle": "A cup of brewed coffee represents a contribution of up to 1.8 grams of fiber of the recommended.",
+      "learnMore": "Learn More"
+    }
+  },
+  "cart": {
+    "title": "Cart",
+    "itemsCount": "You have {{count}} items",
+    "viewFullBasket": "VIEW FULL BASKET",
+    "emptyTitle": "Empty Cart",
+    "emptyDesc": "Your coffee adventure hasn't started yet. Browse our selection and pick a blend!",
+    "shopNow": "Shop Now"
+  },
+  "auth": {
+    "loginTitle": "Sign In",
+    "loginWelcome": "WELCOME BACK",
+    "loginSubtitle": "Welcome to your premium coffee destination.",
+    "loginSocialInfo": "Continue with {{provider}}",
+    "loginDivider": "or sign in with email",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "••••••••",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "loginSubmit": "Log In",
+    "authenticating": "Authenticating...",
+    "exploreTaste": "Explore Your Taste",
+    "noAccount": "Not a member?",
+    "joinNow": "Join Phan Coffee",
+    "loginSuccess": "Login successful!",
+    "loginError": "Incorrect email or password!",
+    "registerTitle": "CREATE ACCOUNT",
+    "registerDivider": "sign up with email"
+  },
+  "footer": {
+    "brandDescription": "Honoring the rich tradition of Vietnamese coffee since 2010. We partner directly with farmers in the Central Highlands to bring you the finest sustainably sourced beans.",
+    "shop": {
+      "title": "SHOP",
+      "allCoffee": "All Coffee",
+      "brewingGear": "Brewing Gear",
+      "merchandise": "Merchandise",
+      "subscription": "Subscription"
+    },
+    "support": {
+      "title": "SUPPORT",
+      "shipping": "Shipping Info",
+      "wholesale": "Wholesale",
+      "returns": "Returns",
+      "privacy": "Privacy Policy"
+    },
+    "copyright": "© {{year}} Phan Coffee. All rights reserved."
+  }
+}

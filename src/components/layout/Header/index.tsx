@@ -1,311 +1,289 @@
-import React, { useMemo, useRef, useEffect, useState } from "react";
-import { Layout, Input } from "antd";
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import {
-  ShoppingCartOutlined,
-  UserOutlined,
-  SearchOutlined,
+  ShoppingCart,
+  Menu,
+  X,
+  Moon,
+  Sun,
+  ChevronRight,
+} from 'lucide-react';
+import { useTheme } from '@/store/ThemeContext';
+import { useAuth } from '@/store/AuthContext';
+import { useCart } from '@/hooks/useCart';
+import { useTranslation } from 'react-i18next';
+import { changeLanguage } from '@/translates/i18n';
+import Logo from '@/components/common/Logo';
+import UserMenu from './UserMenu';
+import AuthModal from '@/components/auth/AuthModal';
 
-  MenuOutlined 
-} from "@ant-design/icons";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-
-import { getCartByUserId } from "../../../api/cartApi";
-import "./index.scss";
-
-
-
-const { Header } = Layout;
-
-type NavItem = { label: string; href: string };
-
-const NAV_ITEMS: NavItem[] = [
-  { label: "shop", href: "/products" },
-  { label: "story", href: "/abouts" },
-  { label: "roast", href: "/#home-roast" },
-  { label: "contact", href: "/contacts" },
+// --- CONSTANTS ---
+const NAV_ITEMS = [
+  { label: 'nav.home', href: '/' },
+  { label: 'nav.coffee', href: '/products' },
+  { label: 'nav.about', href: '/about' },
+  { label: 'nav.contact', href: '/contacts' },
 ];
+
+// --- COMPONENTS ---
+
+/**
+ * IconButton: Reusable premium icon button with consistent styling and micro-interactions
+ */
+const IconButton = React.forwardRef<HTMLButtonElement, {
+  icon: React.ReactNode;
+  onClick?: () => void;
+  badge?: number;
+  className?: string;
+  active?: boolean;
+}>(({ icon, onClick, badge, className = "", active = false }, ref) => (
+  <motion.button
+    ref={ref}
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={onClick}
+    className={`relative flex items-center justify-center w-10 h-10 rounded-full border-[2.5px] transition-all duration-300 group
+      ${active
+        ? 'bg-[#4B3621] border-[#4B3621] text-white'
+        : 'bg-transparent border-white hover:bg-white hover:text-[#4B3621] hover:border-white text-white dark:border-white/30 dark:hover:bg-white dark:hover:text-[#4B3621]'
+      } ${className}`}
+  >
+    {badge !== undefined && badge > 0 && (
+      <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#FFD700] text-[10px] font-bold text-[#4B3621] border-2 border-white dark:border-[#1c1716]">
+        {badge}
+      </span>
+    )}
+    {icon}
+  </motion.button>
+));
 
 const HeaderPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const headerRef = useRef<HTMLDivElement>(null);
-  const { t } = useTranslation();
-  const [cartCount, setCartCount] = useState(0);
-  const [submenuOpen, setSubmenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { dark, toggleDark } = useTheme();
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const { data: cartItems = [] } = useCart(user?.user_ID);
+
+  type RedirectState = { from?: string | { pathname: string; search?: string } };
+
+  const getRedirectPath = (state: RedirectState | null): string => {
+    const from = state?.from;
+    if (!from) return '/';
+
+    if (typeof from === 'string') {
+      return from;
+    }
+
+    if (from.pathname) {
+      return `${from.pathname}${from.search || ''}`;
+    }
+
+    return '/';
+  };
+
+  // UI State
+  const [isVisible, setIsVisible] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const isLoginModalOpen = location.pathname === '/login';
+
+  // Scroll Tracking
+  const { scrollY } = useScroll();
+  const lastScrollY = useRef(0);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const direction = latest > lastScrollY.current ? "down" : "up";
+    if (latest > 100 && direction === "down" && isVisible) {
+      setIsVisible(false);
+    } else if (direction === "up" && !isVisible) {
+      setIsVisible(true);
+    }
+    setIsScrolled(latest > 20);
+    lastScrollY.current = latest;
+  });
 
   useEffect(() => {
-    const checkLoginStatus = () => {
-      const token = localStorage.getItem("token");
-      const user = localStorage.getItem("user");
-      // keep for future UX; header uses goToProfileOrLogin
-      void token;
-      void user;
-    };
-
-    checkLoginStatus();
-    window.addEventListener("storage", checkLoginStatus);
-    return () => window.removeEventListener("storage", checkLoginStatus);
-  }, []);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    const shouldBeDark =
-      stored === "dark"
-        ? true
-        : stored === "light"
-          ? false
-          : document.documentElement.classList.contains("dark");
-
-    document.documentElement.classList.toggle("dark", shouldBeDark);
-    setIsDarkMode(shouldBeDark);
-  }, []);
-
-  const isLoggedIn = useMemo(() => {
-    const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
-    return !!(token && user);
+    setIsMenuOpen(false);
+    setIsCartOpen(false);
   }, [location.pathname]);
 
-  const userId = useMemo(() => {
-    const raw = localStorage.getItem("user_ID");
-    const id = Number(raw);
-    if (Number.isFinite(id) && id > 0) return id;
-
-    const rawUser = localStorage.getItem("user");
-    if (!rawUser) return null;
-
-    try {
-      const u = JSON.parse(rawUser);
-      const fallback = Number(
-        u?.user_ID ??
-          u?.data?.user_ID ??
-          u?.user?.user_ID ??
-          u?.user?.id ??
-          u?.id,
-      );
-      return Number.isFinite(fallback) && fallback > 0 ? fallback : null;
-    } catch {
-      return null;
-    }
-  }, [location.pathname]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchCount = async () => {
-      if (!userId || !isLoggedIn) {
-        if (!cancelled) setCartCount(0);
-        return;
-      }
-
-      try {
-        const items = await getCartByUserId(userId);
-        const total = Array.isArray(items)
-          ? items.reduce((sum, it) => sum + Number(it.quantity || 0), 0)
-          : 0;
-        if (!cancelled) setCartCount(total);
-      } catch {
-        if (!cancelled) setCartCount(0);
-      }
-    };
-
-    void fetchCount();
-    return () => {
-      cancelled = true;
-    };
-  }, [userId, isLoggedIn, location.pathname]);
-
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (!headerRef.current?.contains(e.target as Node)) {
-        setSubmenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, []);
-
-  const toggleDarkMode = () => {
-    const next = !isDarkMode;
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("theme", next ? "dark" : "light");
-    setIsDarkMode(next);
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("user_ID");
-    setSubmenuOpen(false);
-    navigate("/login");
-  };
-
-  const goToProfileOrLogin = () => {
-    if (isLoggedIn) {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      const storedId = localStorage.getItem("user_ID");
-      const userId =
-        storedId ||
-        user?.user_ID ||
-        user?.id ||
-        user?.userId ||
-        user?.data?.user_ID ||
-        user?.user?.user_ID;
-
-      if (userId) {
-        navigate(`/profiles/${userId}`);
-        return;
-      }
-    }
-
-    navigate("/login");
-  };
-
-  const goToCartOrLogin = () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login", {
-        state: { from: { pathname: "/carts" } },
-      });
-      return;
-    }
-    navigate("/carts");
-  };
-
-  const labels: Record<string, string> = {
-    shop: "Cửa hàng",
-    story: "Câu chuyện",
-    roast: "Rang xay",
-    contact: "Liên hệ",
-  };
+  const cartCount = cartItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
 
   return (
-    <div ref={headerRef} className='header-wrapper'>
-      <Header className='user-header'>
-        <div className='user-header__inner'>
-          <div className='user-header__left'>
-            <button className='user-brand' onClick={() => navigate("/")}>
-           <img
-                 src='https://res.cloudinary.com/dfjecxrnl/image/upload/v1773308731/199bea82-b758-411d-863a-1b7be6ecc8b4.png'
-                  alt='Phan Coffee logo'
+    <>
+      <motion.header
+        initial={{ y: 0 }}
+        animate={{ y: isVisible ? 0 : -100 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className={`fixed top-0 left-0 right-0 z-10 transition-all duration-300 ${isScrolled
+            ? 'h-20 bg-[#4B3621]/95 backdrop-blur-md shadow-2xl'
+            : 'h-24 bg-transparent'
+          }`}
+      >
+        <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+
+          {/* Logo Section (Left) */}
+          <Link to="/" className="flex-shrink-0">
+            <Logo size={42} className="md:w-[48px]" />
+          </Link>
+
+          {/* Navigation Menu (Center) */}
+          <nav className="hidden lg:flex items-center gap-6 xl:gap-10 ml-10">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.label}
+                to={item.href}
+                className={`text-xs font-bold uppercase tracking-[0.2em] relative group text-white`}
+              >
+                {t(item.label)}
+                <motion.span
+                  className="absolute -bottom-2 left-0 h-0.5 bg-[#FFD700]"
+                  initial={false}
+                  animate={{
+                    width: location.pathname === item.href ? '100%' : '0%',
+                  }}
+                  whileHover={{ width: '100%' }}
                 />
-              <span className='user-brand__name'>Phan Coffee</span>
-            </button>
-            <nav className='user-nav' aria-label='Điều hướng'>
-              {NAV_ITEMS.map((item) => (
-                <button
-                  key={item.label}
-                  className='user-nav__item'
-                  onClick={() => {
-                    if (item.href.startsWith("/#")) {
-                      const id = item.href.replace("/#", "");
-                      const el = document.getElementById(id);
-                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                      return;
-                    }
-                    navigate(item.href);
-                  }}>
-                  {labels[item.label] || item.label}
-                </button>
-              ))}
-            </nav>
-          </div>
+              </Link>
+            ))}
+          </nav>
 
-          {/* Center search bar */}
-          <div className='user-header__center'>
-            <div className='user-search'>
-              <Input
-                allowClear={false}
-                bordered={false}
-                prefix={<SearchOutlined />}
-                placeholder={t("nav.searchPlaceholder") || "Tìm kiếm cà phê..."}
-                className='user-search__input'
-              />
-            </div>
-          </div>
+          {/* Right-side Icons */}
+          <div className="flex items-center gap-4">
+            <IconButton
+              icon={<ShoppingCart size={18} />}
+              badge={cartCount}
+              onClick={() => setIsCartOpen(true)}
+              className="hidden sm:flex cursor-pointer"
+            />
 
-          <div className='user-header__right'>
-            <div className='user-submenu'>
-              <button
-                type='button'
-                className='user-account'
-                aria-haspopup='menu'
-                aria-expanded={submenuOpen}
-                onClick={() => setSubmenuOpen((v) => !v)}>
-              
-               <MenuOutlined />
-              </button>
+            <IconButton
+              icon={dark ? <Sun size={18} /> : <Moon size={18} />}
+              onClick={toggleDark}
+              className="hidden sm:flex cursor-pointer"
+            />
 
-              {submenuOpen && (
-                <div className='user-submenu__panel' role='menu' aria-label='Tài khoản & giỏ hàng'>
-                  <div className='user-submenu__profile'>
-                    <UserOutlined className='user-submenu__profile-icon' />
-                    <div className='user-submenu__profile-text'>
-                      <div className='user-submenu__name'>Alex Henderson</div>
-                    </div>
-                  </div>
+            {/* Language Toggle */}
+            <IconButton
+              icon={<span className="text-[10px] font-bold">{i18n.language === 'vi' ? 'EN' : 'VN'}</span>}
+              onClick={() => changeLanguage(i18n.language === 'vi' ? 'en' : 'vi')}
+              className="hidden sm:flex cursor-pointer"
+            />
 
-                  <button
-                    type='button'
-                    className='user-submenu__item user-submenu__item--appearance'
-                    role='menuitem'
-                    onClick={toggleDarkMode}>
-                    <span className='user-submenu__label'>Appearance</span>
-                    <span className={`user-submenu__toggle ${isDarkMode ? "user-submenu__toggle--on" : ""}`}>
-                      <span className='user-submenu__toggle-knob' />
-                    </span>
-                  </button>
+            {/* User Account - REFINED COMPONENT */}
+            <UserMenu
+              onLoginClick={() =>
+                navigate('/login', { state: { from: location }, replace: false })
+              }
+            />
 
-                  <button
-                    type='button'
-                    className='user-submenu__item'
-                    role='menuitem'
-                    onClick={() => {
-                      setSubmenuOpen(false);
-                      goToCartOrLogin();
-                    }}>
-                    <div className='user-submenu__icon'>
-                      <ShoppingCartOutlined />
-                    </div>
-                    <div className='user-submenu__text'>
-                      <span className='user-submenu__label'>My Cart</span>
-                      <span className='user-submenu__description'>
-                        {cartCount} item{cartCount === 1 ? "" : "s"} in basket
-                      </span>
-                    </div>
-                    {cartCount > 0 && <span className='user-submenu__badge'>{cartCount}</span>}
-                  </button>
-
-                  <button
-                    type='button'
-                    className='user-submenu__item'
-                    role='menuitem'
-                    onClick={() => {
-                      setSubmenuOpen(false);
-                      goToProfileOrLogin();
-                    }}>
-                    <div className='user-submenu__icon'>
-                      <UserOutlined />
-                    </div>
-                    <span className='user-submenu__label'>Account Settings</span>
-                  </button>
-
-                  <button
-                    type='button'
-                    className='user-submenu__item user-submenu__item--danger'
-                    role='menuitem'
-                    onClick={logout}>
-                    <span className='user-submenu__label'>Sign Out</span>
-                  </button>
-                </div>
-              )}
-            </div>
+            <IconButton
+              icon={isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden"
+            />
           </div>
         </div>
-      </Header>
-    </div>
+
+        {/* mobile Dropdown Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="absolute top-full left-0 right-0 bg-[#4B3621] shadow-2xl lg:hidden overflow-hidden"
+            >
+              <div className="p-6 space-y-4">
+                {NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.label}
+                    to={item.href}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors group"
+                  >
+                    <span className="font-bold text-white uppercase tracking-widest text-sm">{t(item.label)}</span>
+                    <ChevronRight size={18} className="text-[#FFD700] group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                ))}
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <button onClick={() => setIsCartOpen(true)} className="flex items-center justify-center gap-2 p-4 rounded-2xl bg-white text-[#4B3621] font-bold text-xs uppercase tracking-widest">
+                    <ShoppingCart size={16} /> {t('nav.cart')}
+                  </button>
+                  <button onClick={toggleDark} className="flex items-center justify-center gap-2 p-4 rounded-2xl border border-white/20 text-white font-bold text-xs uppercase tracking-widest">
+                    {dark ? <Sun size={16} /> : <Moon size={16} />} {t('common.theme')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.header>
+
+      {/* Cart Drawer */}
+      <AnimatePresence>
+        {isCartOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCartOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-full w-full max-w-md bg-[#FDF5E6] dark:bg-[#1c1716] z-[70] shadow-2xl flex flex-col"
+            >
+              <div className="p-8 flex items-center justify-between border-b border-[#4B3621]/10">
+                <h2 className="text-2xl font-black text-[#4B3621] dark:text-amber-100 tracking-tighter uppercase">{t('cart.title')}</h2>
+                <button onClick={() => setIsCartOpen(false)} className="p-2 rounded-full hover:bg-[#4B3621]/5 transition-colors">
+                  <X size={24} className="text-[#4B3621] dark:text-amber-100" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-center text-center">
+                {cartItems.length > 0 ? (
+                  <div className="w-full space-y-6">
+                    <p className="text-[#4B3621]/60 font-bold uppercase tracking-widest text-xs">
+                      {t('cart.itemsCount', { count: cartCount })}
+                    </p>
+                    <button onClick={() => navigate('/carts')} className="w-full py-5 rounded-2xl bg-[#4B3621] text-white font-black tracking-[0.2em] text-sm hover:shadow-xl transition-all active:scale-95">
+                      {t('cart.viewFullBasket')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="w-20 h-20 bg-[#4B3621]/5 rounded-full flex items-center justify-center mx-auto">
+                      <ShoppingCart size={32} className="text-[#4B3621]/20" />
+                    </div>
+                    <h3 className="text-xl font-black text-[#4B3621] dark:text-amber-100">{t('cart.emptyTitle')}</h3>
+                    <p className="text-gray-400 text-sm max-w-[240px] leading-relaxed">{t('cart.emptyDesc')}</p>
+                    <button onClick={() => { setIsCartOpen(false); navigate('/products'); }} className="px-10 py-4 rounded-full border-2 border-[#4B3621] text-[#4B3621] font-black text-xs uppercase tracking-widest hover:bg-[#4B3621] hover:text-white transition-all">
+                      {t('cart.shopNow')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AuthModal
+        open={isLoginModalOpen}
+        onClose={() => {
+          const redirectTo = getRedirectPath(location.state as RedirectState | null);
+          // Guard against closing into `/login` again.
+          const target = redirectTo === '/login' ? '/' : redirectTo;
+          navigate(target, { replace: true });
+        }}
+      />
+    </>
   );
 };
 

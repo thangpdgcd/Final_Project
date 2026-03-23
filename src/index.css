@@ -1,5 +1,12 @@
+:root {
+  --coffee-brown: #4B3621;
+  --gold: #FFD700;
+  --cream: #FDF5E6;
+  --bg-main: #f7f4ef;
+}
+
 html {
-  background: var(--bg-main, #f7f4ef);
+  background: var(--bg-main);
 }
 
 body {
@@ -7,7 +14,7 @@ body {
   font-family: "Viaoda Libre", serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--bg-main, #f7f4ef);
+  background: var(--bg-main);
 }
 
 code {

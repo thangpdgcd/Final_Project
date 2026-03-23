@@ -1,132 +1,119 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import { Star, Quote, CheckCircle } from "lucide-react";
 
 import "./index.scss";
-
-const LeafIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg
-    className={className}
-    width='16'
-    height='16'
-    viewBox='0 0 24 24'
-    fill='none'
-    xmlns='http://www.w3.org/2000/svg'
-    aria-hidden='true'
-    focusable='false'
-  >
-    <path
-      d='M20.8 3.2c-6.2 1-11 4.5-13.3 9.7C6 16.4 6.9 20 6.9 20s3.6.9 7.1-.6c5.2-2.3 8.7-7.1 9.7-13.3.1-.7-.5-1.3-1.2-1.2Z'
-      fill='#2E7D32'
-      opacity='0.18'
-    />
-    <path
-      d='M20.8 3.2c-6.2 1-11 4.5-13.3 9.7C6 16.4 6.9 20 6.9 20s3.6.9 7.1-.6c5.2-2.3 8.7-7.1 9.7-13.3.1-.7-.5-1.3-1.2-1.2Z'
-      stroke='#2E7D32'
-      strokeWidth='1.6'
-      strokeLinejoin='round'
-    />
-    <path
-      d='M7.6 18.4c2.1-3.8 6.5-8.1 12-11.3'
-      stroke='#2E7D32'
-      strokeWidth='1.6'
-      strokeLinecap='round'
-    />
-  </svg>
-);
 
 const ReviewsSection: React.FC = () => {
   const { t } = useTranslation();
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  } as any;
+
+  const reviews = [
+    {
+      id: 1,
+      content: "home.reviews1Content",
+      author: "home.reviews1Author",
+      role: "BARISTA PROFESSIONAL",
+    },
+    {
+      id: 2,
+      content: "home.reviews2Content",
+      author: "home.reviews2Author",
+      role: "COFFEE LOVER",
+    },
+    {
+      id: 3,
+      content: "home.reviews3Content",
+      author: "home.reviews3Author",
+      role: "SHOP OWNER",
+    },
+  ];
+
   return (
     <section className='customer-reviews'>
       <div className='customer-reviews__container'>
-        <div className='customer-reviews__header'>
-          <div className='customer-reviews__eyebrow'>
-            {t("home.reviewsEyebrow", { defaultValue: "ĐÁNH GIÁ KHÁCH HÀNG" })}
-          </div>
+        <motion.div 
+          className='customer-reviews__header'
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <span className='customer-reviews__eyebrow'>
+            {t("home.reviewsTitle", { defaultValue: "LỜI KHEN TỪ KHÁCH HÀNG" })}
+          </span>
           <h2 className='customer-reviews__title'>
-            {t("home.reviewsTitle", {
-              defaultValue: "Người yêu cà phê nói gì?",
-            })}
+             {t("home.reviewsSubtitle")}
           </h2>
-          <p className='customer-reviews__subtitle'>
-            {t("home.reviewsSubtitle", {
-              defaultValue:
-                "Những chia sẻ chân thành từ khách hàng đã và đang đồng hành cùng Phan Coffee.",
-            })}
-          </p>
-        </div>
+        </motion.div>
 
-        <div className='customer-reviews__grid'>
-          <article className='customer-reviews__item'>
-            <div className='customer-reviews__stars'>☆☆☆☆☆</div>
-            <p className='customer-reviews__content'>
-              {t("home.reviews1Content")}
-            </p>
-            <div className='customer-reviews__profile'>
-              <div className='customer-reviews__badge'>
-                <LeafIcon className='customer-reviews__badge-icon' />
-                <div className='customer-reviews__badge-name'>
-                  {t("home.reviews1ShortName", { defaultValue: "Trần" })}
-                </div>
+        <motion.div 
+          className='customer-reviews__grid'
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
+          {reviews.map((review) => (
+            <motion.article 
+              key={review.id}
+              className='customer-reviews__item'
+              variants={cardVariants}
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
+            >
+              <div className="customer-reviews__quote-icon">
+                <Quote size={24} fill="currentColor" opacity={0.1} />
               </div>
-              <div>
-                <div className='customer-reviews__author'>
-                  {t("home.reviews1Author", {
-                    defaultValue: "Trần Hoàng Long",
-                  })}
-                </div>
-                <div className='customer-reviews__role'>
-                  {t("home.reviews1Role", {
-                    defaultValue: "BARISTA PROFESSIONAL",
-                  })}
-                </div>
+              
+              <div className='customer-reviews__stars'>
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={14} fill="#dfa88b" stroke="#dfa88b" />
+                ))}
               </div>
-            </div>
-          </article>
 
-          <article className='customer-reviews__item'>
-            <div className='customer-reviews__stars'>☆☆☆☆☆</div>
-            <p className='customer-reviews__content'>{t("home.reviews2Content")}</p>
-            <div className='customer-reviews__profile'>
-              <div className='customer-reviews__badge'>
-                <LeafIcon className='customer-reviews__badge-icon' />
-                <div className='customer-reviews__badge-name'>
-                  {t("home.reviews2ShortName", { defaultValue: "Nguyễn" })}
-                </div>
-              </div>
-              <div>
-                <div className='customer-reviews__author'>{t("home.reviews2Author")}</div>
-                <div className='customer-reviews__role'>
-                  {t("home.reviews2Role", { defaultValue: "COFFEE LOVER" })}
-                </div>
-              </div>
-            </div>
-          </article>
+              <p className='customer-reviews__content'>
+                "{t(review.content)}"
+              </p>
 
-          <article className='customer-reviews__item'>
-            <div className='customer-reviews__stars'>☆☆☆☆☆</div>
-            <p className='customer-reviews__content'>{t("home.reviews3Content")}</p>
-            <div className='customer-reviews__profile'>
-              <div className='customer-reviews__badge'>
-                <LeafIcon className='customer-reviews__badge-icon' />
-                <div className='customer-reviews__badge-name'>
-                  {t("home.reviews3ShortName", { defaultValue: "Phạm" })}
+              <div className='customer-reviews__footer'>
+                <div className="customer-reviews__divider" />
+                <div className='customer-reviews__profile'>
+                  <div className="customer-reviews__info">
+                    <div className='customer-reviews__author'>
+                      {t(review.author)}
+                    </div>
+                    <div className='customer-reviews__role'>
+                      <CheckCircle size={10} className="inline mr-1" />
+                      {review.role}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div>
-                <div className='customer-reviews__author'>{t("home.reviews3Author")}</div>
-                <div className='customer-reviews__role'>
-                  {t("home.reviews3Role", { defaultValue: "CHỦ QUÁN CAFE" })}
-                </div>
-              </div>
-            </div>
-          </article>
-        </div>
+            </motion.article>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
 };
 
 export default ReviewsSection;
-

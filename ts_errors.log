@@ -1,0 +1,17 @@
+src/App.test.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/App.test.tsx(2,32): error TS2307: Cannot find module '@testing-library/react' or its corresponding type declarations.
+src/App.test.tsx(5,1): error TS2582: Cannot find name 'test'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha`.
+src/App.test.tsx(8,3): error TS2304: Cannot find name 'expect'.
+src/pages/customers/homes/index.tsx(9,1): error TS6133: 'BestSellersSection' is declared but its value is never read.
+src/pages/customers/orders/index.tsx(25,5): error TS2717: Subsequent property declarations must have the same type.  Property 'paypal' must be of type 'Record<string, unknown> | undefined', but here has type 'any'.
+src/pages/customers/orders/index.tsx(88,9): error TS6133: 'handleMenuClick' is declared but its value is never read.
+src/pages/customers/orders/index.tsx(93,9): error TS6133: 'menuItems' is declared but its value is never read.
+src/pages/customers/orders/index.tsx(266,5): error TS18046: 'window.paypal.Buttons' is of type 'unknown'.
+src/pages/customers/payment/index.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/pages/customers/payment/index.tsx(18,5): error TS2717: Subsequent property declarations must have the same type.  Property 'paypal' must be of type 'Record<string, unknown> | undefined', but here has type 'any'.
+src/pages/customers/payment/index.tsx(91,5): error TS18046: 'window.paypal.Buttons' is of type 'unknown'.
+src/pages/OrderPage.tsx(13,31): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+src/pages/systems/pages/charts_infomation.tsx(223,9): error TS6133: 'topCustomers' is declared but its value is never read.
+src/reportWebVitals.ts(1,31): error TS2307: Cannot find module 'web-vitals' or its corresponding type declarations.
+src/reportWebVitals.ts(5,12): error TS2307: Cannot find module 'web-vitals' or its corresponding type declarations.
+src/services/axios.ts(3,29): error TS2339: Property 'env' does not exist on type 'ImportMeta'.
