@@ -42,12 +42,12 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
 
   const [submitting, setSubmitting] = React.useState(false);
 
-  const onSubmit = async (values: ForgotPasswordValues) => {
+  const onSubmit = async ({ email }: ForgotPasswordValues) => {
     setSubmitting(true);
     try {
       // No backend endpoint is wired for password reset yet.
       // We keep this UX-safe: validate email then show a success message.
-      messageApi.info(t('auth.forgotPasswordInfo'));
+      messageApi.info(`${t('auth.forgotPasswordInfo')}: ${email}`);
       setTimeout(() => setView('login'), 500);
     } finally {
       setSubmitting(false);

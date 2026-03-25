@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo_Web_Phan_Coffeess.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Phan Coffee Shop — Premium Vietnamese Coffee. Browse our curated collection of Robusta, Arabica, Blend and Specialty coffees." />
+    <title>Phan Coffee Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Viaoda+Libre&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function() {
+        try {
+          var localTheme = localStorage.getItem('theme');
+          var darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+          if (localTheme === 'dark' || (!localTheme && darkQuery.matches)) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-D1Iqy3-1.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/antd-5LhTy3za.js">
+    <link rel="modulepreload" crossorigin href="/assets/query-NkppL6SU.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-D7czvQo-.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-XCt41lzy.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

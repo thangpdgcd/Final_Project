@@ -104,7 +104,19 @@ const Chatbox: React.FC = () => {
   return (
     <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] font-sans">
       <AnimatePresence>
-        {isOpen && (
+        {!isOpen ? (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            onClick={() => setIsOpen(true)}
+            className="mb-4 p-4 bg-[#4B3621] text-white rounded-full shadow-2xl shadow-black/20 border border-white/10 hover:bg-[#3d2c1b] active:scale-95 transition-all"
+            aria-label="Open chat"
+            type="button"
+          >
+            <MessageCircle size={20} />
+          </motion.button>
+        ) : (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95, transformOrigin: "bottom right" }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -130,8 +142,15 @@ const Chatbox: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                <button className="p-2 hover:bg-white/10 rounded-full transition-colors" type="button">
                   <MoreVertical size={18} />
+                </button>
+                <button
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                  onClick={() => setIsOpen(false)}
+                  type="button"
+                >
+                  <X size={18} />
                 </button>
               </div>
             </div>

@@ -45,6 +45,11 @@ const Logo: React.FC<LogoProps> = ({
       </div>
 
       {/* Branded Label */}
+      {showText && (
+        <span className="relative z-10 whitespace-nowrap font-black text-[14px] text-[#4B3621] group-hover:text-[#FFD700] transition-colors">
+          Phan Coffee
+        </span>
+      )}
 
     </motion.div>
   );

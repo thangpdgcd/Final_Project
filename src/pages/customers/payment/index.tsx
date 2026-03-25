@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeftOutlined, ReloadOutlined, ThunderboltOutlined, InfoCircleOutlined } from "@ant-design/icons";
