@@ -1,6 +1,29 @@
 import axios from 'axios';
 
-const baseURL = 'http://localhost:8080/api';
+function normalizeApiBaseUrl(raw: string): string {
+  let v = raw.trim();
+  v = v.replace(/\/+$/, '');
+
+  // If user provided domain without protocol, assume http.
+  // If we're running over https (Vercel), prefer https.
+  if (!/^https?:\/\//i.test(v)) {
+    const proto =
+      typeof window !== 'undefined' && window.location?.protocol === 'https:'
+        ? 'https'
+        : 'http';
+    v = `${proto}://${v}`;
+  }
+
+  // Ensure it ends with `/api`
+  if (v.endsWith('/api')) return v;
+  if (v.endsWith('/')) return `${v.slice(0, -1)}/api`;
+  return `${v}/api`;
+}
+
+const apiUrlEnv = import.meta.env.VITE_API_URL as string | undefined;
+// - Prefer VITE_API_URL (set in Vercel env)
+// - Fallback to same-origin `/api` (works if you set up rewrites/proxy)
+const baseURL = apiUrlEnv ? normalizeApiBaseUrl(apiUrlEnv) : '/api';
 
 const api = axios.create({
   baseURL,
