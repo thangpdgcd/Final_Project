@@ -1,16 +1,10 @@
-import usersService from "../../src/service/usersServices.js"; // Import the user service
+import userService from "../service/usersServices.js";
+import models from "../models/index.js";
 
 let getAllUsers = async (req, res) => {
   try {
-    let { name } = req.query;
-
-    if (name) {
-      let result = await usersService.searchUsers(name);
-      return res.status(200).json(result);
-    }
-
-    let users = await usersService.getAllUsers();
-    return res.status(200).json(users);
+    const data = await userService.getAllUsers();
+    return res.status(200).json(data);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -18,42 +12,89 @@ let getAllUsers = async (req, res) => {
 
 let getUsersbyID = async (req, res) => {
   try {
-    let id = req.params.id;
-    let users = await usersService.getUsersById(id);
-    res.status(200).json(users);
+    const id = req.params.id;
+    const data = await userService.getUsersById(id);
+    return res.status(200).json(data);
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
 let createAdmin = async (req, res) => {
   try {
-    let data = req.body;
-    let newUsers = await usersService.createAdmin(data);
-    res.status(201).json(newUsers);
+    const data = req.body;
+    const result = await userService.createAdmin(data);
+    return res.status(201).json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
 let updateUsers = async (req, res) => {
   try {
-    let id = req.params.id;
-    let data = req.body;
-    let updatedUsers = await usersService.updateUsers(id, data);
-    res.status(200).json(updatedUsers);
+    const id = req.params.id;
+    const data = req.body;
+    const result = await userService.updateUsers(id, data);
+    return res.status(200).json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
 let deleteUsers = async (req, res) => {
   try {
-    let id = req.params.id;
-    await usersService.deleteUsers(id);
-    res.status(204).send();
+    const id = req.params.id;
+    const result = await userService.deleteUsers(id);
+    return res.status(200).json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+let updateProfile = async (req, res) => {
+  try {
+    const { name, phoneNumber, address } = req.body;
+    const userId = req.user.id;
+
+    const user = await models.Users.findByPk(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    await user.update({
+      name: name || user.name,
+      phoneNumber: phoneNumber || user.phoneNumber,
+      address: address || user.address
+    });
+
+    return res.status(200).json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+let uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+    
+    const userId = req.user.id;
+    const user = await models.Users.findByPk(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Model/migration may not include `avatar`; avoid 500s so you can still test upload end-to-end.
+    if (!Object.prototype.hasOwnProperty.call(user.dataValues, "avatar")) {
+      return res.status(200).json({
+        message: "Avatar uploaded (DB field `avatar` not configured in model).",
+        avatarUrl: req.file.path,
+      });
+    }
+
+    await user.update({ avatar: req.file.path });
+
+    return res.status(200).json({ 
+      message: "Avatar uploaded successfully", 
+      avatarUrl: req.file.path 
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -63,4 +104,6 @@ export default {
   createAdmin,
   updateUsers,
   deleteUsers,
+  updateProfile,
+  uploadAvatar
 };

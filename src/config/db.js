@@ -1,20 +1,26 @@
-// db.js
-const mysql = require("mysql2");
+import 'dotenv/config';
+import mysql from 'mysql2';
 
-const connection = mysql.createConnection({
-  host: "localhost",
-  port: 3306,
-  user: "root",
-  password: "", 
-  database: "coffee",
+const connection = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: {
+    rejectUnauthorized: false
+  },
+  waitForConnections: true,
+  connectionLimit: 10,
 });
 
-connection.connect((err) => {
+connection.getConnection((err, conn) => {
   if (err) {
     console.error("Kết nối thất bại: " + err.stack);
     return;
   }
-  console.log("Kết nối thành công với ID " + connection.threadId);
+  console.log("Kết nối thành công với ID " + conn.threadId);
+  conn.release();
 });
 
-module.exports = connection;
+export default connection;

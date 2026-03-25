@@ -1,9 +1,7 @@
 // src/server.js
 import express from "express";
 import dotenv from "dotenv";
-import cors from "cors";
 import cookieParser from "cookie-parser";
-import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 import path from "path";
 import swaggerUi from "swagger-ui-express";
@@ -11,6 +9,7 @@ import swaggerSpec from "./config/swagger.js";
 import paypal from "paypal-rest-sdk";
 
 import configViewEngine from "./config/viewEngine.js";
+import { buildCorsMiddleware } from "./config/corsConfig.js";
 import initRoutes from "./routes/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,33 +28,17 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser()); // Đọc cookie (cần cho HttpOnly cookie auth)
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
-
-
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Auth-Mode"],
-    //hêm dòng này để cho phép frontend gửi header X-Auth-Mode qua CORS:
-//Frontend login có gửi X-Auth-Mode: bearer
-//Trình duyệt sẽ preflight và kiểm tra header này có được backend cho phép không
-//Nếu không thêm vào allowedHeaders, request bị chặn ngay từ preflight
-//Nên thêm:
-//"X-Auth-Mode" vào allowedHeaders là bắt buộc để login chạy được.
-    credentials: true,
-  })
-);
+const corsMiddleware = buildCorsMiddleware();
+app.use(corsMiddleware);
 
 // Quan trọng: handle preflight
 // Express 5 (with path-to-regexp v6) does not support the bare "*" path.
 // Use a regex route so preflight requests are handled for all paths.
-app.options(/.*/, cors());
+app.options(/.*/, corsMiddleware);
 
 if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
   console.error("❌ Missing PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET in .env");
@@ -76,8 +59,13 @@ initRoutes(app);
 const swaggerOptions = {
   swaggerOptions: {
     persistAuthorization: true, // Lưu token khi refresh trang
+    docExpansion: "full", // Mở rộng danh sách endpoint ngay trên Swagger home
   },
 };
+
+// Useful for tools like Rapidoc / manual testing (and for your `homeapi.ejs`).
+app.get("/openapi.json", (req, res) => res.json(swaggerSpec));
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerOptions));
 
 // when user search not found page

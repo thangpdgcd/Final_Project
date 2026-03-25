@@ -39,87 +39,62 @@ let login = async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ message: "Email và mật khẩu là bắt buộc." });
   }
-  console.log("🔑 Thông tin đăng nhập:", { email, password: "[Đã ẩn]" });
+
   try {
     const result = await authService.login(email, password);
-    const { token, user } = result;
+    const { accessToken, refreshToken, user } = result;
 
-    // HttpOnly cookie - JavaScript không đọc được, không lưu localStorage
     const isProduction = process.env.NODE_ENV === "production";
-    res.cookie("access_token", token, {
+    
+    // Refresh Token in HTTP-only cookie
+    res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? "strict" : "lax",
-      maxAge: 60 * 60 * 1000, // 1 hour
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: "/",
     });
 
-    // Trả user. Token KHÔNG trả trong body → frontend không lưu localStorage được.
-    // Chỉ trả token khi có header X-Auth-Mode: bearer (Swagger/Postman test)
-    const useCookieOnly = req.get("X-Auth-Mode") !== "bearer";
-    const response = { message: "Đăng nhập thành công", user };
-    if (!useCookieOnly) response.token = token;
-    return res.status(200).json(response);
+    return res.status(200).json({
+      message: "Đăng nhập thành công",
+      accessToken,
+      user
+    });
   } catch (error) {
     console.error("❌ Lỗi login:", error);
     return res.status(401).json({ message: error.message });
   }
 };
 
-let showLoginPage = (_, res) => {
-  res.render("login", { message: null });
-};
+let refreshToken = async (req, res) => {
+  const refreshToken = req.cookies.refresh_token;
 
-let loginEJS = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.render("login", { message: "Email và mật khẩu là bắt buộc." });
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Refresh token not found." });
   }
 
   try {
-    const { token, user } = await authService.login(email, password);
-
-    // Lưu vào session
-    req.session.user = user;
-    req.session.token = token;
-
-    // Chuyển hướng sang trang homeapi
-    return res.redirect("/");
-  } catch (error) {
-    return res.render("login", { message: error.message });
-  }
-};
-
-let showRegisterPage = (_, res) => {
-  res.render("register", { message: null });
-};
-
-let registerEJS = async (req, res) => {
-  try {
-    const { name, email, address, phoneNumber, password, roleID } = req.body;
-
-    if (!name || !email || !password) {
-      return res.render("register", {
-        message: "Please fill in all the information.",
-      });
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET || "REFRESH_SECRET");
+    
+    const user = await models.Users.findByPk(decoded.id);
+    if (!user) {
+      return res.status(401).json({ message: "User not found." });
     }
 
-    const allowedRoles = ["1", "2", "3"];
-    const validatedRole = allowedRoles.includes(roleID) ? roleID : "1"; // default là "1" (user)
+    const { accessToken, refreshToken: newRefreshToken } = authService.generateTokens(user);
 
-    await authService.registerUser({
-      name,
-      email,
-      address,
-      phoneNumber,
-      password,
-      roleID: validatedRole,
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie("refresh_token", newRefreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "strict" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
     });
 
-    return res.redirect("/login"); // Chuyển đến trang login sau khi đăng ký
-  } catch (error) {
-    return res.render("register", { message: error.message });
+    return res.status(200).json({ accessToken });
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid or expired refresh token." });
   }
 };
 
@@ -128,7 +103,7 @@ let getMe = (req, res) => {
 };
 
 let logout = (req, res) => {
-  res.clearCookie("access_token", { path: "/" });
+  res.clearCookie("refresh_token", { path: "/" });
   if (req.session) {
     req.session.destroy();
   }
@@ -138,10 +113,7 @@ let logout = (req, res) => {
 export default {
   registerUser,
   login,
-  showLoginPage,
-  loginEJS,
-  showRegisterPage,
-  registerEJS,
+
   getMe,
   logout,
 };

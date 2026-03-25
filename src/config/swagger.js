@@ -18,7 +18,8 @@ const swaggerOptions = {
     info: {
       title: "API Documentation",
       version: "1.0.0",
-      description: "Swagger API for system. **Bấm Authorize** (góc trên phải) → dán token từ POST /api/login → Authorize.",
+      description:
+        "Swagger API for system. **Authorize** (góc trên phải) → dán `accessToken` từ POST /api/login.",
     },
     tags: [
       {

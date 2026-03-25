@@ -3,6 +3,7 @@ import authMiddleware from "../middlewares/auth.js";
 import express from "express";
 
 const router = express.Router();
+
 /**
  * @swagger
  * tags:
@@ -14,7 +15,7 @@ const router = express.Router();
  * @swagger
  * /api/register:
  *   post:
- *     summary: Đăng ký tài khoản
+ *     summary: Register a new account
  *     tags: [Auth]
  *     security: []
  *     requestBody:
@@ -23,25 +24,34 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
- *               - name
+ *             required: [name, email, password]
  *             properties:
  *               name:
  *                 type: string
- *                 example: Nguyễn Văn A
+ *                 example: John Doe
  *               email:
  *                 type: string
- *                 example: user@gmail.com
+ *                 example: john@example.com
+ *               address:
+ *                 type: string
+ *                 example: HCM
+ *               phoneNumber:
+ *                 type: string
+ *                 example: "0900000001"
  *               password:
  *                 type: string
- *                 example: 12345678
+ *                 format: password
+ *                 example: "123456"
+ *               roleID:
+ *                 type: string
+ *                 enum: ["1", "2", "3"]
+ *                 example: "2"
+ *                 description: "1=user, 2=admin, 3=manager"
  *     responses:
  *       201:
- *         description: Đăng ký thành công
+ *         description: Register success
  *       400:
- *         description: Dữ liệu không hợp lệ
+ *         description: Bad request
  */
 router.post("/register", authController.registerUser);
 
@@ -49,139 +59,51 @@ router.post("/register", authController.registerUser);
  * @swagger
  * /api/login:
  *   post:
- *     summary: Đăng nhập (API - JWT)
- *    
+ *     summary: Login and receive JWT access token
+ *     tags: [Auth]
  *     security: []
- *     parameters:
- *       - in: header
- *         name: X-Auth-Mode
- *         required: false
- *         schema:
- *           type: string
- *           example: bearer
- *         description: Gửi giá trị 'bearer' để nhận token trong response (dùng cho Swagger/Postman)
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
+ *             required: [email, password]
  *             properties:
  *               email:
  *                 type: string
- *                 example: user@gmail.com
+ *                 example: admin@example.com
  *               password:
  *                 type: string
- *                 example: 12345678
+ *                 format: password
+ *                 example: Admin@123
  *     responses:
  *       200:
- *         description: Đăng nhập thành công
- *       401:
- *         description: Sai email hoặc mật khẩu
+ *         description: Login success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: JWT access token (paste into Swagger Authorize)
+ *                 user:
+ *                   type: object
  */
 router.post("/login", authController.login);
 
 /**
  * @swagger
- * /api/login:
- *   get:
- *     summary: Hiển thị trang đăng nhập (EJS)
- *     tags: [Auth - View]
- *     security: []
- *     responses:
- *       200:
- *         description: Trang login EJS
- */
-router.get("/login", authController.showLoginPage);
-
-/**
- * @swagger
- * /api/loginEJS:
- *   post:
- *     summary: Đăng nhập bằng form EJS
- *     tags: [Auth - View]
- *     security: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 example: user@gmail.com
- *               password:
- *                 type: string
- *                 example: 12345678
- *     responses:
- *       302:
- *         description: Redirect sau khi đăng nhập
- */
-router.post("/loginEJS", authController.loginEJS);
-
-/**
- * @swagger
- * /api/register:
- *   get:
- *     summary: Hiển thị trang đăng ký (EJS)
- *     tags: [Auth - View]
- *     security: []
- *     responses:
- *       200:
- *         description: Trang register EJS
- */
-router.get("/register", authController.showRegisterPage);
-
-/**
- * @swagger
- * /api/registerEJS:
- *   post:
- *     summary: Đăng ký bằng form EJS
- *     tags: [Auth - View]
- *     security: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/x-www-form-urlencoded:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - password
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       302:
- *         description: Redirect sau khi đăng ký
- */
-router.post("/registerEJS", authController.registerEJS);
-
-/**
- * @swagger
  * /api/me:
  *   get:
- *     summary: Lấy thông tin user hiện tại (cần token)
+ *     summary: Get current logged-in user info
  *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Thông tin user từ token
+ *         description: Current user info
  *       401:
- *         description: Chưa đăng nhập
+ *         description: Unauthorized
  */
 router.get("/me", authMiddleware, authController.getMe);
 
@@ -189,12 +111,12 @@ router.get("/me", authMiddleware, authController.getMe);
  * @swagger
  * /api/logout:
  *   post:
- *     summary: Đăng xuất (xóa cookie)
+ *     summary: Logout (clears refresh token cookie)
  *     tags: [Auth]
  *     security: []
  *     responses:
  *       200:
- *         description: Đăng xuất thành công
+ *         description: Logout success
  */
 router.post("/logout", authController.logout);
 

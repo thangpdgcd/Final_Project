@@ -2,6 +2,11 @@
 import express from "express";
 import OrdersController from "../controllers/ordersController.js";
 import authMiddleware from "../middlewares/auth.js";
+import {
+  isCustomer,
+  isStaffOrAdmin,
+  verifyToken,
+} from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -63,7 +68,12 @@ router.get("/orders", authMiddleware, OrdersController.getAllOrders);
  *       400:
  *         description: Bad request
  */
-router.post("/create-orders", authMiddleware, OrdersController.createOrders);
+router.post(
+  "/create-orders",
+  verifyToken,
+  isCustomer,
+  OrdersController.createOrders,
+);
 
 /**
  * @swagger
@@ -139,6 +149,34 @@ router.put("/orders/:id", authMiddleware, OrdersController.updateOrders);
  *         description: Order not found
  */
 router.delete("/orders/:id", authMiddleware, OrdersController.deleteOrders);
+
+/**
+ * @swagger
+ * /api/orders/approve/{id}:
+ *   post:
+ *     summary: Approve an order (staff/admin only)
+ *     tags: [Orders]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Order ID
+ *     responses:
+ *       200:
+ *         description: Order approved successfully
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Order not found
+ */
+router.post(
+  "/orders/approve/:id",
+  verifyToken,
+  isStaffOrAdmin,
+  OrdersController.approveOrder,
+);
 
 /* ================== INIT ================== */
 const initOrdersRoutes = (app) => {

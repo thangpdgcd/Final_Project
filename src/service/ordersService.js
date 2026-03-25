@@ -18,76 +18,76 @@ const getAllOrders = async () => {
   });
 };
 const getOrderById = async (orderId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      console.log("🔍 Searching orderId:", orderId);
-      const orders = await Orders.findByPk(orderId, {
-        include: {
-          model: Users,
-          as: "users",
-          attributes: ["userId", "name", "email"],
-        },
-      });
+  try {
+    console.log("Searching orderId:", orderId);
+    const orders = await Orders.findByPk(orderId, {
+      include: {
+        model: Users,
+        as: "users",
+        attributes: ["userId", "name", "email"],
+      },
+    });
 
-      if (!orders) {
-        throw new Error("Order not found");
-      }
-
-      return orders;
-    } catch (error) {
-      throw new Error("Error retrieving order: " + error.message);
+    if (!orders) {
+      throw new Error("Order not found");
     }
-  });
+
+    return orders;
+  } catch (error) {
+    if (error.message === "Order not found") {
+      throw error;
+    }
+    throw new Error("Error retrieving order: " + error.message);
+  }
 };
 
 const createOrders = async (userId, opts = {}) => {
-  return new Promise(async (resolve, reject) => {
-    if (!userId) throw new Error("Missing userId");
-    const {
-      status = "Pending",
-      paymentMethod = null,
-      paypalCaptureId = null,
-    } = opts;
+  if (!userId) throw new Error("Missing userId");
+  const {
+    status = "Pending",
+    paymentMethod = null,
+    paypalCaptureId = null,
+  } = opts;
 
-    const cart = await Carts.findOne({
-      where: { userId },
-      include: [{ model: Cart_Items, as: "cart_Items" }],
-    });
-
-    if (!cart) throw new Error("Cart not found");
-    if (!cart.cart_Items || cart.cart_Items.length === 0)
-      throw new Error("Cart is empty");
-
-    const totalAmount = cart.cart_Items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0,
-    );
-
-    const order = await Orders.create({
-      userId,
-      total_Amount: totalAmount,
-      status, // ✅ Paid hoặc Pending
-      shipping_Address: "Chưa cập nhật",
-
-      // ✅ nếu DB có cột thì lưu thêm
-      payment_Method: paymentMethod,
-      paypal_Capture_Id: paypalCaptureId,
-      paid_At: status === "Paid" ? new Date() : null,
-    });
-
-    for (const item of cart.cart_Items) {
-      await Order_Items.create({
-        orderId: order.orderId,
-        productId: item.productId,
-        quantity: item.quantity,
-        price: item.price,
-      });
-    }
-
-    await Cart_Items.destroy({ where: { cartId: cart.cartId } });
-
-    return order;
+  const cart = await Carts.findOne({
+    where: { userId },
+    include: [{ model: Cart_Items, as: "cart_Items" }],
   });
+
+  if (!cart) throw new Error("Cart not found");
+  if (!cart.cart_Items || cart.cart_Items.length === 0) {
+    throw new Error("Cart is empty");
+  }
+
+  const totalAmount = cart.cart_Items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+
+  const order = await Orders.create({
+    userId,
+    total_Amount: totalAmount,
+    status, // ✅ Paid hoặc Pending
+    shipping_Address: "Chưa cập nhật",
+
+    // ✅ nếu DB có cột thì lưu thêm
+    payment_Method: paymentMethod,
+    paypal_Capture_Id: paypalCaptureId,
+    paid_At: status === "Paid" ? new Date() : null,
+  });
+
+  for (const item of cart.cart_Items) {
+    await Order_Items.create({
+      orderId: order.orderId,
+      productId: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+    });
+  }
+
+  await Cart_Items.destroy({ where: { cartId: cart.cartId } });
+
+  return order;
 };
 
 const updateOrder = async (updateOrderid, data) => {

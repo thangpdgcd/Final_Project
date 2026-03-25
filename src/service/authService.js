@@ -64,6 +64,24 @@ const registerUser = async ({
   };
 };
 
+const generateTokens = (user) => {
+  const payload = { id: user.userId, roleID: user.roleID };
+  
+  const accessToken = jwt.sign(
+    payload,
+    process.env.JWT_SECRET || "ACCESS_SECRET",
+    { expiresIn: "3h" }
+  );
+
+  const refreshToken = jwt.sign(
+    payload,
+    process.env.REFRESH_TOKEN_SECRET || "REFRESH_SECRET",
+    { expiresIn: "7d" }
+  );
+
+  return { accessToken, refreshToken };
+};
+
 const login = async (Email, password) => {
   if (!Email || !password) {
     throw new Error("Email and password are required.");
@@ -82,14 +100,11 @@ const login = async (Email, password) => {
     throw new Error("Incorrect email or password.");
   }
 
-  const token = jwt.sign(
-    { id: user.userId, roleID: user.roleID },
-    process.env.JWT_SECRET || "SECRET_KEY",
-    { expiresIn: "1h" }, // Token chỉ có hiệu lực trong 1 giờ
-  );
+  const { accessToken, refreshToken } = generateTokens(user);
 
   return {
-    token,
+    accessToken,
+    refreshToken,
     user: {
       id: user.userId,
       name: user.Name,
@@ -102,4 +117,5 @@ const login = async (Email, password) => {
 export default {
   registerUser,
   login,
+  generateTokens,
 };
