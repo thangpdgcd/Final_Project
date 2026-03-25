@@ -1,4 +1,6 @@
 import authService from "../service/authService.js";
+import jwt from "jsonwebtoken";
+import models from "../models/index.js";
 
 let registerUser = async (req, res) => {
   try {
@@ -50,7 +52,8 @@ let login = async (req, res) => {
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? "strict" : "lax",
+      // When FE/BE are on different domains (common on Vercel), cookie needs SameSite=None.
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: "/",
     });
@@ -87,7 +90,8 @@ let refreshToken = async (req, res) => {
     res.cookie("refresh_token", newRefreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? "strict" : "lax",
+      // When FE/BE are on different domains (common on Vercel), cookie needs SameSite=None.
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     });
@@ -113,6 +117,9 @@ let logout = (req, res) => {
 export default {
   registerUser,
   login,
+
+  // Refresh access token using refresh_token cookie
+  refreshToken,
 
   getMe,
   logout,

@@ -120,6 +120,11 @@ router.get("/me", authMiddleware, authController.getMe);
  */
 router.post("/logout", authController.logout);
 
+/**
+ * Refresh token: expects refresh_token in HTTP-only cookie
+ */
+router.post("/refresh-token", authController.refreshToken);
+
 const initAuthenticated = (app) => {
   app.use("/api", router);
 };

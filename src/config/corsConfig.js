@@ -6,6 +6,17 @@ const fallbackOrigins = [
   "http://localhost:5175",
 ];
 
+function isVercelOrigin(origin) {
+  // Allow Vercel preview/production domains without requiring env changes.
+  // Examples:
+  // - https://my-app.vercel.app
+  // - https://my-app-git-main.vercel.app
+  return (
+    typeof origin === "string" &&
+    (origin.endsWith(".vercel.app") || origin.endsWith(".vercel.dev"))
+  );
+}
+
 // tránh bị sập server
 function parseAllowedOriginsFromEnv(envValue) {
   if (!envValue || typeof envValue !== "string") return fallbackOrigins;
@@ -29,6 +40,7 @@ export function buildCorsMiddleware() {
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) return callback(null, true);
+      if (isVercelOrigin(origin)) return callback(null, true);
 
       return callback(new Error("Not allowed by CORS"), false);
     },
