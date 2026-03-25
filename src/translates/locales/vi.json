@@ -9,7 +9,11 @@
     "theme": "Giao diện",
     "darkMode": "Chế độ tối",
     "lightMode": "Chế độ sáng",
-    "search": "Tìm kiếm"
+    "search": "Tìm kiếm",
+    "lang": {
+      "en": "EN",
+      "vi": "VN"
+    }
   },
   "nav": {
     "home": "Trang chủ",
@@ -21,6 +25,106 @@
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
     "searchPlaceholder": "Tìm kiếm cà phê..."
+  },
+  "about": {
+    "sectionLabel": "VỀ PHAN COFFEE",
+    "heroTitle": "Từ Tây Nguyên đến Từng Tách Cà Phê",
+    "heroDescription": "Chúng tôi chọn lọc hạt từ Tây Nguyên và rang mẻ nhỏ để hương thơm luôn tươi mới, sạch và rõ ràng.",
+    "products": {
+      "natural": "Tự Nhiên",
+      "honey": "Honey",
+      "wash": "Washed"
+    },
+    "images": {
+      "freshAlt": "Cà phê rang tươi",
+      "mainAlt": "Rang xay cà phê",
+      "secondaryAlt": "Cà phê Arabica",
+      "processNaturalAlt": "Quy trình tự nhiên",
+      "qualityAlt": "Chất lượng cà phê"
+    },
+    "process": {
+      "heading": "Chất lượng bắt đầu từ quy trình",
+      "title": "Hành trình rang mộc"
+    },
+    "cards": {
+      "fresh": {
+        "title": "Rang Tươi",
+        "description": "Rang theo mẻ nhỏ để hương thơm rạng rỡ và kết thúc mượt mà."
+      },
+      "natural": {
+        "title": "Quy trình Tự Nhiên",
+        "description": "Chế biến tự nhiên giúp hương vị cân bằng và tỏa sáng rõ ràng."
+      },
+      "quality": {
+        "title": "Kiểm soát Chất lượng",
+        "description": "Kiểm soát nhiệt độ và thời gian để mỗi mẻ đều đạt chuẩn chất lượng."
+      }
+    }
+  },
+  "aboutPage": {
+    "heroLabel": "CÂU CHUYỆN CỦA CHÚNG TÔI",
+    "heroTitle": "Phan Coffee",
+    "heroSubtitle": "Khởi nguồn từ tình yêu với hạt cà phê Kon Tum, chúng tôi mang đến hương vị nguyên bản - không tẩm ướp, không phụ gia.",
+    "heroCta": "Khám phá sản phẩm",
+    "origin": {
+      "label": "Nguồn gốc",
+      "titleLine1": "Từ đất Kon Tum",
+      "titleLine2": "đến từng tách cà phê",
+      "p1": "Phan Coffee ra đời tại mảnh đất cao nguyên Kon Tum, nơi có độ cao lý tưởng, khí hậu mát mẻ và đất đỏ bazan màu mỡ - những điều kiện tạo nên hạt cà phê đặc biệt.",
+      "p2": "Chúng tôi làm việc trực tiếp với nông hộ địa phương, đảm bảo thu mua công bằng và canh tác bền vững. Mỗi mẻ rang đều được theo dõi kỹ lưỡng để giữ hương vị nhất quán."
+    },
+    "process": {
+      "label": "Quy trình",
+      "title": "Từ vườn đến ly cà phê",
+      "steps": [
+        {
+          "icon": "🌱",
+          "title": "Tuyển chọn hạt",
+          "desc": "Hạt cà phê được tuyển chọn kỹ lưỡng từ các vườn Kon Tum để đảm bảo chất lượng đầu vào."
+        },
+        {
+          "icon": "🔥",
+          "title": "Rang thủ công",
+          "desc": "Rang theo phong cách truyền thống, kiểm soát nhiệt độ và thời gian để đạt hương vị tốt nhất."
+        },
+        {
+          "icon": "📦",
+          "title": "Đóng gói tươi",
+          "desc": "Đóng gói ngay sau rang để giữ mùi thơm. Van thoát khí một chiều giúp cà phê tươi lâu hơn."
+        },
+        {
+          "icon": "🚀",
+          "title": "Giao hàng nhanh",
+          "desc": "Giao trong ngày tại Kon Tum và toàn quốc trong 2-3 ngày để bạn luôn nhận được cà phê mới."
+        }
+      ]
+    },
+    "values": {
+      "label": "Cam kết",
+      "title": "Giá trị cốt lõi",
+      "items": [
+        {
+          "icon": "🌿",
+          "title": "Nguyên chất 100%",
+          "desc": "Không tẩm ướp, không chất bảo quản. Chỉ có hạt cà phê rang mộc đúng chuẩn."
+        },
+        {
+          "icon": "🤝",
+          "title": "Thương mại công bằng",
+          "desc": "Hợp tác trực tiếp với nông dân để đảm bảo thu nhập bền vững cho cộng đồng."
+        },
+        {
+          "icon": "♻️",
+          "title": "Bền vững môi trường",
+          "desc": "Bao bì thân thiện môi trường và quy trình sản xuất tiết kiệm năng lượng."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Sẵn sàng thưởng thức?",
+      "subtitle": "Khám phá bộ sưu tập cà phê rang mộc nguyên chất của chúng tôi.",
+      "button": "Mua ngay"
+    }
   },
   "home": {
     "heroBadge": "TỪ ĐẠI NGÀN KON TUM",
@@ -60,6 +164,102 @@
       "title": "CẬP NHẬT TIN TỨC",
       "subtitle": "Mỗi tách cà phê pha phin có thể đóng góp tới 1.8g chất xơ trong khẩu phần khuyến nghị hằng ngày.",
       "learnMore": "Xem thêm"
+    },
+    "bestSeller": {
+      "title": "Măng Đen Blend",
+      "eyebrow": "Sản phẩm nổi bật",
+      "quote": "“Sự hòa quyện tuyệt vời giữa vị đắng thanh thoát và hương thơm nồng nàn từ tài nguyên Tây Nguyên. Một hành trình cảm xúc trong từng ngụm cà phê.”",
+      "imageAlt": "Sản phẩm Măng Đen Blend",
+      "price": "285.000đ",
+      "badge": "Best Seller",
+      "addToCart": "Thêm vào giỏ hàng",
+      "bullets": [
+        "100% cà phê rang mộc tự nhiên",
+        "Nguồn gốc: Vùng núi Măng Đen, Kon Tum",
+        "Hương vị: Socola, Caramel, Thảo mộc"
+      ]
+    },
+    "reviews1Author": "Minh Anh",
+    "reviews1Content": "Hương thơm tuyệt vời, vị đậm đà và hậu vị êm.",
+    "reviews2Author": "Trương N.",
+    "reviews2Content": "Vị phong phú, rang đúng gu. Rất đáng thử.",
+    "reviews3Author": "Lan H.",
+    "reviews3Content": "Thơm, cân bằng và không bao giờ làm mình thất vọng.",
+    "clubCtaEmailPlaceholder": "Email của bạn...",
+    "clubCtaTitle": "Gia nhập Phan Coffee Club",
+    "clubCtaSubtitle": "Nhận thông báo về mẻ rang mới, ưu đãi đặc biệt và kiến thức cà phê mỗi tuần.",
+    "clubCtaButton": "Đăng ký",
+    "heroFeatures": {
+      "aromatic": "THƠM NGON",
+      "organic": "HỮU CƠ",
+      "heritage": "DI SẢN"
+    },
+    "reviewRoles": {
+      "barista": "BARISTA CHUYÊN NGHIỆP",
+      "coffeeLover": "TÍN ĐỒ CÀ PHÊ",
+      "shopOwner": "CHỦ QUÁN"
+    },
+    "explore": {
+      "title": "Khám phá hương vị",
+      "items": {
+        "singleOrigin": {
+          "title": "Single Origin",
+          "desc": "Hương vị nguyên bản từ những vùng nguyên liệu đặc trưng."
+        },
+        "houseBlends": {
+          "title": "House Blends",
+          "desc": "Sự kết hợp hoàn hảo tạo nên phong vị độc bản của Phan Coffee."
+        },
+        "brewingTools": {
+          "title": "Dụng cụ pha",
+          "desc": "Nâng tầm trải nghiệm thưởng thức cà phê tại gia."
+        }
+      }
+    },
+    "artisticRoasting": {
+      "title": "Nghệ thuật rang xay",
+      "desc": "Tại Phan Coffee, rang xay không chỉ là công đoạn kỹ thuật mà còn là nghệ thuật. Chúng tôi lắng nghe từng tiếng nổ, quan sát màu sắc và hương thơm để dừng đúng thời điểm vàng.",
+      "cards": {
+        "temp": {
+          "title": "Nhiệt độ tối ưu",
+          "desc": "Kiểm soát nhiệt độ chính xác để đánh thức hương vị tiềm ẩn."
+        },
+        "slowRoast": {
+          "title": "Rang chậm",
+          "desc": "Quy trình rang kéo dài giúp hạt chín đều từ trong ra ngoài."
+        }
+      }
+    },
+    "handsToHeart": {
+      "titleLine1": "Từ đôi tay",
+      "titleLine2": "đến trái tim",
+      "desc": "Mỗi hạt cà phê bạn thưởng thức đều mang theo câu chuyện của người nông dân Kon Tum cần cù. Chúng tôi tiếp nối hành trình ấy bằng niềm đam mê rang mộc tận tụy.",
+      "founderName": "Anh Phan",
+      "founderRole": "Người sáng lập Phan Coffee",
+      "mediaAlt": {
+        "farmer": "Người nông dân và quả cà phê",
+        "barista": "Barista đang pha chế"
+      }
+    },
+    "roastingProcess": {
+      "eyebrow": "NGHỆ THUẬT RANG XAY",
+      "title": "Quy trình rang xay nghệ thuật",
+      "description": "Tại Phan Coffee, mỗi mẻ rang là bản giao hưởng của nhiệt độ và thời gian. Chúng tôi không chỉ rang cà phê mà còn đánh thức tầng hương sâu nhất trong từng hạt mộc.",
+      "imageAlt": "Quy trình rang xay Phan Coffee",
+      "items": {
+        "manualSelect": {
+          "title": "Chọn lọc thủ công",
+          "desc": "Chỉ những quả chín mọng đạt chuẩn kích thước mới được đưa vào quy trình."
+        },
+        "pureRoast": {
+          "title": "Rang mộc 100%",
+          "desc": "Cam kết không tẩm ướp phụ gia, giữ nguyên vị đắng thanh và hậu ngọt nguyên bản."
+        },
+        "scaPack": {
+          "title": "Đóng gói chuẩn SCA",
+          "desc": "Bảo quản trong túi van một chiều giúp cà phê luôn tươi mới như vừa ra lò."
+        }
+      }
     }
   },
   "cart": {
@@ -69,6 +269,37 @@
     "emptyTitle": "Giỏ hàng trống",
     "emptyDesc": "Hành trình cà phê của bạn chưa bắt đầu. Hãy khám phá các loại cà phê của chúng tôi!",
     "shopNow": "Mua sắm ngay"
+  },
+  "products": {
+    "title": "Sản phẩm",
+    "kicker": "DANH SÁCH CÀ PHÊ",
+    "mediumRoast": "Rang mộc vừa",
+    "searchPlaceholder": "Tìm kiếm sản phẩm...",
+    "selectOptionPlaceholder": "Chọn một tùy chọn",
+    "zoomAria": "Phóng to",
+    "filterAria": "Bộ lọc",
+    "viewDetailsAria": "Xem chi tiết",
+    "tabs": {
+      "all": "Tất cả cà phê"
+    },
+    "sort": {
+      "default": "Mặc định",
+      "priceAsc": "Giá: Thấp đến Cao",
+      "priceDesc": "Giá: Cao đến Thấp",
+      "nameAsc": "Tên: A-Z",
+      "nameDesc": "Tên: Z-A"
+    },
+    "itemsLabel": "sản phẩm",
+    "empty": "Không có sản phẩm nào.",
+    "defaultDescription": "Cà phê rang mộc với hương thơm phong phú và vị cân bằng.",
+    "heroKicker": "Khám phá bộ sưu tập",
+    "heroTitle": "Cà Phê Phan",
+    "heroSubtitle": "Rang mộc nguyên chất từ mảnh đất Kon Tum - hương thơm, vị đậm, không tạp chất.",
+    "loadError": "Lỗi tải sản phẩm",
+    "byId": {}
+  },
+  "categories": {
+    "byId": {}
   },
   "auth": {
     "loginTitle": "Đăng Nhập",
@@ -90,10 +321,66 @@
     "loginSuccess": "Đăng nhập thành công!",
     "loginError": "Email hoặc mật khẩu không chính xác!",
     "registerTitle": "TẠO TÀI KHOẢN",
-    "registerDivider": "Đăng ký bằng email"
+    "registerDivider": "Đăng ký bằng email",
+    "loginEmailLabel": "Email",
+    "loginEmailPlaceholder": "ban@example.com",
+    "loginEmailRequired": "Email là bắt buộc",
+    "loginEmailInvalid": "Email không hợp lệ",
+    "loginPasswordLabel": "Mật khẩu",
+    "loginPasswordPlaceholder": "••••••••",
+    "loginPasswordRequired": "Mật khẩu là bắt buộc",
+    "loginRememberMe": "Ghi nhớ đăng nhập",
+    "loginForgotPassword": "Quên mật khẩu?",
+    "loginNoAccount": "Chưa có tài khoản?",
+    "loginRegister": "Tạo tài khoản",
+    "loginSocialFacebook": "Tiếp tục với Facebook",
+    "loginSocialGoogle": "Tiếp tục với Google",
+    "loginSocialInstagram": "Tiếp tục với Instagram",
+    "registerFullNameLabel": "Họ và tên",
+    "registerFullNameRequired": "Họ và tên là bắt buộc",
+    "registerFullNamePlaceholder": "Nguyễn Văn A",
+    "registerEmailLabel": "Email",
+    "registerEmailRequired": "Email là bắt buộc",
+    "registerEmailInvalid": "Email không hợp lệ",
+    "registerError": "Đăng ký thất bại. Vui lòng thử lại.",
+    "registerAddressLabel": "Địa chỉ",
+    "registerAddressPlaceholder": "Ví dụ: 123 ABC Street, Quận 1",
+    "registerAgreeLabel": "Tôi đồng ý với điều khoản",
+    "registerAgreeRequired": "Bạn phải đồng ý để tiếp tục",
+    "registerAlreadyHaveAccount": "Bạn đã có tài khoản?",
+    "registerConfirmPasswordLabel": "Xác nhận mật khẩu",
+    "registerConfirmPasswordNotMatch": "Mật khẩu không khớp",
+    "registerConfirmPasswordRequired": "Xác nhận mật khẩu là bắt buộc",
+    "registerPasswordLabel": "Mật khẩu",
+    "registerPasswordRequired": "Mật khẩu ít nhất 6 ký tự",
+    "registerPhoneLabel": "Số điện thoại",
+    "registerSubmit": "Tạo tài khoản",
+    "registerSuccess": "Đăng ký thành công! Vui lòng đăng nhập.",
+    "registerGotoLogin": "Đăng nhập",
+    "loginSocialDivider": "Cổng bảo mật",
+    "loginBannerTitlePrefix": "Rang Mộc",
+    "loginBannerTitleHighlight": "Hoàn Hảo.",
+    "loginBannerQuote": "Cà phê rang mộc nguyên chất từ Kon Tum — hương thơm nồng nàn, vị đậm đà. Trải nghiệm nguồn gốc.",
+    "loginFeatureAromatic": "Thơm Ngon",
+    "loginFeatureOrganic": "Hữu Cơ",
+    "loginFeatureHeritage": "Di Sản",
+    "registerJoinUs": "Tham gia ngay.",
+    "registerSubtitle": "Tạo tài khoản của bạn và bắt đầu hành trình cà phê.",
+    "registerProcessing": "Đang xử lý...",
+    "registerSecureData": "Dữ liệu an toàn",
+    "registerBannerTitlePrefix": "Tham gia cùng",
+    "registerBannerTitleHighlight": "Di Sản.",
+    "registerBannerQuote": "Trải nghiệm tinh chất cà phê rang mộc nguyên chất từ cao nguyên Kon Tum.",
+    "registerFeaturePremium": "Cao Cấp",
+    "registerFeatureFresh": "Tươi Mới",
+    "registerFeatureAuthentic": "Chân Thực",
+    "forgotPasswordInfo": "Nếu tài khoản tồn tại, bạn sẽ nhận được liên kết đặt lại mật khẩu sớm.",
+    "forgotPasswordSending": "Đang gửi...",
+    "forgotPasswordSubmit": "Gửi liên kết đặt lại mật khẩu"
   },
   "profile": {
     "title": "Hồ sơ cá nhân",
+    "profileNavigationAria": "Điều hướng hồ sơ",
     "editProfile": "Chỉnh sửa hồ sơ",
     "saveChanges": "Lưu thay đổi",
     "avatarSuccess": "Cập nhật ảnh đại diện thành công!",
@@ -108,7 +395,133 @@
     "membership": "Hội viên",
     "joinedSince": "Ngày tham gia",
     "accountStatus": "Trạng thái",
-    "points": "Điểm Coffee"
+    "points": "Điểm Coffee",
+    "accountBadge": "Tài khoản của tôi",
+    "alertTitle": "Hồ sơ",
+    "back": "Quay lại",
+    "changeAvatarAria": "Thay đổi ảnh đại diện",
+    "changeAvatarLabel": "Thay đổi ảnh",
+    "emptyField": "Không có",
+    "fieldName": "Họ và tên",
+    "fieldEmail": "Email",
+    "fieldAddress": "Địa chỉ",
+    "locationPlaceholder": "TP.HCM, Việt Nam",
+    "fieldPhone": "Số điện thoại",
+    "loading": "Đang tải...",
+    "loadErrorFallback": "Không thể tải hồ sơ",
+    "missingUserId": "Thiếu user id",
+    "noName": "Không có tên",
+    "historyOrdersSearchPlaceholder":
+      "Bạn có thể tìm kiếm theo tên Shop, ID đơn hàng hoặc Tên Sản phẩm",
+    "notFound": "Không tìm thấy người dùng"
+  },
+  "contact": {
+    "heroLabel": "LIÊN HỆ",
+    "heroTitle": "Nói chuyện với chúng tôi",
+    "heroSubtitle": "Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn",
+    "success": "✅ Cảm ơn! Chúng tôi sẽ liên hệ bạn sớm nhất.",
+    "addressLabel": "Địa chỉ",
+    "phoneLabel": "Điện thoại",
+    "emailLabel": "Email",
+    "hoursLabel": "Giờ làm việc",
+    "form": {
+      "infoTitle": "Thông tin liên hệ",
+      "title": "Gửi tin nhắn",
+      "nameLabel": "Họ và tên",
+      "nameRequired": "Vui lòng nhập tên",
+      "namePlaceholder": "Nguyễn Văn A",
+      "emailLabel": "Email",
+      "emailInvalid": "Email không hợp lệ",
+      "emailPlaceholder": "your@email.com",
+      "messageLabel": "Tin nhắn",
+      "messageRequired": "Vui lòng nhập tin nhắn",
+      "messagePlaceholder": "Nhập tin nhắn của bạn...",
+      "customerMessagePlaceholder": "Chia sẻ câu chuyện hoặc thắc mắc của bạn...",
+      "subjectPlaceholder": "Ví dụ: Góp ý về sản phẩm",
+      "submit": "Gửi tin nhắn"
+    }
+  },
+  "wishlist": {
+    "premiumGrade": "Hạng Premium",
+    "inStock": "Còn hàng",
+    "limited": "Giới hạn",
+    "bestSeller": "Bán chạy",
+    "premiumPrice": "Giá Premium",
+    "toast": {
+      "addToCartSuccess": "✅ Đã thêm vào giỏ hàng",
+      "addToCartError": "❌ Không thể thêm vào giỏ",
+      "removeSuccess": "Đã xóa khỏi danh sách yêu thích"
+    },
+    "breadcrumb": {
+      "origins": "Nguồn gốc",
+      "treasures": "Kho báu"
+    },
+    "savedTitlePrefix": "Đã lưu",
+    "savedTitleHighlight": "Hương vị.",
+    "collectionSize": "Kích thước bộ sưu tập",
+    "yourSelects": "Lựa chọn của bạn",
+    "quietCollectionTitle": "Bộ sưu tập yên bình.",
+    "quietCollectionQuote": "Cà phê rang mộc nguyên chất từ Kon Tum — chưa có lựa chọn nào. Hành trình bắt đầu với lựa chọn đầu tiên của bạn.",
+    "browseHeritage": "Khám phá di sản",
+    "discoveryNew": "Khám phá mới"
+  },
+  "productDetail": {
+    "purchaseSubscribeSuccess": "✅ Đã đăng ký gói thành công!",
+    "purchaseOnceSuccess": "✅ Đã thêm vào giỏ hàng!",
+    "purchaseError": "❌ Có lỗi xảy ra, vui lòng thử lại.",
+    "favoriteRemovedSuccess": "Đã xóa khỏi danh sách yêu thích",
+    "notFoundMessage": "Không tìm thấy sản phẩm",
+    "backToStore": "← Quay lại cửa hàng",
+    "badgeBestSeller": "BEST SELLER",
+    "badgeLimitedEdition": "LIMITED EDITION",
+    "store": "Cửa hàng",
+    "artOfCoffee": "The Art of Coffee"
+  },
+  "coffeePackageDetail": {
+    "purchaseSubscribeSuccess": "Đăng ký thành công!",
+    "purchaseOnceSuccess": "Đã thêm vào giỏ hàng!",
+    "badgeBestSeller": "BEST SELLER",
+    "badgeLimitedEdition": "LIMITED EDITION",
+    "fromFarmToCup": "From Farm to Cup",
+    "grindWholeBeans": "Whole Beans",
+    "roastMedium": "Medium",
+    "frequencyEvery2Weeks": "Every 2 weeks"
+  },
+  "customersCart": {
+    "title": "🛒 Giỏ hàng của bạn",
+    "notLoggedIn": "Bạn chưa đăng nhập.",
+    "loadError": "Không thể tải giỏ hàng",
+    "updateError": "Cập nhật thất bại",
+    "removeSuccess": "Đã xoá sản phẩm",
+    "removeError": "Xoá thất bại",
+    "empty": "Giỏ hàng trống",
+    "selectedItems": "Đã chọn {{count}} sản phẩm",
+    "totalLabel": "Tổng cộng:",
+    "checkout": "Mua hàng",
+    "columns": {
+      "product": "Sản phẩm",
+      "unitPrice": "Đơn giá",
+      "quantity": "Số lượng",
+      "total": "Thành tiền",
+      "actions": "Thao tác"
+    },
+    "actions": {
+      "remove": "Xóa"
+    },
+    "fallback": {
+      "productAlt": "product",
+      "noName": "Không có tên",
+      "categoryLabel": "Phân loại: Mặc định"
+    }
+  },
+  "chatbox": {
+    "greeting": "Xin chào! Phan Coffee có thể giúp gì cho bạn hôm nay?",
+    "alwaysOnline": "Luôn trực tuyến",
+    "placeholder": "Hỏi chúng tôi bất cứ điều gì...",
+    "botResponse1": "Chúng tôi cung cấp các loại cà phê rang mộc nguyên chất 100%.",
+    "botResponse2": "Bạn có thể xem thực đơn tại phần 'Cà phê' trên thanh menu nhé!",
+    "botResponse3": "Phan Coffee có dịch vụ giao hàng tận nơi tại Kon Tum và toàn quốc.",
+    "botResponse4": "Cảm ơn bạn đã quan tâm, chúng tôi sẽ sớm có nhân viên hỗ trợ trực tiếp."
   },
   "footer": {
     "brandDescription": "Tôn vinh truyền thống cà phê Việt Nam từ năm 2010. Chúng tôi hợp tác trực tiếp với nông hộ tại Tây Nguyên để mang đến những hạt cà phê bền vững, chất lượng.",
@@ -117,7 +530,25 @@
       "allCoffee": "Tất cả cà phê",
       "brewingGear": "Dụng cụ pha",
       "merchandise": "Phụ kiện",
-      "subscription": "Gói định kỳ"
+      "subscription": "Gói định kỳ",
+      "robusta": "Cà phê Robusta",
+      "arabica": "Cà phê Arabica",
+      "mangDenBlend": "Măng Đen Blend",
+      "filterBag": "Cà phê túi lọc"
+    },
+    "info": {
+      "title": "Thông tin",
+      "about": "Về chúng tôi",
+      "shipping": "Chính sách giao hàng",
+      "brewingGuide": "Hướng dẫn pha chế",
+      "wholesale": "Liên hệ sỉ/đại lý"
+    },
+    "contact": {
+      "title": "Liên hệ",
+      "address": "86 Lâm Tùng, Ia Chim, TP. Kon Tum",
+      "phone": "+84 123 456 789",
+      "email": "hello@phancoffee.vn",
+      "hours": "Thứ 2 - CN: 07:00 - 21:00"
     },
     "support": {
       "title": "HỖ TRỢ",
@@ -126,6 +557,14 @@
       "returns": "Đổi trả",
       "privacy": "Chính sách bảo mật"
     },
-    "copyright": "© {{year}} Phan Coffee. Bảo lưu mọi quyền."
-  }
+    "termsOfService": "Điều khoản dịch vụ",
+    "copyright": "© {{year}} Phan Coffee - Cà phê rang mộc. Bảo lưu mọi quyền."
+  },
+  "payment": {
+    "cartEmpty": "Giỏ hàng trống!",
+    "amountPlaceholder": "10.00",
+    "orderPaymentSuccess":
+      "Thanh toán thành công ✅ Đang chuyển đến sản phẩm bạn đã đặt..."
+  },
+  "paymentId": "Mã thanh toán"
 }

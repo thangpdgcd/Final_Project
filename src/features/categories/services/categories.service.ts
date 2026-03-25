@@ -10,7 +10,14 @@ const normalizeCategory = (record: Record<string, unknown>): Category => ({
 export const categoriesService = {
   getAll: async (): Promise<Category[]> => {
     const res = await axiosInstance.get('/categories');
-    const raw = Array.isArray(res.data) ? res.data : (res.data?.categories ?? []);
+    const raw =
+      Array.isArray(res.data)
+        ? res.data
+        : (res.data?.categories ??
+          res.data?.data?.categories ??
+          res.data?.data ??
+          res.data?.rows ??
+          []);
     return (Array.isArray(raw) ? raw : [])
       .map(normalizeCategory)
       .filter((c) => Number.isFinite(c.category_ID) && c.category_ID > 0);

@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConfigProvider, theme as antdTheme } from 'antd';
+import { ConfigProvider, Spin, theme as antdTheme } from 'antd';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ThemeProvider, useTheme } from '@/store/ThemeContext';
 import { AuthProvider } from '@/store/AuthContext';
 import AppRoutes from '@/routes';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 import '@/styles/globals.css';
 
 const queryClient = new QueryClient({
@@ -34,7 +35,25 @@ const AppContent: React.FC = () => {
       }}
     >
       <BrowserRouter>
-        <AppRoutes />
+        <ErrorBoundary>
+          <Suspense
+            fallback={
+              <div
+                style={{
+                  minHeight: '100vh',
+                  display: 'grid',
+                  placeItems: 'center',
+                }}
+              >
+                <Spin size="large" tip="Loading page...">
+                  <div style={{ minHeight: 24, minWidth: 24 }} />
+                </Spin>
+              </div>
+            }
+          >
+            <AppRoutes />
+          </Suspense>
+        </ErrorBoundary>
       </BrowserRouter>
       <ToastContainer
         position="top-right"

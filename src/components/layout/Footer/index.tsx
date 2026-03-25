@@ -1,6 +1,7 @@
 import React from "react";
 import { Layout, Row, Col, Typography } from "antd";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   FacebookFilled,
   InstagramOutlined,
@@ -16,6 +17,7 @@ const { Title } = Typography;
 
 const FooterPage: React.FC = () => {
   const year = new Date().getFullYear();
+  const { t } = useTranslation();
 
   return (
     <Footer className='app-footer'>
@@ -30,12 +32,9 @@ const FooterPage: React.FC = () => {
                   alt='Phan Coffee logo'
                 />
               </div>
-              <div className='footer-brand__name'>Phan Coffee</div>
+              <div className='footer-brand__name'>{t("common.brandName")}</div>
             </div>
-            <p className='footer-text'>
-              Cung cấp giải pháp cà phê rang mộc nguyên chất cho gia đình và doanh
-              nghiệp. Tận tâm trong từng hạt cà phê từ mảnh đất Kon Tum.
-            </p>
+            <p className='footer-text'>{t("footer.brandDescription")}</p>
             <div className='footer-social'>
               <a
                 href='https://web.facebook.com/phancoffee.vn'
@@ -58,66 +57,60 @@ const FooterPage: React.FC = () => {
 
           {/* Products */}
           <Col xs={12} md={6} lg={5} className='footer-column'>
-            <Title level={5} className='footer-heading'>
-              Sản phẩm
-            </Title>
+            <Title level={5} className='footer-heading'>{t("footer.shop.title")}</Title>
             <ul className='footer-list'>
               <li>
-                <Link to='/products?category=robusta'>Cà phê Robusta</Link>
+                <Link to='/products?category=robusta'>{t("footer.shop.robusta")}</Link>
               </li>
               <li>
-                <Link to='/products?category=arabica'>Cà phê Arabica</Link>
+                <Link to='/products?category=arabica'>{t("footer.shop.arabica")}</Link>
               </li>
               <li>
-                <Link to='/products?category=mang-den-blend'>Măng Đen Blend</Link>
+                <Link to='/products?category=mang-den-blend'>{t("footer.shop.mangDenBlend")}</Link>
               </li>
               <li>
-                <Link to='/products?category=filter-bag'>Cà phê túi lọc</Link>
+                <Link to='/products?category=filter-bag'>{t("footer.shop.filterBag")}</Link>
               </li>
             </ul>
           </Col>
 
           {/* Info */}
           <Col xs={12} md={6} lg={5} className='footer-column'>
-            <Title level={5} className='footer-heading'>
-              Thông tin
-            </Title>
+            <Title level={5} className='footer-heading'>{t("footer.info.title")}</Title>
             <ul className='footer-list'>
               <li>
-                <Link to='/abouts'>Về chúng tôi</Link>
+                <Link to='/abouts'>{t("footer.info.about")}</Link>
               </li>
               <li>
-                <Link to='/shipping-policy'>Chính sách giao hàng</Link>
+                <Link to='/shipping-policy'>{t("footer.info.shipping")}</Link>
               </li>
               <li>
-                <Link to='/brewing-guide'>Hướng dẫn pha chế</Link>
+                <Link to='/brewing-guide'>{t("footer.info.brewingGuide")}</Link>
               </li>
               <li>
-                <Link to='/wholesale'>Liên hệ sỉ/đại lý</Link>
+                <Link to='/wholesale'>{t("footer.info.wholesale")}</Link>
               </li>
             </ul>
           </Col>
 
           {/* Contact */}
           <Col xs={24} md={12} lg={7} className='footer-column footer-contact'>
-            <Title level={5} className='footer-heading'>
-              Liên hệ
-            </Title>
+            <Title level={5} className='footer-heading'>{t("footer.contact.title")}</Title>
             <div className='footer-contact__item'>
               <EnvironmentOutlined className='footer-contact__icon' />
-              <span>86 Lâm Tùng, Ia Chim, TP. Kon Tum</span>
+              <span>{t("footer.contact.address")}</span>
             </div>
             <div className='footer-contact__item'>
               <PhoneOutlined className='footer-contact__icon' />
-              <a href='tel:+84123456789'>+84 123 456 789</a>
+              <a href='tel:+84123456789'>{t("footer.contact.phone")}</a>
             </div>
             <div className='footer-contact__item'>
               <MailOutlined className='footer-contact__icon' />
-              <a href='mailto:hello@phancoffee.vn'>hello@phancoffee.vn</a>
+              <a href='mailto:hello@phancoffee.vn'>{t("footer.contact.email")}</a>
             </div>
             <div className='footer-contact__item'>
               <ClockCircleOutlined className='footer-contact__icon' />
-              <span>Thứ 2 - CN: 07:00 - 21:00</span>
+              <span>{t("footer.contact.hours")}</span>
             </div>
           </Col>
         </Row>
@@ -126,11 +119,11 @@ const FooterPage: React.FC = () => {
       {/* Bottom bar */}
       <div className='app-footer__bottom'>
         <div className='footer-bottom-left'>
-          © {year} Phan Coffee - Cà phê rang mộc. All rights reserved.
+          {t("footer.copyright", { year })}
         </div>
         <div className='footer-bottom-right'>
-          <Link to='/terms-of-service'>Điều khoản dịch vụ</Link>
-          <Link to='/privacy'>Chính sách bảo mật</Link>
+          <Link to='/terms-of-service'>{t("footer.termsOfService")}</Link>
+          <Link to='/privacy'>{t("footer.support.privacy")}</Link>
         </div>
       </div>
     </Footer>

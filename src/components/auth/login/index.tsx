@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Layout, Form, Input, Button, Checkbox, message, Divider } from "antd";
+import { Layout, Form, Input, Button, Checkbox, App, Divider } from "antd";
 import {
   FacebookFilled,
   InstagramFilled,
   ChromeOutlined,
 } from "@ant-design/icons";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { login, LoginPayload, LoginResponse } from "../../../api/authApi";
 import { useTranslation } from "react-i18next";
 
@@ -21,9 +21,9 @@ interface LoginFormValues extends LoginPayload {
 }
 
 const LoginPage: React.FC = () => {
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useTranslation();
 
   const onFinish = async (values: LoginFormValues) => {
@@ -59,13 +59,7 @@ const LoginPage: React.FC = () => {
 
       message.success(`✅ ${t("auth.loginSuccess")}`);
 
-      // Nếu trước đó bị chặn ở PrivateRoutes, quay lại trang đó, ngược lại về home
-      const from =
-        (location.state as any)?.from?.pathname ||
-        (location.state as any)?.from ||
-        "/";
-
-      navigate(from, { replace: true });
+      navigate("/", { replace: true });
 
       return (data as any).user;
     } catch {

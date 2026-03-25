@@ -4,16 +4,22 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { Mail } from 'lucide-react';
-import { message } from 'antd';
+import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import type { AuthView } from '../AuthModal';
 
-const forgotPasswordSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email'),
-});
+const buildForgotPasswordSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z
+      .string()
+      .min(1, t('auth.loginEmailRequired'))
+      .email(t('auth.loginEmailInvalid')),
+  });
 
-type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
+type ForgotPasswordValues = z.infer<
+  ReturnType<typeof buildForgotPasswordSchema>
+>;
 
 type ForgotPasswordFormProps = {
   setView: React.Dispatch<React.SetStateAction<AuthView>>;
@@ -22,8 +28,9 @@ type ForgotPasswordFormProps = {
 const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   setView,
 }) => {
+  const { message: messageApi } = App.useApp();
   const { t } = useTranslation();
-  const [messageApi, contextHolder] = message.useMessage();
+  const forgotPasswordSchema = buildForgotPasswordSchema(t);
 
   const {
     register,
@@ -40,9 +47,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
     try {
       // No backend endpoint is wired for password reset yet.
       // We keep this UX-safe: validate email then show a success message.
-      messageApi.info(
-        'If an account exists for this email, you will receive a reset link shortly.',
-      );
+      messageApi.info(t('auth.forgotPasswordInfo'));
       setTimeout(() => setView('login'), 500);
     } finally {
       setSubmitting(false);
@@ -51,7 +56,6 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
 
   return (
     <>
-      {contextHolder}
       <motion.form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full space-y-5"
@@ -82,7 +86,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
           disabled={submitting}
           className="w-full py-4 rounded-2xl bg-[#4B3621] text-white font-black tracking-[0.2em] text-sm shadow-xl shadow-[#4B3621]/20 disabled:opacity-50 transition-all uppercase"
         >
-          {submitting ? 'Sending...' : 'Send reset link'}
+          {submitting ? t('auth.forgotPasswordSending') : t('auth.forgotPasswordSubmit')}
         </button>
 
         <div className="pt-2 text-center">
@@ -91,7 +95,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
             onClick={() => setView('login')}
             className="text-[12px] font-bold text-[#4B3621] hover:underline decoration-2"
           >
-            Back to login
+            {t('auth.registerGotoLogin')}
           </button>
         </div>
       </motion.form>

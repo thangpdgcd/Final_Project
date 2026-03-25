@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { 
+  App,
   Button, 
   Radio, 
   Select, 
@@ -10,7 +11,6 @@ import {
   Divider, 
   Carousel, 
   InputNumber,
-  message
 } from 'antd';
 import { 
   ShoppingCart, 
@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 // --- TYPES ---
 interface Review {
@@ -82,7 +83,9 @@ const RELATED: Partial<CoffeeExperience>[] = [
 
 // --- COMPONENT ---
 const CoffeePackageDetail: React.FC = () => {
+  const { message } = App.useApp();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [purchaseType, setPurchaseType] = useState<'once' | 'subscribe'>('subscribe');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [grind, setGrind] = useState('Beans');
@@ -98,7 +101,11 @@ const CoffeePackageDetail: React.FC = () => {
   const savings = unitPrice * discountRate * quantity;
 
   const handleCTA = () => {
-    message.success(purchaseType === 'subscribe' ? 'Subscribed successfully!' : 'Added to cart!');
+    message.success(
+      purchaseType === 'subscribe'
+        ? t('coffeePackageDetail.purchaseSubscribeSuccess')
+        : t('coffeePackageDetail.purchaseOnceSuccess'),
+    );
   };
 
   return (
@@ -124,10 +131,18 @@ const CoffeePackageDetail: React.FC = () => {
           {/* Hero Gallery */}
           <section className="relative rounded-[32px] overflow-hidden shadow-2xl bg-white border-4 border-white">
             <div className="absolute top-6 left-6 z-10 flex flex-col gap-2">
-              <Badge.Ribbon text="BEST SELLER" color="#6f4e37">
+              <Badge.Ribbon
+                text={t('coffeePackageDetail.badgeBestSeller')}
+                color="#6f4e37"
+              >
                 <div className="hidden"></div>
               </Badge.Ribbon>
-              <Tag color="orange" className="font-bold border-none px-4 py-1 rounded-full shadow-sm">LIMITED EDITION</Tag>
+              <Tag
+                color="orange"
+                className="font-bold border-none px-4 py-1 rounded-full shadow-sm"
+              >
+                {t('coffeePackageDetail.badgeLimitedEdition')}
+              </Tag>
             </div>
             
             <Carousel autoplay effect="fade" dotPosition="bottom">
@@ -172,7 +187,9 @@ const CoffeePackageDetail: React.FC = () => {
             viewport={{ once: true }}
             className="bg-white rounded-[40px] p-8 md:p-12 shadow-sm border border-[#6f4e37]/5 relative overflow-hidden"
           >
-            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[#6f4e37] mb-8">From Farm to Cup</h2>
+            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[#6f4e37] mb-8">
+              {t('coffeePackageDetail.fromFarmToCup')}
+            </h2>
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <h3 className="text-3xl font-black mb-6 leading-tight">The Misty Peaks of {COFFEE_DATA.origin}</h3>
@@ -311,7 +328,9 @@ const CoffeePackageDetail: React.FC = () => {
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-50">Grind Type</label>
                     <Select value={grind} onChange={setGrind} className="w-full custom-select" size="large">
-                      <Select.Option value="Beans">Whole Beans</Select.Option>
+                      <Select.Option value="Beans">
+                        {t('coffeePackageDetail.grindWholeBeans')}
+                      </Select.Option>
                       <Select.Option value="Ground">Ground</Select.Option>
                     </Select>
                   </div>
@@ -319,7 +338,9 @@ const CoffeePackageDetail: React.FC = () => {
                     <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-50">Roast Level</label>
                     <Select value={roast} onChange={setRoast} className="w-full custom-select" size="large">
                       <Select.Option value="Light">Light</Select.Option>
-                      <Select.Option value="Medium">Medium</Select.Option>
+                      <Select.Option value="Medium">
+                        {t('coffeePackageDetail.roastMedium')}
+                      </Select.Option>
                       <Select.Option value="Dark">Dark</Select.Option>
                     </Select>
                   </div>
@@ -330,7 +351,9 @@ const CoffeePackageDetail: React.FC = () => {
                     <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-50">Delivery Frequency</label>
                     <Select value={frequency} onChange={setFrequency} className="w-full custom-select" size="large">
                       <Select.Option value="Every week">Every 1 week</Select.Option>
-                      <Select.Option value="Every 2 weeks">Every 2 weeks</Select.Option>
+                      <Select.Option value="Every 2 weeks">
+                        {t('coffeePackageDetail.frequencyEvery2Weeks')}
+                      </Select.Option>
                       <Select.Option value="Monthly">Every month</Select.Option>
                     </Select>
                   </div>

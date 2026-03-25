@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Star, Quote, CheckCircle } from "lucide-react";
+import { Star, CheckCircle, X } from "lucide-react";
 
 import "./index.scss";
 
@@ -32,19 +32,19 @@ const ReviewsSection: React.FC = () => {
       id: 1,
       content: "home.reviews1Content",
       author: "home.reviews1Author",
-      role: "BARISTA PROFESSIONAL",
+      role: "home.reviewRoles.barista",
     },
     {
       id: 2,
       content: "home.reviews2Content",
       author: "home.reviews2Author",
-      role: "COFFEE LOVER",
+      role: "home.reviewRoles.coffeeLover",
     },
     {
       id: 3,
       content: "home.reviews3Content",
       author: "home.reviews3Author",
-      role: "SHOP OWNER",
+      role: "home.reviewRoles.shopOwner",
     },
   ];
 
@@ -59,7 +59,7 @@ const ReviewsSection: React.FC = () => {
           transition={{ duration: 0.8 }}
         >
           <span className='customer-reviews__eyebrow'>
-            {t("home.reviewsTitle", { defaultValue: "LỜI KHEN TỪ KHÁCH HÀNG" })}
+            {t("home.reviewsTitle", { defaultValue: "Customer Reviews" })}
           </span>
           <h2 className='customer-reviews__title'>
              {t("home.reviewsSubtitle")}
@@ -80,9 +80,16 @@ const ReviewsSection: React.FC = () => {
               variants={cardVariants}
               whileHover={{ y: -10, transition: { duration: 0.3 } }}
             >
-              <div className="customer-reviews__quote-icon">
-                <Quote size={24} fill="currentColor" opacity={0.1} />
-              </div>
+              <motion.button
+                type="button"
+                className="customer-reviews__quote-icon"
+                whileHover={{ scale: 1.08, rotate: 8 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 280, damping: 18 }}
+                aria-label="Close icon"
+              >
+                <X size={20} />
+              </motion.button>
               
               <div className='customer-reviews__stars'>
                 {[...Array(5)].map((_, i) => (
@@ -103,7 +110,7 @@ const ReviewsSection: React.FC = () => {
                     </div>
                     <div className='customer-reviews__role'>
                       <CheckCircle size={10} className="inline mr-1" />
-                      {review.role}
+                      {t(review.role)}
                     </div>
                   </div>
                 </div>

@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User } from 'lucide-react';
-import { message } from 'antd';
+import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { authService } from '@/features/auth/services/auth.service';
@@ -13,27 +13,29 @@ import type { RegisterPayload } from '@/types';
 
 import type { AuthView } from '../AuthModal';
 
-const registerSchema = z
-  .object({
-    name: z.string().min(2, 'Name is required'),
-    email: z.string().min(1, 'Email is required').email('Invalid email'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string().min(1, 'Confirm password is required'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
+const buildRegisterSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      name: z.string().min(2, t('auth.registerFullNameRequired')),
+      email: z.string().min(1, t('auth.registerEmailRequired')).email(t('auth.registerEmailInvalid')),
+      password: z.string().min(6, t('auth.registerPasswordRequired')),
+      confirmPassword: z.string().min(1, t('auth.registerConfirmPasswordRequired')),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t('auth.registerConfirmPasswordNotMatch'),
+      path: ['confirmPassword'],
+    });
 
-type RegisterFormValues = z.infer<typeof registerSchema>;
+type RegisterFormValues = z.infer<ReturnType<typeof buildRegisterSchema>>;
 
 type RegisterFormProps = {
   setView: React.Dispatch<React.SetStateAction<AuthView>>;
 };
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ setView }) => {
+  const { message: messageApi } = App.useApp();
   const { t } = useTranslation();
-  const [messageApi, contextHolder] = message.useMessage();
+  const registerSchema = buildRegisterSchema(t);
 
   const {
     register,
@@ -46,11 +48,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ setView }) => {
   const registerMutation = useMutation({
     mutationFn: (payload: RegisterPayload) => authService.register(payload),
     onSuccess: () => {
-      messageApi.success('Registration successful! Please log in.');
+      messageApi.success(t('auth.registerSuccess'));
       setView('login');
     },
     onError: () => {
-      messageApi.error('Registration failed. Please check your details and try again.');
+      messageApi.error(t('auth.registerError'));
     },
   });
 
@@ -65,7 +67,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ setView }) => {
 
   return (
     <>
-      {contextHolder}
       <motion.form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full space-y-5"
@@ -79,7 +80,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ setView }) => {
             <input
               {...register('name')}
               type="text"
-              placeholder="Full name"
+              placeholder={t('auth.registerFullNameLabel')}
               className={`w-full bg-gray-50 dark:bg-[#2a2423] border-2 ${
                 errors.name ? 'border-red-500/50' : 'border-transparent'
               } focus:border-[#4B3621]/20 dark:focus:border-[#FFD700]/20 py-4 pl-12 pr-4 rounded-2xl outline-none transition-all font-bold placeholder:text-gray-400`}
@@ -142,7 +143,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ setView }) => {
             <input
               {...register('confirmPassword')}
               type="password"
-              placeholder="Confirm password"
+              placeholder={t('auth.registerConfirmPasswordLabel')}
               className={`w-full bg-gray-50 dark:bg-[#2a2423] border-2 ${
                 errors.confirmPassword ? 'border-red-500/50' : 'border-transparent'
               } focus:border-[#4B3621]/20 dark:focus:border-[#FFD700]/20 py-4 pl-12 pr-4 rounded-2xl outline-none transition-all font-bold placeholder:text-gray-400`}
@@ -161,7 +162,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ setView }) => {
           disabled={registerMutation.isPending}
           className="w-full py-4 rounded-2xl bg-[#4B3621] text-white font-black tracking-[0.2em] text-sm shadow-xl shadow-[#4B3621]/20 disabled:opacity-50 transition-all uppercase"
         >
-          {registerMutation.isPending ? 'Creating...' : 'Create account'}
+          {registerMutation.isPending ? t('auth.registerProcessing') : t('auth.registerSubmit')}
         </button>
 
         <div className="pt-2 text-center">
@@ -170,7 +171,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ setView }) => {
             onClick={() => setView('login')}
             className="text-gray-400 font-bold text-xs uppercase tracking-tight hover:text-[#4B3621] transition-colors"
           >
-            Already have an account?
+            {t('auth.registerAlreadyHaveAccount')}
           </button>
         </div>
       </motion.form>

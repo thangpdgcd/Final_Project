@@ -9,7 +9,7 @@ const { Content } = Layout;
 const CustomerLayout: React.FC = () => (
   <Layout className="min-h-screen">
     <HeaderPage />
-    <Content>
+    <Content className="pt-24">
       <Suspense
         fallback={
           <div className="page-loading">

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./index.scss";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeftOutlined, ReloadOutlined, ThunderboltOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import Chatbox from "../../../components/chatbox";
 
 const API_BASE =
@@ -23,7 +24,6 @@ export default function PaymentPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Lấy từ OrderPage gửi sang
   const passed = location.state || {};
   const initialAmount = passed?.amount || "10.00";
   const initialCurrency = passed?.currency || "USD";
@@ -53,17 +53,13 @@ export default function PaymentPage() {
 
     const client_id = String(data?.data || "").trim();
     if (!client_id) throw new Error("BE không trả PAYPAL_CLIENT_ID");
-    if (client_id.includes("${"))
-      throw new Error("ClientId bị sai format (${clientId})");
 
     return client_id;
   };
 
   const loadPaypalScript = async (client_id: string, curr: string) => {
-    // nếu đã có paypal global rồi thì thôi
     if (window.paypal) return;
 
-    // tránh append nhiều lần
     const existed = document.querySelector(`script[data-paypal-sdk="1"]`);
     if (existed) return;
 
@@ -90,9 +86,13 @@ export default function PaymentPage() {
 
     window.paypal
       .Buttons({
-        style: { layout: "vertical", label: "paypal" },
+        style: {
+          layout: "vertical",
+          label: "paypal",
+          shape: "rect",
+          color: "gold"
+        },
 
-        // ✅ tạo order qua BE (khuyến nghị)
         createOrder: async () => {
           const res = await fetch(`${API_BASE}${CREATE_ENDPOINT}`, {
             method: "POST",
@@ -108,7 +108,6 @@ export default function PaymentPage() {
           return String(orderId);
         },
 
-        // ✅ approve -> capture qua BE
         onApprove: async (data: any) => {
           try {
             const orderId = data?.orderID;
@@ -156,7 +155,6 @@ export default function PaymentPage() {
     }
   };
 
-  // Auto load lần đầu
   useEffect(() => {
     if (scriptLoadedRef.current) return;
     scriptLoadedRef.current = true;
@@ -164,7 +162,6 @@ export default function PaymentPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Khi đổi amount/currency -> render lại button (SDK đã load)
   useEffect(() => {
     if (status !== "ready") return;
     if (!window.paypal) return;
@@ -173,91 +170,163 @@ export default function PaymentPage() {
   }, [amountFixed, currency]);
 
   return (
-    <div className='pp-wrap'>
-      <div className='pp-card'>
-        <div className='pp-header'>
-          <div className='pp-title'>Payment</div>
-          <div className='pp-sub'>
-            Trang Payment: FE gọi <b>/payment/config</b> lấy client_id → load
-            PayPal SDK → hiển thị PayPal Buttons
+    <div className='min-h-screen bg-[#0b1220] flex items-center justify-center p-4 sm:p-8 relative overflow-hidden'>
+      {/* Background Decorative Blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px]" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className='w-full max-w-xl bg-white/10 backdrop-blur-2xl rounded-[2rem] border border-white/10 shadow-2xl overflow-hidden'
+      >
+        <div className='p-8 sm:p-10'>
+          <div className='flex items-center justify-between mb-8'>
+            <div>
+              <h1 className='text-3xl font-black text-white tracking-tight flex items-center gap-2'>
+                <ThunderboltOutlined className="text-yellow-400" />
+                Thanh Toán
+              </h1>
+              <p className='text-white/50 text-sm mt-1'>Hoàn tất đơn hàng với PayPal</p>
+            </div>
+            <div className="bg-white/5 rounded-2xl p-2 border border-white/5">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6" />
+            </div>
           </div>
-        </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 12,
-            marginBottom: 12,
-          }}>
-          <button className='pp-button' onClick={() => navigate(-1)}>
-            ← Quay lại đơn hàng
-          </button>
+          <div className='flex flex-wrap items-center gap-3 mb-8'>
+            <button
+              onClick={() => navigate(-1)}
+              className='flex-1 h-12 rounded-xl bg-white/5 hover:bg-white/10 text-white font-semibold transition-all border border-white/5 flex items-center justify-center gap-2 group'
+            >
+              <ArrowLeftOutlined className="group-hover:-translate-x-1 transition-transform" />
+              Quay lại
+            </button>
 
-          <button
-            className='pp-button'
-            onClick={handleLoadPaypal}
-            disabled={status === "loading"}>
-            {status === "loading"
-              ? "Đang tải PayPal..."
-              : "Tải/Refresh PayPal Buttons"}
-          </button>
-        </div>
-
-        <div className='pp-form'>
-          <label className='pp-label'>
-            Số tiền (USD)
-            <input
-              className='pp-input'
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder='10.00'
-              inputMode='decimal'
-            />
-          </label>
-
-          <label className='pp-label'>
-            Tiền tệ
-            <select
-              className='pp-select'
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}>
-              <option value='USD'>USD</option>
-              <option value='EUR'>EUR</option>
-            </select>
-          </label>
-        </div>
-
-        {!!totalAmountVND && (
-          <div className='pp-hint' style={{ marginTop: 8 }}>
-            Tổng đơn hàng (VND):{" "}
-            <b>{Number(totalAmountVND).toLocaleString()}₫</b>
+            <button
+              onClick={handleLoadPaypal}
+              disabled={status === "loading"}
+              className='flex-[1.5] h-12 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 disabled:opacity-50'
+            >
+              <ReloadOutlined className={status === "loading" ? "animate-spin" : ""} />
+              {status === "loading" ? "Đang tải..." : "Refresh PayPal"}
+            </button>
           </div>
-        )}
 
-        {error && <div className='pp-error'>❌ {error}</div>}
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8'>
+            <div className='space-y-2'>
+              <label className='text-xs font-bold text-white/40 uppercase tracking-widest px-1 ml-1'>
+                Số tiền (USD)
+              </label>
+              <input
+                className='w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-lg'
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="0.00"
+                inputMode='decimal'
+              />
+            </div>
 
-        <div className='pp-divider' />
+            <div className='space-y-2'>
+              <label className='text-xs font-bold text-white/40 uppercase tracking-widest px-1 ml-1'>
+                Tiền tệ
+              </label>
+              <select
+                className='w-full h-14 bg-white/5 border border-white/10 rounded-2xl px-4 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none cursor-pointer'
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+              >
+                <option value='USD' className="bg-[#1a2130]">USD - US Dollar</option>
+                <option value='EUR' className="bg-[#1a2130]">EUR - Euro</option>
+              </select>
+            </div>
+          </div>
 
-        <div className='pp-paypalBox'>
-          {status !== "ready" && (
-            <div className='pp-paypalPlaceholder'>
-              {status === "loading"
-                ? "Đang load PayPal SDK..."
-                : "PayPal Buttons sẽ hiển thị ở đây"}
+          {totalAmountVND > 0 && (
+            <div className='bg-white/5 rounded-2xl p-4 border border-white/5 mb-8 flex items-center gap-4'>
+              <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400">
+                <ThunderboltOutlined />
+              </div>
+              <div>
+                <div className="text-white/40 text-[10px] font-black uppercase tracking-tighter">Tổng đơn hàng quy đổi</div>
+                <div className="text-xl font-bold text-white">
+                  {Number(totalAmountVND).toLocaleString()}₫
+                </div>
+              </div>
             </div>
           )}
 
-          <div ref={paypalRef} />
-        </div>
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className='bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl p-4 text-sm font-medium mb-8 flex items-center gap-3'
+              >
+                <span className="text-lg">⚠️</span>
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-        <div className='pp-hint'>
-          API Base: <b>{API_BASE}</b>
-          <br />
-          Config endpoint: <b>{CONFIG_ENDPOINT}</b>
+          <div className='relative mb-8'>
+            <div className="absolute inset-x-0 top-1/2 h-px bg-white/5" />
+            <span className="relative z-10 bg-[#1a2130]/0 px-4 text-white/20 text-[10px] uppercase font-black tracking-[0.2em] flex justify-center">
+              Cổng thanh toán
+            </span>
+          </div>
+
+          <div className='bg-white/5 rounded-3xl p-6 border border-white/10 min-h-[140px] flex flex-col justify-center relative overflow-hidden'>
+            {status !== "ready" && (
+              <div className='flex flex-col items-center justify-center gap-3 text-white/30 italic text-sm'>
+                {status === "loading" ? (
+                  <>
+                    <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+                    <span>Đang chuẩn bị PayPal SDK...</span>
+                  </>
+                ) : (
+                  <span>Nút thanh toán sẽ hiển thị tại đây</span>
+                )}
+              </div>
+            )}
+
+            <div ref={paypalRef} className={status === "ready" ? "block" : "hidden"} />
+          </div>
+
+          <div className='mt-8 pt-8 border-t border-white/5 flex flex-col gap-3'>
+            <div className='flex items-center gap-2 text-[10px] text-white/30 uppercase font-bold tracking-widest'>
+              <InfoCircleOutlined /> Thông tin kỹ thuật
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-white/30">API Base</span>
+                <span className="text-white/60 font-mono">{API_BASE}</span>
+              </div>
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-white/30">Endpoint</span>
+                <span className="text-white/60 font-mono">{CONFIG_ENDPOINT}</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
+
       <Chatbox />
+
+      <style>{`
+        body {
+            background: #0b1220;
+        }
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+        }
+      `}</style>
     </div>
   );
 }

@@ -9,7 +9,11 @@
     "theme": "Theme",
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
-    "search": "Search"
+    "search": "Search",
+    "lang": {
+      "en": "EN",
+      "vi": "VN"
+    }
   },
   "nav": {
     "home": "Home",
@@ -21,6 +25,106 @@
     "login": "Login",
     "logout": "Logout",
     "searchPlaceholder": "Search coffee..."
+  },
+  "about": {
+    "sectionLabel": "ABOUT PHAN COFFEE",
+    "heroTitle": "From the Highlands to Your Cup",
+    "heroDescription": "We select beans from the Central Highlands and roast in small batches to keep every aroma fresh and clean.",
+    "products": {
+      "natural": "Natural",
+      "honey": "Honey",
+      "wash": "Washed"
+    },
+    "images": {
+      "freshAlt": "Fresh coffee",
+      "mainAlt": "Coffee roasting",
+      "secondaryAlt": "Coffee arabica",
+      "processNaturalAlt": "Natural process",
+      "qualityAlt": "Quality coffee"
+    },
+    "process": {
+      "heading": "A precise roasting process",
+      "title": "Our Roasting Journey"
+    },
+    "cards": {
+      "fresh": {
+        "title": "Fresh Roasting",
+        "description": "Roasted in small batches for vibrant aroma and a smooth finish."
+      },
+      "natural": {
+        "title": "Natural Process",
+        "description": "Naturally processed for balanced sweetness and bright notes."
+      },
+      "quality": {
+        "title": "Quality Control",
+        "description": "Careful temperature and timing control for consistent, excellent flavor."
+      }
+    }
+  },
+  "aboutPage": {
+    "heroLabel": "OUR STORY",
+    "heroTitle": "Phan Coffee",
+    "heroSubtitle": "Born from our love for Kon Tum beans, we deliver authentic flavor with no additives and no compromise.",
+    "heroCta": "Explore Products",
+    "origin": {
+      "label": "Origin",
+      "titleLine1": "From Kon Tum soil",
+      "titleLine2": "to every coffee cup",
+      "p1": "Phan Coffee was born in the highlands of Kon Tum, where ideal altitude, cool weather, and fertile basalt soil create exceptional coffee beans.",
+      "p2": "We work directly with local farmers to ensure fair sourcing and sustainable cultivation. Every roast batch is monitored carefully for consistent taste."
+    },
+    "process": {
+      "label": "Process",
+      "title": "From farm to cup",
+      "steps": [
+        {
+          "icon": "🌱",
+          "title": "Bean selection",
+          "desc": "Beans are selected carefully from Kon Tum coffee farms to ensure top-quality raw input."
+        },
+        {
+          "icon": "🔥",
+          "title": "Artisan roasting",
+          "desc": "Traditional hand-roasting with precise control of heat and time for the best possible flavor."
+        },
+        {
+          "icon": "📦",
+          "title": "Fresh packaging",
+          "desc": "Packed right after roasting to preserve aroma. One-way valves keep coffee fresher for longer."
+        },
+        {
+          "icon": "🚀",
+          "title": "Fast delivery",
+          "desc": "Same-day shipping in Kon Tum and nationwide delivery in 2-3 days for maximum freshness."
+        }
+      ]
+    },
+    "values": {
+      "label": "Commitment",
+      "title": "Core values",
+      "items": [
+        {
+          "icon": "🌿",
+          "title": "100% pure",
+          "desc": "No flavoring and no preservatives. Only carefully roasted coffee beans."
+        },
+        {
+          "icon": "🤝",
+          "title": "Fair trade",
+          "desc": "Direct collaboration with farmers to support sustainable income for local communities."
+        },
+        {
+          "icon": "♻️",
+          "title": "Sustainable",
+          "desc": "Eco-friendly packaging and production processes designed to save energy."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready for your next cup?",
+      "subtitle": "Discover our collection of pure roasted coffee.",
+      "button": "Shop now"
+    }
   },
   "home": {
     "heroBadge": "FROM THE CENTRAL HIGHLANDS",
@@ -60,6 +164,103 @@
       "title": "UPDATE NEWS",
       "subtitle": "A cup of brewed coffee represents a contribution of up to 1.8 grams of fiber of the recommended.",
       "learnMore": "Learn More"
+    },
+    "bestSeller": {
+      "title": "Mang Den Blend",
+      "eyebrow": "Featured Product",
+      "quote": "“A perfect harmony between smooth bitterness and rich Highland aromas. An emotional journey in every cup.”",
+      "imageAlt": "Mang Den Blend product",
+      "price": "285.000đ",
+      "badge": "Best Seller",
+      "addToCart": "Add to cart",
+      "bullets": [
+        "100% natural roasted coffee",
+        "Origin: Mang Den Mountains, Kon Tum",
+        "Flavor: Chocolate, Caramel, Herbal notes"
+      ]
+    },
+    "reviewsTitle": "Customer Reviews",
+    "reviews1Author": "Minh Anh",
+    "reviews1Content": "Amazing aroma and a smooth, comforting taste. It feels like home.",
+    "reviews2Author": "Truong N.",
+    "reviews2Content": "Rich flavor with the perfect roast. Highly recommended.",
+    "reviews3Author": "Lan H.",
+    "reviews3Content": "So fresh and balanced—I can’t go without it.",
+    "clubCtaEmailPlaceholder": "Email of yours...",
+    "clubCtaTitle": "Join the Phan Coffee Club",
+    "clubCtaSubtitle": "Get updates on our latest roasts, special offers, and coffee insights every week.",
+    "clubCtaButton": "Subscribe",
+    "heroFeatures": {
+      "aromatic": "AROMATIC",
+      "organic": "ORGANIC",
+      "heritage": "HERITAGE"
+    },
+    "reviewRoles": {
+      "barista": "PROFESSIONAL BARISTA",
+      "coffeeLover": "COFFEE LOVER",
+      "shopOwner": "SHOP OWNER"
+    },
+    "explore": {
+      "title": "Explore Flavors",
+      "items": {
+        "singleOrigin": {
+          "title": "Single Origin",
+          "desc": "Original flavor profiles from distinctive coffee-growing regions."
+        },
+        "houseBlends": {
+          "title": "House Blends",
+          "desc": "Signature blends crafted for the unique Phan Coffee experience."
+        },
+        "brewingTools": {
+          "title": "Brewing Tools",
+          "desc": "Upgrade your at-home coffee ritual."
+        }
+      }
+    },
+    "artisticRoasting": {
+      "title": "The art of roasting",
+      "desc": "At Phan Coffee, roasting is not just technical work - it is an art. We listen to each crack, observe color and aroma shifts, and stop at the perfect moment to preserve every layer of flavor.",
+      "cards": {
+        "temp": {
+          "title": "Optimal temperature",
+          "desc": "Precise heat control unlocks hidden flavor notes."
+        },
+        "slowRoast": {
+          "title": "Slow roast",
+          "desc": "Longer roasting helps beans develop evenly from core to surface."
+        }
+      }
+    },
+    "handsToHeart": {
+      "titleLine1": "From hands",
+      "titleLine2": "to heart",
+      "desc": "Every bean carries the story of hardworking Kon Tum farmers. They care for each tree with dedication, and we continue that journey with passion in every roast.",
+      "founderName": "Anh Phan",
+      "founderRole": "Founder of Phan Coffee",
+      "mediaAlt": {
+        "farmer": "Coffee farmer holding cherries",
+        "barista": "Barista preparing coffee"
+      }
+    },
+    "roastingProcess": {
+      "eyebrow": "ROASTING ART",
+      "title": "Artisan roasting process",
+      "description": "At Phan Coffee, each roast is a symphony of time and temperature. We do more than roast coffee; we awaken the deepest flavor layers in every bean.",
+      "imageAlt": "Phan Coffee roasting process",
+      "items": {
+        "manualSelect": {
+          "title": "Manual selection",
+          "desc": "Only ripe cherries with proper size standards enter our process."
+        },
+        "pureRoast": {
+          "title": "100% pure roast",
+          "desc": "No additives. We keep the natural clean bitterness and sweet finish."
+        },
+        "scaPack": {
+          "title": "SCA-standard packaging",
+          "desc": "Packed in one-way valve bags to keep coffee as fresh as possible."
+        }
+      }
     }
   },
   "cart": {
@@ -69,6 +270,37 @@
     "emptyTitle": "Empty Cart",
     "emptyDesc": "Your coffee adventure hasn't started yet. Browse our selection and pick a blend!",
     "shopNow": "Shop Now"
+  },
+  "products": {
+    "title": "Products",
+    "kicker": "OUR COFFEE COLLECTION",
+    "mediumRoast": "Medium Roast",
+    "searchPlaceholder": "Search coffees...",
+    "selectOptionPlaceholder": "Select an option",
+    "zoomAria": "Zoom",
+    "filterAria": "Filter",
+    "viewDetailsAria": "View details",
+    "tabs": {
+      "all": "All Coffees"
+    },
+    "sort": {
+      "default": "Featured",
+      "priceAsc": "Price: Low to High",
+      "priceDesc": "Price: High to Low",
+      "nameAsc": "Name: A to Z",
+      "nameDesc": "Name: Z to A"
+    },
+    "itemsLabel": "items",
+    "empty": "No products found.",
+    "defaultDescription": "Premium roasted coffee with rich aroma and balanced flavor.",
+    "heroKicker": "Explore the collection",
+    "heroTitle": "Phan Coffee",
+    "heroSubtitle": "Pure roasted coffee from Kon Tum - rich aroma, bold flavor, no additives.",
+    "loadError": "Failed to load products",
+    "byId": {}
+  },
+  "categories": {
+    "byId": {}
   },
   "auth": {
     "loginTitle": "Sign In",
@@ -90,10 +322,66 @@
     "loginSuccess": "Login successful!",
     "loginError": "Incorrect email or password!",
     "registerTitle": "CREATE ACCOUNT",
-    "registerDivider": "sign up with email"
+    "registerDivider": "sign up with email",
+    "loginEmailLabel": "Email Address",
+    "loginEmailPlaceholder": "you@example.com",
+    "loginEmailRequired": "Email is required",
+    "loginEmailInvalid": "Invalid email",
+    "loginPasswordLabel": "Password",
+    "loginPasswordPlaceholder": "••••••••",
+    "loginPasswordRequired": "Password is required",
+    "loginRememberMe": "Remember me",
+    "loginForgotPassword": "Forgot password?",
+    "loginNoAccount": "Not a member?",
+    "loginRegister": "Create account",
+    "loginSocialFacebook": "Continue with Facebook",
+    "loginSocialGoogle": "Continue with Google",
+    "loginSocialInstagram": "Continue with Instagram",
+    "registerFullNameLabel": "Full Name",
+    "registerFullNameRequired": "Full name is required",
+    "registerFullNamePlaceholder": "John Doe",
+    "registerEmailLabel": "Email Address",
+    "registerEmailRequired": "Email is required",
+    "registerEmailInvalid": "Invalid email",
+    "registerPasswordLabel": "Password",
+    "registerPasswordRequired": "Password must be at least 6 characters",
+    "registerConfirmPasswordLabel": "Confirm Password",
+    "registerConfirmPasswordRequired": "Confirm password is required",
+    "registerConfirmPasswordNotMatch": "Passwords do not match",
+    "registerPhoneLabel": "Phone Number",
+    "registerAddressLabel": "Address",
+    "registerAddressPlaceholder": "e.g. 123 ABC Street, District 1",
+    "registerAgreeLabel": "I agree to the terms",
+    "registerAgreeRequired": "You must agree to proceed",
+    "registerAlreadyHaveAccount": "Already have an account?",
+    "registerGotoLogin": "Log in",
+    "registerSubmit": "Create Account",
+    "registerSuccess": "Registration successful! Please log in.",
+    "registerError": "Registration failed. Please try again.",
+    "loginSocialDivider": "Secure Gateway",
+    "loginBannerTitlePrefix": "Brewing",
+    "loginBannerTitleHighlight": "Excellence.",
+    "loginBannerQuote": "Pure roasted coffee from Kon Tum — rich aroma, bold flavor. Experience the source.",
+    "loginFeatureAromatic": "Aromatic",
+    "loginFeatureOrganic": "Organic",
+    "loginFeatureHeritage": "Heritage",
+    "registerJoinUs": "Join Us.",
+    "registerSubtitle": "Create your account and start your coffee journey.",
+    "registerProcessing": "Processing...",
+    "registerSecureData": "Secure Data",
+    "registerBannerTitlePrefix": "Join the",
+    "registerBannerTitleHighlight": "Legacy.",
+    "registerBannerQuote": "Experience the pure essence of roasted coffee from the highlands of Kon Tum.",
+    "registerFeaturePremium": "Premium",
+    "registerFeatureFresh": "Fresh",
+    "registerFeatureAuthentic": "Authentic",
+    "forgotPasswordInfo": "If an account exists for this email, you will receive a reset link shortly.",
+    "forgotPasswordSending": "Sending...",
+    "forgotPasswordSubmit": "Send reset link"
   },
   "profile": {
     "title": "User Profile",
+    "profileNavigationAria": "Profile navigation",
     "editProfile": "Edit Profile",
     "saveChanges": "Save Changes",
     "avatarSuccess": "Avatar updated successfully!",
@@ -109,6 +397,133 @@
     "joinedSince": "Joined Since",
     "accountStatus": "Account Status",
     "points": "Coffee Points"
+    ,
+    "accountBadge": "Account",
+    "alertTitle": "Profile",
+    "back": "Back",
+    "changeAvatarAria": "Change your avatar",
+    "changeAvatarLabel": "Change avatar",
+    "emptyField": "Not provided",
+    "fieldName": "Full Name",
+    "fieldEmail": "Email Address",
+    "fieldAddress": "Address",
+    "locationPlaceholder": "HCM City, Vietnam",
+    "fieldPhone": "Phone Number",
+    "loading": "Loading...",
+    "loadErrorFallback": "Failed to load profile.",
+    "missingUserId": "Missing user id",
+    "noName": "No name",
+    "historyOrdersSearchPlaceholder":
+      "You can search by shop name, order ID, or product name",
+    "notFound": "User not found"
+  },
+  "contact": {
+    "heroLabel": "CONTACT",
+    "heroTitle": "Talk to us",
+    "heroSubtitle": "We're always ready to listen and support you.",
+    "success": "Thank you! We'll get back to you as soon as possible.",
+    "addressLabel": "Address",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email",
+    "hoursLabel": "Working hours",
+    "form": {
+      "infoTitle": "Contact Information",
+      "title": "Send a message",
+      "nameLabel": "Full name",
+      "nameRequired": "Please enter your name",
+      "namePlaceholder": "Nguyen Van A",
+      "emailLabel": "Email",
+      "emailInvalid": "Invalid email",
+      "emailPlaceholder": "your@email.com",
+      "messageLabel": "Message",
+      "messageRequired": "Please enter your message",
+      "messagePlaceholder": "Type your message...",
+      "customerMessagePlaceholder": "Share your story or questions...",
+      "subjectPlaceholder": "Example: Product feedback",
+      "submit": "Send message"
+    }
+  },
+  "wishlist": {
+    "premiumGrade": "Premium Grade",
+    "inStock": "In Stock",
+    "limited": "Limited",
+    "bestSeller": "Best Seller",
+    "premiumPrice": "Premium Price",
+    "toast": {
+      "addToCartSuccess": "✅ Added to cart",
+      "addToCartError": "❌ Unable to add to cart",
+      "removeSuccess": "Removed from wishlist"
+    },
+    "breadcrumb": {
+      "origins": "Origins",
+      "treasures": "Treasures"
+    },
+    "savedTitlePrefix": "Saved",
+    "savedTitleHighlight": "Tastes.",
+    "collectionSize": "Collection Size",
+    "yourSelects": "Your Selects",
+    "quietCollectionTitle": "Quiet Collection.",
+    "quietCollectionQuote": "Pure roasted coffee from Kon Tum — no favorites found. The adventure begins with your first selection.",
+    "browseHeritage": "Browse Our Heritage",
+    "discoveryNew": "Discovery New"
+  },
+  "productDetail": {
+    "purchaseSubscribeSuccess": "✅ Package subscription successful!",
+    "purchaseOnceSuccess": "✅ Added to cart!",
+    "purchaseError": "❌ Something went wrong. Please try again.",
+    "favoriteRemovedSuccess": "Removed from wishlist",
+    "notFoundMessage": "Product not found",
+    "backToStore": "Back to shop",
+    "badgeBestSeller": "BEST SELLER",
+    "badgeLimitedEdition": "LIMITED EDITION",
+    "store": "Shop",
+    "artOfCoffee": "The Art of Coffee"
+  },
+  "coffeePackageDetail": {
+    "purchaseSubscribeSuccess": "Subscribed successfully!",
+    "purchaseOnceSuccess": "Added to cart!",
+    "badgeBestSeller": "BEST SELLER",
+    "badgeLimitedEdition": "LIMITED EDITION",
+    "fromFarmToCup": "From Farm to Cup",
+    "grindWholeBeans": "Whole Beans",
+    "roastMedium": "Medium",
+    "frequencyEvery2Weeks": "Every 2 weeks"
+  },
+  "customersCart": {
+    "title": "🛒 Your Cart",
+    "notLoggedIn": "Please log in first.",
+    "loadError": "Unable to load cart.",
+    "updateError": "Failed to update cart.",
+    "removeSuccess": "Removed from cart.",
+    "removeError": "Failed to remove item.",
+    "empty": "Your cart is empty",
+    "selectedItems": "Selected {{count}} products",
+    "totalLabel": "Total:",
+    "checkout": "Checkout",
+    "columns": {
+      "product": "Product",
+      "unitPrice": "Unit Price",
+      "quantity": "Quantity",
+      "total": "Total",
+      "actions": "Actions"
+    },
+    "actions": {
+      "remove": "Remove"
+    },
+    "fallback": {
+      "productAlt": "product",
+      "noName": "No name",
+      "categoryLabel": "Category: Default"
+    }
+  },
+  "chatbox": {
+    "greeting": "Hi! How can Phan Coffee help you today?",
+    "alwaysOnline": "Always Online",
+    "placeholder": "Ask us anything...",
+    "botResponse1": "We offer 100% pure roasted coffee.",
+    "botResponse2": "You can check our menu under the 'Coffee' section in the top navigation.",
+    "botResponse3": "Phan Coffee delivers to Kon Tum and nationwide.",
+    "botResponse4": "Thank you for your interest. Our team will support you shortly."
   },
   "footer": {
     "brandDescription": "Honoring the rich tradition of Vietnamese coffee since 2010. We partner directly with farmers in the Central Highlands to bring you the finest sustainably sourced beans.",
@@ -117,7 +532,25 @@
       "allCoffee": "All Coffee",
       "brewingGear": "Brewing Gear",
       "merchandise": "Merchandise",
-      "subscription": "Subscription"
+      "subscription": "Subscription",
+      "robusta": "Robusta Coffee",
+      "arabica": "Arabica Coffee",
+      "mangDenBlend": "Mang Den Blend",
+      "filterBag": "Filter Bag Coffee"
+    },
+    "info": {
+      "title": "Information",
+      "about": "About us",
+      "shipping": "Shipping Policy",
+      "brewingGuide": "Brewing Guide",
+      "wholesale": "Wholesale / Distributors"
+    },
+    "contact": {
+      "title": "Contact",
+      "address": "86 Lam Tung, Ia Chim, Kon Tum",
+      "phone": "+84 123 456 789",
+      "email": "hello@phancoffee.vn",
+      "hours": "Mon - Sun: 07:00 - 21:00"
     },
     "support": {
       "title": "SUPPORT",
@@ -126,6 +559,14 @@
       "returns": "Returns",
       "privacy": "Privacy Policy"
     },
-    "copyright": "© {{year}} Phan Coffee. All rights reserved."
-  }
+    "termsOfService": "Terms of Service",
+    "copyright": "© {{year}} Phan Coffee - Roasted Coffee. All rights reserved."
+  },
+  "payment": {
+    "cartEmpty": "Cart is empty!",
+    "amountPlaceholder": "10.00",
+    "orderPaymentSuccess":
+      "Payment success ✅ Redirecting to your ordered products..."
+  },
+  "paymentId": "Payment ID"
 }

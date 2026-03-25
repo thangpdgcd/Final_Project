@@ -1,7 +1,6 @@
 import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import CustomerLayout from '@/layouts/CustomerLayout';
-import AdminLayout from '@/layouts/AdminLayout';
 import ProtectedRoute from '@/routes/ProtectedRoute';
 
 // ─── Customer pages (lazy-loaded) ─────────────────────────────────────────────
@@ -17,9 +16,6 @@ const OrderPage = lazy(() => import('@/pages/OrderPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 const WishlistPage = lazy(() => import('@/pages/WishlistPage'));
-
-// ─── Admin pages (lazy-loaded) ────────────────────────────────────────────────
-const SystemPage = lazy(() => import('@/pages/system/SystemPage'));
 
 const AppRoutes = () => (
   <Routes>
@@ -38,17 +34,10 @@ const AppRoutes = () => (
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/profiles/:userid" element={<ProfilePage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/carts" element={<CartPage />} />
         <Route path="/order" element={<OrderPage />} />
         <Route path="/orders" element={<OrderPage />} />
         <Route path="/wishlist" element={<WishlistPage />} />
-      </Route>
-    </Route>
-
-    {/* ── Admin Layout (protected) ── */}
-    <Route element={<ProtectedRoute allowedRoles={['admin', 1]} />}>
-      <Route path="/system/*" element={<AdminLayout />}>
-        <Route index element={<SystemPage />} />
-        <Route path="*" element={<SystemPage />} />
       </Route>
     </Route>
 

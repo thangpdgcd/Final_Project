@@ -1,8 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import "./index.scss";
 
 const ArtisticRoastingSection: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <section className='artistic-roasting'>
       <div className='artistic-roasting__bg' aria-hidden='true'>
@@ -14,11 +16,9 @@ const ArtisticRoastingSection: React.FC = () => {
       </div>
       <div className='artistic-roasting__container'>
         <div className='artistic-roasting__content'>
-          <h2 className='artistic-roasting__title'>Nghệ thuật rang xay</h2>
+          <h2 className='artistic-roasting__title'>{t("home.artisticRoasting.title")}</h2>
           <p className='artistic-roasting__desc'>
-            Tại Phan Coffee, rang xay không chỉ là một công đoạn kỹ thuật, đó là một môn nghệ
-            thuật. Chúng tôi lắng nghe tiếng “nổ” của từng hạt cà phê, cảm nhận sự biến chuyển
-            của màu sắc và hương thơm để dừng đúng thời điểm vàng, giữ trọn vẹn tinh túy nhất.
+            {t("home.artisticRoasting.desc")}
           </p>
 
           <div className='artistic-roasting__grid'>
@@ -26,9 +26,9 @@ const ArtisticRoastingSection: React.FC = () => {
               <div className='artistic-roasting__icon' aria-hidden='true'>
                 🔥
               </div>
-              <div className='artistic-roasting__card-title'>Nhiệt độ tối ưu</div>
+              <div className='artistic-roasting__card-title'>{t("home.artisticRoasting.cards.temp.title")}</div>
               <div className='artistic-roasting__card-desc'>
-                Kiểm soát nhiệt độ chính xác để đánh thức hương vị tiềm ẩn.
+                {t("home.artisticRoasting.cards.temp.desc")}
               </div>
             </div>
 
@@ -36,9 +36,9 @@ const ArtisticRoastingSection: React.FC = () => {
               <div className='artistic-roasting__icon' aria-hidden='true'>
                 ⏱️
               </div>
-              <div className='artistic-roasting__card-title'>Rang chậm (Slow Roast)</div>
+              <div className='artistic-roasting__card-title'>{t("home.artisticRoasting.cards.slowRoast.title")}</div>
               <div className='artistic-roasting__card-desc'>
-                Quy trình rang kéo dài giúp hạt chín đều từ trong ra ngoài.
+                {t("home.artisticRoasting.cards.slowRoast.desc")}
               </div>
             </div>
           </div>

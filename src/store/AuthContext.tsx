@@ -8,7 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (accessToken: string, user: AuthUser) => void;
   logout: () => Promise<void>;
-  refreshAuth: () => Promise<string | null>;
+
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,13 +28,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const raw = localStorage.getItem('user');
     return raw ? JSON.parse(raw) : null;
   });
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('user'));
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+    if (storedToken) {
+      setAccessToken(storedToken);
+    }
+    setIsLoading(false);
+  }, []);
 
   const login = useCallback((accessToken: string, newUser: AuthUser) => {
     setAccessToken(accessToken);
     setUser(newUser);
     setIsAuthenticated(true);
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('token', accessToken);
     localStorage.setItem('user', JSON.stringify(newUser));
   }, []);
 
@@ -47,31 +57,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAccessToken('');
       setUser(null);
       setIsAuthenticated(false);
+      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
     }
   }, []);
 
-  const refreshAuth = useCallback(async () => {
-    try {
-      const res = await api.post('/refresh-token');
-      const { accessToken } = res.data;
-      setAccessToken(accessToken);
-      setIsAuthenticated(true);
-      return accessToken;
-    } catch (error) {
-      setIsAuthenticated(false);
-      return null;
-    }
-  }, []);
 
-  // On mount, perform silent refresh
-  useEffect(() => {
-    const initAuth = async () => {
-      await refreshAuth();
-      setIsLoading(false);
-    };
-    initAuth();
-  }, [refreshAuth]);
 
   const value = useMemo<AuthContextType>(
     () => ({
@@ -80,9 +72,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isLoading,
       login,
       logout,
-      refreshAuth,
+
     }),
-    [user, isAuthenticated, isLoading, login, logout, refreshAuth]
+    [user, isAuthenticated, isLoading, login, logout,]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

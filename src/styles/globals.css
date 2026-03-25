@@ -1,12 +1,19 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ─── Design Tokens ────────────────────────────────────────────────────────── */
 :root {
   /* Coffee Palette */
-  --color-primary: #6f4e37;
+  --color-coffee-brown: #4b2e2b;
+  --color-dark-brown: #3e2723;
+  --color-cream: #faf3e0;
+  --color-caramel: #c69c6d;
+  --color-dark: #121212;
+
+  --color-primary: var(--color-coffee-brown);
   --color-primary-light: #8b6347;
-  --color-primary-dark: #4e3524;
-  --color-secondary: #c4963b;
+  --color-primary-dark: var(--color-dark-brown);
+  --color-secondary: var(--color-caramel);
   --color-secondary-light: #d4ab5a;
   --color-cream: #fdf6e3;
   --color-cream-dark: #f5ead0;
@@ -17,6 +24,7 @@
   --font-display: 'Playfair Display', Georgia, serif;
 
   /* Shadows */
+  --shadow-soft: 0 10px 30px rgba(75, 46, 43, 0.12);
   --shadow-card: 0 4px 20px rgba(111, 78, 55, 0.12);
   --shadow-card-hover: 0 12px 40px rgba(111, 78, 55, 0.22);
   --shadow-nav: 0 2px 20px rgba(0, 0, 0, 0.08);
@@ -28,8 +36,11 @@
 
 /* ─── Dark Mode Tokens ─────────────────────────────────────────────────────── */
 .dark {
+  --color-dark: #121212;
   --color-cream: #1a1007;
   --color-cream-dark: #231608;
+  --color-primary: #c69c6d;
+  --color-primary-dark: #faf3e0;
   --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
   --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
@@ -45,13 +56,14 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-cream);
+  background-color: var(--bg-main, var(--color-cream));
   color: #1a0a00;
   line-height: 1.6;
   transition: background-color var(--transition-base), color var(--transition-base);
 }
 
 .dark body {
+  background-color: var(--color-dark);
   color: #f5ead0;
 }
 
@@ -95,6 +107,49 @@ h1, h2, h3, h4, h5 {
 
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease both;
+}
+
+.header-nav-link {
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.header-nav-link:hover {
+  transform: translateY(-1px);
+}
+
+.btn-grad {
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  background-image: linear-gradient(to right, #603813 0%, #b29f94 51%, #603813 100%);
+  background-size: 200% auto;
+  color: #fff;
+  border-radius: 9999px;
+  border: none;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  box-shadow: 0 10px 24px rgba(96, 56, 19, 0.3);
+  transition:
+    background-position 0.5s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease 0.08s;
+}
+
+.btn-grad:hover {
+  background-position: right center;
+  color: #fff;
+  text-decoration: none;
+  transform: scale(1.05);
+  box-shadow: 0 14px 28px rgba(96, 56, 19, 0.38);
+}
+
+.btn-grad:active {
+  transform: scale(0.96);
+  transition-delay: 0s;
 }
 
 /* ─── Product Card ─────────────────────────────────────────────────────────── */

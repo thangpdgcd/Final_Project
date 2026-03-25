@@ -1,10 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import "./index.scss";
 
 const FeaturedProductSection: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <section className='featured-product'>
@@ -14,40 +16,39 @@ const FeaturedProductSection: React.FC = () => {
             <div className='featured-product__media-inner'>
               <img
                 src='https://res.cloudinary.com/dfjecxrnl/image/upload/v1768211093/arabicamangden4_ymrrpn.jpg'
-                alt='Măng Đen Blend'
+                alt={t("home.bestSeller.imageAlt")}
                 loading='lazy'
               />
-              <div className='featured-product__badge'>Best Seller</div>
+              <div className='featured-product__badge'>{t("home.bestSeller.badge")}</div>
             </div>
           </div>
 
           <div className='featured-product__content'>
-            <p className='featured-product__eyebrow'>Sản phẩm nổi bật</p>
-            <h2 className='featured-product__title'>Măng Đen Blend</h2>
+            <p className='featured-product__eyebrow'>{t("home.bestSeller.eyebrow")}</p>
+            <h2 className='featured-product__title'>{t("home.bestSeller.title")}</h2>
             <p className='featured-product__quote'>
-              “Sự hòa quyện tuyệt vời giữa vị đắng thanh thoát và hương thơm nồng nàn từ đại
-              ngàn Tây Nguyên. Một hành trình cảm xúc trong từng ngụm cà phê.”
+              {t("home.bestSeller.quote")}
             </p>
 
             <ul className='featured-product__bullets'>
               <li>
                 <span className='featured-product__dot' aria-hidden='true' />
-                100% Cà phê rang mộc tự nhiên
+                {t("home.bestSeller.bullets.0")}
               </li>
               <li>
                 <span className='featured-product__dot' aria-hidden='true' />
-                Nguồn gốc: Vùng núi Măng Đen, Kon Tum
+                {t("home.bestSeller.bullets.1")}
               </li>
               <li>
                 <span className='featured-product__dot' aria-hidden='true' />
-                Hương vị: Socola, Caramel, Thảo mộc
+                {t("home.bestSeller.bullets.2")}
               </li>
             </ul>
 
             <div className='featured-product__bottom'>
-              <div className='featured-product__price'>285.000đ</div>
+              <div className='featured-product__price'>{t("home.bestSeller.price")}</div>
               <button className='featured-product__cta' onClick={() => navigate("/products")}>
-                Thêm vào giỏ hàng
+                {t("home.bestSeller.addToCart")}
               </button>
             </div>
           </div>

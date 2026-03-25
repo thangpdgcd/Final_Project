@@ -1,10 +1,10 @@
-import Userprofile from "../pages/customers/profiles";
-import OrderDetail from "../pages/customers/orders";
-import PageCart from "../pages/customers/cart";
+import Userprofile from "../pages/ProfilePage";
+import OrderDetail from "../pages/customers/orders/orders";
+import PageCart from "../pages/customers/cart/cart"
 import PaymentPage from "../pages/customers/payment";
-import OrdersPageHistory from "../pages/customers/history_orders";
+import OrdersPageHistory from "../pages/customers/history_orders/history_orders";
 
-import SystemPage from "../pages/systems/pages/SystemPage";
+
 import { AppRoute } from "./route.type";
 
 const privateRoutes: AppRoute[] = [
@@ -14,7 +14,6 @@ const privateRoutes: AppRoute[] = [
   { path: "/carts", element: <PageCart /> },
   { path: "/paypal/config", element: <PaymentPage /> },
   { path: "/history-orders", element: <OrdersPageHistory /> },
-  { path: "/system", element: <SystemPage /> },
 ];
 
 export default privateRoutes;

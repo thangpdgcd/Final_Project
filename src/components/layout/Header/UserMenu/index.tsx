@@ -4,6 +4,8 @@ import { User, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/store/AuthContext';
 import Dropdown from './Dropdown';
+import { useTranslation } from 'react-i18next';
+import { getImageSrc } from '@/utils/image';
 
 interface UserMenuProps {
   onLoginClick: () => void;
@@ -14,6 +16,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
   const { user, isAuthenticated, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   // --- LOGIC: Toggles & Navigation ---
   const handleAvatarClick = (e: React.MouseEvent) => {
@@ -87,12 +90,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
         whileTap={{ scale: 0.95 }}
         onClick={handleAvatarClick}
         className="relative group p-0.5 rounded-full border border-white/10 hover:border-[#FFD700] transition-colors duration-300 cursor-pointer"
-        aria-label="User Profile"
+        aria-label={t('profile.title')}
       >
         <div className="absolute inset-0 bg-[#FFD700]/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
         <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center overflow-hidden relative z-10 border border-white/5">
           {isAuthenticated && user?.avatar ? (
-            <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+            <img src={getImageSrc(user.avatar)} alt="Avatar" className="w-full h-full object-cover" />
           ) : isAuthenticated && user?.name ? (
             <span className="text-[#FFD700] font-black text-sm uppercase">
               {user.name.charAt(0)}

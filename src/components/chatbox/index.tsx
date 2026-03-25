@@ -7,12 +7,14 @@ import {
   Coffee,
   MoreVertical
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Message {
   id: string;
-  text: string;
   sender: "user" | "bot";
   timestamp: Date;
+  text?: string;
+  textKey?: string;
 }
 
 const TypingIndicator = () => (
@@ -29,13 +31,22 @@ const TypingIndicator = () => (
 );
 
 const Chatbox: React.FC = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+
+  const BOT_RESPONSE_KEYS = [
+    "chatbox.botResponse1",
+    "chatbox.botResponse2",
+    "chatbox.botResponse3",
+    "chatbox.botResponse4",
+  ] as const;
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Xin chào! Phan Coffee có thể giúp gì cho bạn hôm nay?",
       sender: "bot",
+      textKey: "chatbox.greeting",
       timestamp: new Date(),
     },
   ]);
@@ -69,18 +80,13 @@ const Chatbox: React.FC = () => {
     // Simulate bot response
     setTimeout(() => {
       setIsTyping(false);
-      const botResponses = [
-        "Chúng tôi cung cấp các loại cà phê rang mộc nguyên chất 100%.",
-        "Bạn có thể xem thực đơn tại phần 'Cà phê' trên thanh menu nhé!",
-        "Phan Coffee có dịch vụ giao hàng tận nơi tại Kon Tum và toàn quốc.",
-        "Cảm ơn bạn đã quan tâm, chúng tôi sẽ sớm có nhân viên hỗ trợ trực tiếp.",
-      ];
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+      const randomKey =
+        BOT_RESPONSE_KEYS[Math.floor(Math.random() * BOT_RESPONSE_KEYS.length)];
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: randomResponse,
         sender: "bot",
+        textKey: randomKey,
         timestamp: new Date(),
       };
 
@@ -96,14 +102,14 @@ const Chatbox: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] font-sans">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] font-sans">
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95, transformOrigin: "bottom right" }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="mb-4 w-[380px] h-[520px] bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl shadow-black/20 border border-gray-100 dark:border-zinc-800 flex flex-col overflow-hidden"
+            className="mb-4 w-[calc(100vw-2rem)] max-w-[380px] h-[70vh] max-h-[520px] bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl shadow-black/20 border border-gray-100 dark:border-zinc-800 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="px-6 py-5 bg-[#4B3621] text-white flex items-center justify-between">
@@ -115,16 +121,17 @@ const Chatbox: React.FC = () => {
                   <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#4B3621] rounded-full" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm leading-none mb-1">Phan Coffee</h3>
-                  <p className="text-[10px] text-amber-200/70 font-bold uppercase tracking-widest">Always Online</p>
+                  <h3 className="font-bold text-sm leading-none mb-1">
+                    {t("common.brandName")}
+                  </h3>
+                  <p className="text-[10px] text-amber-200/70 font-bold uppercase tracking-widest">
+                    {t("chatbox.alwaysOnline")}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
                   <MoreVertical size={18} />
-                </button>
-                <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                  <X size={18} />
                 </button>
               </div>
             </div>
@@ -143,7 +150,7 @@ const Chatbox: React.FC = () => {
                         : 'bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 rounded-tl-none'
                       }`}
                     >
-                      {msg.text}
+                      {msg.textKey ? t(msg.textKey) : msg.text}
                     </div>
                     <span className="text-[10px] text-gray-400 mt-1 font-medium px-1">
                       {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -168,7 +175,7 @@ const Chatbox: React.FC = () => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask us anything..."
+                  placeholder={t("chatbox.placeholder")}
                   className="w-full py-4 pl-5 pr-14 bg-transparent outline-none text-sm dark:text-zinc-200"
                 />
                 <button
@@ -184,28 +191,7 @@ const Chatbox: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Toggle Button */}
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 relative
-          ${isOpen
-            ? 'bg-white text-[#4B3621] rotate-90 scale-90'
-            : 'bg-[#4B3621] text-white'
-          }`}
-      >
-        {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
-        {!isOpen && (
-          <motion.span
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="absolute -top-1 -right-1 w-6 h-6 bg-amber-400 text-[#4B3621] rounded-full text-[10px] font-black flex items-center justify-center border-2 border-white shadow-lg"
-          >
-            1
-          </motion.span>
-        )}
-      </motion.button>
+   
     </div>
   );
 };

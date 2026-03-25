@@ -1,18 +1,18 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 import "./index.scss";
 
 const RoastingProcessSection: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <section className='roasting-process'>
       <div className='roasting-process__inner'>
         <div>
-          <div className='roasting-process__eyebrow'>NGHỆ THUẬT RANG XAY</div>
-          <h2 className='roasting-process__title'>Quy trình rang xay nghệ thuật</h2>
+          <div className='roasting-process__eyebrow'>{t("home.roastingProcess.eyebrow")}</div>
+          <h2 className='roasting-process__title'>{t("home.roastingProcess.title")}</h2>
           <p className='roasting-process__description'>
-            Tại Phan Coffee, mỗi mẻ rang là một bản giao hưởng của nhiệt độ và thời gian.
-            Chúng tôi không chỉ rang cà phê, chúng tôi đánh thức những tầng hương vị sâu
-            thẳm nhất trong từng hạt mộc.
+            {t("home.roastingProcess.description")}
           </p>
 
           <div className='roasting-process__highlights'>
@@ -34,9 +34,9 @@ const RoastingProcessSection: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <div className='roasting-process__item-title'>Chọn lọc thủ công</div>
+                <div className='roasting-process__item-title'>{t("home.roastingProcess.items.manualSelect.title")}</div>
                 <div className='roasting-process__item-desc'>
-                  Chỉ những quả chín mọng và đạt chuẩn kích thước mới được đưa vào quy trình.
+                  {t("home.roastingProcess.items.manualSelect.desc")}
                 </div>
               </div>
             </div>
@@ -65,9 +65,9 @@ const RoastingProcessSection: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <div className='roasting-process__item-title'>Rang mộc 100%</div>
+                <div className='roasting-process__item-title'>{t("home.roastingProcess.items.pureRoast.title")}</div>
                 <div className='roasting-process__item-desc'>
-                  Cam kết không tẩm ướp phụ gia, giữ nguyên vị đắng thanh và hậu ngọt nguyên bản.
+                  {t("home.roastingProcess.items.pureRoast.desc")}
                 </div>
               </div>
             </div>
@@ -102,9 +102,9 @@ const RoastingProcessSection: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <div className='roasting-process__item-title'>Đóng gói chuẩn SCA</div>
+                <div className='roasting-process__item-title'>{t("home.roastingProcess.items.scaPack.title")}</div>
                 <div className='roasting-process__item-desc'>
-                  Bảo quản trong túi van 1 chiều giúp cà phê luôn tươi mới như vừa ra lò.
+                  {t("home.roastingProcess.items.scaPack.desc")}
                 </div>
               </div>
             </div>
@@ -115,7 +115,7 @@ const RoastingProcessSection: React.FC = () => {
           <img
             className='roasting-process__image'
             src='https://res.cloudinary.com/dfjecxrnl/image/upload/v1773308043/a_close_up_high_quality_photograph_of_a_person_s_hands_holding_a_handful_of_roasted_coffee_beans_over_a_large_bowl_of_coffee_beans._the_person_is_wearing_a_teal_colored_button_up_shirt._the_lighting_is_warm_and_art_apfefk.png'
-            alt='Quy trình rang xay Phan Coffee'
+            alt={t("home.roastingProcess.imageAlt")}
             loading='lazy'
           />
           <div className='roasting-process__badge'>

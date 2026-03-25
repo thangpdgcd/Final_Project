@@ -10,21 +10,16 @@ import {
   ChevronRight,
   ArrowRight
 } from 'lucide-react';
-import { message } from 'antd';
+import { App } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useAddToCart } from '@/hooks/useCart';
 import { useAuth } from '@/store/AuthContext';
+import { getImageSrc } from '@/utils/image';
 
 // Utility for image source and price formatting
-const getImageSrc = (img?: string | null): string => {
-  if (!img) return '/no-image.png';
-  const v = String(img).trim();
-  if (/^https?:\/\//i.test(v) || v.startsWith('data:image/')) return v;
-  const head = v.slice(0, 12);
-  const mime = head.startsWith('/9j/') ? 'image/jpeg' : head.startsWith('iVBOR') ? 'image/png' : 'image/webp';
-  return `data:${mime};base64,${v}`;
-};
+
 
 const formatPrice = (v: number) =>
   new Intl.NumberFormat('vi-VN', { 
@@ -35,6 +30,7 @@ const formatPrice = (v: number) =>
 
 const WishlistItem: React.FC<{ product: any; onRemove: (id: number, e: any) => void; onAdd: (p: any, e: any) => void }> = ({ product, onRemove, onAdd }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   return (
     <motion.div
@@ -67,17 +63,19 @@ const WishlistItem: React.FC<{ product: any; onRemove: (id: number, e: any) => v
            <div className="flex items-center gap-1 text-[#FFD700]">
              {[1,2,3,4,5].map(i => <Star key={i} size={10} fill="currentColor" />)}
            </div>
-           <p className="text-[8px] text-white font-black uppercase tracking-[0.2em] mt-1">Premium Grade</p>
+           <p className="text-[8px] text-white font-black uppercase tracking-[0.2em] mt-1">
+             {t("wishlist.premiumGrade")}
+           </p>
         </div>
       </div>
 
       <div className="p-8 flex flex-col flex-1 bg-white dark:bg-[#1c1716]">
         <div className="flex items-center gap-2 mb-4">
           <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${product.stock > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-            {product.stock > 0 ? 'In Stock' : 'Limited'}
+            {product.stock > 0 ? t("wishlist.inStock") : t("wishlist.limited")}
           </span>
           <span className="px-3 py-1 rounded-full bg-[#FFD700]/10 text-[#4B3621] text-[10px] font-black uppercase tracking-widest">
-            Best Seller
+            {t("wishlist.bestSeller")}
           </span>
         </div>
         
@@ -87,7 +85,9 @@ const WishlistItem: React.FC<{ product: any; onRemove: (id: number, e: any) => v
         
         <div className="flex items-center justify-between mt-auto">
           <div className="flex flex-col">
-            <span className="text-[10px] text-[#4B3621]/40 font-bold uppercase tracking-widest mb-1">Premium Price</span>
+            <span className="text-[10px] text-[#4B3621]/40 font-bold uppercase tracking-widest mb-1">
+              {t("wishlist.premiumPrice")}
+            </span>
             <span className="text-2xl font-black text-[#4B3621] dark:text-[#FFD700] tracking-tighter leading-none">
               {formatPrice(Number(product.price))}
             </span>
@@ -108,10 +108,12 @@ const WishlistItem: React.FC<{ product: any; onRemove: (id: number, e: any) => v
 };
 
 const WishlistPage: React.FC = () => {
+  const { message } = App.useApp();
   const { wishlist, removeFromWishlist } = useWishlist();
   const navigate = useNavigate();
   const { user } = useAuth();
   const addToCart = useAddToCart();
+  const { t } = useTranslation();
 
   const handleQuickAdd = (product: any, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -128,8 +130,8 @@ const WishlistPage: React.FC = () => {
         price: product.price 
       },
       {
-        onSuccess: () => message.success('✅ Đã thêm vào giỏ hàng'),
-        onError: () => message.error('❌ Không thể thêm vào giỏ'),
+        onSuccess: () => message.success(t('wishlist.toast.addToCartSuccess')),
+        onError: () => message.error(t('wishlist.toast.addToCartError')),
       }
     );
   };
@@ -137,7 +139,7 @@ const WishlistPage: React.FC = () => {
   const handleRemove = (productId: number, e: React.MouseEvent) => {
     e.stopPropagation();
     removeFromWishlist(productId);
-    message.success('Đã xóa khỏi danh sách yêu thích');
+    message.success(t('wishlist.toast.removeSuccess'));
   };
 
   return (
@@ -147,12 +149,17 @@ const WishlistPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-20">
           <div className="max-w-xl">
             <div className="flex items-center gap-3 text-[#4B3621]/30 dark:text-white/20 text-xs font-black uppercase tracking-[0.4em] mb-6">
-              <Link to="/" className="hover:text-[#4B3621] dark:hover:text-white transition-colors">Origins</Link>
+              <Link to="/" className="hover:text-[#4B3621] dark:hover:text-white transition-colors">
+                {t('wishlist.breadcrumb.origins')}
+              </Link>
               <ChevronRight size={14} />
-              <span className="text-[#4B3621] dark:text-white">Treasures</span>
+              <span className="text-[#4B3621] dark:text-white">
+                {t('wishlist.breadcrumb.treasures')}
+              </span>
             </div>
             <h1 className="text-7xl md:text-8xl font-black text-[#4B3621] dark:text-amber-100 tracking-tighter uppercase leading-[0.8] mb-4 drop-shadow-sm">
-              Saved <br /> <span className="text-[#FFD700]">Tastes.</span>
+              {t('wishlist.savedTitlePrefix')} <br />{" "}
+              <span className="text-[#FFD700]">{t('wishlist.savedTitleHighlight')}</span>
             </h1>
             <div className="h-1.5 w-24 bg-[#FFD700] rounded-full" />
           </div>
@@ -162,8 +169,12 @@ const WishlistPage: React.FC = () => {
               {wishlist.length}
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#4B3621]/40 dark:text-white/40">Collection Size</p>
-              <p className="text-sm font-black text-[#4B3621] dark:text-amber-100 uppercase tracking-tighter">Your Selects</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#4B3621]/40 dark:text-white/40">
+                {t('wishlist.collectionSize')}
+              </p>
+              <p className="text-sm font-black text-[#4B3621] dark:text-amber-100 uppercase tracking-tighter">
+                {t('wishlist.yourSelects')}
+              </p>
             </div>
           </div>
         </div>
@@ -190,9 +201,11 @@ const WishlistPage: React.FC = () => {
                 </div>
               </div>
               
-              <h2 className="text-4xl md:text-5xl font-black text-[#4B3621] dark:text-amber-100 mb-6 uppercase tracking-tight">Quiet Collection.</h2>
+              <h2 className="text-4xl md:text-5xl font-black text-[#4B3621] dark:text-amber-100 mb-6 uppercase tracking-tight">
+                {t('wishlist.quietCollectionTitle')}
+              </h2>
               <p className="text-[#4B3621]/40 dark:text-white/40 font-bold text-lg mb-16 max-w-sm leading-relaxed">
-                "Pure roasted coffee from Kon Tum — no favorites found. The adventure begins with your first selection."
+                {t('wishlist.quietCollectionQuote')}
               </p>
               
               <motion.button 
@@ -201,7 +214,8 @@ const WishlistPage: React.FC = () => {
                 onClick={() => navigate('/products')}
                 className="group flex items-center gap-4 px-14 py-6 bg-[#4B3621] text-white rounded-full font-black uppercase tracking-widest text-xs shadow-xl transition-all"
               >
-                Browse Our Heritage <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                {t('wishlist.browseHeritage')}{" "}
+                <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
               </motion.button>
             </motion.div>
           ) : (
@@ -228,7 +242,9 @@ const WishlistPage: React.FC = () => {
                   <Package size={32} className="text-[#4B3621]/20 dark:text-white/20" />
                 </div>
                 <p className="text-sm font-black text-[#4B3621]/30 dark:text-white/20 uppercase tracking-[0.2em] text-center">
-                  Discovery New <br /> Origins
+                  {t('wishlist.discoveryNew')}
+                  <br />
+                  {t('wishlist.breadcrumb.origins')}
                 </p>
               </motion.button>
             </motion.div>

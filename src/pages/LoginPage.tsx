@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Mail,
@@ -15,7 +15,7 @@ import {
   Leaf,
   Mountain
 } from 'lucide-react';
-import { message } from 'antd';
+import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/AuthContext';
 import { authService } from '@/features/auth/services/auth.service';
@@ -29,34 +29,13 @@ const loginSchema = z.object({
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
-type RedirectState = { from?: string | { pathname: string; search?: string } };
-
-const getRedirectPath = (state: RedirectState | null): string => {
-  const from = state?.from;
-  if (!from) return '/';
-
-  if (typeof from === 'string') {
-    return from;
-  }
-
-  if (from.pathname) {
-    return `${from.pathname}${from.search || ''}`;
-  }
-
-  return '/';
-};
 
 const LoginPage: React.FC = () => {
+  const { message: messageApi } = App.useApp();
   const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useTranslation();
   const { login, isAuthenticated } = useAuth();
-  const [messageApi, contextHolder] = message.useMessage();
   const didRedirectRef = useRef(false);
-
-  const redirectTo = useMemo(() => {
-    return getRedirectPath((location.state as RedirectState) || null);
-  }, [location.state]);
 
   const {
     register,
@@ -114,8 +93,8 @@ const LoginPage: React.FC = () => {
     }
     if (didRedirectRef.current) return;
     didRedirectRef.current = true;
-    navigate(redirectTo, { replace: true });
-  }, [isAuthenticated, navigate, redirectTo]);
+    navigate('/', { replace: true });
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = (values: LoginForm) => {
     loginMutation.mutate({ email: values.email, password: values.password });
@@ -123,7 +102,6 @@ const LoginPage: React.FC = () => {
 
   return (
     <>
-      {contextHolder}
       <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-[#FDF5E6]">
       {/* Left (Form) - Dark themed premium form */}
       <motion.div
@@ -197,19 +175,21 @@ const LoginPage: React.FC = () => {
           <div className="mt-16">
             <div className="relative flex items-center justify-center mb-10">
               <div className="flex-1 border-t border-gray-800"></div>
-              <span className="mx-6 text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">Secure Gateway</span>
+              <span className="mx-6 text-[10px] font-black uppercase tracking-[0.3em] text-gray-600">
+                {t("auth.loginSocialDivider")}
+              </span>
               <div className="flex-1 border-t border-gray-800"></div>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
               {[
-                { icon: <Facebook />, color: "hover:text-[#1877F2]", label: "FB" },
-                { icon: <Chrome />, color: "hover:text-emerald-400", label: "GL" },
-                { icon: <Instagram />, color: "hover:text-pink-500", label: "IG" }
+                { icon: <Facebook />, color: "hover:text-[#1877F2]", titleKey: "auth.loginSocialFacebook" },
+                { icon: <Chrome />, color: "hover:text-emerald-400", titleKey: "auth.loginSocialGoogle" },
+                { icon: <Instagram />, color: "hover:text-pink-500", titleKey: "auth.loginSocialInstagram" }
               ].map((social, i) => (
                 <button
                   key={i}
-                  title={t('auth.loginSocialInfo', { provider: social.label })}
+                  title={t(social.titleKey)}
                   className={`h-16 flex items-center justify-center rounded-2xl bg-[#2a2423] text-gray-400 border border-transparent hover:border-gray-700 transition-all hover:bg-white/5 ${social.color}`}
                 >
                   {social.icon}
@@ -251,23 +231,27 @@ const LoginPage: React.FC = () => {
           <Logo size={200} showText={false} className="mb-12" />
 
           <h2 className="text-6xl font-black text-white mb-8 tracking-tighter leading-[0.9] uppercase text-shadow">
-            Brewing <br /> <span className="text-[#FFD700]">Excellence.</span>
+            {t("auth.loginBannerTitlePrefix")}{" "}
+            <br />{" "}
+            <span className="text-[#FFD700]">{t("auth.loginBannerTitleHighlight")}</span>
           </h2>
           <p className="text-amber-100/60 max-w-sm mx-auto font-bold text-lg mb-16 leading-relaxed">
-            "Pure roasted coffee from Kon Tum — rich aroma, bold flavor. Experience the source."
+            {t("auth.loginBannerQuote")}
           </p>
 
           <div className="grid grid-cols-3 gap-12">
             {[
-              { icon: <Coffee />, label: "Aromatic" },
-              { icon: <Leaf />, label: "Organic" },
-              { icon: <Mountain />, label: "Heritage" }
+              { icon: <Coffee />, labelKey: "auth.loginFeatureAromatic" },
+              { icon: <Leaf />, labelKey: "auth.loginFeatureOrganic" },
+              { icon: <Mountain />, labelKey: "auth.loginFeatureHeritage" }
             ].map((feature, i) => (
               <div key={i} className="flex flex-col items-center gap-4 group">
                 <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-[#FFD700] group-hover:bg-[#FFD700] group-hover:text-[#4B3621] transition-all duration-300 shadow-xl">
                   {React.cloneElement(feature.icon as React.ReactElement, { size: 28 })}
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-white transition-colors">{feature.label}</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 group-hover:text-white transition-colors">
+                  {t(feature.labelKey)}
+                </span>
               </div>
             ))}
           </div>

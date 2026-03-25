@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <Content className="homepage__content">
+    <Content className="homepage__content min-h-screen bg-[#e7d6c0] text-[#2f1f18] transition-colors duration-300 dark:bg-[#1b120d] dark:text-[#f3e2cc]">
       <HeroSection onScrollNext={handleScrollHero} />
       <div id="home-content">
         <Suspense fallback={null}>

@@ -16,11 +16,27 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
   if (isLoading) return null;
 
   if (!isLoggedIn) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    const loginPath = '/login';
+    return <Navigate to={loginPath} replace state={{ from: location }} />;
   }
 
-  if (allowedRoles && user && !allowedRoles.includes(user.roleID)) {
-    return <Navigate to="/" replace />;
+  // Normalize roleID so "1" (string) matches 1 (number).
+  const normalizeRole = (role: string | number | undefined) => {
+    if (role === undefined || role === null) return role;
+    if (typeof role === 'string') {
+      const n = Number(role);
+      return Number.isNaN(n) ? role : n;
+    }
+    return role;
+  };
+
+  if (allowedRoles && user) {
+    const normalizedAllowed = allowedRoles.map(normalizeRole);
+    const normalizedUserRole = normalizeRole(user.roleID);
+
+    if (!normalizedAllowed.includes(normalizedUserRole)) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <Outlet />;

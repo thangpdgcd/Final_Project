@@ -1,6 +1,6 @@
 // src/pages/register/index.tsx
 import React, { useState } from "react";
-import { Layout, Form, Input, Button, Checkbox, message, Divider } from "antd";
+import { Layout, Form, Input, Button, Checkbox, App, Divider } from "antd";
 import { useNavigate } from "react-router-dom";
 import {
   register,
@@ -23,6 +23,7 @@ interface RegisterFormValues extends RegisterPayload {
 }
 
 const RegisterPage: React.FC = () => {
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -43,7 +44,7 @@ const RegisterPage: React.FC = () => {
       console.log("✅ Register success:", data);
 
       message.success(`✅ ${t("auth.registerSuccess")}`);
-      navigate("/system");
+      navigate("/login");
     } catch (err: any) {
       console.error("❌ Register error:", err?.message || err);
       message.error(`❌ ${t("auth.registerError")}`);
@@ -91,7 +92,7 @@ const RegisterPage: React.FC = () => {
                       message: t("auth.registerFullNameRequired"),
                     },
                   ]}>
-                  <Input placeholder='John Doe' />
+                  <Input placeholder={t("auth.registerFullNamePlaceholder")} />
                 </Form.Item>
 
                 <Form.Item
@@ -115,7 +116,7 @@ const RegisterPage: React.FC = () => {
                   </Form.Item>
 
                   <Form.Item label={t("auth.registerAddressLabel")} name='address'>
-                    <Input placeholder='e.g. 123 ABC Street, District 1' />
+                    <Input placeholder={t("auth.registerAddressPlaceholder")} />
                   </Form.Item>
                 </div>
 

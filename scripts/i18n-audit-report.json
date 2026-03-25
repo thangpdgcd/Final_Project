@@ -1,0 +1,17 @@
+{
+  "summary": {
+    "usedKeysCount": 194,
+    "enKeysCount": 334,
+    "viKeysCount": 334,
+    "missingInEnCount": 0,
+    "missingInViCount": 0,
+    "hardcodedCandidatesCount": 0
+  },
+  "missingInEn": [],
+  "missingInVi": [],
+  "hardcodedCandidates": [],
+  "notes": [
+    "This audit uses regex heuristics; it may miss dynamic t(key) usage or over-flag some UI strings.",
+    "Use the missingInEn/missingInVi lists as the hard blocker; treat hardcodedCandidates as a to-translate shortlist."
+  ]
+}

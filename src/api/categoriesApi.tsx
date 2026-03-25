@@ -24,6 +24,35 @@ export interface Category {
   description?: string;
 }
 
+const normalizeCategory = (record: any): Category => ({
+  category_ID: Number(
+    record?.category_ID ??
+      record?.categories_ID ??
+      record?.categoriesId ??
+      record?.categoryId ??
+      record?.ID ??
+      record?.id ??
+      0,
+  ),
+  name: String(record?.name ?? record?.Name ?? ''),
+  description: (record?.description ?? record?.Description) as string | undefined,
+});
+
+const extractCategoryList = (payload: any): any[] => {
+  if (Array.isArray(payload)) return payload;
+  return (
+    payload?.categories ??
+    payload?.data?.categories ??
+    payload?.data?.items ??
+    payload?.items ??
+    payload?.results ??
+    payload?.docs ??
+    payload?.data ??
+    payload?.rows ??
+    []
+  );
+};
+
 export interface CreateCategoryPayload {
   // FE dùng name/description
   name: string;
@@ -45,9 +74,14 @@ export interface UpdateCategoryPayload {
 /* --------- API FUNCTIONS --------- */
 
 // Lấy tất cả categories
-export async function getAllCategories(): Promise<any> {
-  const res = await axios.get(`${apiBase}/categories`);
-  return res.data;
+export async function getAllCategories(): Promise<Category[]> {
+  const res = await axios.get(`${apiBase}/categories`, {
+    params: { page: 1, limit: 1000 },
+  });
+  const raw = extractCategoryList(res.data);
+  return (Array.isArray(raw) ? raw : [])
+    .map(normalizeCategory)
+    .filter((c) => Number.isFinite(c.category_ID) && c.category_ID > 0);
 }
 
 // Lấy category theo ID

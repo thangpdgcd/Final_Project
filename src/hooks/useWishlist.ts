@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { message } from 'antd';
+import { App } from 'antd';
 import type { Product } from '@/types';
 
 export const useWishlist = () => {
+  const { message } = App.useApp();
   const [wishlist, setWishlist] = useState<Product[]>([]);
 
   useEffect(() => {

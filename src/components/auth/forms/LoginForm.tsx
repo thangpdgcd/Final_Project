@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Mail, Lock } from 'lucide-react';
-import { message } from 'antd';
+import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/store/AuthContext';
@@ -14,22 +14,27 @@ import type { LoginPayload } from '@/types';
 
 import type { AuthView } from '../AuthModal';
 
-const loginSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email'),
-  password: z.string().min(1, 'Password is required'),
-  remember: z.boolean().optional(),
-});
+const buildLoginSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z
+      .string()
+      .min(1, t('auth.loginEmailRequired'))
+      .email(t('auth.loginEmailInvalid')),
+    password: z.string().min(1, t('auth.loginPasswordRequired')),
+    remember: z.boolean().optional(),
+  });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type LoginFormValues = z.infer<ReturnType<typeof buildLoginSchema>>;
 
 type LoginFormProps = {
   setView: React.Dispatch<React.SetStateAction<AuthView>>;
 };
 
 const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
+  const { message: messageApi } = App.useApp();
   const { t } = useTranslation();
   const { login } = useAuth();
-  const [messageApi, contextHolder] = message.useMessage();
+  const loginSchema = buildLoginSchema(t);
 
   const {
     register,
@@ -43,12 +48,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
   const loginMutation = useMutation({
     mutationFn: (payload: LoginPayload) => authService.login(payload),
     onSuccess: (data) => {
-      if (!data?.token || !data?.user) {
+      if (!data?.accessToken || !data?.user) {
         messageApi.error(t('auth.loginError'));
         return;
       }
 
-      login(data.token, data.user);
+      login(data.accessToken, data.user);
       messageApi.success(t('auth.loginSuccess'));
     },
     onError: () => {
@@ -65,7 +70,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
 
   return (
     <>
-      {contextHolder}
       <motion.form
         onSubmit={handleSubmit(onSubmit)}
         className="w-full space-y-5"
@@ -145,13 +149,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
 
         <div className="pt-2 text-center">
           <p className="text-gray-400 font-bold text-xs uppercase tracking-tight">
-            Not a member?{' '}
+            {t('auth.loginNoAccount')}{' '}
             <button
               type="button"
               onClick={() => setView('register')}
               className="text-[#4B3621] dark:text-[#FFD700] hover:underline font-black transition-colors"
             >
-              Create account
+              {t('auth.loginRegister')}
             </button>
           </p>
         </div>

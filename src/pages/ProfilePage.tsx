@@ -1,35 +1,174 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  User, 
-  Mail, 
-  MapPin, 
-  Phone, 
-  Camera, 
-  Save, 
-  Shield, 
-  Calendar,
+import {
+  User,
   Loader2,
-  CheckCircle
+  ShoppingBag,
+  Bell,
+  Ticket,
+  Database,
+  Wallet,
+  Coffee
 } from 'lucide-react';
-import { message } from 'antd';
+import { App } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/AuthContext';
 import * as profileApi from '@/api/profileApi';
+import { getImageSrc } from '@/utils/image';
+import { useOrders } from '@/hooks/useOrders';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { ordersService } from '@/features/orders/services/orders.service';
+import { useAddToCart } from '@/hooks/useCart';
+
+const formatPrice = (v: number) =>
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v || 0);
+
+const OrderItemsSummary: React.FC<{ orderId: number }> = ({ orderId }) => {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!orderId) return;
+    
+    const fetchItems = async () => {
+      try {
+        const res = await ordersService.getItemsByOrderId(orderId);
+        setItems(res || []);
+      } catch (e) {
+        console.error("Error fetching order items:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchItems();
+  }, [orderId]);
+
+  if (!orderId) return null;
+  if (loading) return (
+    <div className="animate-pulse flex gap-4 my-2">
+      <div className="w-16 h-16 bg-stone-100 rounded" />
+      <div className="flex-1 space-y-2 py-1">
+        <div className="h-3 bg-stone-100 rounded w-3/4" />
+        <div className="h-3 bg-stone-100 rounded w-1/4" />
+      </div>
+    </div>
+  );
+
+  if (!items.length) return <div className="text-xs text-stone-400 italic py-2">Đang xử lý thông tin sản phẩm...</div>;
+
+  return (
+    <div className="divide-y divide-stone-50 dark:divide-stone-800">
+      {items.map((item, idx) => (
+        <div key={item.orderitem_ID || idx} className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
+          <div className="w-20 h-20 bg-stone-50 dark:bg-stone-900 rounded-sm border border-stone-100 dark:border-stone-800 flex items-center justify-center overflow-hidden flex-shrink-0">
+            {item.products?.image ? (
+              <img src={getImageSrc(item.products.image)} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <Coffee className="text-stone-200" size={32} />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-stone-800 dark:text-stone-100 font-medium truncate">
+              {item.products?.name || `Sản phẩm #${item.product_ID}`}
+            </h4>
+            <p className="text-stone-400 text-xs mt-1">Phân loại hàng: Mặc định</p>
+            <span className="text-sm mt-1 block font-medium text-stone-600 dark:text-stone-400">x{item.quantity}</span>
+          </div>
+          <div className="text-right flex-shrink-0">
+            <span className="text-stone-400 line-through text-[10px] block opacity-50">{formatPrice(Number(item.price) * 1.2)}</span>
+            <span className="text-[#ee4d2d] font-medium text-sm">{formatPrice(Number(item.price))}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const ProfilePage: React.FC = () => {
+  const { message } = App.useApp();
   const { user, login } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const addToCart = useAddToCart();
+
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleBuyAgain = async (orderID: number) => {
+    if (!orderID) return;
+    try {
+      setIsLoading(true);
+      const items = await ordersService.getItemsByOrderId(orderID);
+      
+      if (!items || items.length === 0) {
+        message.warning("Không tìm thấy sản phẩm để mua lại!");
+        return;
+      }
+
+      await Promise.all(items.map(item => 
+        addToCart.mutateAsync({
+          user_ID: user!.user_ID,
+          product_ID: item.product_ID,
+          quantity: item.quantity,
+          price: item.price
+        })
+      ));
+
+      message.success("Đã thêm sản phẩm vào giỏ hàng!");
+      navigate('/cart');
+    } catch (err) {
+      console.error(err);
+      message.error("Có lỗi xảy ra khi mua lại sản phẩm.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
     phoneNumber: user?.phoneNumber || '',
     address: user?.address || '',
   });
+
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(user?.avatar || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const currentTab = searchParams.get('tab') || 'profile';
+
+  const { data: allOrders = [], isLoading: ordersLoading } = useOrders();
+
+  const userOrders = useMemo(() => {
+    return allOrders
+      .filter(o => {
+        const orderUserId = o.user_ID || (o as any).UserID || (o as any).userId;
+        const currentUserId = user?.user_ID;
+        return Number(orderUserId) === Number(currentUserId);
+      })
+      .sort((a, b) => {
+        const idA = a.order_ID || (a as any).orderId || 0;
+        const idB = b.order_ID || (b as any).orderId || 0;
+        return Number(idB) - Number(idA);
+      });
+  }, [allOrders, user]);
+
+  const orderTabs = [
+    { key: 'all', label: 'Tất cả' },
+    { key: 'Pending', label: 'Chờ thanh toán' },
+    { key: 'Shipping', label: 'Vận chuyển' },
+    { key: 'To Receive', label: 'Chờ giao hàng' },
+    { key: 'Completed', label: 'Hoàn thành' },
+    { key: 'Cancelled', label: 'Đã hủy' },
+    { key: 'Refund', label: 'Trả hàng/Hoàn tiền' },
+  ];
+
+  const filteredOrders = useMemo(() => {
+    const status = searchParams.get('status') || 'all';
+    if (status === 'all') return userOrders;
+    return userOrders.filter(o => String(o.status || '').toLowerCase() === status.toLowerCase());
+  }, [userOrders, searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,17 +179,15 @@ const ProfilePage: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Local preview
     const reader = new FileReader();
     reader.onloadend = () => setPreviewAvatar(reader.result as string);
     reader.readAsDataURL(file);
 
-    // Upload to Cloudinary
     try {
       setIsLoading(true);
       const res = await profileApi.uploadAvatar(file);
       message.success(t('profile.avatarSuccess') || 'Avatar updated!');
-      if (user) login('', { ...user, avatar: res.avatarUrl }); // '' means keep current token
+      if (user) login('', { ...user, avatar: res.avatarUrl });
     } catch (error) {
       message.error(t('profile.avatarError') || 'Upload failed');
     } finally {
@@ -77,179 +214,224 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDF5E6] dark:bg-[#1c1716] pt-32 pb-20 px-4">
-      <div className="max-w-4xl mx-auto">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-[#2a2423] rounded-[2.5rem] shadow-2xl overflow-hidden border border-amber-100/20 dark:border-white/5"
-        >
-          {/* Header/Cover */}
-          <div className="h-48 bg-gradient-to-r from-[#4B3621] to-[#6f4e37] relative">
-            <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/coffee-beans.png')]"></div>
-          </div>
-
-          <div className="px-8 pb-12">
-            <div className="flex flex-col md:flex-row items-end gap-8 -mt-20 mb-12">
-              {/* Avatar Section */}
-              <div className="relative group">
-                <div className="w-40 h-40 rounded-[2rem] bg-amber-50 dark:bg-zinc-800 border-8 border-white dark:border-[#2a2423] shadow-xl overflow-hidden">
-                  {previewAvatar ? (
-                    <img src={previewAvatar} alt="Profile" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[#4B3621] dark:text-amber-100">
-                      <User size={64} />
-                    </div>
-                  )}
-                  {isLoading && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <Loader2 className="animate-spin text-white" size={32} />
-                    </div>
-                  )}
-                </div>
-                <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-2 right-2 p-3 bg-[#4B3621] text-white rounded-2xl shadow-lg hover:scale-110 transition-transform active:scale-95 border-2 border-white dark:border-[#2a2423]"
-                >
-                  <Camera size={18} />
-                </button>
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  onChange={handleAvatarChange} 
-                  className="hidden" 
-                  accept="image/*"
-                />
-              </div>
-
-              <div className="flex-1 mb-2">
-                <h1 className="text-4xl font-black text-[#4B3621] dark:text-white tracking-tight mb-2">
-                  {user?.name}
-                </h1>
-                <div className="flex flex-wrap gap-3">
-                  <span className="px-4 py-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-[#4B3621] dark:text-amber-200 text-xs font-black uppercase tracking-widest border border-amber-200/50">
-                    {user?.roleID === '1' || user?.roleID === 1 ? 'Administrator' : 'Coffee Lover'}
-                  </span>
-                  <span className="px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-widest border border-emerald-200/50 flex items-center gap-2">
-                    <CheckCircle size={12} /> Verified
-                  </span>
-                </div>
-              </div>
-
-              <button 
-                onClick={() => isEditing ? handleSaveProfile() : setIsEditing(true)}
-                disabled={isLoading}
-                className={`px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-sm flex items-center gap-3 transition-all
-                  ${isEditing 
-                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:bg-emerald-600' 
-                    : 'bg-[#4B3621] text-white shadow-lg shadow-[#4B3621]/30 hover:bg-[#3d2c1b]'
-                  }`}
+    <div className="bg-[#f5f5f5] dark:bg-[#0a0a0a] min-h-screen pt-32 pb-20">
+      <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row gap-6">
+        {/* SIDEBAR */}
+        <div className="w-full md:w-60 flex flex-col gap-6">
+          <div className="flex items-center gap-4 px-2">
+            <div className="w-12 h-12 rounded-full overflow-hidden border border-stone-200 dark:border-stone-800 bg-white">
+              <img src={getImageSrc(previewAvatar || user?.avatar)} alt="avatar" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex flex-col overflow-hidden">
+              <span className="font-bold truncate text-stone-900 dark:text-stone-100">{user?.name}</span>
+              <button
+                onClick={() => setSearchParams({ tab: 'profile' })}
+                className="text-stone-500 text-xs flex items-center gap-1 hover:text-stone-700 text-left"
               >
-                {isLoading ? <Loader2 className="animate-spin" size={18} /> : (isEditing ? <Save size={18} /> : <User size={18} />)}
-                {isEditing ? 'Save Changes' : 'Edit Profile'}
+                <EditOutlined style={{ fontSize: 10 }} /> Sửa Hồ Sơ
               </button>
             </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Info Column */}
-              <div className="lg:col-span-2 space-y-8">
-                <section>
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-gray-500 mb-6 flex items-center gap-3">
-                    <Shield size={14} /> Personal Information
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 ml-1">Full Name</label>
-                      <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          className="w-full bg-gray-50 dark:bg-zinc-900/50 border border-transparent focus:border-amber-200 dark:focus:border-amber-900/50 py-4 pl-12 pr-4 rounded-2xl outline-none transition-all font-bold disabled:opacity-60"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 ml-1">Email Address</label>
-                      <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          value={formData.email}
-                          disabled={true}
-                          className="w-full bg-gray-50 dark:bg-zinc-900/50 border border-transparent py-4 pl-12 pr-4 rounded-2xl outline-none font-bold opacity-60 cursor-not-allowed"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 ml-1">Phone Number</label>
-                      <div className="relative">
-                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          name="phoneNumber"
-                          value={formData.phoneNumber}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="+84 000 000 000"
-                          className="w-full bg-gray-50 dark:bg-zinc-900/50 border border-transparent focus:border-amber-200 dark:focus:border-amber-900/50 py-4 pl-12 pr-4 rounded-2xl outline-none transition-all font-bold disabled:opacity-60"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 ml-1">Location</label>
-                      <div className="relative">
-                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          name="address"
-                          value={formData.address}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="HCM City, Vietnam"
-                          className="w-full bg-gray-50 dark:bg-zinc-900/50 border border-transparent focus:border-amber-200 dark:focus:border-amber-900/50 py-4 pl-12 pr-4 rounded-2xl outline-none transition-all font-bold disabled:opacity-60"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </div>
-
-              {/* Sidebar Column */}
-              <div className="space-y-8">
-                <div className="p-8 rounded-[2rem] bg-gray-50 dark:bg-zinc-900/50 border border-amber-100 dark:border-white/5">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#4B3621] dark:text-amber-200 mb-6">Membership</h4>
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center text-amber-500 shadow-sm">
-                        <Calendar size={20} />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined Since</p>
-                        <p className="font-bold text-sm text-[#4B3621] dark:text-white">March 2024</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center text-rose-500 shadow-sm">
-                        <Shield size={20} />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Account Status</p>
-                        <p className="font-bold text-sm text-emerald-500">Active & Verified</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-8 rounded-[2rem] bg-[#4B3621] text-white overflow-hidden relative group">
-                   <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-                   <h4 className="relative z-10 text-[10px] font-black underline decoration-amber-400 underline-offset-8 uppercase tracking-[0.2em] mb-4">Coffee Points</h4>
-                   <p className="relative z-10 text-4xl font-black mb-1">1,250 <span className="text-xs uppercase text-amber-400">PTS</span></p>
-                   <p className="relative z-10 text-[10px] font-bold text-amber-200/50 uppercase tracking-widest">Gold Tier Member</p>
-                </div>
-              </div>
-            </div>
           </div>
-        </motion.div>
+
+          <nav className="flex flex-col gap-1">
+            <button
+              onClick={() => setSearchParams({ tab: 'profile' })}
+              className={`flex items-center gap-3 px-3 py-2 rounded-sm text-sm transition-colors ${currentTab === 'profile' ? 'text-orange-600 font-medium' : 'text-stone-600 dark:text-stone-400 hover:text-orange-600'}`}
+            >
+              <User size={18} className="text-blue-500" />
+              Tài Khoản Của Tôi
+            </button>
+            <button
+              onClick={() => setSearchParams({ tab: 'orders' })}
+              className={`flex items-center gap-3 px-3 py-2 rounded-sm text-sm transition-colors ${currentTab === 'orders' ? 'text-orange-600 font-medium' : 'text-stone-600 dark:text-stone-400 hover:text-orange-600'}`}
+            >
+              <ShoppingBag size={18} className="text-orange-600" />
+              Đơn Mua
+            </button>
+            <button className="flex items-center gap-3 px-3 py-2 rounded-sm text-sm text-stone-600 dark:text-stone-400 hover:text-orange-600">
+              <Bell size={18} className="text-orange-500" />
+              Thông Báo
+            </button>
+            <button className="flex items-center gap-3 px-3 py-2 rounded-sm text-sm text-stone-600 dark:text-stone-400 hover:text-orange-600">
+              <Ticket size={18} className="text-orange-600" />
+              Kho Voucher
+            </button>
+            <button className="flex items-center gap-3 px-3 py-2 rounded-sm text-sm text-stone-600 dark:text-stone-400 hover:text-orange-600">
+              <Database size={18} className="text-amber-500" />
+              Shopee Xu
+            </button>
+          </nav>
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div className="flex-1">
+          {currentTab === 'profile' ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white dark:bg-[#1e1e1e] shadow-sm rounded-sm p-8"
+            >
+              <div className="border-b border-stone-100 dark:border-stone-800 pb-4 mb-8">
+                <h2 className="text-lg font-medium text-stone-900 dark:text-stone-100">Hồ Sơ Của Tôi</h2>
+                <p className="text-stone-500 text-sm mt-1">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+              </div>
+
+              <div className="flex flex-col lg:flex-row gap-12">
+                <div className="flex-1 space-y-6">
+                  <div className="flex items-center gap-4">
+                    <span className="w-32 text-right text-stone-500 text-sm">Tên đăng nhập</span>
+                    <span className="font-medium text-stone-800 dark:text-stone-100">{user?.email?.split('@')[0]}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="w-32 text-right text-stone-500 text-sm">Tên</span>
+                    <input
+                      name="name"
+                      disabled={!isEditing}
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="flex-1 max-w-md border border-stone-200 dark:border-stone-800 bg-transparent px-3 py-2 rounded-sm outline-none focus:border-stone-400 disabled:bg-stone-50 dark:disabled:bg-stone-900/40"
+                    />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="w-32 text-right text-stone-500 text-sm">Email</span>
+                    <span className="text-stone-800 dark:text-stone-100">{formData.email}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="w-32 text-right text-stone-500 text-sm">Số điện thoại</span>
+                    <input
+                      name="phoneNumber"
+                      disabled={!isEditing}
+                      value={formData.phoneNumber}
+                      onChange={handleInputChange}
+                      className="flex-1 max-w-md border border-stone-200 dark:border-stone-800 bg-transparent px-3 py-2 rounded-sm outline-none focus:border-stone-400 disabled:bg-stone-50 dark:disabled:bg-stone-900/40"
+                    />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="w-32 text-right text-stone-500 text-sm">Địa chỉ</span>
+                    <input
+                      name="address"
+                      disabled={!isEditing}
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      className="flex-1 max-w-md border border-stone-200 dark:border-stone-800 bg-transparent px-3 py-2 rounded-sm outline-none focus:border-stone-400 disabled:bg-stone-50 dark:disabled:bg-stone-900/40"
+                    />
+                  </div>
+                  <div className="flex items-center gap-4 pt-4">
+                    <div className="w-32" />
+                    <button
+                      disabled={isLoading}
+                      onClick={() => isEditing ? handleSaveProfile() : setIsEditing(true)}
+                      className="bg-[#ee4d2d] text-white px-8 py-2.5 rounded-sm shadow-sm hover:bg-[#d73211] transition-colors font-medium flex items-center gap-2"
+                    >
+                      {isLoading && <Loader2 size={16} className="animate-spin" />}
+                      {isEditing ? 'Lưu' : 'Thay đổi'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="w-full lg:w-72 border-l border-stone-100 dark:border-stone-800 flex flex-col items-center gap-4 px-8">
+                  <div className="w-24 h-24 rounded-full overflow-hidden mb-2 border border-stone-100 dark:border-stone-800">
+                    <img src={getImageSrc(previewAvatar)} alt="avatar" className="w-full h-full object-cover" />
+                  </div>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border border-stone-200 dark:border-stone-800 px-4 py-2 rounded-sm text-stone-600 dark:text-stone-400 text-sm hover:bg-stone-50 dark:hover:bg-stone-900"
+                  >
+                    Chọn Ảnh
+                  </button>
+                  <p className="text-xs text-stone-400 text-center leading-relaxed">
+                    Dụng lượng file tối đa 1 MB<br />Định dạng:.JPEG, .PNG
+                  </p>
+                  <input ref={fileInputRef} type="file" onChange={handleAvatarChange} className="hidden" accept="image/*" />
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <div className="bg-white dark:bg-[#1e1e1e] shadow-sm rounded-sm overflow-hidden top-[100px] z-20">
+                <div className="flex items-center overflow-x-auto scroller-hidden">
+                  {orderTabs.map(tab => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setSearchParams({ tab: 'orders', status: tab.key })}
+                      className={`flex-1 min-w-[120px] py-4 text-sm text-center transition-colors border-b-2 whitespace-nowrap ${(searchParams.get('status') || 'all') === tab.key
+                          ? 'text-[#ee4d2d] border-[#ee4d2d]'
+                          : 'text-stone-600 dark:text-stone-400 border-transparent hover:text-[#ee4d2d]'
+                        }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {ordersLoading ? (
+                  <div className="bg-white dark:bg-[#1e1e1e] p-12 text-center rounded-sm shadow-sm">
+                    <Loader2 className="animate-spin mx-auto text-orange-600" size={32} />
+                    <p className="mt-4 text-stone-500">Đang tải đơn hàng...</p>
+                  </div>
+                ) : filteredOrders.length === 0 ? (
+                  <div className="bg-white dark:bg-[#1e1e1e] p-20 text-center rounded-sm shadow-sm">
+                    <div className="w-24 h-24 bg-stone-50 dark:bg-stone-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <ShoppingBag size={48} className="text-stone-200 dark:text-stone-700" />
+                    </div>
+                    <p className="text-stone-500">Bạn chưa có đơn hàng nào nè.</p>
+                  </div>
+                ) : (
+                  filteredOrders.map(order => {
+                    const orderID = order.order_ID || (order as any).orderId;
+                    return (
+                      <div key={orderID} className="bg-white dark:bg-[#1e1e1e] shadow-sm rounded-sm overflow-hidden border border-stone-100 dark:border-stone-800">
+                        <div className="px-6 py-3 border-b border-stone-50 dark:border-stone-800 flex items-center justify-between bg-stone-50/30 dark:bg-stone-900/10">
+                          <div className="flex items-center gap-2">
+                            <span className="bg-[#ee4d2d] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase">Yêu thích</span>
+                            <span className="text-sm font-bold text-stone-900 dark:text-stone-100 uppercase">Phan Coffee Official</span>
+                            <button className="bg-[#ee4d2d] text-white text-[10px] px-2 py-0.5 rounded-sm hover:opacity-90">Chat</button>
+                            <Link to="/products" className="text-stone-500 text-xs border border-stone-200 dark:border-stone-800 px-2 py-0.5 rounded-sm hover:bg-stone-50 dark:hover:bg-stone-900 transition-colors">Xem Shop</Link>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs uppercase tracking-wider text-[#ee4d2d] font-bold border-r pr-3 border-stone-200 dark:border-stone-800">
+                              {String(order.status).toLowerCase() === 'completed' ? 'ĐÃ GIAO' : (order.status || 'CHỜ XÁC NHẬN')}
+                            </span>
+                            <span className="text-stone-500 text-xs">ID đơn hàng: {orderID}</span>
+                          </div>
+                        </div>
+
+                        <div className="px-6 pt-6">
+                          <OrderItemsSummary orderId={orderID} />
+                        </div>
+
+                        <div className="bg-[#fffefb] dark:bg-stone-900/10 px-6 py-4 border-t border-stone-50 dark:border-stone-800 flex flex-col items-end gap-4 overflow-hidden">
+                          <div className="flex items-center gap-2">
+                            <Wallet className="text-[#ee4d2d]" size={20} />
+                            <span className="text-sm text-stone-700 dark:text-stone-300">Thành tiền:</span>
+                            <span className="text-2xl font-bold text-[#ee4d2d]">{formatPrice(Number(order.total_Amount))}</span>
+                          </div>
+                          <div className="flex items-center gap-3 flex-wrap justify-end">
+                            <button
+                              onClick={() => handleBuyAgain(orderID)}
+                              disabled={isLoading}
+                              className="bg-[#ee4d2d] text-white px-8 py-2 rounded-sm shadow-sm hover:bg-[#d73211] transition-colors font-medium disabled:opacity-50"
+                            >
+                              Mua Lại
+                            </button>
+                            <button className="border border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 px-4 py-2 rounded-sm text-sm hover:bg-stone-50 dark:hover:bg-stone-900 transition-all">Xem Chi Tiết Đơn Hàng</button>
+                            <button className="border border-stone-200 dark:border-stone-800 text-stone-600 dark:text-stone-400 px-4 py-2 rounded-sm text-sm hover:bg-stone-50 dark:hover:bg-stone-900 transition-all">Liên Hệ Người Bán</button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </motion.div>
+          )}
+        </div>
       </div>
     </div>
   );

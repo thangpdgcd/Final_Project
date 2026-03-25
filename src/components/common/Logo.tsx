@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import logoImage from '@/assets/images/logo_PhanCoffee.jpg';
+import logoImage from '../../../public/assets/img/logo_PhanCoffee.jpg';
 
 interface LogoProps {
   size?: number | string;

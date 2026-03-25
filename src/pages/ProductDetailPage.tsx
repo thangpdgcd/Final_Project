@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
+  App,
   Button,
   Skeleton,
   Alert,
-  message,
   Radio,
   Select,
   Rate,
@@ -31,29 +31,26 @@ import { useProduct } from '@/hooks/useProducts';
 import { useAddToCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useAuth } from '@/store/AuthContext';
+import { useTranslation } from 'react-i18next';
+import { getImageSrc } from '@/utils/image';
 
-const getImageSrc = (img?: string | null): string => {
-  if (!img) return '/no-image.png';
-  const v = String(img).trim();
-  if (/^https?:\/\//i.test(v) || v.startsWith('data:image/')) return v;
-  const head = v.slice(0, 12);
-  const mime = head.startsWith('/9j/') ? 'image/jpeg' : head.startsWith('iVBOR') ? 'image/png' : 'image/webp';
-  return `data:${mime};base64,${v}`;
-};
+
 
 const formatPrice = (v: number) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v || 0);
 
 const ProductDetailPage: React.FC = () => {
+  const { message } = App.useApp();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: product, isLoading, error } = useProduct(Number(id));
   const addToCart = useAddToCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { t } = useTranslation();
 
   // --- UI STATE ---
-  const [purchaseType, setPurchaseType] = useState<'once' | 'subscribe'>('subscribe');
+  const [purchaseType, setPurchaseType] = useState<'once' | 'subscribe'>('once');
   const [grind, setGrind] = useState('Beans');
   const [roast, setRoast] = useState('Medium');
   const [frequency, setFrequency] = useState('Every 2 weeks');
@@ -81,8 +78,12 @@ const ProductDetailPage: React.FC = () => {
         price: finalPrice / quantity
       },
       {
-        onSuccess: () => message.success(purchaseType === 'subscribe' ? '✅ Đã đăng ký gói thành công!' : '✅ Đã thêm vào giỏ hàng!'),
-        onError: () => message.error('❌ Có lỗi xảy ra, vui lòng thử lại.'),
+        onSuccess: () =>
+          {
+            message.success(t('productDetail.purchaseOnceSuccess'));
+            navigate('/cart');
+          },
+        onError: () => message.error(t('productDetail.purchaseError')),
       },
     );
   };
@@ -91,7 +92,7 @@ const ProductDetailPage: React.FC = () => {
     if (!product) return;
     if (isInWishlist(product.product_ID)) {
       removeFromWishlist(product.product_ID);
-      message.success('Đã xóa khỏi danh sách yêu thích');
+      message.success(t('productDetail.favoriteRemovedSuccess'));
     } else {
       addToWishlist(product);
     }
@@ -100,8 +101,10 @@ const ProductDetailPage: React.FC = () => {
   if (isLoading) return <div className="max-w-7xl mx-auto px-4 py-20 bg-[#FFF9F3] min-h-screen"><Skeleton active avatar paragraph={{ rows: 10 }} /></div>;
   if (error || !product) return (
     <div className="max-w-7xl mx-auto px-4 py-20 bg-[#FFF9F3] min-h-screen">
-      <Alert type="error" message="Không tìm thấy sản phẩm" showIcon />
-      <Button className="mt-6" onClick={() => navigate('/products')}>← Quay lại cửa hàng</Button>
+      <Alert type="error" message={t('productDetail.notFoundMessage')} showIcon />
+      <Button className="mt-6" onClick={() => navigate('/products')}>
+        {t('productDetail.backToStore')}
+      </Button>
     </div>
   );
 
@@ -114,9 +117,11 @@ const ProductDetailPage: React.FC = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <button onClick={() => navigate('/products')} className="group flex items-center text-[#6f4e37] font-black uppercase tracking-widest text-xs">
             <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Cửa hàng
+              {t('productDetail.store')}
           </button>
-          <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#6f4e37] opacity-40 hidden md:block">The Art of Coffee</div>
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#6f4e37] opacity-40 hidden md:block">
+              {t('productDetail.artOfCoffee')}
+            </div>
           <button onClick={toggleWishlist} className={`p-2 rounded-full transition-all ${isFavorited ? 'bg-red-50 text-red-500 shadow-md' : 'hover:bg-amber-50'}`}>
             <Heart className={`w-5 h-5 ${isFavorited ? 'fill-current' : ''}`} />
           </button>
@@ -131,8 +136,12 @@ const ProductDetailPage: React.FC = () => {
           {/* Visual Experience */}
           <section className="relative group">
             <div className="absolute top-8 left-8 z-10 flex flex-col gap-3 pointer-events-none">
-              <span className="px-5 py-2 bg-[#6f4e37] text-white text-[10px] font-black tracking-[0.2em] rounded-full shadow-xl">BEST SELLER</span>
-              <span className="px-5 py-2 bg-white/90 backdrop-blur text-orange-600 text-[10px] font-black tracking-[0.2em] rounded-full shadow-lg border border-orange-100">LIMITED EDITION</span>
+              <span className="px-5 py-2 bg-[#6f4e37] text-white text-[10px] font-black tracking-[0.2em] rounded-full shadow-xl">
+                {t('productDetail.badgeBestSeller')}
+              </span>
+              <span className="px-5 py-2 bg-white/90 backdrop-blur text-orange-600 text-[10px] font-black tracking-[0.2em] rounded-full shadow-lg border border-orange-100">
+                {t('productDetail.badgeLimitedEdition')}
+              </span>
             </div>
 
             <div className="rounded-[50px] overflow-hidden bg-white shadow-2xl border-8 border-white group-hover:shadow-[0_40px_80px_-20px_rgba(111,78,55,0.2)] transition-shadow duration-700">
@@ -349,10 +358,10 @@ const ProductDetailPage: React.FC = () => {
                   size="large"
                   type="primary"
                   className="h-24 rounded-[25px] bg-[#6f4e37] border-none text-xl font-black tracking-tighter hover:bg-[#4e3524] transition-all shadow-2xl shadow-brown-200/50"
-                  icon={purchaseType === 'subscribe' ? <Calendar className="w-6 h-6 mr-2" /> : <ShoppingCart className="w-6 h-6 mr-2" />}
+                  icon={<ShoppingCart className="w-6 h-6 mr-2" />}
                   onClick={handleCTA}
                 >
-                  {purchaseType === 'subscribe' ? 'BẮT ĐẦU TRẢI NGHIỆM' : 'THÊM VÀO GIỎ HÀNG'}
+                  MUA NGAY
                 </Button>
               </div>
             </div>
@@ -390,7 +399,7 @@ const ProductDetailPage: React.FC = () => {
           className="bg-[#6f4e37] border-none h-16 px-10 rounded-2xl font-black text-xs"
           onClick={handleCTA}
         >
-          {purchaseType === 'subscribe' ? 'ĐĂNG KÝ NGAY' : 'MUA NGAY'}
+          MUA NGAY
         </Button>
       </div>
 
