@@ -1,8 +1,30 @@
 import axios from "axios";
 
-const apilogin = process.env.API_URL_LOGIN || "http://localhost:8080/api/login";
+function normalizeApiBaseUrl(raw: string): string {
+  let v = raw.trim();
+  v = v.replace(/\/+$/, "");
+  if (!/^https?:\/\//i.test(v)) v = `https://${v}`;
+  return v;
+}
+
+const apiHost =
+  (import.meta.env.VITE_API_URL as string | undefined) || process.env.VITE_API_URL;
+
+// - Prefer explicit API_URL_LOGIN/API_URL_REGISTER if you set them in Vercel
+// - Otherwise derive from VITE_API_URL
+const apilogin =
+  process.env.API_URL_LOGIN ||
+  (apiHost ? `${normalizeApiBaseUrl(apiHost)}/api/login` : "http://localhost:8080/api/login");
 const apiregister =
-  process.env.API_URL_REGISTER || "http://localhost:8080/api/register";
+  process.env.API_URL_REGISTER ||
+  (apiHost
+    ? `${normalizeApiBaseUrl(apiHost)}/api/register`
+    : "http://localhost:8080/api/register");
+
+const axiosWithCreds = axios.create({
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
+});
 
 export interface LoginPayload {
   email: string;
@@ -30,13 +52,14 @@ export interface RegisterResponse {
 }
 
 export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
-  const res = await axios.post(`${apilogin}`, payload);
+  // withCredentials is required so browser can store HttpOnly refresh cookies cross-site
+  const res = await axiosWithCreds.post(`${apilogin}`, payload);
   return res.data;
 };
 
 export const register = async (
   payload: RegisterPayload
 ): Promise<RegisterResponse> => {
-  const res = await axios.post(`${apiregister}`, payload);
+  const res = await axiosWithCreds.post(`${apiregister}`, payload);
   return res.data;
 };
