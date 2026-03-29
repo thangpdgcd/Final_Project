@@ -20,6 +20,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { ordersService } from '@/features/orders/services/orders.service';
 import { useAddToCart } from '@/hooks/useCart';
+import type { Order } from '@/types';
 
 const formatPrice = (v: number) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v || 0);
@@ -128,7 +129,6 @@ const ProfilePage: React.FC = () => {
 
   const [formData, setFormData] = useState({
     name: user?.name || '',
-    email: user?.email || '',
     phoneNumber: user?.phoneNumber || '',
     address: user?.address || '',
   });
@@ -138,16 +138,25 @@ const ProfilePage: React.FC = () => {
 
   const currentTab = searchParams.get('tab') || 'profile';
 
-  const { data: allOrders = [], isLoading: ordersLoading } = useOrders();
+  const { data: allOrdersRaw, isLoading: ordersLoading } = useOrders();
+  const allOrders = useMemo<Order[]>(() => {
+    if (Array.isArray(allOrdersRaw)) return allOrdersRaw;
+    // In case API returns a wrapped shape
+    const v = allOrdersRaw as any;
+    if (v && Array.isArray(v.orders)) return v.orders as Order[];
+    if (v && Array.isArray(v.data)) return v.data as Order[];
+    if (v && Array.isArray(v.result)) return v.result as Order[];
+    return [];
+  }, [allOrdersRaw]);
 
-  const userOrders = useMemo(() => {
+  const userOrders = useMemo<Order[]>(() => {
     return allOrders
-      .filter(o => {
+      .filter((o: Order) => {
         const orderUserId = o.user_ID || (o as any).UserID || (o as any).userId;
         const currentUserId = user?.user_ID;
         return Number(orderUserId) === Number(currentUserId);
       })
-      .sort((a, b) => {
+      .sort((a: Order, b: Order) => {
         const idA = a.order_ID || (a as any).orderId || 0;
         const idB = b.order_ID || (b as any).orderId || 0;
         return Number(idB) - Number(idA);
@@ -164,10 +173,10 @@ const ProfilePage: React.FC = () => {
     { key: 'Refund', label: 'Trả hàng/Hoàn tiền' },
   ];
 
-  const filteredOrders = useMemo(() => {
+  const filteredOrders = useMemo<Order[]>(() => {
     const status = searchParams.get('status') || 'all';
     if (status === 'all') return userOrders;
-    return userOrders.filter(o => String(o.status || '').toLowerCase() === status.toLowerCase());
+    return userOrders.filter((o: Order) => String(o.status || '').toLowerCase() === status.toLowerCase());
   }, [userOrders, searchParams]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -293,10 +302,6 @@ const ProfilePage: React.FC = () => {
                     />
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="w-32 text-right text-stone-500 text-sm">Email</span>
-                    <span className="text-stone-800 dark:text-stone-100">{formData.email}</span>
-                  </div>
-                  <div className="flex items-center gap-4">
                     <span className="w-32 text-right text-stone-500 text-sm">Số điện thoại</span>
                     <input
                       name="phoneNumber"
@@ -383,7 +388,7 @@ const ProfilePage: React.FC = () => {
                     <p className="text-stone-500">Bạn chưa có đơn hàng nào nè.</p>
                   </div>
                 ) : (
-                  filteredOrders.map(order => {
+                  filteredOrders.map((order: Order) => {
                     const orderID = order.order_ID || (order as any).orderId;
                     return (
                       <div key={orderID} className="bg-white dark:bg-[#1e1e1e] shadow-sm rounded-sm overflow-hidden border border-stone-100 dark:border-stone-800">

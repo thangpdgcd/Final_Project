@@ -4,6 +4,14 @@ export const getImageSrc = (img?: string | null): string => {
   
   // If it's already a URL or a full data-URI, return it as-is
   if (/^https?:\/\//i.test(v) || v.startsWith('data:image/')) {
+    // If the site is https, upgrade http image URLs to https to avoid mixed-content blocks.
+    if (
+      /^http:\/\//i.test(v) &&
+      typeof window !== 'undefined' &&
+      window.location?.protocol === 'https:'
+    ) {
+      return v.replace(/^http:\/\//i, 'https://');
+    }
     return v;
   }
 

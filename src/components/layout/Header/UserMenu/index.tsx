@@ -89,11 +89,11 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleAvatarClick}
-        className="relative group p-0.5 rounded-full border border-white/10 hover:border-[#FFD700] transition-colors duration-300 cursor-pointer"
+        className="relative group p-0.5 rounded-full border border-stone-200 hover:border-[#FFD700] dark:border-white/10 transition-colors duration-300 cursor-pointer"
         aria-label={t('profile.title')}
       >
         <div className="absolute inset-0 bg-[#FFD700]/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
-        <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center overflow-hidden relative z-10 border border-white/5">
+        <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-white/5 flex items-center justify-center overflow-hidden relative z-10 border border-stone-200 dark:border-white/5">
           {isAuthenticated && user?.avatar ? (
             <img src={getImageSrc(user.avatar)} alt="Avatar" className="w-full h-full object-cover" />
           ) : isAuthenticated && user?.name ? (
@@ -101,7 +101,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
               {user.name.charAt(0)}
             </span>
           ) : (
-            <User size={20} className="text-white group-hover:text-[#FFD700] transition-colors" />
+            <User size={20} className="text-stone-700 dark:text-white group-hover:text-[#FFD700] transition-colors" />
           )}
         </div>
       </motion.button>
@@ -113,7 +113,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
         aria-haspopup="true"
         aria-expanded={isOpen}
         className={`w-8 h-10 rounded-xl flex items-center justify-center transition-all duration-300 group cursor-pointer
-          ${isOpen ? 'text-[#FFD700] bg-white/5' : 'text-white/40 hover:text-white hover:bg-white/5'}
+          ${isOpen ? 'text-[#FFD700] bg-stone-100 dark:bg-white/5' : 'text-stone-500 hover:text-stone-900 hover:bg-stone-100 dark:text-white/40 dark:hover:text-white dark:hover:bg-white/5'}
         `}
       >
         <ChevronDown 

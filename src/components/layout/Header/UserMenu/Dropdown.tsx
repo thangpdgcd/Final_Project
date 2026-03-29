@@ -11,6 +11,7 @@ import {
   Settings,
   Heart
 } from 'lucide-react';
+import { getImageSrc } from '@/utils/image';
 
 interface DropdownProps {
   isLoggedIn: boolean;
@@ -41,17 +42,19 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 10, scale: 0.95 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="w-72 bg-gradient-to-b from-[#1c1716] to-[#2a2423] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden flex flex-col"
+      className="w-72 rounded-2xl overflow-hidden flex flex-col border shadow-2xl
+        bg-white border-stone-200 shadow-black/10
+        dark:bg-gradient-to-b dark:from-[#1c1716] dark:to-[#2a2423] dark:border-white/10 dark:shadow-black/60"
     >
       {isLoggedIn ? (
         <>
           {/* A. Header Section */}
-          <div className="p-6 border-b border-white/5 bg-white/[0.02]">
+          <div className="p-6 border-b border-stone-100 bg-stone-50/50 dark:border-white/5 dark:bg-white/[0.02]">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#FFD700] to-amber-200 p-0.5 shadow-lg shadow-[#FFD700]/10">
-                <div className="w-full h-full rounded-full bg-[#1c1716] flex items-center justify-center overflow-hidden border-2 border-[#1c1716]">
+                <div className="w-full h-full rounded-full bg-white dark:bg-[#1c1716] flex items-center justify-center overflow-hidden border-2 border-white dark:border-[#1c1716]">
                   {user?.avatar ? (
-                    <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                    <img src={getImageSrc(user.avatar)} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-[#FFD700] font-black text-lg">
                       {user?.name?.charAt(0) || 'U'}
@@ -60,10 +63,10 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="text-white font-black text-base truncate tracking-tight uppercase">
+                <h4 className="text-stone-900 dark:text-white font-black text-base truncate tracking-tight uppercase">
                   {user?.name}
                 </h4>
-                <p className="text-[10px] text-white/40 truncate font-medium lowercase font-mono">
+                <p className="text-[10px] text-stone-500 dark:text-white/40 truncate font-medium lowercase font-mono">
                   {user?.email || 'member@phancoffee.com'}
                 </p>
               </div>
@@ -76,10 +79,14 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
               <button
                 key={item.label}
                 onClick={() => handleAction(item.path)}
-                className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl hover:bg-white/5 transition-all group text-white/70 hover:text-white cursor-pointer"
+                className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all group cursor-pointer
+                  text-stone-700 hover:text-stone-900 hover:bg-stone-100
+                  dark:text-white/70 dark:hover:text-white dark:hover:bg-white/5`}
               >
                 <div className="flex items-center gap-4 group-hover:translate-x-1 transition-transform">
-                  <div className="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center text-[#FFD700] group-hover:bg-[#FFD700] group-hover:text-[#1c1716] transition-all">
+                  <div className={`w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center text-[#b88900] group-hover:bg-[#FFD700] group-hover:text-[#1c1716] transition-all
+                    dark:bg-white/5 dark:text-[#FFD700]`}
+                  >
                     {item.icon}
                   </div>
                   <span className="font-bold text-sm tracking-tight">{item.label}</span>
@@ -90,7 +97,7 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
           </div>
  
           {/* C. Footer Layer */}
-          <div className="mt-auto border-t border-white/5 p-2 bg-black/10">
+          <div className="mt-auto border-t border-stone-100 p-2 bg-stone-50/40 dark:border-white/5 dark:bg-black/10">
             <button
               onClick={onLogout}
               className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-red-500/10 transition-all group text-red-400 font-bold text-sm cursor-pointer"
@@ -105,17 +112,17 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
       ) : (
         <div className="flex flex-col">
           {/* Guest Header */}
-          <div className="p-6 border-b border-white/5 bg-white/[0.02]">
+          <div className="p-6 border-b border-stone-100 bg-stone-50/50 dark:border-white/5 dark:bg-white/[0.02]">
             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FFD700] mb-1">Account</p>
-            <h3 className="text-white font-black text-xl tracking-tight uppercase">Guest User</h3>
+            <h3 className="text-stone-900 dark:text-white font-black text-xl tracking-tight uppercase">Guest User</h3>
           </div>
  
           {/* Guest Content */}
           <div className="p-6">
-            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-white/20 mb-6 mx-auto border border-white/10 rotate-3 transition-transform">
+            <div className="w-16 h-16 rounded-2xl bg-stone-100 dark:bg-white/5 flex items-center justify-center text-stone-400 dark:text-white/20 mb-6 mx-auto border border-stone-200 dark:border-white/10 rotate-3 transition-transform">
               <User size={32} />
             </div>
-            <p className="text-xs text-white/50 text-center mb-8 font-medium leading-relaxed max-w-[200px] mx-auto">
+            <p className="text-xs text-stone-500 dark:text-white/50 text-center mb-8 font-medium leading-relaxed max-w-[200px] mx-auto">
               Join our heritage circle to track your orders and enjoy exclusive coffee perks.
             </p>
             <button
@@ -130,8 +137,8 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
           </div>
  
           {/* Guest Footer Tagline */}
-          <div className="border-t border-white/5 p-4 bg-black/5 flex items-center justify-center">
-            <span className="text-[10px] font-bold text-white/10 uppercase tracking-widest">Phan Coffee • Est 1995</span>
+          <div className="border-t border-stone-100 p-4 bg-stone-50/40 flex items-center justify-center dark:border-white/5 dark:bg-black/5">
+            <span className="text-[10px] font-bold text-stone-400/60 dark:text-white/10 uppercase tracking-widest">Phan Coffee • Est 1995</span>
           </div>
         </div>
       )}

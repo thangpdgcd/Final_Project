@@ -3,8 +3,13 @@ import type { Order, CreateOrderPayload, OrderItem, CreateOrderItemPayload } fro
 
 export const ordersService = {
   getAll: async (): Promise<Order[]> => {
-    const res = await axiosInstance.get<Order[]>('/orders');
-    return res.data;
+    const res = await axiosInstance.get<any>('/orders');
+    const data = res.data;
+    if (Array.isArray(data)) return data as Order[];
+    if (data && Array.isArray(data.orders)) return data.orders as Order[];
+    if (data && Array.isArray(data.data)) return data.data as Order[];
+    if (data && Array.isArray(data.result)) return data.result as Order[];
+    return [];
   },
 
   getById: async (id: number): Promise<Order> => {

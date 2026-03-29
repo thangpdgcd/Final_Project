@@ -183,8 +183,8 @@ const HeaderPage: React.FC = () => {
         <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
 
           {/* Logo Section (Left) */}
-          <Link to="/" className="flex-shrink-0">
-            <Logo size={42} className="md:w-[48px]" />
+          <Link to="/" className="flex-shrink-0 min-w-0">
+            <Logo size={42} />
           </Link>
 
           {/* Navigation Menu (Center) */}
