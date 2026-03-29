@@ -1,6 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import logoImage from '../../../public/assets/img/logo_PhanCoffee.jpg';
+import React from "react";
+import { motion } from "framer-motion";
 
 interface LogoProps {
   size?: number | string;
@@ -11,14 +10,19 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({
   size = 48,
-  className = '',
+  className = "",
   showText = true,
 }) => {
-  const logoUrl = logoImage;
+  // `public/` assets must be referenced by URL (not imported as modules).
+  // Use BASE_URL so the component works even if the app is hosted under a subpath.
+  const baseUrl = import.meta.env.BASE_URL ?? "/";
+  const logoUrl = `${baseUrl}assets/img/logo_PhanCoffee.jpg`;
+  const fallbackUrl = `${baseUrl}assets/img/no-image.png`;
 
   // Determine container dimensions based on size prop
-  const sizeClass = typeof size === 'number' ? '' : size;
-  const inlineStyle = typeof size === 'number' ? { width: size, height: size } : {};
+  const sizeClass = typeof size === "number" ? "" : size;
+  const inlineStyle =
+    typeof size === "number" ? { width: size, height: size } : {};
 
   return (
     <motion.div
@@ -39,7 +43,7 @@ const Logo: React.FC<LogoProps> = ({
           alt="Phan Coffee"
           className="w-full h-full object-cover rounded-full"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = '/logo-fallback.png';
+                (e.currentTarget as HTMLImageElement).src = fallbackUrl;
           }}
         />
       </div>
@@ -50,7 +54,6 @@ const Logo: React.FC<LogoProps> = ({
           Phan Coffee
         </span>
       )}
-
     </motion.div>
   );
 };
