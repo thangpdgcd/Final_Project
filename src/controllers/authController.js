@@ -36,7 +36,8 @@ let registerUser = async (req, res) => {
 };
 
 let login = async (req, res) => {
-  const { email, password } = req.body;
+  const email = typeof req.body?.email === "string" ? req.body.email.trim() : "";
+  const password = req.body?.password;
 
   if (!email || !password) {
     return res.status(400).json({ message: "Email và mật khẩu là bắt buộc." });
@@ -70,7 +71,18 @@ let login = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Lỗi login:", error);
-    return res.status(401).json({ message: error.message });
+    const msg = error?.message || "Đăng nhập thất bại.";
+    const isDb =
+      typeof msg === "string" &&
+      (msg.includes("ECONNREFUSED") ||
+        msg.includes("SequelizeConnectionError") ||
+        msg.includes("connect ETIMEDOUT"));
+    if (isDb) {
+      return res.status(503).json({
+        message: "Không kết nối được cơ sở dữ liệu. Hãy bật MySQL và kiểm tra backend/.env (DB_HOST, DB_PORT).",
+      });
+    }
+    return res.status(401).json({ message: msg });
   }
 };
 

@@ -22,8 +22,10 @@ let addToCart = async (req, res) => {
     const userId = req.user.id; // Lấy từ token - bảo mật hơn
     const productId = req.body.productId ?? req.body.product_ID;
     const { quantity, price } = req.body;
-    if (!productId || !quantity || price == null) {
-      return res.status(400).json({ message: "Missing required fields (productId, quantity, price)" });
+    if (!productId || !quantity) {
+      return res
+        .status(400)
+        .json({ message: "Missing required fields (productId, quantity)" });
     }
 
     const cart = await cartService.addToCart(
@@ -65,8 +67,11 @@ let updateCart = async (req, res) => {
 
 let getCartByUserId = async (req, res) => {
   try {
-    const userId = req.user.id; // Lấy từ token (đã verify bởi authMiddleware)
-    const items = await cartService.getCartByUserId(userId);
+    const userId = req.user?.id ?? req.user?.userId;
+    if (userId == null || !Number.isFinite(Number(userId))) {
+      return res.status(401).json({ message: "Token thiếu thông tin người dùng." });
+    }
+    const items = await cartService.getCartByUserId(Number(userId));
     return res.status(200).json(items);
   } catch (e) {
     return res.status(500).json({ message: e.message });
@@ -81,7 +86,14 @@ let removeCart = async (req, res) => {
       .status(200)
       .json({ message: "Xoá sản phẩm khỏi giỏ hàng thành công" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    const msg = error?.message || "Failed to remove cart item";
+    if (msg.includes("không tồn tại") || msg.toLowerCase().includes("not exist")) {
+      return res.status(404).json({ message: msg });
+    }
+    if (msg.toLowerCase().includes("thiếu")) {
+      return res.status(400).json({ message: msg });
+    }
+    return res.status(500).json({ message: msg });
   }
 };
 

@@ -58,8 +58,8 @@ const registerUser = async ({
 
   return {
     id: newUser.userId,
-    name: newUser.Name,
-    email: newUser.Email,
+    name: newUser.name,
+    email: newUser.email,
     roleID: newUser.roleID,
   };
 };
@@ -83,15 +83,16 @@ const generateTokens = (user) => {
 };
 
 const login = async (Email, password) => {
-  if (!Email || !password) {
+  const emailNorm = typeof Email === "string" ? Email.trim() : "";
+  if (!emailNorm || !password) {
     throw new Error("Email and password are required.");
   }
 
-  if (!emailRegex.test(Email)) {
+  if (!emailRegex.test(emailNorm)) {
     throw new Error("Invalid email address.");
   }
 
-  const user = await Users.findOne({ where: { Email } });
+  const user = await Users.findOne({ where: { email: emailNorm } });
 
   if (!user) throw new Error("Incorrect email or password.");
 
@@ -107,8 +108,8 @@ const login = async (Email, password) => {
     refreshToken,
     user: {
       id: user.userId,
-      name: user.Name,
-      email: user.Email,
+      name: user.name,
+      email: user.email,
       roleID: user.roleID,
     },
   };

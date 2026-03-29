@@ -1,12 +1,11 @@
 import db from "../models/index.js";
-let { Carts, Cart_Items, Products } = db;
 
 // Add product to cart
 const addToCart = async (userId, productId, quantity, price) => {
   const uId = Number(userId);
   const pId = Number(productId);
   const qty = Number(quantity);
-  const unitPrice = Number(price);
+  let unitPrice = price == null ? null : Number(price);
 
   if (!Number.isFinite(uId) || uId <= 0) {
     throw new Error("Invalid userId");
@@ -17,8 +16,14 @@ const addToCart = async (userId, productId, quantity, price) => {
   if (!Number.isFinite(qty) || qty <= 0) {
     throw new Error("Invalid quantity");
   }
+
   if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
-    throw new Error("Invalid price");
+    const product = await db.Products.findByPk(pId);
+    if (!product) throw new Error("Product not found");
+    unitPrice = Number(product.price);
+    if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
+      throw new Error("Invalid product price");
+    }
   }
 
   let cart = await db.Carts.findOne({ where: { userId: uId } });
@@ -46,69 +51,57 @@ const addToCart = async (userId, productId, quantity, price) => {
 
   return cartItem;
 };
-let getCartByUserId = (userId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (!userId) return reject(new Error("User ID là bắt buộc"));
 
-      const cart = await Carts.findOne({
-        where: { userId },
-        include: [
-          {
-            model: Cart_Items,
-            as: "cart_Items",
-            include: [{ model: Products, as: "products" }],
-          },
-        ],
-      });
+/**
+ * Two-step load avoids fragile nested includes (some MySQL/Sequelize combos error on deep joins).
+ */
+const getCartByUserId = async (userId) => {
+  const uid = Number(userId);
+  if (!Number.isFinite(uid) || uid <= 0) {
+    throw new Error("User ID là bắt buộc");
+  }
 
-      if (!cart) return resolve([]);
-      resolve(cart.cart_Items || []);
-    } catch (error) {
-      reject(new Error("Không thể lấy giỏ hàng: " + error.message));
-    }
+  const cart = await db.Carts.findOne({ where: { userId: uid } });
+  if (!cart) return [];
+
+  return db.Cart_Items.findAll({
+    where: { cartId: cart.cartId },
+    include: [{ model: db.Products, as: "products", required: false }],
+    order: [["cartItemId", "ASC"]],
   });
 };
 
-let getCartItem = (cartId) => {
+const getCartItem = (cartId) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!cartId) return reject(new Error("Cart ID là bắt buộc"));
 
-      let cart = await Carts.findOne({
+      const cart = await db.Carts.findOne({
         where: { cartId: cartId },
-        include: [
-          {
-            model: Cart_Items,
-            as: "cart_Items", // đúng alias như model
-            include: [
-              {
-                model: Products,
-                as: "products",
-              },
-            ],
-          },
-        ],
       });
-
       if (!cart) return resolve(null);
 
-      // Trả về riêng mảng cartItems nếu bạn chỉ muốn cart item
-      resolve(cart.cart_Items);
+      const rows = await db.Cart_Items.findAll({
+        where: { cartId: cart.cartId },
+        include: [{ model: db.Products, as: "products", required: false }],
+        order: [["cartItemId", "ASC"]],
+      });
+
+      resolve(rows);
     } catch (error) {
       reject(new Error("Không thể lấy giỏ hàng: " + error.message));
     }
   });
 };
 
-let updateCart = (cartItemId, quantity) => {
+const updateCart = (cartItemId, quantity) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!cartItemId || !quantity) {
         return reject(new Error("Thiếu cart item ID hoặc số lượng"));
       }
 
-      let item = await Cart_Items.findByPk(cartItemId);
+      const item = await db.Cart_Items.findByPk(cartItemId);
       if (!item) return reject(new Error("Cart Item không tồn tại"));
 
       item.quantity = quantity;
@@ -120,12 +113,12 @@ let updateCart = (cartItemId, quantity) => {
   });
 };
 
-let removeCart = (cartItemId) => {
+const removeCart = (cartItemId) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!cartItemId) return reject(new Error("Thiếu cart item ID"));
 
-      let item = await Cart_Items.findByPk(cartItemId);
+      const item = await db.Cart_Items.findByPk(cartItemId);
       if (!item) return reject(new Error("Cart Item không tồn tại"));
 
       await item.destroy();
@@ -135,10 +128,11 @@ let removeCart = (cartItemId) => {
     }
   });
 };
-let searchCart = (name) => {
+
+const searchCart = (name) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let cart = await Carts.findAll({
+      const cart = await db.Carts.findAll({
         where: {
           name: name,
         },
@@ -149,6 +143,7 @@ let searchCart = (name) => {
     }
   });
 };
+
 export default {
   getCartItem,
   addToCart,

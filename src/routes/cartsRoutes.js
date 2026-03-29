@@ -109,7 +109,12 @@ router.put("/cart-items/:cartItemId", authMiddleware, cartController.updateCart)
 router.delete("/cart-items/:cartItemId", authMiddleware, cartController.removeCart);
 
 const initCartRoutes = (app) => {
+  // Đăng ký trực tiếp trên app để alias không dấu `-` luôn khớp (một số FE gọi `/cartitems`).
+  // Nếu chỉ dựa vào `router` + `app.use("/api", router)` mà process cũ chưa restart vẫn 404.
+  app.put("/api/cartitems/:cartItemId", authMiddleware, cartController.updateCart);
+  app.delete("/api/cartitems/:cartItemId", authMiddleware, cartController.removeCart);
+
   app.use("/api", router);
-};  
+};
 
 export default initCartRoutes;

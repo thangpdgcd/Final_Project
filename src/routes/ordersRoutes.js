@@ -178,6 +178,43 @@ router.post(
   OrdersController.approveOrder,
 );
 
+/**
+ * Order Items (nested REST)
+ * - GET    /api/orders/:orderId/items?include=product
+ * - POST   /api/orders/:orderId/items
+ * - DELETE /api/orders/:orderId/items/:orderItemId
+ */
+router.get(
+  "/orders/:orderId/items",
+  verifyToken,
+  OrdersController.getOrderItems,
+);
+
+router.post(
+  "/orders/:orderId/items",
+  verifyToken,
+  OrdersController.createOrderItem,
+);
+
+router.delete(
+  "/orders/:orderId/items/:orderItemId",
+  verifyToken,
+  OrdersController.deleteOrderItem,
+);
+
+// Backward-compat (flat order items)
+router.post("/orderitems", verifyToken, OrdersController.createOrderItemFlat);
+router.post(
+  "/create-orderitems",
+  verifyToken,
+  OrdersController.createOrderItemFlat,
+);
+router.delete(
+  "/orderitems/:orderItemId",
+  verifyToken,
+  OrdersController.deleteOrderItemFlat,
+);
+
 /* ================== INIT ================== */
 const initOrdersRoutes = (app) => {
   app.use("/api", router);

@@ -1,10 +1,9 @@
 import db from "../models/index.js";
 
-let { Categories } = db;
-let getAllCategories = () => {
+const getAllCategories = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const categories = await Categories.findAll(); // ✅ Dùng đúng tên model import
+      const categories = await db.Categories.findAll();
       resolve(categories);
     } catch (error) {
       reject(new Error("Unable to retrieve category list: " + error.message));
@@ -12,10 +11,10 @@ let getAllCategories = () => {
   });
 };
 
-let getCategoriesById = (id) => {
+const getCategoriesById = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let category = await Categories.findByPk(id);
+      const category = await db.Categories.findByPk(id);
       if (!category) {
         return reject(new Error("Category not found with ID: " + id));
       }
@@ -25,7 +24,8 @@ let getCategoriesById = (id) => {
     }
   });
 };
-let createCategories = (data) => {
+
+const createCategories = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       let { name, description } = data;
@@ -37,7 +37,7 @@ let createCategories = (data) => {
         return reject(new Error("Category name is required."));
       }
 
-      const existName = await Categories.findOne({
+      const existName = await db.Categories.findOne({
         where: { name },
       });
 
@@ -46,7 +46,7 @@ let createCategories = (data) => {
       }
 
       if (description) {
-        const existDesc = await Categories.findOne({
+        const existDesc = await db.Categories.findOne({
           where: { description },
         });
 
@@ -55,7 +55,7 @@ let createCategories = (data) => {
         }
       }
 
-      let newCategory = await Categories.create({
+      const newCategory = await db.Categories.create({
         name,
         description: description || null,
       });
@@ -66,29 +66,28 @@ let createCategories = (data) => {
     }
   });
 };
-let updateCategories = async (id, data) => {
+
+const updateCategories = async (id, data) => {
   try {
-    let categoryId = Number(id);
+    const categoryId = Number(id);
     if (!Number.isFinite(categoryId)) {
       throw new Error("Invalid category id.");
     }
 
-    let category = await Categories.findByPk(categoryId);
+    const category = await db.Categories.findByPk(categoryId);
     if (!category) {
       throw new Error("Category not found for update.");
     }
 
-    // hỗ trợ cả 2 kiểu key
-    let name = data?.name ?? data?.Name;
-    let description = data?.description ?? data?.Description;
+    const name = data?.name ?? data?.Name;
+    const description = data?.description ?? data?.Description;
 
-    // chỉ update khi client có gửi field
     if (name !== undefined) {
       category.name = String(name).trim();
     }
 
     if (description !== undefined) {
-      category.description = String(description).trim(); // cho phép ""
+      category.description = String(description).trim();
     }
 
     await category.save();
@@ -99,10 +98,10 @@ let updateCategories = async (id, data) => {
   }
 };
 
-let deleteCategories = (id) => {
+const deleteCategories = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let category = await Categories.findByPk(id);
+      const category = await db.Categories.findByPk(id);
       if (!category) {
         return reject(new Error("Category not found for deletion."));
       }
@@ -115,10 +114,10 @@ let deleteCategories = (id) => {
   });
 };
 
-let searchCategories = (name) => {
+const searchCategories = (name) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let categories = await Categories.findAll({
+      const categories = await db.Categories.findAll({
         where: {
           name: name,
         },

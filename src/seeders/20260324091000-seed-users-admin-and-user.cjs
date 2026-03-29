@@ -10,14 +10,14 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     const now = new Date();
     const accounts = [
-      {
-        name: "Admin Account",
-        email: "admin@example.com",
-        address: "District 1, Ho Chi Minh City",
-        phoneNumber: "0900000001",
-        password: "123456",
-        roleID: "2",
-      },
+        {
+          name: "Admin Account",
+          email: "admin@example.com",
+          address: "District 1, Ho Chi Minh City",
+          phoneNumber: "0900000001",
+          password: "123456",
+          roleID: "2",
+        },
       {
         name: "User Account",
         email: "user@example.com",

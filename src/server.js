@@ -16,34 +16,48 @@ import initRoutes from "./routes/index.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load env file explicitly so local `node src/server.js` can pick the right one.
-// Priority:
-// - `.env.production` when NODE_ENV=production
-// - otherwise `.env`
-const envFileName =
-  process.env.NODE_ENV === "production" ? ".env.production" : ".env";
-const envPath = path.resolve(__dirname, `../${envFileName}`);
-if (fs.existsSync(envPath)) {
-  // override=true so `.env.production` can replace values loaded earlier
-  // by other modules that call dotenv.config() with default `.env`.
-  dotenv.config({ path: envPath, override: true });
+
+// Always load `.env` (ignore NODE_ENV).
+const loadedEnvPath = path.resolve(__dirname, "../.env");
+if (fs.existsSync(loadedEnvPath)) {
+  dotenv.config({ path: loadedEnvPath, override: true });
 } else {
-  // Fallback to .env if the chosen file doesn't exist
-  dotenv.config({ path: path.resolve(__dirname, "../.env"), override: true });
+  console.warn("⚠️ Missing .env file at:", loadedEnvPath);
 }
 //log cloudinary config status
 
-console.log("ENV FILE:", envPath);
+console.log("ENV FILE:", loadedEnvPath);
+console.log("NODE_ENV:", process.env.NODE_ENV ?? "(undefined)");
 console.log(
   "PAYPAL_CLIENT_ID:",
   process.env.PAYPAL_CLIENT_ID ? "✅ OK" : "❌ MISSING",
 );
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const DEFAULT_PORT = 8080;
+const basePort = Number.parseInt(process.env.PORT ?? "", 10);
+const PORT = Number.isFinite(basePort) ? basePort : DEFAULT_PORT;
 
 // middlewares
-app.use(express.json({ limit: "50mb" }));
+// Express 5 router may not reach later `(err, req, res, next)` handlers for JSON parse
+// failures from `express.json()`. Wrap the parser so invalid JSON always returns JSON 400.
+const jsonParser = express.json({ limit: "50mb" });
+app.use((req, res, next) => {
+  jsonParser(req, res, (err) => {
+    if (!err) return next();
+    const badBody =
+      err.type === "entity.parse.failed" ||
+      (Number(err.status) === 400 &&
+        (err instanceof SyntaxError || /JSON/i.test(String(err.message || ""))));
+    if (badBody) {
+      return res.status(400).json({
+        message:
+          "Request body must be valid JSON (use double quotes for keys/strings).",
+      });
+    }
+    return next(err);
+  });
+});
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser()); // Đọc cookie (cần cho HttpOnly cookie auth)
 
@@ -88,8 +102,37 @@ app.use((req, res) => {
   res.status(404).render("notfound");
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Swagger UI: http://localhost:${PORT}/api-docs`);
-});
+function listenWithRetry(startPort, maxAttempts = 10) {
+  let attempts = 0;
+  let currentPort = startPort;
+
+  const tryListen = () => {
+    const server = app.listen(currentPort, "0.0.0.0", () => {
+      console.log(`✅ Server listening on: http://localhost:${currentPort}`);
+      console.log(`Swagger UI: http://localhost:${currentPort}/api-docs`);
+    });
+
+    server.on("error", (err) => {
+      if (err?.code === "EADDRINUSE" && attempts < maxAttempts) {
+        attempts += 1;
+        console.warn(
+          `⚠️ Port ${currentPort} is in use. Retrying on ${currentPort + 1}... (${attempts}/${maxAttempts})`,
+        );
+        currentPort += 1;
+        setTimeout(tryListen, 150);
+        return;
+      }
+      console.error("❌ Server listen error:", err);
+      process.exitCode = 1;
+    });
+
+    // Ensure the server keeps the event loop alive even if something unrefs it.
+    server.ref?.();
+  };
+
+  tryListen();
+}
+
+listenWithRetry(PORT);
 
 export default app;

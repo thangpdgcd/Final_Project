@@ -15,7 +15,11 @@ const router = express.Router();
  * @swagger
  * /api/register:
  *   post:
- *     summary: Register a new account
+ *     summary: Đăng ký tài khoản mới
+ *     description: |
+ *       Bắt buộc: `name`, `email`, `password` (mật khẩu ≥ 6 ký tự).
+ *       Không gửi `roleID` → mặc định user thường (`"1"`).
+ *       **Test nhanh:** mở tab này → **Try it out** → giữ JSON mẫu bên dưới → **Execute**.
  *     tags: [Auth]
  *     security: []
  *     requestBody:
@@ -28,30 +32,75 @@ const router = express.Router();
  *             properties:
  *               name:
  *                 type: string
- *                 example: John Doe
+ *                 minLength: 2
+ *                 maxLength: 50
  *               email:
  *                 type: string
- *                 example: john@example.com
+ *                 format: email
  *               address:
  *                 type: string
- *                 example: HCM
  *               phoneNumber:
  *                 type: string
- *                 example: "0900000001"
+ *                 description: Tùy chọn; 9–15 chữ số (có thể có +)
  *               password:
  *                 type: string
  *                 format: password
- *                 example: "123456"
+ *                 minLength: 6
  *               roleID:
  *                 type: string
  *                 enum: ["1", "2", "3"]
- *                 example: "2"
- *                 description: "1=user, 2=admin, 3=manager"
+ *                 description: "1 = user, 2 = admin, 3 = manager (thường để test chỉ cần bỏ trường này)"
+ *           example:
+ *             name: "Nguyễn Văn Test"
+ *             email: "swagger.test@example.com"
+ *             password: "123456"
+ *             address: "Quận 1, TP.HCM"
+ *             phoneNumber: "0901234567"
  *     responses:
  *       201:
- *         description: Register success
+ *         description: Đăng ký thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Đăng ký thành công
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     roleID:
+ *                       type: string
+ *             example:
+ *               message: "Đăng ký thành công"
+ *               user:
+ *                 id: 10
+ *                 name: "Nguyễn Văn Test"
+ *                 email: "swagger.test@example.com"
+ *                 roleID: "1"
  *       400:
- *         description: Bad request
+ *         description: Lỗi validation hoặc email đã tồn tại
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             examples:
+ *               missingFields:
+ *                 summary: Thiếu trường
+ *                 value: { message: "Tên, Email và mật khẩu là bắt buộc." }
+ *               duplicateEmail:
+ *                 summary: Email trùng
+ *                 value: { message: "Email already exists." }
  */
 router.post("/register", authController.registerUser);
 

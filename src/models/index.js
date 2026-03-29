@@ -3,12 +3,16 @@ import path from "path";
 import { Sequelize, DataTypes } from "sequelize";
 import { fileURLToPath, pathToFileURL } from "url";
 import dotenv from "dotenv";
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import configModule from "../config/config.cjs";
+// Load `.env` before Sequelize reads process.env. Must use an absolute path because
+// this module is imported while other packages initialize; cwd may not be `backend/`.
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+
+/** Dynamic import so this runs after `dotenv` above; `config.cjs` also loads `.env` by absolute path. */
+const { default: configModule } = await import("../config/config.cjs");
 // Ensure we use the correct DB TLS settings on TiDB Cloud even if NODE_ENV
 // isn't set to "production" on the hosting platform.
 //setup tidb cloud connection on production environment
@@ -18,6 +22,11 @@ const inferredEnv =
     : undefined;
 const env = process.env.NODE_ENV || inferredEnv || "development";
 const config = configModule[env];
+if (!config) {
+  throw new Error(
+    `Missing Sequelize config for env "${env}". Check NODE_ENV and src/config/config.cjs.`,
+  );
+}
 
 const db = {};
 const sequelize = new Sequelize(
@@ -35,8 +44,10 @@ for (const file of files) {
   const filePath = path.join(__dirname, file);
   const fileUrl = pathToFileURL(filePath).href;
   const modelImport = await import(fileUrl);
-  const model = modelImport.default(sequelize, DataTypes);
-  db[model.name] = model;
+  const ModelClass = modelImport.default(sequelize, DataTypes);
+  // Prefer Sequelize modelName (stable); avoid relying on class `name` alone.
+  const registryKey = ModelClass.options?.modelName ?? ModelClass.name;
+  db[registryKey] = ModelClass;
 }
 
 Object.keys(db).forEach((modelName) => {
