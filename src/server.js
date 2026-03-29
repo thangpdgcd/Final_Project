@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { fileURLToPath } from "url";
 import path from "path";
+import fs from "fs";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.js";
 import paypal from "paypal-rest-sdk";
@@ -15,10 +16,24 @@ import initRoutes from "./routes/index.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: new URL("../.env", import.meta.url) });
+// Load env file explicitly so local `node src/server.js` can pick the right one.
+// Priority:
+// - `.env.production` when NODE_ENV=production
+// - otherwise `.env`
+const envFileName =
+  process.env.NODE_ENV === "production" ? ".env.production" : ".env";
+const envPath = path.resolve(__dirname, `../${envFileName}`);
+if (fs.existsSync(envPath)) {
+  // override=true so `.env.production` can replace values loaded earlier
+  // by other modules that call dotenv.config() with default `.env`.
+  dotenv.config({ path: envPath, override: true });
+} else {
+  // Fallback to .env if the chosen file doesn't exist
+  dotenv.config({ path: path.resolve(__dirname, "../.env"), override: true });
+}
 //log cloudinary config status
 
-console.log("ENV FILE:", path.resolve(__dirname, "../.env"));
+console.log("ENV FILE:", envPath);
 console.log(
   "PAYPAL_CLIENT_ID:",
   process.env.PAYPAL_CLIENT_ID ? "✅ OK" : "❌ MISSING",
