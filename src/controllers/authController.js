@@ -46,14 +46,19 @@ let login = async (req, res) => {
     const result = await authService.login(email, password);
     const { accessToken, refreshToken, user } = result;
 
-    const isProduction = process.env.NODE_ENV === "production";
+    // Set cookie attributes based on actual request protocol.
+    // Railway/Vercel typically terminate TLS at a proxy/load balancer.
+    const isSecure =
+      req.secure ||
+      req.headers["x-forwarded-proto"] === "https" ||
+      process.env.NODE_ENV === "production";
     
     // Refresh Token in HTTP-only cookie
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: isProduction,
-      // When FE/BE are on different domains (common on Vercel), cookie needs SameSite=None.
-      sameSite: isProduction ? "none" : "lax",
+      secure: isSecure,
+      // Cross-site XHR (FE on another domain) needs SameSite=None + Secure.
+      sameSite: isSecure ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       path: "/",
     });
@@ -86,12 +91,15 @@ let refreshToken = async (req, res) => {
 
     const { accessToken, refreshToken: newRefreshToken } = authService.generateTokens(user);
 
-    const isProduction = process.env.NODE_ENV === "production";
+    const isSecure =
+      req.secure ||
+      req.headers["x-forwarded-proto"] === "https" ||
+      process.env.NODE_ENV === "production";
     res.cookie("refresh_token", newRefreshToken, {
       httpOnly: true,
-      secure: isProduction,
-      // When FE/BE are on different domains (common on Vercel), cookie needs SameSite=None.
-      sameSite: isProduction ? "none" : "lax",
+      secure: isSecure,
+      // Cross-site XHR (FE on another domain) needs SameSite=None + Secure.
+      sameSite: isSecure ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     });

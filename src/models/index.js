@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 import configModule from "../config/config.cjs";
 // Ensure we use the correct DB TLS settings on TiDB Cloud even if NODE_ENV
 // isn't set to "production" on the hosting platform.
+//setup tidb cloud connection on production environment
 const inferredEnv =
   process.env.DB_HOST && process.env.DB_HOST.toLowerCase().includes("tidbcloud")
     ? "production"

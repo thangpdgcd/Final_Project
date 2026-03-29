@@ -11,7 +11,6 @@ module.exports = {
     const now = new Date();
     const accounts = [
       {
-        user_ID: 1,
         name: "Admin Account",
         email: "admin@example.com",
         address: "District 1, Ho Chi Minh City",
@@ -20,7 +19,6 @@ module.exports = {
         roleID: "2",
       },
       {
-        user_ID: 2,
         name: "User Account",
         email: "user@example.com",
         address: "Thu Duc, Ho Chi Minh City",
@@ -59,11 +57,25 @@ module.exports = {
       seenEmails.add(account.email);
     }
 
+    // Idempotent insert: only insert records that don't exist yet (email is UNIQUE).
     const seededUsers = [];
     for (const account of accounts) {
+      const existing = await queryInterface.sequelize.query(
+        "SELECT email FROM Users WHERE email = :email LIMIT 1",
+        {
+          replacements: { email: account.email },
+          type: Sequelize.QueryTypes.SELECT,
+        }
+      );
+
+      if (existing && existing.length > 0) {
+        console.log(`Skip existing user: ${account.email}`);
+        continue;
+      }
+
       const hashedPassword = await bcrypt.hash(account.password, 10);
       seededUsers.push({
-        user_ID: account.user_ID,
+        // Let DB auto-increment user_ID
         name: account.name,
         email: account.email,
         address: account.address,
@@ -75,11 +87,11 @@ module.exports = {
       });
     }
 
-    await queryInterface.bulkInsert(
-      "Users",
-      seededUsers,
-      {}
-    );
+    if (seededUsers.length > 0) {
+      await queryInterface.bulkInsert("Users", seededUsers, {});
+    } else {
+      console.log("✅ Admin/User already exist - nothing to seed.");
+    }
   },
 
   async down(queryInterface, Sequelize) {

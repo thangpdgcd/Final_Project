@@ -47,5 +47,9 @@ export function buildCorsMiddleware() {
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Auth-Mode"],
+    sameSite: 'none', //set cookie sameSite to none to allow cross-site requests
+    httpOnly: true, //set cookie httpOnly to true to prevent cross-site scripting attacks 
+      
+    secure: true,
   });
 }
