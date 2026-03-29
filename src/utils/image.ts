@@ -6,6 +6,20 @@ export const getImageSrc = (img?: string | null): string => {
   if (/^https?:\/\//i.test(v) || v.startsWith('data:image/')) {
     return v;
   }
+
+  // Handle protocol-relative URLs
+  if (v.startsWith('//')) {
+    return `https:${v}`;
+  }
+
+  // Handle Cloudinary URLs that were saved without protocol
+  // e.g. "res.cloudinary.com/<cloud>/image/upload/..."
+  if (/^res\.cloudinary\.com\//i.test(v) || /^.*cloudinary\.com\//i.test(v)) {
+    return `https://${v.replace(/^https?:\/\//i, '')}`;
+  }
+
+  // Allow app-relative/static paths
+  if (v.startsWith('/')) return v;
   
   // Basic heuristic to detect MIME type from base64 start
   // PNG: iVBORw0KGgo (starts with iVBOR)
