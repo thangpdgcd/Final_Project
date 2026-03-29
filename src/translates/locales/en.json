@@ -15,6 +15,18 @@
       "vi": "VN"
     }
   },
+  "order": {
+    "buyAgain": "Buy again",
+    "viewDetails": "View details",
+    "contactSeller": "Contact seller",
+    "total": "Total",
+    "quantity": "Qty",
+    "pending": "Pending",
+    "completed": "Completed",
+    "loadingItems": "Loading items...",
+    "itemsEmpty": "No items found for this order yet.",
+    "productFallback": "Product #{{id}}"
+  },
   "nav": {
     "home": "Home",
     "coffee": "Coffee",

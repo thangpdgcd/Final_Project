@@ -44,7 +44,12 @@ export const setAccessToken = (token: string) => {
 // Request Interceptor
 api.interceptors.request.use(
   (config) => {
-    if (accessToken) {
+    const url = String(config.url ?? '');
+    const skipAuth =
+      url.includes('/login') ||
+      url.includes('/register') ||
+      url.includes('/refresh-token');
+    if (accessToken && !skipAuth) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
@@ -56,10 +61,18 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error?.config;
+    const requestUrl: string = String(originalRequest?.url ?? '');
+
+    // Don't attempt silent refresh for auth endpoints (login/register/refresh itself)
+    // because a 401 there is almost always "bad credentials" or "no refresh cookie".
+    const skipRefresh =
+      requestUrl.includes('/login') ||
+      requestUrl.includes('/register') ||
+      requestUrl.includes('/refresh-token');
 
     // If 401 and not already retried
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (!skipRefresh && error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {

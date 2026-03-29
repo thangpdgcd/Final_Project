@@ -21,10 +21,20 @@ const pickProductPayload = (data: any) => data?.product ?? data?.data ?? data;
 export const productsService = {
   getAll: async (): Promise<Product[]> => {
     const res = await axiosInstance.get('/products');
-    let list: any[] = [];
-    if (Array.isArray(res.data)) list = res.data;
-    else if (res.data && Array.isArray(res.data.products)) list = res.data.products;
-    return list.map(mapProduct);
+    const raw =
+      Array.isArray(res.data)
+        ? res.data
+        : (res.data?.products ??
+          res.data?.data?.products ??
+          res.data?.data ??
+          res.data?.rows ??
+          res.data?.result ??
+          []);
+
+    const list = Array.isArray(raw) ? raw : [];
+    return list
+      .map(mapProduct)
+      .filter((p) => Number.isFinite(p.product_ID) && p.product_ID > 0);
   },
 
   getById: async (id: number): Promise<Product> => {

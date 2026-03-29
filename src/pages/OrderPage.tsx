@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Alert, Spin, Modal, Form, Input } from 'antd';
 import { EnvironmentOutlined, ShopOutlined, MessageOutlined, TagOutlined, CarOutlined } from '@ant-design/icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCreateOrder } from '@/hooks/useOrders';
 import { useAuth } from '@/store/AuthContext';
 import { toast } from 'react-toastify';
@@ -9,6 +10,8 @@ import type { CartItem } from '@/types';
 import Chatbox from '@/components/chatbox';
 import { getImageSrc } from '@/utils/image';
 import { ordersService } from '@/features/orders/services/orders.service';
+import { cartService } from '@/features/cart/services/cart.service';
+import { CART_KEY } from '@/hooks/useCart';
 
 const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:8080';
 
@@ -18,6 +21,7 @@ const formatPrice = (v: number) =>
 const OrderPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const { user } = useAuth();
   const cartItems: CartItem[] = useMemo(() => (location.state as { cartItems?: CartItem[] })?.cartItems || [], [location.state]);
 
@@ -91,11 +95,23 @@ const OrderPage: React.FC = () => {
         shipping_Address: `${shipping.fullName} | ${shipping.phone} | ${shipping.address}`,
       });
 
+      const createdOrderId = Number(
+        (newOrder as any)?.order_ID ??
+          (newOrder as any)?.orderId ??
+          (newOrder as any)?.id ??
+          (newOrder as any)?.data?.order_ID ??
+          (newOrder as any)?.data?.orderId ??
+          (newOrder as any)?.data?.id
+      );
+      if (!Number.isFinite(createdOrderId) || createdOrderId <= 0) {
+        throw new Error('INVALID_ORDER_ID');
+      }
+
       // 🔥 Save actual products to the order
       for (const item of cartItems) {
         try {
           await ordersService.createItem({
-            order_ID: newOrder.order_ID,
+            order_ID: createdOrderId,
             product_ID: item.product_ID,
             quantity: item.quantity,
             price: item.products?.price || item.price || 0,
@@ -104,6 +120,39 @@ const OrderPage: React.FC = () => {
           console.error("Failed to save order item:", itemErr);
         }
       }
+
+      // ✅ Clear cart after successful checkout (dùng ID mới nhất từ server theo product_ID)
+      const uid = Number(
+        user?.user_ID ??
+          (typeof window !== 'undefined' ? localStorage.getItem('user_ID') : null),
+      );
+      if (Number.isFinite(uid) && uid > 0) {
+        try {
+          const fresh = await cartService.getByUserId(uid);
+          const checkoutPids = new Set(
+            cartItems
+              .map((i) => Number((i as any).product_ID ?? (i as any).productId))
+              .filter((n) => Number.isFinite(n) && n > 0),
+          );
+          const idsToRemove = [
+            ...new Set(
+              fresh
+                .filter((row) =>
+                  checkoutPids.has(Number((row as any).product_ID ?? (row as any).productId)),
+                )
+                .map((row) => Number((row as any).cartitem_ID ?? (row as any).cartItemId))
+                .filter((id) => Number.isFinite(id) && id > 0),
+            ),
+          ];
+          if (idsToRemove.length > 0) {
+            await Promise.allSettled(idsToRemove.map((id) => cartService.removeItem(id)));
+          }
+        } catch {
+          /* giỏ đã trống hoặc lỗi mạng — bỏ qua xoá */
+        }
+        await qc.invalidateQueries({ queryKey: CART_KEY });
+      }
+
       toast.success(capture ? '✅ Thanh toán thành công!' : '✅ Đặt hàng thành công!');
       navigate('/profile?tab=orders&status=Pending');
     } catch {

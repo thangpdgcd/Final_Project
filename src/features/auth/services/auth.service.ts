@@ -45,7 +45,11 @@ const normalizeUser = (raw: RawLoginResponse['user']): AuthUser | null => {
 
 export const authService = {
   login: async (payload: LoginPayload): Promise<{ accessToken: string; user: AuthUser }> => {
-    const res = await api.post<RawLoginResponse>('/login', payload);
+    const body = {
+      email: String(payload.email ?? '').trim(),
+      password: payload.password,
+    };
+    const res = await api.post<RawLoginResponse>('/login', body);
 
     const data = res.data;
     const accessToken = data.accessToken;

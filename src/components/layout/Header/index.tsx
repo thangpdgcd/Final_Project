@@ -299,88 +299,143 @@ const HeaderPage: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
               onClick={() => setIsCartOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60]"
             />
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-[#121212] border-l border-stone-200 dark:border-stone-800 z-[70] shadow-2xl flex flex-col"
             >
-              <div className="p-8 flex items-center justify-between border-b border-stone-200 dark:border-stone-800">
-                <h2 className="text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tighter uppercase">{t('cart.title')}</h2>
-                <button onClick={() => setIsCartOpen(false)} className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
-                  <X size={24} className="text-stone-500 dark:text-stone-400" />
-                </button>
+              <div className="p-6 md:p-8 flex items-center justify-between border-b border-stone-100 dark:border-stone-800/50 bg-stone-50/50 dark:bg-[#121212]/50">
+                <h2 className="text-xl md:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tighter uppercase">
+                  {t('cart.title')}
+                </h2>
+                <motion.button 
+                  whileHover={{ rotate: 90, scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setIsCartOpen(false)} 
+                  className="p-2 rounded-full bg-stone-100 dark:bg-stone-800/50 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+                >
+                  <X size={20} className="text-stone-600 dark:text-stone-300" />
+                </motion.button>
               </div>
-              <div className="flex-1 overflow-y-auto p-8 flex flex-col items-center justify-center text-center">
+              
+              <div className="flex-1 overflow-y-auto p-6 md:p-8 flex flex-col pt-6">
                 {cartItems.length > 0 ? (
-                  <div className="w-full space-y-5">
-                    <div className="w-full max-h-[56vh] overflow-y-auto space-y-3 pr-1">
-                      {cartItems.map((item) => {
-                        const img = item?.products?.image;
-                        const imageSrc = getImageSrc(img);
-                        const linePrice =
-                          Number(item.quantity || 0) *
-                          Number(item.products?.price ?? item.price ?? 0);
-                        return (
-                          <div
-                            key={item.cartitem_ID}
-                            className="w-full rounded-2xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#1e1e1e] p-3 flex items-center gap-3"
-                          >
-                            <img
-                              src={imageSrc}
-                              alt={item.products?.name || "cart-product"}
-                              className="h-14 w-14 rounded-xl object-cover bg-white"
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).src = "/no-image.png";
-                              }}
-                            />
-                            <div className="flex-1 min-w-0 text-left">
-                              <div className="text-sm font-bold text-stone-800 dark:text-stone-200 truncate">
-                                {item.products?.name || `Product #${item.product_ID}`}
+                  <div className="w-full h-full flex flex-col">
+                    <motion.div 
+                      layout 
+                      className="w-full overflow-y-auto space-y-4 pr-2 flex-1 scrollbar-hide"
+                    >
+                      <AnimatePresence initial={false}>
+                        {cartItems.map((item, idx) => {
+                          const img = item?.products?.image;
+                          const imageSrc = getImageSrc(img);
+                          const linePrice =
+                            Number(item.quantity || 0) *
+                            Number(item.products?.price ?? item.price ?? 0);
+                          return (
+                            <motion.div
+                              layout
+                              key={item.cartitem_ID || idx}
+                              initial={{ opacity: 0, x: 50, scale: 0.95 }}
+                              animate={{ opacity: 1, x: 0, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                              transition={{ type: "spring", stiffness: 400, damping: 30, delay: idx * 0.05 }}
+                              whileHover={{ y: -2, scale: 1.01 }}
+                              className="w-full rounded-2xl border border-stone-100 dark:border-white/5 bg-white dark:bg-white/5 p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow"
+                            >
+                              <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-stone-100 dark:bg-black/20 flex-shrink-0">
+                                <img
+                                  src={imageSrc}
+                                  alt={item.products?.name || "cart-product"}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = "/no-image.png";
+                                  }}
+                                />
                               </div>
-                              <div className="text-xs text-stone-500 dark:text-stone-400 mt-1">
-                                Qty: {item.quantity}
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-bold text-stone-800 dark:text-stone-100 truncate mb-1">
+                                  {item.products?.name || `Product #${item.product_ID}`}
+                                </div>
+                                <div className="text-xs font-medium text-stone-500 dark:text-stone-400">
+                                  Qty: <span className="text-stone-700 dark:text-stone-300">{item.quantity}</span>
+                                </div>
                               </div>
-                            </div>
-                            <div className="text-xs font-bold text-stone-800 dark:text-stone-200 whitespace-nowrap">
-                              {linePrice.toLocaleString()} ₫
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                              <div className="text-sm font-black text-stone-900 dark:text-white whitespace-nowrap">
+                                {linePrice.toLocaleString()} ₫
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </AnimatePresence>
+                    </motion.div>
 
-                    <div className="w-full rounded-2xl bg-stone-100 dark:bg-[#1e1e1e] p-3 flex items-center justify-between">
-                      <span className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
-                        Total
-                      </span>
-                      <span className="text-sm font-black text-stone-900 dark:text-stone-100">
-                        {cartTotal.toLocaleString()} ₫
-                      </span>
-                    </div>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="mt-auto pt-6 border-t border-stone-100 dark:border-stone-800/50 space-y-4"
+                    >
+                      <div className="w-full rounded-2xl bg-stone-50 dark:bg-white/5 p-4 flex items-center justify-between border border-stone-100 dark:border-white/5">
+                        <span className="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
+                          Total
+                        </span>
+                        <span className="text-base font-black text-stone-900 dark:text-white mt-[2px]">
+                          {cartTotal.toLocaleString()} ₫
+                        </span>
+                      </div>
 
-                    <p className="text-stone-500 dark:text-stone-400 font-bold uppercase tracking-widest text-xs">
-                      {t('cart.itemsCount', { count: cartCount })}
-                    </p>
-                    <button onClick={() => navigate('/cart')} className="w-full py-5 rounded-2xl bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900 font-black tracking-[0.2em] text-sm hover:opacity-90 transition-all active:scale-95 shadow-md">
-                      {t('cart.viewFullBasket')}
-                    </button>
+                      <div className="text-center pt-2">
+                        <p className="text-stone-500 dark:text-stone-400 font-bold uppercase tracking-widest text-[10px] mb-4">
+                          {t('cart.itemsCount', { count: cartCount })}
+                        </p>
+                        <motion.button 
+                          whileHover={{ scale: 1.02, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => { setIsCartOpen(false); navigate('/cart'); }} 
+                          className="w-full py-4 rounded-xl bg-stone-900 dark:bg-stone-200 text-white dark:text-stone-900 font-black tracking-widest text-sm hover:opacity-90 transition-opacity shadow-lg"
+                        >
+                          {t('cart.viewFullBasket')}
+                        </motion.button>
+                      </div>
+                    </motion.div>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    <div className="w-20 h-20 bg-stone-100 dark:bg-[#1e1e1e] rounded-full flex items-center justify-center mx-auto">
-                      <ShoppingCart size={32} className="text-stone-400 dark:text-stone-500" />
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex-1 flex flex-col items-center justify-center space-y-6 text-center"
+                  >
+                    <motion.div 
+                      animate={{ y: [0, -10, 0] }} 
+                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      className="w-24 h-24 bg-stone-100 dark:bg-white/5 rounded-full flex items-center justify-center border border-stone-200 dark:border-white/10"
+                    >
+                      <ShoppingCart size={40} className="text-stone-300 dark:text-stone-600" />
+                    </motion.div>
+                    <div>
+                      <h3 className="text-xl font-black text-stone-900 dark:text-white mb-2 uppercase tracking-tight">
+                        {t('cart.emptyTitle')}
+                      </h3>
+                      <p className="text-stone-500 dark:text-stone-400 text-sm max-w-[240px] leading-relaxed mx-auto">
+                        {t('cart.emptyDesc')}
+                      </p>
                     </div>
-                    <h3 className="text-xl font-black text-stone-900 dark:text-stone-100">{t('cart.emptyTitle')}</h3>
-                    <p className="text-stone-500 dark:text-stone-400 text-sm max-w-[240px] leading-relaxed mx-auto">{t('cart.emptyDesc')}</p>
-                    <button onClick={() => { setIsCartOpen(false); navigate('/products'); }} className="px-10 py-4 rounded-full border-2 border-stone-800 dark:border-stone-200 text-stone-800 dark:text-stone-200 font-black text-xs uppercase tracking-widest hover:bg-stone-800 dark:hover:bg-stone-200 hover:text-white dark:hover:text-stone-900 transition-all">
+                    <motion.button 
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => { setIsCartOpen(false); navigate('/products'); }} 
+                      className="px-8 py-3 rounded-full border-2 border-stone-900 dark:border-stone-100 text-stone-900 dark:text-stone-100 font-black text-xs uppercase tracking-widest hover:bg-stone-900 dark:hover:bg-stone-100 hover:text-white dark:hover:text-stone-900 transition-colors mt-4"
+                    >
                       {t('cart.shopNow')}
-                    </button>
-                  </div>
+                    </motion.button>
+                  </motion.div>
                 )}
               </div>
             </motion.div>

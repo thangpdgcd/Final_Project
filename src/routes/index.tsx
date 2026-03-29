@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import CustomerLayout from '@/layouts/CustomerLayout';
-import ProtectedRoute from '@/routes/ProtectedRoute';
+import AuthGuard from '@/components/AuthGuard';
 
 // ─── Customer pages (lazy-loaded) ─────────────────────────────────────────────
 const HomePage = lazy(() => import('@/pages/HomePage'));
@@ -27,10 +27,11 @@ const AppRoutes = () => (
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Protected customer routes */}
-      <Route element={<ProtectedRoute />}>
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/products/:id" element={<ProductDetailPage />} />
+      <Route path="/products" element={<ProductsPage />} />
+      <Route path="/products/:id" element={<ProductDetailPage />} />
+
+      {/* Protected customer routes strictly according to requirements */}
+      <Route element={<AuthGuard />}>
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/profiles/:userid" element={<ProfilePage />} />
         <Route path="/cart" element={<CartPage />} />

@@ -33,6 +33,7 @@ import { useWishlist } from '@/hooks/useWishlist';
 import { useAuth } from '@/store/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { getImageSrc } from '@/utils/image';
+import { toast } from 'react-toastify';
 
 
 
@@ -65,6 +66,7 @@ const ProductDetailPage: React.FC = () => {
 
   const handleCTA = () => {
     if (!user?.user_ID) {
+      toast.warning('Vui lòng đăng nhập', { toastId: 'require-login' });
       navigate('/login', { state: { from: { pathname: `/products/${id}` } } });
       return;
     }

@@ -26,6 +26,18 @@
     "logout": "Đăng xuất",
     "searchPlaceholder": "Tìm kiếm cà phê..."
   },
+  "order": {
+    "buyAgain": "Mua lại",
+    "viewDetails": "Xem chi tiết",
+    "contactSeller": "Liên hệ người bán",
+    "total": "Thành tiền",
+    "quantity": "Số lượng",
+    "pending": "Chờ xác nhận",
+    "completed": "Hoàn thành",
+    "loadingItems": "Đang tải sản phẩm...",
+    "itemsEmpty": "Đơn hàng này chưa có sản phẩm nào.",
+    "productFallback": "Sản phẩm #{{id}}"
+  },
   "about": {
     "sectionLabel": "VỀ PHAN COFFEE",
     "heroTitle": "Từ Tây Nguyên đến Từng Tách Cà Phê",
