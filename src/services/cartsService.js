@@ -58,7 +58,7 @@ const addToCart = async (userId, productId, quantity, price) => {
 const getCartByUserId = async (userId) => {
   const uid = Number(userId);
   if (!Number.isFinite(uid) || uid <= 0) {
-    throw new Error("User ID là bắt buộc");
+    throw new Error("User ID is required");
   }
 
   const cart = await db.Carts.findOne({ where: { userId: uid } });
@@ -74,7 +74,7 @@ const getCartByUserId = async (userId) => {
 const getCartItem = (cartId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!cartId) return reject(new Error("Cart ID là bắt buộc"));
+      if (!cartId) return reject(new Error("Cart ID is required"));
 
       const cart = await db.Carts.findOne({
         where: { cartId: cartId },
@@ -89,7 +89,7 @@ const getCartItem = (cartId) => {
 
       resolve(rows);
     } catch (error) {
-      reject(new Error("Không thể lấy giỏ hàng: " + error.message));
+      reject(new Error("Could not load cart: " + error.message));
     }
   });
 };
@@ -98,17 +98,17 @@ const updateCart = (cartItemId, quantity) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (!cartItemId || !quantity) {
-        return reject(new Error("Thiếu cart item ID hoặc số lượng"));
+        return reject(new Error("Missing cart item ID or quantity"));
       }
 
       const item = await db.Cart_Items.findByPk(cartItemId);
-      if (!item) return reject(new Error("Cart Item không tồn tại"));
+      if (!item) return reject(new Error("Cart item does not exist"));
 
       item.quantity = quantity;
       await item.save();
       resolve(item);
     } catch (error) {
-      reject(new Error("Không thể cập nhật số lượng: " + error.message));
+      reject(new Error("Could not update quantity: " + error.message));
     }
   });
 };
@@ -116,15 +116,15 @@ const updateCart = (cartItemId, quantity) => {
 const removeCart = (cartItemId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!cartItemId) return reject(new Error("Thiếu cart item ID"));
+      if (!cartItemId) return reject(new Error("Missing cart item ID"));
 
       const item = await db.Cart_Items.findByPk(cartItemId);
-      if (!item) return reject(new Error("Cart Item không tồn tại"));
+      if (!item) return reject(new Error("Cart item does not exist"));
 
       await item.destroy();
       resolve(true);
     } catch (error) {
-      reject(new Error("Không thể xóa Cart Item: " + error.message));
+      reject(new Error("Could not delete cart item: " + error.message));
     }
   });
 };
@@ -139,7 +139,7 @@ const searchCart = (name) => {
       });
       resolve(cart);
     } catch (error) {
-      reject(new Error("Không thể tìm kiếm người dùng: " + error.message));
+      reject(new Error("Cart search failed: " + error.message));
     }
   });
 };

@@ -64,7 +64,7 @@ export default (sequelize) => {
     {
       sequelize,
       modelName: "Products",
-      tableName: "Products", // đúng với bảng trong DB
+      tableName: "Products",
       timestamps: true,
     }
   );

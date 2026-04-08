@@ -1,55 +1,56 @@
-import productsService from "../service/productsService.js";
+import productsService from "../services/productsService.js";
+import { sendSuccess, sendError } from "../utils/response.js";
 
-let getAllProducts = async (req, res) => {
+const getAllProducts = async (req, res) => {
   try {
-    let { name } = req.query;
+    const { name } = req.query;
     if (name) {
-      let result = await productsService.searchProducts(name);
-      return res.status(200).json(result);
+      const result = await productsService.searchProducts(name);
+      return sendSuccess(res, 200, result, "OK");
     }
-    let products = await productsService.getAllProducts();
-    return res.status(200).json(products);
+    const products = await productsService.getAllProducts();
+    return sendSuccess(res, 200, products, "OK");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let getProductsById = async (req, res) => {
+const getProductsById = async (req, res) => {
   const id = req.params.id;
   try {
     const product = await productsService.getProductsById(id);
-    res.status(200).json(product);
+    return sendSuccess(res, 200, product, "OK");
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    return sendError(res, 404, error.message, null);
   }
 };
 
-let createProducts = async (req, res) => {
+const createProducts = async (req, res) => {
   try {
     const newProduct = await productsService.createProducts(req.body);
-    res.status(201).json(newProduct);
+    return sendSuccess(res, 201, newProduct, "Created");
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendError(res, 400, error.message, null);
   }
 };
 
-let updateProducts = async (req, res) => {
+const updateProducts = async (req, res) => {
   const id = req.params.id;
   try {
     const updated = await productsService.updateProducts(id, req.body);
-    res.status(200).json(updated);
+    return sendSuccess(res, 200, updated, "OK");
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendError(res, 400, error.message, null);
   }
 };
 
-let deleteProducts = async (req, res) => {
+const deleteProducts = async (req, res) => {
   const id = req.params.id;
   try {
     const result = await productsService.deleteProducts(id);
-    res.status(200).json(result);
+    return sendSuccess(res, 200, result, "OK");
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendError(res, 400, error.message, null);
   }
 };
 

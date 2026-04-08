@@ -3,14 +3,12 @@ import { Model, DataTypes } from "sequelize";
 export default (sequelize) => {
   class Order_Items extends Model {
     static associate(models) {
-      // Liên kết với bảng Orders
       Order_Items.belongsTo(models.Orders, {
         foreignKey: "orderId",
         targetKey: "orderId",
         as: "orders",
       });
 
-      // Liên kết với bảng Products
       Order_Items.belongsTo(models.Products, {
         foreignKey: "productId",
         targetKey: "productId",

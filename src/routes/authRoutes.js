@@ -1,5 +1,10 @@
 import authController from "../controllers/authController.js";
 import authMiddleware from "../middlewares/auth.js";
+import { handleValidationErrors } from "../middlewares/validateRequest.js";
+import {
+  loginRules,
+  registerRules,
+} from "../validators/authValidators.js";
 import express from "express";
 
 const router = express.Router();
@@ -15,11 +20,10 @@ const router = express.Router();
  * @swagger
  * /api/register:
  *   post:
- *     summary: Đăng ký tài khoản mới
+ *     summary: Register a new account
  *     description: |
- *       Bắt buộc: `name`, `email`, `password` (mật khẩu ≥ 6 ký tự).
- *       Không gửi `roleID` → mặc định user thường (`"1"`).
- *       **Test nhanh:** mở tab này → **Try it out** → giữ JSON mẫu bên dưới → **Execute**.
+ *       Required: `name`, `email`, `password` (min 6 characters).
+ *       Omit `roleID` to default to customer (`"1"`).
  *     tags: [Auth]
  *     security: []
  *     requestBody:
@@ -41,7 +45,7 @@ const router = express.Router();
  *                 type: string
  *               phoneNumber:
  *                 type: string
- *                 description: Tùy chọn; 9–15 chữ số (có thể có +)
+ *                 description: Optional; 9–15 digits (may include +)
  *               password:
  *                 type: string
  *                 format: password
@@ -49,16 +53,16 @@ const router = express.Router();
  *               roleID:
  *                 type: string
  *                 enum: ["1", "2", "3"]
- *                 description: "1 = user, 2 = admin, 3 = manager (thường để test chỉ cần bỏ trường này)"
+ *                 description: "1 = customer, 2 = admin, 3 = staff"
  *           example:
- *             name: "Nguyễn Văn Test"
+ *             name: "Test User"
  *             email: "swagger.test@example.com"
  *             password: "123456"
- *             address: "Quận 1, TP.HCM"
+ *             address: "Example City"
  *             phoneNumber: "0901234567"
  *     responses:
  *       201:
- *         description: Đăng ký thành công
+ *         description: Registration successful
  *         content:
  *           application/json:
  *             schema:
@@ -66,7 +70,7 @@ const router = express.Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Đăng ký thành công
+ *                   example: Registration successful
  *                 user:
  *                   type: object
  *                   properties:
@@ -79,14 +83,14 @@ const router = express.Router();
  *                     roleID:
  *                       type: string
  *             example:
- *               message: "Đăng ký thành công"
+ *               message: "Registration successful"
  *               user:
  *                 id: 10
- *                 name: "Nguyễn Văn Test"
+ *                 name: "Test User"
  *                 email: "swagger.test@example.com"
  *                 roleID: "1"
  *       400:
- *         description: Lỗi validation hoặc email đã tồn tại
+ *         description: Validation error or email already exists
  *         content:
  *           application/json:
  *             schema:
@@ -96,13 +100,18 @@ const router = express.Router();
  *                   type: string
  *             examples:
  *               missingFields:
- *                 summary: Thiếu trường
- *                 value: { message: "Tên, Email và mật khẩu là bắt buộc." }
+ *                 summary: Missing fields
+ *                 value: { success: false, message: "Validation failed", data: [] }
  *               duplicateEmail:
- *                 summary: Email trùng
- *                 value: { message: "Email already exists." }
+ *                 summary: Duplicate email
+ *                 value: { success: false, message: "Email already exists.", data: null }
  */
-router.post("/register", authController.registerUser);
+router.post(
+  "/register",
+  registerRules,
+  handleValidationErrors,
+  authController.registerUser,
+);
 
 /**
  * @swagger
@@ -140,7 +149,12 @@ router.post("/register", authController.registerUser);
  *                 user:
  *                   type: object
  */
-router.post("/login", authController.login);
+router.post(
+  "/login",
+  loginRules,
+  handleValidationErrors,
+  authController.login,
+);
 
 /**
  * @swagger

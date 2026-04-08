@@ -31,8 +31,8 @@ export default (sequelize) => {
     {
       sequelize,
       modelName: "Categories",
-      tableName: "Categories", // tên bảng thực tế trong CSDL
-      timestamps: false, // nếu bạn không dùng createdAt/updatedAt
+      tableName: "Categories",
+      timestamps: false,
     }
   );
 

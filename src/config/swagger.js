@@ -19,7 +19,7 @@ const swaggerOptions = {
       title: "API Documentation",
       version: "1.0.0",
       description:
-        "Swagger API for system. **Authorize** (góc trên phải) → dán `accessToken` từ POST /api/login.",
+        "API docs. Use **Authorize** and paste `accessToken` from POST /api/login (`data.accessToken` in the response body).",
     },
     tags: [
       {
@@ -59,13 +59,13 @@ const swaggerOptions = {
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
-          description: "Dán token (chỉ token, không cần chữ Bearer). Lấy từ POST /api/login → response.token",
+          description: "JWT only (or full `Bearer <token>`). From POST /api/login → `data.accessToken`.",
         },
       },
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: [routesGlob], // nơi viết comment swagger
+  apis: [routesGlob],
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);

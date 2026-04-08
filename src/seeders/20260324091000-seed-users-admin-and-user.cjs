@@ -17,7 +17,15 @@ module.exports = {
           phoneNumber: "0900000001",
           password: "123456",
           roleID: "2",
-        },
+      },
+        {
+        name: "Staff Account",
+        email: "staff@example.com",
+        address: "Thu Duc, Ho Chi Minh City",
+        phoneNumber: "0900000002",
+        password: "123456",
+        roleID: "3",
+      },
       {
         name: "User Account",
         email: "user@example.com",

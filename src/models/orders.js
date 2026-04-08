@@ -3,11 +3,14 @@ import { Model } from "sequelize";
 export default (sequelize, DataTypes) => {
   class Orders extends Model {
     static associate(models) {
-      // Mỗi đơn hàng thuộc về một người dùng
       Orders.belongsTo(models.Users, {
         foreignKey: "userId",
         targetKey: "userId",
         as: "users",
+      });
+      Orders.hasMany(models.Order_Items, {
+        foreignKey: "orderId",
+        as: "order_Items",
       });
     }
   }

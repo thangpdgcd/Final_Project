@@ -3,14 +3,12 @@ import { Model, DataTypes } from "sequelize";
 export default (sequelize) => {
   class Cart_Items extends Model {
     static associate(models) {
-      // Mỗi Cart_Item thuộc về một Cart
       Cart_Items.belongsTo(models.Carts, {
         foreignKey: "cartId",
         targetKey: "cartId",
         as: "carts",
       });
 
-      // Mỗi Cart_Item thuộc về một Product
       Cart_Items.belongsTo(models.Products, {
         foreignKey: "productId",
         targetKey: "productId",

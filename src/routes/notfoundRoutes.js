@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.get("/notfound", authMiddleware, notfoundPage);
 const initNotfoundRoutes = (app) => {
-  app.use("/", router); // Tất cả route đều bắt đầu bằng /api
+  app.use("/", router);
 };
 export default initNotfoundRoutes;  

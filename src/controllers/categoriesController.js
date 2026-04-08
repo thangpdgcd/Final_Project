@@ -1,58 +1,59 @@
-import CategoriesService from "../service/categoriesService.js";
+import CategoriesService from "../services/categoriesService.js";
+import { sendSuccess, sendError } from "../utils/response.js";
 
-let getAllCategories = async (req, res) => {
+const getAllCategories = async (req, res) => {
   try {
-    let { name } = req.query;
+    const { name } = req.query;
     if (name) {
-      let result = await CategoriesService.searchCategories(name);
-      return res.status(200).json(result);
+      const result = await CategoriesService.searchCategories(name);
+      return sendSuccess(res, 200, result, "OK");
     }
-    let categories = await CategoriesService.getAllCategories();
+    const categories = await CategoriesService.getAllCategories();
 
-    return res.status(200).json(categories);
+    return sendSuccess(res, 200, categories, "OK");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let getCategoriesById = async (req, res) => {
+const getCategoriesById = async (req, res) => {
   try {
-    let id = req.params.id;
-    let Categories = await CategoriesService.getCategoriesById(id);
-    res.status(200).json(Categories);
+    const id = req.params.id;
+    const categories = await CategoriesService.getCategoriesById(id);
+    return sendSuccess(res, 200, categories, "OK");
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    return sendError(res, 404, error.message, null);
   }
 };
 
-let createCategories = async (req, res) => {
+const createCategories = async (req, res) => {
   try {
-    let data = req.body;
-    let newCategories = await CategoriesService.createCategories(data);
-    res.status(201).json(newCategories);
+    const data = req.body;
+    const newCategories = await CategoriesService.createCategories(data);
+    return sendSuccess(res, 201, newCategories, "Created");
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendError(res, 400, error.message, null);
   }
 };
 
-let updateCategories = async (req, res) => {
+const updateCategories = async (req, res) => {
   try {
-    let id = req.params.id;
-    let data = req.body;
-    let updatedCategories = await CategoriesService.updateCategories(id, data);
-    res.status(200).json(updatedCategories);
+    const id = req.params.id;
+    const data = req.body;
+    const updatedCategories = await CategoriesService.updateCategories(id, data);
+    return sendSuccess(res, 200, updatedCategories, "OK");
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendError(res, 400, error.message, null);
   }
 };
 
-let deleteCategories = async (req, res) => {
+const deleteCategories = async (req, res) => {
   try {
-    let id = req.params.id;
-    let result = await CategoriesService.deleteCategories(id);
-    res.status(200).json(result);
+    const id = req.params.id;
+    const result = await CategoriesService.deleteCategories(id);
+    return sendSuccess(res, 200, result, "OK");
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    return sendError(res, 400, error.message, null);
   }
 };
 

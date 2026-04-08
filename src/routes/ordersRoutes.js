@@ -1,6 +1,7 @@
 // src/routes/ordersRoutes.js
 import express from "express";
 import OrdersController from "../controllers/ordersController.js";
+import OrderItemsController from "../controllers/orderItemsController.js";
 import authMiddleware from "../middlewares/auth.js";
 import {
   isCustomer,
@@ -74,6 +75,15 @@ router.post(
   isCustomer,
   OrdersController.createOrders,
 );
+router.post(
+  "/orders",
+  verifyToken,
+  isCustomer,
+  OrdersController.createOrders,
+);
+
+/** Current user's orders (JWT). */
+router.get("/my-orders", verifyToken, OrdersController.getMyOrders);
 
 /**
  * @swagger
@@ -128,7 +138,7 @@ router.get("/orders/:id", authMiddleware, OrdersController.getOrderById);
  *       404:
  *         description: Order not found
  */
-router.put("/orders/:id", authMiddleware, OrdersController.updateOrders);
+router.put("/orders/:id", verifyToken, OrdersController.updateOrders);
 
 /**
  * @swagger
@@ -187,32 +197,32 @@ router.post(
 router.get(
   "/orders/:orderId/items",
   verifyToken,
-  OrdersController.getOrderItems,
+  OrderItemsController.getOrderItems,
 );
 
 router.post(
   "/orders/:orderId/items",
   verifyToken,
-  OrdersController.createOrderItem,
+  OrderItemsController.createOrderItem,
 );
 
 router.delete(
   "/orders/:orderId/items/:orderItemId",
   verifyToken,
-  OrdersController.deleteOrderItem,
+  OrderItemsController.deleteOrderItem,
 );
 
 // Backward-compat (flat order items)
-router.post("/orderitems", verifyToken, OrdersController.createOrderItemFlat);
+router.post("/orderitems", verifyToken, OrderItemsController.createOrderItemFlat);
 router.post(
   "/create-orderitems",
   verifyToken,
-  OrdersController.createOrderItemFlat,
+  OrderItemsController.createOrderItemFlat,
 );
 router.delete(
   "/orderitems/:orderItemId",
   verifyToken,
-  OrdersController.deleteOrderItemFlat,
+  OrderItemsController.deleteOrderItemFlat,
 );
 
 /* ================== INIT ================== */

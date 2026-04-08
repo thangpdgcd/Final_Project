@@ -1,4 +1,5 @@
 import express from "express";
+import { sendSuccess, sendError } from "../utils/response.js";
 
 const router = express.Router();
 
@@ -50,17 +51,11 @@ const initPaymentsRoutes = (app) => {
     const client_id = process.env.PAYPAL_CLIENT_ID;
 
     if (!client_id) {
-      return res.status(500).json({
-        status: "error",
-        message: "Missing PAYPAL_CLIENT_ID in .env",
-      });
+      return sendError(res, 500, "Missing PAYPAL_CLIENT_ID in .env", null);
     }
 
     res.set("Cache-Control", "no-store");
-    return res.status(200).json({
-      status: "success",
-      data: client_id,
-    });
+    return sendSuccess(res, 200, { clientId: client_id }, "OK");
   });
 
   return app.use("/", router);

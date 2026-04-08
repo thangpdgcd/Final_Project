@@ -1,5 +1,6 @@
 import express from "express";
 import db from "../models/index.js";
+import { sendSuccess, sendError } from "../utils/response.js";
 import initUserRoutes from "./usersRoutes.js";
 import initProductsRoutes from "./productsRoutes.js";
 import initCategoriesRoutes from "./categoriesRoutes.js";
@@ -19,25 +20,31 @@ router.get("/", (req, res) => {
 router.get("/api/health", async (req, res) => {
   try {
     await db.sequelize.authenticate();
-    res.json({
-      ok: true,
-      database: "up",
-      host: process.env.DB_HOST,
-      name: process.env.DB_NAME,
-    });
+    return sendSuccess(
+      res,
+      200,
+      {
+        database: "up",
+        host: process.env.DB_HOST,
+        name: process.env.DB_NAME,
+      },
+      "OK",
+    );
   } catch (e) {
-    res.status(503).json({
-      ok: false,
-      database: "down",
-      message: e?.message || "Database error",
-      hint: "Start MySQL (e.g. `docker compose up -d` → DB_PORT=3307) or point DB_HOST/DB_PORT/DB_PASS at your real server. Access denied usually means wrong password or wrong port (local MySQL on 3306 vs Docker on 3307).",
-    });
+    return sendError(
+      res,
+      503,
+      e?.message || "Database error",
+      {
+        database: "down",
+        hint: "Start MySQL or set DB_HOST/DB_PORT/DB_PASS. Access denied often means wrong password or port.",
+      },
+    );
   }
 });
 
 /**
- * Khởi tạo tất cả routes
- * Thứ tự quan trọng: route cụ thể trước, catch-all sau
+ * Mount route modules (specific routes before any catch-all).
  */
 const initRoutes = (app) => {
   app.use("/", router);

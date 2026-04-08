@@ -6,34 +6,25 @@ const fallbackOrigins = [
   "http://localhost:5175",
 ];
 
-function isVercelOrigin(origin) {
-  // Allow Vercel preview/production domains without requiring env changes.
-  // Examples:
-  // - https://my-app.vercel.app
-  // - https://my-app-git-main.vercel.app
+const isVercelOrigin = (origin) => {
   return (
     typeof origin === "string" &&
     (origin.endsWith(".vercel.app") || origin.endsWith(".vercel.dev"))
   );
-}
+};
 
-function isNonProduction() {
-  return process.env.NODE_ENV !== "production";
-}
+const isNonProduction = () => process.env.NODE_ENV !== "production";
 
-/** True if hostname is loopback (IPv4, IPv6, or "localhost"). */
-function isLoopbackHostname(hostname) {
+const isLoopbackHostname = (hostname) => {
   if (!hostname) return false;
   const h = hostname.toLowerCase();
   if (h === "localhost" || h === "127.0.0.1") return true;
-  // IPv6 loopback from URL API: hostname is "[::1]"
   if (h === "[::1]" || h === "::1") return true;
   return false;
-}
+};
 
-/** Private LAN (RFC1918) — common when opening the app via http://192.168.x.x:5173 from phone/other PC. */
-function isPrivateLanHostname(hostname) {
-  if (!hostname || hostname.includes(":")) return false; // skip IPv6 (handled above)
+const isPrivateLanHostname = (hostname) => {
+  if (!hostname || hostname.includes(":")) return false;
   const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(hostname);
   if (!m) return false;
   const a = Number(m[1]);
@@ -42,12 +33,9 @@ function isPrivateLanHostname(hostname) {
   if (a === 172 && b >= 16 && b <= 31) return true;
   if (a === 192 && b === 168) return true;
   return false;
-}
+};
 
-/**
- * In non-production, allow http(s) from loopback or private LAN without listing every IP in ALLOWED_ORIGINS.
- */
-function isPermissiveDevOrigin(origin) {
+const isPermissiveDevOrigin = (origin) => {
   if (!isNonProduction()) return false;
   if (typeof origin !== "string") return false;
   try {
@@ -57,10 +45,9 @@ function isPermissiveDevOrigin(origin) {
   } catch {
     return false;
   }
-}
+};
 
-// tránh bị sập server
-function parseAllowedOriginsFromEnv(envValue) {
+const parseAllowedOriginsFromEnv = (envValue) => {
   if (!envValue || typeof envValue !== "string") return fallbackOrigins;
 
   const parsed = envValue
@@ -69,10 +56,9 @@ function parseAllowedOriginsFromEnv(envValue) {
     .filter(Boolean);
 
   return parsed.length ? parsed : fallbackOrigins;
-}
+};
 
-export function buildCorsMiddleware() {
-  // Build-time read so dotenv in `server.js` is guaranteed to run first.
+export const buildCorsMiddleware = () => {
   const allowedOrigins = parseAllowedOriginsFromEnv(process.env.ALLOWED_ORIGINS);
   const strictDev = process.env.CORS_STRICT_DEVELOPMENT === "true";
   const prod = process.env.NODE_ENV === "production";
@@ -84,9 +70,7 @@ export function buildCorsMiddleware() {
   }
 
   return cors({
-    // Production + strict dev: whitelist. Default dev: allow any Origin (avoids tunnel / .local / odd hosts).
     origin: (origin, callback) => {
-      // Allow requests without Origin header (e.g. curl, swagger tooling).
       if (!origin) return callback(null, true);
 
       const requested =
@@ -108,9 +92,5 @@ export function buildCorsMiddleware() {
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Auth-Mode"],
-    sameSite: 'none', //set cookie sameSite to none to allow cross-site requests
-    httpOnly: true, //set cookie httpOnly to true to prevent cross-site scripting attacks 
-      
-    secure: true,
   });
-}
+};

@@ -65,19 +65,17 @@ const registerUser = async ({
 };
 
 const generateTokens = (user) => {
-  const payload = { id: user.userId, roleID: user.roleID };
-  
-  const accessToken = jwt.sign(
-    payload,
-    process.env.JWT_SECRET || "ACCESS_SECRET",
-    { expiresIn: "3h" }
-  );
+  const accessSecret = process.env.JWT_SECRET;
+  const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
+  if (!accessSecret || !refreshSecret) {
+    throw new Error("JWT_SECRET and REFRESH_TOKEN_SECRET must be set");
+  }
 
-  const refreshToken = jwt.sign(
-    payload,
-    process.env.REFRESH_TOKEN_SECRET || "REFRESH_SECRET",
-    { expiresIn: "7d" }
-  );
+  const payload = { id: user.userId, roleID: user.roleID };
+
+  const accessToken = jwt.sign(payload, accessSecret, { expiresIn: "3h" });
+
+  const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: "7d" });
 
   return { accessToken, refreshToken };
 };

@@ -1,31 +1,36 @@
-import cartService from "../service/cartsService.js";
+import cartService from "../services/cartsService.js";
+import { sendSuccess, sendError } from "../utils/response.js";
 
-let getCartItem = async (req, res) => {
+const getCartItem = async (req, res) => {
   try {
     const { cartId } = req.params;
     if (!cartId) {
-      return res.status(400).json({ message: "Cart ID is required" });
+      return sendError(res, 400, "Cart ID is required", null);
     }
 
     const cartItems = await cartService.getCartItem(cartId);
     if (!cartItems) {
-      return res.status(404).json({ message: "Cart not found" });
+      return sendError(res, 404, "Cart not found", null);
     }
 
-    return res.status(200).json(cartItems);
+    return sendSuccess(res, 200, cartItems, "OK");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
-let addToCart = async (req, res) => {
+
+const addToCart = async (req, res) => {
   try {
-    const userId = req.user.id; // Lấy từ token - bảo mật hơn
+    const userId = req.user.id;
     const productId = req.body.productId ?? req.body.product_ID;
     const { quantity, price } = req.body;
     if (!productId || !quantity) {
-      return res
-        .status(400)
-        .json({ message: "Missing required fields (productId, quantity)" });
+      return sendError(
+        res,
+        400,
+        "Missing required fields (productId, quantity)",
+        null,
+      );
     }
 
     const cart = await cartService.addToCart(
@@ -35,65 +40,55 @@ let addToCart = async (req, res) => {
       price,
     );
 
-    return res.status(201).json({
-      message: "Thêm sản phẩm vào giỏ hàng thành công",
-      data: cart,
-    });
+    return sendSuccess(res, 201, { cart }, "Product added to cart");
   } catch (error) {
-    return res.status(500).json({
-      message: `Không thể thêm sản phẩm: ${error.message}`,
-    });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let updateCart = async (req, res) => {
+const updateCart = async (req, res) => {
   try {
     const { cartItemId } = req.params;
     const { quantity } = req.body;
 
     if (!quantity || quantity < 1) {
-      return res.status(400).json({ message: "Invalid quantity" });
+      return sendError(res, 400, "Invalid quantity", null);
     }
 
     const updatedItem = await cartService.updateCart(cartItemId, quantity);
-    return res.status(200).json({
-      message: "Cập nhật số lượng thành công",
-      data: updatedItem,
-    });
+    return sendSuccess(res, 200, { item: updatedItem }, "Quantity updated");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let getCartByUserId = async (req, res) => {
+const getCartByUserId = async (req, res) => {
   try {
     const userId = req.user?.id ?? req.user?.userId;
     if (userId == null || !Number.isFinite(Number(userId))) {
-      return res.status(401).json({ message: "Token thiếu thông tin người dùng." });
+      return sendError(res, 401, "User id missing from token", null);
     }
     const items = await cartService.getCartByUserId(Number(userId));
-    return res.status(200).json(items);
+    return sendSuccess(res, 200, items, "OK");
   } catch (e) {
-    return res.status(500).json({ message: e.message });
+    return sendError(res, 500, e.message, null);
   }
 };
 
-let removeCart = async (req, res) => {
+const removeCart = async (req, res) => {
   try {
     const { cartItemId } = req.params;
     await cartService.removeCart(cartItemId);
-    return res
-      .status(200)
-      .json({ message: "Xoá sản phẩm khỏi giỏ hàng thành công" });
+    return sendSuccess(res, 200, null, "Cart item removed");
   } catch (error) {
     const msg = error?.message || "Failed to remove cart item";
-    if (msg.includes("không tồn tại") || msg.toLowerCase().includes("not exist")) {
-      return res.status(404).json({ message: msg });
+    if (msg.toLowerCase().includes("not exist") || msg.includes("does not exist")) {
+      return sendError(res, 404, msg, null);
     }
-    if (msg.toLowerCase().includes("thiếu")) {
-      return res.status(400).json({ message: msg });
+    if (msg.toLowerCase().includes("missing") || msg.toLowerCase().includes("required")) {
+      return sendError(res, 400, msg, null);
     }
-    return res.status(500).json({ message: msg });
+    return sendError(res, 500, msg, null);
   }
 };
 

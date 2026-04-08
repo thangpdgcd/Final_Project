@@ -1,100 +1,104 @@
-import userService from "../service/usersServices.js";
+import userService from "../services/usersServices.js";
 import models from "../models/index.js";
+import { sendSuccess, sendError } from "../utils/response.js";
 
-let getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res) => {
   try {
     const data = await userService.getAllUsers();
-    return res.status(200).json(data);
+    return sendSuccess(res, 200, data, "OK");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let getUsersbyID = async (req, res) => {
+const getUsersbyID = async (req, res) => {
   try {
     const id = req.params.id;
     const data = await userService.getUsersById(id);
-    return res.status(200).json(data);
+    return sendSuccess(res, 200, data, "OK");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let createAdmin = async (req, res) => {
+const createAdmin = async (req, res) => {
   try {
     const data = req.body;
     const result = await userService.createAdmin(data);
-    return res.status(201).json(result);
+    return sendSuccess(res, 201, result, "Created");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let updateUsers = async (req, res) => {
+const updateUsers = async (req, res) => {
   try {
     const id = req.params.id;
     const data = req.body;
     const result = await userService.updateUsers(id, data);
-    return res.status(200).json(result);
+    return sendSuccess(res, 200, result, "OK");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let deleteUsers = async (req, res) => {
+const deleteUsers = async (req, res) => {
   try {
     const id = req.params.id;
     const result = await userService.deleteUsers(id);
-    return res.status(200).json(result);
+    return sendSuccess(res, 200, result, "OK");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let updateProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
     const { name, phoneNumber, address } = req.body;
     const userId = req.user.id;
 
     const user = await models.Users.findByPk(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return sendError(res, 404, "User not found", null);
 
     await user.update({
       name: name || user.name,
       phoneNumber: phoneNumber || user.phoneNumber,
-      address: address || user.address
+      address: address || user.address,
     });
 
-    return res.status(200).json({ message: "Profile updated successfully", user });
+    return sendSuccess(res, 200, { user }, "Profile updated successfully");
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
-let uploadAvatar = async (req, res) => {
+const uploadAvatar = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-    
+    if (!req.file) return sendError(res, 400, "No file uploaded", null);
+
     const userId = req.user.id;
     const user = await models.Users.findByPk(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) return sendError(res, 404, "User not found", null);
 
-    // Model/migration may not include `avatar`; avoid 500s so you can still test upload end-to-end.
     if (!Object.prototype.hasOwnProperty.call(user.dataValues, "avatar")) {
-      return res.status(200).json({
-        message: "Avatar uploaded (DB field `avatar` not configured in model).",
-        avatarUrl: req.file.path,
-      });
+      return sendSuccess(
+        res,
+        200,
+        { avatarUrl: req.file.path },
+        "Avatar uploaded (avatar field not configured on model).",
+      );
     }
 
     await user.update({ avatar: req.file.path });
 
-    return res.status(200).json({ 
-      message: "Avatar uploaded successfully", 
-      avatarUrl: req.file.path 
-    });
+    return sendSuccess(
+      res,
+      200,
+      { avatarUrl: req.file.path },
+      "Avatar uploaded successfully",
+    );
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return sendError(res, 500, error.message, null);
   }
 };
 
@@ -105,5 +109,5 @@ export default {
   updateUsers,
   deleteUsers,
   updateProfile,
-  uploadAvatar
+  uploadAvatar,
 };

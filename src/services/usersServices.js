@@ -1,5 +1,5 @@
 import db from "../models/index.js";
-let { Users, Orders } = db;
+const { Users, Orders } = db;
 import bcrypt from "bcrypt";
 
 const getAllUsers = async () => {
@@ -7,10 +7,10 @@ const getAllUsers = async () => {
     const usersList = await Users.findAll({
       include: {
         model: Orders,
-        as: "orders", // phải trùng alias khi khai báo quan hệ
+        as: "orders",
         attributes: ["orderId", "total_Amount", "status"],
       },
-      attributes: ["userId", "name", "email", "address", "phoneNumber"], // lấy info user
+      attributes: ["userId", "name", "email", "address", "phoneNumber"],
     });
     return usersList;
   } catch (error) {
@@ -18,10 +18,10 @@ const getAllUsers = async () => {
   }
 };
 
-let getUsersById = (id) => {
+const getUsersById = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let user = await Users.findByPk(id);
+      const user = await Users.findByPk(id);
       if (!user) return reject(new Error("User does not exist"));
       resolve(user);
     } catch (error) {
@@ -32,31 +32,24 @@ let getUsersById = (id) => {
   });
 };
 
-let createAdmin = (data) => {
+const createAdmin = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let { name, email, address, phoneNumber, password, roleID } = data;
+      const { name, email, address, phoneNumber, password, roleID } = data;
 
       if (!name || !email || !password) {
         return reject(new Error("Missing required information"));
       }
 
-      // ✅ ép roleID về number (mặc định Admin=2)
       const finalRoleID =
         roleID !== undefined && roleID !== null && String(roleID).trim() !== ""
           ? Number(roleID)
           : 2;
 
-      // ✅ chặn role ngoài phạm vi bạn dùng
       const safeRoleID = [1, 2, 3].includes(finalRoleID) ? finalRoleID : 2;
 
-      // ✅ check email unique là đủ
       const existingEmail = await Users.findOne({ where: { email } });
       if (existingEmail) return reject(new Error("Email already exists."));
-
-      // ❌ KHÔNG nên check address unique (bỏ đi)
-      // const existingAddress = await Users.findOne({ where: { address } });
-      // if (existingAddress) return reject(new Error("Address already exists."));
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -66,8 +59,8 @@ let createAdmin = (data) => {
         address: address || "",
         phoneNumber: phoneNumber || "",
         password: hashedPassword,
-        roleID: safeRoleID, // ✅ number 1/2/3
-        status: data.status || "active", // nếu có cột status
+        roleID: safeRoleID,
+        status: data.status || "active",
       });
 
       resolve(newUser);
@@ -77,10 +70,10 @@ let createAdmin = (data) => {
   });
 };
 
-let updateUsers = (id, data) => {
+const updateUsers = (id, data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let user = await Users.findByPk(id);
+      const user = await Users.findByPk(id);
       if (!user) return reject(new Error("User does not exist"));
       await user.update(data);
       resolve(user);
@@ -90,10 +83,10 @@ let updateUsers = (id, data) => {
   });
 };
 
-let deleteUsers = (id) => {
+const deleteUsers = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let user = await Users.findByPk(id);
+      const user = await Users.findByPk(id);
       if (!user) return reject(new Error("User does not exist"));
 
       await user.destroy();
@@ -104,10 +97,10 @@ let deleteUsers = (id) => {
   });
 };
 
-let searchUsers = (name) => {
+const searchUsers = (name) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let users = await Users.findAll({
+      const users = await Users.findAll({
         where: {
           name: name,
         },

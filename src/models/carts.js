@@ -3,14 +3,12 @@ import { Model, DataTypes } from "sequelize";
 export default (sequelize, models) => {
   class Carts extends Model {
     static associate(models) {
-      // Mỗi giỏ hàng thuộc về 1 người dùng
       Carts.belongsTo(models.Users, {
         foreignKey: "userId",
         targetKey: "userId",
-        as: "users", // alias để gọi như: cart.getUser()
+        as: "users",
       });
 
-      // Mối quan hệ N:M với Products thông qua Cart_Items
       Carts.belongsToMany(models.Products, {
         through: models.Cart_Items,
         as: "products",
@@ -18,10 +16,9 @@ export default (sequelize, models) => {
         otherKey: "productId",
       });
 
-      // 1 cart có nhiều cart items
       Carts.hasMany(models.Cart_Items, {
         foreignKey: "cartId",
-        as: "cart_Items", // 👈 alias phải trùng
+        as: "cart_Items",
       });
     }
   }

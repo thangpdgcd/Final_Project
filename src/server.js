@@ -1,6 +1,8 @@
 // src/server.js
 import express from "express";
+import http from "http";
 import dotenv from "dotenv";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -12,6 +14,10 @@ import paypal from "paypal-rest-sdk";
 import configViewEngine from "./config/viewEngine.js";
 import { buildCorsMiddleware } from "./config/corsConfig.js";
 import initRoutes from "./routes/index.js";
+import { attachSocket } from "./socket/socket.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
+import { notFoundHandler } from "./middlewares/notFoundHandler.js";
+import { sendError } from "./utils/response.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,16 +30,36 @@ if (fs.existsSync(loadedEnvPath)) {
 } else {
   console.warn("⚠️ Missing .env file at:", loadedEnvPath);
 }
-//log cloudinary config status
 
-console.log("ENV FILE:", loadedEnvPath);
-console.log("NODE_ENV:", process.env.NODE_ENV ?? "(undefined)");
+if (process.env.NODE_ENV !== "production") {
+  console.log("ENV FILE:", loadedEnvPath);
+  console.log("NODE_ENV:", process.env.NODE_ENV ?? "(undefined)");
+}
 console.log(
   "PAYPAL_CLIENT_ID:",
   process.env.PAYPAL_CLIENT_ID ? "✅ OK" : "❌ MISSING",
 );
 
+if (process.env.NODE_ENV === "production") {
+  if (!process.env.JWT_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
+    console.error(
+      "JWT_SECRET and REFRESH_TOKEN_SECRET are required in production.",
+    );
+    process.exit(1);
+  }
+} else if (!process.env.JWT_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
+  console.warn(
+    "JWT_SECRET and REFRESH_TOKEN_SECRET should be set in .env for authentication.",
+  );
+}
+
 const app = express();
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
 const DEFAULT_PORT = 8080;
 const basePort = Number.parseInt(process.env.PORT ?? "", 10);
 const PORT = Number.isFinite(basePort) ? basePort : DEFAULT_PORT;
@@ -50,22 +76,23 @@ app.use((req, res, next) => {
       (Number(err.status) === 400 &&
         (err instanceof SyntaxError || /JSON/i.test(String(err.message || ""))));
     if (badBody) {
-      return res.status(400).json({
-        message:
-          "Request body must be valid JSON (use double quotes for keys/strings).",
-      });
+      return sendError(
+        res,
+        400,
+        "Request body must be valid JSON (use double quotes for keys/strings).",
+        null,
+      );
     }
     return next(err);
   });
 });
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(cookieParser()); // Đọc cookie (cần cho HttpOnly cookie auth)
+app.use(cookieParser());
 
 const corsMiddleware = buildCorsMiddleware();
 app.use(corsMiddleware);
 
-// Quan trọng: handle preflight
-// Express 5 (with path-to-regexp v6) does not support the bare "*" path.
+// Express 5 (path-to-regexp v6) does not support the bare "*" path.
 // Use a regex route so preflight requests are handled for all paths.
 app.options(/.*/, corsMiddleware);
 
@@ -84,11 +111,13 @@ if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
 configViewEngine(app);
 initRoutes(app);
 
-// Swagger phải đặt TRƯỚC 404 handler (Express xử lý theo thứ tự)
+const httpServer = http.createServer(app);
+attachSocket(httpServer);
+
 const swaggerOptions = {
   swaggerOptions: {
-    persistAuthorization: true, // Lưu token khi refresh trang
-    docExpansion: "full", // Mở rộng danh sách endpoint ngay trên Swagger home
+    persistAuthorization: true,
+    docExpansion: "full",
   },
 };
 
@@ -97,22 +126,21 @@ app.get("/openapi.json", (req, res) => res.json(swaggerSpec));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerOptions));
 
-// when user search not found page
-app.use((req, res) => {
-  res.status(404).render("notfound");
-});
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-function listenWithRetry(startPort, maxAttempts = 10) {
+const listenWithRetry = (startPort, maxAttempts = 10) => {
   let attempts = 0;
   let currentPort = startPort;
 
   const tryListen = () => {
-    const server = app.listen(currentPort, "0.0.0.0", () => {
+    httpServer.listen(currentPort, "0.0.0.0", () => {
       console.log(`✅ Server listening on: http://localhost:${currentPort}`);
       console.log(`Swagger UI: http://localhost:${currentPort}/api-docs`);
+      console.log(`Socket.IO: ws://localhost:${currentPort}/socket.io/`);
     });
 
-    server.on("error", (err) => {
+    httpServer.on("error", (err) => {
       if (err?.code === "EADDRINUSE" && attempts < maxAttempts) {
         attempts += 1;
         console.warn(
@@ -126,12 +154,11 @@ function listenWithRetry(startPort, maxAttempts = 10) {
       process.exitCode = 1;
     });
 
-    // Ensure the server keeps the event loop alive even if something unrefs it.
-    server.ref?.();
+    httpServer.ref?.();
   };
 
   tryListen();
-}
+};
 
 listenWithRetry(PORT);
 
