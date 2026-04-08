@@ -23,11 +23,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-// Always load `.env` (ignore NODE_ENV).
 const loadedEnvPath = path.resolve(__dirname, "../.env");
-if (fs.existsSync(loadedEnvPath)) {
+const hasDotEnv = fs.existsSync(loadedEnvPath);
+if (hasDotEnv) {
   dotenv.config({ path: loadedEnvPath, override: true });
-} else {
+} else if (process.env.NODE_ENV !== "production") {
   console.warn("⚠️ Missing .env file at:", loadedEnvPath);
 }
 
