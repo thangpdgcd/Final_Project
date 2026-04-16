@@ -27,11 +27,9 @@ module.exports = {
     host: process.env.DB_HOST || "127.0.0.1",
     port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : undefined,
     dialect: "mysql",
-    // TiDB Cloud serverless thường yêu cầu TLS.
-    // rejectUnauthorized:false giúp bạn dùng nhanh (không verify CA) cho môi trường triển khai.
     dialectOptions: {
       ssl: {
-        // Force TLS encryption for TiDB Cloud.
+        // TiDB Cloud serverless usually requires TLS.
         require: true,
         rejectUnauthorized: false,
       },

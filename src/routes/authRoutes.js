@@ -1,13 +1,6 @@
-import authController from "../controllers/authController.js";
-import authMiddleware from "../middlewares/auth.js";
-import { handleValidationErrors } from "../middlewares/validateRequest.js";
-import {
-  loginRules,
-  registerRules,
-} from "../validators/authValidators.js";
-import express from "express";
+import { buildAuthRouter } from "../modules/auth/auth.routes.js";
 
-const router = express.Router();
+const router = buildAuthRouter();
 
 /**
  * @swagger
@@ -106,12 +99,7 @@ const router = express.Router();
  *                 summary: Duplicate email
  *                 value: { success: false, message: "Email already exists.", data: null }
  */
-router.post(
-  "/register",
-  registerRules,
-  handleValidationErrors,
-  authController.registerUser,
-);
+// routes are provided by buildAuthRouter()
 
 /**
  * @swagger
@@ -149,12 +137,7 @@ router.post(
  *                 user:
  *                   type: object
  */
-router.post(
-  "/login",
-  loginRules,
-  handleValidationErrors,
-  authController.login,
-);
+// routes are provided by buildAuthRouter()
 
 /**
  * @swagger
@@ -168,7 +151,7 @@ router.post(
  *       401:
  *         description: Unauthorized
  */
-router.get("/me", authMiddleware, authController.getMe);
+// routes are provided by buildAuthRouter()
 
 /**
  * @swagger
@@ -181,12 +164,12 @@ router.get("/me", authMiddleware, authController.getMe);
  *       200:
  *         description: Logout success
  */
-router.post("/logout", authController.logout);
+// routes are provided by buildAuthRouter()
 
 /**
  * Refresh token: expects refresh_token in HTTP-only cookie
  */
-router.post("/refresh-token", authController.refreshToken);
+// routes are provided by buildAuthRouter()
 
 const initAuthenticated = (app) => {
   app.use("/api", router);

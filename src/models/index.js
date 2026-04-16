@@ -2,14 +2,13 @@ import fs from "fs";
 import path from "path";
 import { Sequelize, DataTypes } from "sequelize";
 import { fileURLToPath, pathToFileURL } from "url";
-import dotenv from "dotenv";
+import { loadEnv } from "../config/runtimeEnv.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load `.env` before Sequelize reads process.env. Must use an absolute path because
-// this module is imported while other packages initialize; cwd may not be `backend/`.
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+// Load `.env` early so Sequelize reads from a stable env source.
+loadEnv();
 
 /** Dynamic import so this runs after `dotenv` above; `config.cjs` also loads `.env` by absolute path. */
 const { default: configModule } = await import("../config/config.cjs");
@@ -48,6 +47,24 @@ for (const file of files) {
   // Prefer Sequelize modelName (stable); avoid relying on class `name` alone.
   const registryKey = ModelClass.options?.modelName ?? ModelClass.name;
   db[registryKey] = ModelClass;
+}
+
+// Module-owned models (kept outside src/models/)
+const moduleModelDirs = [
+  path.resolve(__dirname, "../modules/chat/chat.models"),
+];
+
+for (const dir of moduleModelDirs) {
+  if (!fs.existsSync(dir)) continue;
+  const moduleFiles = fs.readdirSync(dir).filter((f) => f.endsWith(".js"));
+  for (const file of moduleFiles) {
+    const filePath = path.join(dir, file);
+    const fileUrl = pathToFileURL(filePath).href;
+    const modelImport = await import(fileUrl);
+    const ModelClass = modelImport.default(sequelize, DataTypes);
+    const registryKey = ModelClass.options?.modelName ?? ModelClass.name;
+    db[registryKey] = ModelClass;
+  }
 }
 
 Object.keys(db).forEach((modelName) => {

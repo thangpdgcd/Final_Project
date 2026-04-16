@@ -9,6 +9,8 @@ import initCartRoutes from "./cartsRoutes.js";
 import initAuthRoutes from "./authRoutes.js";
 import initNotfoundRoutes from "./notfoundRoutes.js";
 import initPaymentsRoutes from "./paymentsRoutes.js";
+import initChatRoutes from "./chatRoutes.js";
+import initPresenceRoutes from "./presenceRoutes.js";
 
 const router = express.Router();
 
@@ -54,6 +56,8 @@ const initRoutes = (app) => {
   initOrdersRoutes(app);
   initCartRoutes(app);
   initAuthRoutes(app);
+  initChatRoutes(app);
+  initPresenceRoutes(app);
   initNotfoundRoutes(app);
   initPaymentsRoutes(app);
 };
