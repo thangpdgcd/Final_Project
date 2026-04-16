@@ -35,6 +35,7 @@ export interface AuthUser {
   avatar?: string;
   phoneNumber?: string;
   address?: string;
+  walletXu?: number;
 }
 
 export interface LoginResponse {
@@ -153,6 +154,7 @@ export interface User {
   roleID: number | string;
   phoneNumber?: string;
   address?: string;
+  walletXu?: number;
   status?: 'active' | 'inactive';
   createdAt?: string;
   updatedAt?: string;

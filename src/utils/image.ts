@@ -29,6 +29,13 @@ export const getImageSrc = (img?: string | null): string => {
   // Allow app-relative/static paths
   if (v.startsWith('/')) return v;
   
+  // Only treat as base64 when it clearly looks like one.
+  const looksLikeBase64 =
+    v.length >= 80 &&
+    /^[A-Za-z0-9+/=\s]+$/.test(v) &&
+    !/\s{2,}/.test(v);
+  if (!looksLikeBase64) return '/no-image.png';
+
   // Basic heuristic to detect MIME type from base64 start
   // PNG: iVBORw0KGgo (starts with iVBOR)
   // JPEG: /9j/

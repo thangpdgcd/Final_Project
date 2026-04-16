@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       name: String(u.name ?? u.username ?? ''),
       email: String(u.email ?? ''),
       roleID: (u.roleID ?? u.roleId ?? u.role ?? 0) as any,
-      avatar: u.avatar ?? undefined,
+      avatar: u.avatar ?? u.avatarUrl ?? undefined,
       phoneNumber: u.phoneNumber ?? u.phone ?? undefined,
       address: u.address ?? undefined,
     };
@@ -67,6 +67,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // ignore
     }
     setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const hydrateFromServer = async () => {
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const res = await api.get('/me');
+        const rawUser =
+          (res.data as any)?.user ??
+          (res.data as any)?.data?.user ??
+          (res.data as any)?.data ??
+          null;
+        const normalized = normalizeUser(rawUser);
+        if (!normalized) return;
+        setUser(normalized);
+        setIsAuthenticated(true);
+        localStorage.setItem('user', JSON.stringify(normalized));
+        localStorage.setItem('user_ID', String(normalized.user_ID));
+      } catch {
+        // Keep current local state if /me fails.
+      }
+    };
+    void hydrateFromServer();
+  }, []);
+
+  useEffect(() => {
+    const onAuthCleared = () => {
+      setUser(null);
+      setIsAuthenticated(false);
+    };
+    window.addEventListener('auth:cleared', onAuthCleared);
+    return () => window.removeEventListener('auth:cleared', onAuthCleared);
   }, []);
 
   const login = useCallback((accessToken: string, newUser: AuthUser) => {

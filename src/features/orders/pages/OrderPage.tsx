@@ -12,8 +12,9 @@ import Chatbox from '@/components/chatbox';
 import EditorialPageShell from '@/components/layout/EditorialPageShell';
 import { getImageSrc } from '@/utils/image';
 import { ordersService } from '../services/orders.service';
-import { cartService, CART_KEY } from '@/features/cart';
+import { CART_KEY, syncCartToSelectionForCheckout } from '@/features/cart';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import * as profileApi from '@/api/profileApi';
 
 const API_BASE = ((import.meta.env.VITE_API_URL as string) || 'http://localhost:8080').replace(/\/+$/, '');
 const API_HOST = API_BASE.endsWith('/api') ? API_BASE.slice(0, -4) : API_BASE;
@@ -38,8 +39,10 @@ const OrderPage: React.FC = () => {
   const [sdkReady, setSdkReady] = useState(false);
   const [loadingSdk, setLoadingSdk] = useState(false);
   const [error, setError] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'cod'>('cod');
+  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'cod' | 'coffee_coin'>('cod');
   const [shippingFee] = useState(17000);
+  const [walletCoin, setWalletCoin] = useState<number | null>(null);
+  const [walletLoading, setWalletLoading] = useState(false);
 
   const [shipping, setShipping] = useState({
     fullName: user?.name || '',
@@ -66,6 +69,26 @@ const OrderPage: React.FC = () => {
     const usd = grandTotal / 24000;
     return usd > 0 ? usd.toFixed(2) : '0.00';
   }, [grandTotal]);
+
+  const fetchWalletCoin = async () => {
+    if (!user?.user_ID) return;
+    try {
+      setWalletLoading(true);
+      const payload = await profileApi.getWallet();
+      const walletValue = Number(
+        (payload as any)?.walletCoin ??
+          (payload as any)?.walletXu ??
+          (payload as any)?.data?.walletCoin ??
+          (payload as any)?.data?.walletXu ??
+          0,
+      );
+      setWalletCoin(Number.isFinite(walletValue) ? walletValue : 0);
+    } catch {
+      setWalletCoin(null);
+    } finally {
+      setWalletLoading(false);
+    }
+  };
 
   const getPaypalClientId = async (): Promise<string> => {
     const envClientId = (import.meta.env.VITE_PAYPAL_CLIENT_ID as string | undefined)?.trim();
@@ -134,7 +157,7 @@ const OrderPage: React.FC = () => {
     }
   };
 
-  const handleSaveOrder = async (capture: Record<string, unknown> | null) => {
+  const handleSaveOrder = async (opts: { method: 'paypal' | 'cod' | 'coffee_coin'; captureId?: string }) => {
     if (savingOnceRef.current) return;
     savingOnceRef.current = true;
     try {
@@ -144,13 +167,15 @@ const OrderPage: React.FC = () => {
       const userIdToUse = Number.isFinite(fallbackUserId) ? fallbackUserId : (user?.user_ID as any);
       if (!userIdToUse) throw new Error('MISSING_USER_ID');
 
+      await syncCartToSelectionForCheckout(userIdToUse, cartItems);
+
       const newOrder = await createOrder.mutateAsync({
         user_ID: userIdToUse,
-        status: capture ? 'Paid' : 'Pending',
-        paymentMethod: capture ? 'PayPal' : 'COD',
-        paypalCaptureId: capture ? ((capture as any)?.id as string) : undefined,
+        status: opts.method === 'paypal' ? 'Paid' : 'pending',
         total_Amount: grandTotal,
         shipping_Address: `${shipping.fullName} | ${shipping.phone} | ${shipping.address}`,
+        paymentMethod: opts.method === 'coffee_coin' ? 'COFFEE_COIN' : opts.method === 'paypal' ? 'PayPal' : 'COD',
+        paypalCaptureId: opts.method === 'paypal' ? opts.captureId : undefined,
       });
 
       const createdOrderId = Number(
@@ -165,43 +190,27 @@ const OrderPage: React.FC = () => {
         throw new Error('INVALID_ORDER_ID');
       }
 
-      for (const item of cartItems) {
-        try {
-          await ordersService.createItem({
-            order_ID: createdOrderId,
-            product_ID: item.product_ID,
-            quantity: item.quantity,
-            price: item.products?.price || item.price || 0,
-          });
-        } catch (itemErr) {
-          console.error('Failed to save order item:', itemErr);
-        }
+      const shipLine = `${shipping.fullName} | ${shipping.phone} | ${shipping.address}`;
+      const payNote =
+        opts.method === 'paypal'
+          ? `PayPal | capture: ${String(opts.captureId ?? '')}`
+          : opts.method === 'coffee_coin'
+            ? 'Coffee Coin'
+            : 'COD';
+      try {
+        await ordersService.update(createdOrderId, {
+          shipping_Address: `${shipLine} | ${payNote}`,
+        });
+      } catch (e) {
+        console.warn('Could not persist shipping note on order:', e);
       }
 
       const uid = Number(user?.user_ID ?? (typeof window !== 'undefined' ? localStorage.getItem('user_ID') : null));
       if (Number.isFinite(uid) && uid > 0) {
-        try {
-          const fresh = await cartService.getByUserId(uid);
-          const checkoutPids = new Set(
-            cartItems
-              .map((i) => Number((i as any).product_ID ?? (i as any).productId))
-              .filter((n) => Number.isFinite(n) && n > 0),
-          );
-          const idsToRemove = [
-            ...new Set(
-              fresh
-                .filter((row) => checkoutPids.has(Number((row as any).product_ID ?? (row as any).productId)))
-                .map((row) => Number((row as any).cartitem_ID ?? (row as any).cartItemId))
-                .filter((id) => Number.isFinite(id) && id > 0),
-            ),
-          ];
-          if (idsToRemove.length > 0) {
-            await Promise.allSettled(idsToRemove.map((id) => cartService.removeItem(id)));
-          }
-        } catch {
-          /* ignore */
-        }
         await qc.invalidateQueries({ queryKey: CART_KEY });
+      }
+      if (opts.method === 'coffee_coin') {
+        await fetchWalletCoin();
       }
 
       toast.success('✅ Order created successfully!');
@@ -223,8 +232,10 @@ const OrderPage: React.FC = () => {
     if (paymentMethod === 'paypal') {
       setShowPaypal(true);
       if (!sdkReady) await loadPaypalScript();
+    } else if (paymentMethod === 'coffee_coin') {
+      await handleSaveOrder({ method: 'coffee_coin' });
     } else {
-      await handleSaveOrder(null);
+      await handleSaveOrder({ method: 'cod' });
     }
   };
 
@@ -240,8 +251,9 @@ const OrderPage: React.FC = () => {
           actions.order.create({ purchase_units: [{ amount: { currency_code: 'USD', value: amountUSD } }] }),
         onApprove: async (_d: any, actions: any) => {
           const capture = await actions.order.capture();
+          const captureId = String((capture as any)?.id ?? '');
           setShowPaypal(false);
-          await handleSaveOrder(capture);
+          await handleSaveOrder({ method: 'paypal', captureId });
         },
         onError: (err: any) => {
           console.error(err);
@@ -258,6 +270,12 @@ const OrderPage: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [cartItems, navigate]);
+
+  useEffect(() => {
+    if (paymentMethod === 'coffee_coin') {
+      void fetchWalletCoin();
+    }
+  }, [paymentMethod, user?.user_ID]);
 
   if (!cartItems.length) {
     return (
@@ -391,8 +409,34 @@ const OrderPage: React.FC = () => {
               >
                 PayPal
               </button>
+              <button
+                onClick={() => setPaymentMethod('coffee_coin')}
+                className={`px-4 py-2 border rounded-sm text-sm transition-all ${
+                  paymentMethod === 'coffee_coin'
+                    ? 'border-orange-600 text-orange-600'
+                    : 'border-stone-200 dark:border-stone-800 hover:border-orange-600'
+                }`}
+              >
+                Coffee Coin
+              </button>
             </div>
           </div>
+
+          {paymentMethod === 'coffee_coin' && (
+            <div className="px-6 py-3 border-b border-stone-50 dark:border-stone-800 text-sm">
+              <span className="text-stone-500">Số dư Coffee Coin: </span>
+              <span className="font-semibold text-orange-600">
+                {walletLoading
+                  ? 'Đang tải...'
+                  : `${Number(walletCoin ?? 0).toLocaleString('vi-VN')} Coin`}
+              </span>
+              {!walletLoading && walletCoin != null && walletCoin < grandTotal && (
+                <span className="ml-3 text-red-500">
+                  Số dư không đủ để thanh toán đơn này.
+                </span>
+              )}
+            </div>
+          )}
 
           <div className="p-10 flex flex-col items-end space-y-3 bg-[#fffefb] dark:bg-[#1a1a1a]">
             <div className="grid grid-cols-2 gap-x-20 gap-y-3 text-sm text-stone-500 text-right min-w-[300px]">
@@ -413,6 +457,12 @@ const OrderPage: React.FC = () => {
                   type="primary"
                   className="bg-orange-600 hover:bg-orange-700 border-none h-12 px-14 font-bold text-lg rounded-sm"
                   loading={createOrder.isPending}
+                  disabled={
+                    paymentMethod === 'coffee_coin' &&
+                    !walletLoading &&
+                    walletCoin != null &&
+                    walletCoin < grandTotal
+                  }
                   onClick={handlePlaceOrder}
                 >
                   Đặt hàng

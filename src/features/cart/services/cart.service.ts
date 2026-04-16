@@ -117,3 +117,58 @@ export const cartService = {
   },
 };
 
+/**
+ * Makes the server cart match the checkout selection so POST /create-orders
+ * creates the correct line items (backend builds the order from the DB cart).
+ */
+export async function syncCartToSelectionForCheckout(
+  userId: number,
+  selected: CartItem[],
+): Promise<void> {
+  const uid = Number(userId);
+  if (!Number.isFinite(uid) || uid <= 0) throw new Error('INVALID_USER_ID');
+
+  const selectedPids = new Set(
+    selected
+      .map((i) => Number((i as CartItem & { productId?: number }).product_ID ?? (i as CartItem & { productId?: number }).productId))
+      .filter((n) => Number.isFinite(n) && n > 0),
+  );
+  if (selectedPids.size === 0) throw new Error('EMPTY_CHECKOUT_SELECTION');
+
+  const serverCart = await cartService.getByUserId(uid);
+
+  for (const row of serverCart) {
+    const pid = Number((row as CartItem).product_ID ?? (row as CartItem & { productId?: number }).productId);
+    if (!selectedPids.has(pid)) {
+      const cid = Number((row as CartItem).cartitem_ID ?? (row as CartItem & { cartItemId?: number }).cartItemId);
+      if (Number.isFinite(cid) && cid > 0) await cartService.removeItem(cid);
+    }
+  }
+
+  const fresh = await cartService.getByUserId(uid);
+
+  for (const sel of selected) {
+    const pid = Number((sel as CartItem).product_ID ?? (sel as CartItem & { productId?: number }).productId);
+    if (!Number.isFinite(pid) || pid <= 0) continue;
+    const wantQty = Number(sel.quantity) || 1;
+    const price = Number(sel.products?.price ?? sel.price ?? 0);
+    const serverRow = fresh.find(
+      (r) => Number((r as CartItem).product_ID ?? (r as CartItem & { productId?: number }).productId) === pid,
+    );
+    if (!serverRow) {
+      await cartService.addToCart({
+        user_ID: uid,
+        product_ID: pid,
+        quantity: wantQty,
+        price: Number.isFinite(price) && price >= 0 ? price : 0,
+      });
+    } else {
+      const curQty = Number(serverRow.quantity) || 0;
+      const cid = Number((serverRow as CartItem).cartitem_ID ?? (serverRow as CartItem & { cartItemId?: number }).cartItemId);
+      if (Number.isFinite(cid) && cid > 0 && curQty !== wantQty) {
+        await cartService.updateItem(cid, wantQty);
+      }
+    }
+  }
+}
+

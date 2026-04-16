@@ -11,6 +11,7 @@
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "search": "Search",
+    "refresh": "Refresh",
     "lang": {
       "en": "EN",
       "vi": "VN"
@@ -527,11 +528,123 @@
       "maxFileSize": "Max file size: 1 MB",
       "formats": "Formats: .JPEG, .PNG"
     },
+    "refund": {
+      "modalTitle": "Confirm refund request",
+      "submitRequest": "Submit request",
+      "confirmMessage": "Do you want to submit a refund request for this order?"
+    },
+    "guest": "Guest",
+    "premiumMemberBadge": "PREMIUM MEMBER",
+    "sideNav": {
+      "account": "ACCOUNT",
+      "orders": "ORDERS",
+      "promotions": "PROMOTIONS"
+    },
+    "menu": {
+      "myAccount": { "title": "My account", "description": "Personal info, security, and payments" },
+      "vouchers": { "title": "Vouchers", "description": "Your exclusive promo codes" },
+      "orders": { "title": "Orders", "description": "Track deliveries and order history" },
+      "settings": { "title": "Settings", "description": "Language, display, and privacy" },
+      "notifications": { "title": "Notifications", "description": "Updates on collections and orders" },
+      "help": { "title": "Help center", "description": "Contact our 24/7 support team" }
+    },
+    "stats": {
+      "orders": "ORDERS",
+      "voucher": "VOUCHER",
+      "coffeeCoin": "COFFEE COIN",
+      "loadingShort": "...",
+      "topupPaypal": "Top up with PayPal"
+    },
+    "identity": {
+      "sectionTitle": "PERSONAL INFORMATION",
+      "accountLabel": "ACCOUNT",
+      "emailLabel": "EMAIL",
+      "fieldName": "FULL NAME",
+      "fieldPhone": "PHONE",
+      "fieldAddress": "ADDRESS",
+      "placeholderName": "Enter your full name...",
+      "placeholderPhone": "Enter your phone number...",
+      "placeholderAddress": "Enter your address...",
+      "cancelEdit": "CANCEL",
+      "saveChangesCaps": "SAVE CHANGES",
+      "editProfileCaps": "EDIT PROFILE"
+    },
     "orders": {
       "productInfoPending": "Processing product information...",
       "reloginToBuyAgain": "Please log in again to buy again.",
       "addToCartSuccess": "Added to cart.",
-      "addToCartError": "Unable to add product to cart."
+      "addToCartError": "Unable to add product to cart.",
+      "tabs": {
+        "all": "All",
+        "pending": "Awaiting payment",
+        "shipping": "Shipping",
+        "toReceive": "Awaiting delivery",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "refund": "Returns & refunds"
+      },
+      "loadingOrders": "Loading orders...",
+      "emptyTitle": "No orders yet",
+      "emptySubtitle": "Explore our premium coffee collection.",
+      "shopNow": "SHOP NOW",
+      "favoriteBadge": "FAVORITE",
+      "storeName": "Phan Coffee Official",
+      "status": {
+        "refunded": "REFUNDED",
+        "delivered": "DELIVERED",
+        "pending": "PENDING",
+        "confirmed": "CONFIRMED",
+        "processing": "PROCESSING",
+        "shipping": "SHIPPING",
+        "shipped": "SHIPPED",
+        "sent": "SENT",
+        "completed": "COMPLETED",
+        "cancelled": "CANCELLED",
+        "refund_requested": "REFUND REQUESTED"
+      },
+      "footerHintCancel": "Your order is pending — you can cancel.",
+      "footerHintRefund": "Didn't receive your order?",
+      "requestRefund": "Request refund",
+      "requestRefundLoading": "Sending request...",
+      "requestReturn": "Request return",
+      "cancelOrder": "Cancel order",
+      "subtotalLabel": "Subtotal",
+      "messages": {
+        "orderIdMissing": "Could not determine order ID.",
+        "cancelOrderConfirm": "Are you sure you want to cancel this order?",
+        "cancelOrderSuccess": "Order cancelled.",
+        "cancelOrderError": "Unable to cancel order in the current state.",
+        "refundSuccess": "Refund request submitted.",
+        "refundError": "Unable to submit refund request."
+      }
+    },
+    "wallet": {
+      "topup": "PayPal top-up",
+      "refund": "Order refund",
+      "spend": "Coffee Coin payment",
+      "transactionFallback": "Wallet transaction",
+      "noTransactions": "No Coffee Coin transactions yet.",
+      "balanceLabel": "Balance:",
+      "topupModalTitle": "Top up Coffee Coin with PayPal",
+      "topupInputHint": "Enter the number of coins to top up (1 Coin = 1 VND)",
+      "paypalEstimate": "Estimated PayPal: ${{amount}}",
+      "reloadPaypalButton": "Reload PayPal button",
+      "processingPayment": "Processing payment...",
+      "historyTitle": "COFFEE COIN HISTORY",
+      "coinSuffix": "Coin",
+      "topupSuccess": "Coffee Coin topped up successfully",
+      "topupFailed": "Top-up failed",
+      "paypalPaymentFailed": "PayPal payment failed",
+      "paypalSdkLoadFailed": "Could not load PayPal SDK",
+      "paypalInitFailed": "Could not initialize PayPal",
+      "paypalButtonsInitFailed": "Could not initialize PayPal buttons",
+      "paypalNotReady": "PayPal is not available in this browser.",
+      "paypalRenderFailed": "Could not render PayPal button",
+      "missingPayPalClientId": "Missing PAYPAL_CLIENT_ID"
+    },
+    "membership": {
+      "bannerLabel": "EXCLUSIVE MEMBERSHIP",
+      "bannerTitle": "Experience the Extraordinary"
     }
   },
   "contact": {
@@ -727,6 +840,28 @@
     "botResponse2": "You can check our menu under the 'Coffee' section in the top navigation.",
     "botResponse3": "Phan Coffee delivers to Kon Tum and nationwide.",
     "botResponse4": "Thank you for your interest. Our team will support you shortly."
+  },
+  "supportChat": {
+    "title": "Support chat",
+    "supportTitle": "Support",
+    "loginRequired": "Login required",
+    "supportConnecting": "Support (connecting...)",
+    "startConversation": "Start a conversation with support",
+    "offlineError": "Chat is offline. Please try again in a moment.",
+    "conversationLabel": "Conversation {{id}}",
+    "joinedById": "Joined by ID",
+    "loginToChat": "Please login to chat.",
+    "selectConversationFirst": "Please select a conversation first.",
+    "sendFailed": "Failed to send message",
+    "activeNow": "Active now",
+    "offline": "Offline",
+    "notAuthenticated": "Not authenticated",
+    "live": "live",
+    "down": "down",
+    "info": "Info",
+    "more": "More",
+    "staffEmptyState": "Select a conversation from the left to start.",
+    "customerEmptyState": "Choose a conversation from the left, or click \"Contact support\"."
   },
   "footer": {
     "brandDescription": "Honoring the rich tradition of Vietnamese coffee since 2010. We partner directly with farmers in the Central Highlands to bring you the finest sustainably sourced beans.",

@@ -374,7 +374,14 @@ const ContactPage: React.FC = () => {
           <div className="pointer-events-none absolute inset-0 bg-[color-mix(in_srgb,var(--hl-surface)_8%,transparent)]" aria-hidden />
 
           <div className="relative z-[1] max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12 lg:py-16 min-h-[inherit] flex items-center">
-           
+            <a
+              href={directionsHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-white/95 px-5 py-2.5 text-sm font-semibold text-stone-900 shadow-lg ring-1 ring-black/5 hover:bg-white"
+            >
+              {t('contact.mapDirections')}
+            </a>
           </div>
         </section>
       </div>

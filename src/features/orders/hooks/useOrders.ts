@@ -4,10 +4,19 @@ import type { CreateOrderPayload } from '@/types';
 
 export const ORDERS_KEY = ['orders'] as const;
 
-export const useOrders = () =>
+type UseOrdersOptions = {
+  enabled?: boolean;
+  refetchInterval?: number | false;
+};
+
+export const useOrders = (options?: UseOrdersOptions) =>
   useQuery({
     queryKey: ORDERS_KEY,
     queryFn: ordersService.getAll,
+    enabled: options?.enabled ?? true,
+    refetchInterval: options?.refetchInterval ?? false,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
   });
 
 export const useCreateOrder = () => {

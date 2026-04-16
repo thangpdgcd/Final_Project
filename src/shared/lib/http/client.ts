@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getApiBaseUrl } from '@/shared/lib/http/baseUrl';
-import { getAccessToken, setAccessToken } from '@/shared/lib/http/tokenStore';
+import { clearAuthStorage, getAccessToken, setAccessToken } from '@/shared/lib/http/tokenStore';
 
 type RetriableRequestConfig = {
   _retry?: boolean;
@@ -80,7 +80,12 @@ httpClient.interceptors.response.use(
         },
       );
 
-      const newToken = String(refreshRes.data?.accessToken ?? '');
+      const newToken = String(
+        refreshRes.data?.accessToken ??
+          refreshRes.data?.data?.accessToken ??
+          refreshRes.data?.result?.accessToken ??
+          '',
+      );
 
       if (!newToken) {
         isRefreshing = false;
@@ -98,6 +103,7 @@ httpClient.interceptors.response.use(
     } catch (refreshError) {
       isRefreshing = false;
       flushQueue('');
+      clearAuthStorage();
       return Promise.reject(refreshError);
     }
   },

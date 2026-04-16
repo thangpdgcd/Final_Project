@@ -100,7 +100,7 @@ const AboutPage: React.FC = () => {
                 className="absolute inset-0 h-full w-full object-cover object-center"
                 loading="eager"
                 decoding="async"
-                fetchpriority="high"
+                fetchPriority="high"
               />
               <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[color-mix(in_srgb,var(--hl-primary)_18%,transparent)] via-transparent to-transparent"
@@ -387,7 +387,7 @@ const AboutPage: React.FC = () => {
         <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
           <h2
             id="about-cta-heading"
-            className="text-white text-3xl sm:text-4xl font-medium mb-4 max-w-2xl mx-auto"
+            className="text-black text-3xl sm:text-4xl font-medium mb-4 max-w-2xl mx-auto"
             style={{ fontFamily: 'var(--font-highland-display)' }}
           >
             {t('aboutPage.cta.title')}

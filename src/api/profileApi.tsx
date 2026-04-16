@@ -8,6 +8,12 @@ export interface UpdateProfilePayload {
   avatarUrl?: string;
 }
 
+export interface WalletTopupPayload {
+  amountXu: number;
+  paypalCaptureId: string;
+  note?: string;
+}
+
 export const pickUserFromProfileResponse = (raw: unknown): Record<string, unknown> | null => {
   if (!raw || typeof raw !== "object") return null;
   const data = raw as Record<string, any>;
@@ -66,5 +72,15 @@ export const uploadAvatar = async (file: File) => {
 
 export const getMe = async () => {
   const res = await api.get("/me");
+  return res.data;
+};
+
+export const getWallet = async () => {
+  const res = await api.get("/wallet");
+  return res.data;
+};
+
+export const topupWallet = async (payload: WalletTopupPayload) => {
+  const res = await api.post("/wallet/topup", payload);
   return res.data;
 };

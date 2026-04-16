@@ -11,6 +11,7 @@
     "darkMode": "Chế độ tối",
     "lightMode": "Chế độ sáng",
     "search": "Tìm kiếm",
+    "refresh": "Làm mới",
     "lang": {
       "en": "EN",
       "vi": "VN"
@@ -525,11 +526,123 @@
       "maxFileSize": "Dung lượng file tối đa 1 MB",
       "formats": "Định dạng: .JPEG, .PNG"
     },
+    "refund": {
+      "modalTitle": "Xác nhận hoàn tiền",
+      "submitRequest": "Gửi yêu cầu",
+      "confirmMessage": "Bạn muốn gửi yêu cầu hoàn tiền cho đơn này?"
+    },
+    "guest": "Khách",
+    "premiumMemberBadge": "HỘI VIÊN CAO CẤP",
+    "sideNav": {
+      "account": "TÀI KHOẢN",
+      "orders": "ĐƠN HÀNG",
+      "promotions": "KHUYẾN MÃI"
+    },
+    "menu": {
+      "myAccount": { "title": "Tài khoản của tôi", "description": "Thông tin cá nhân, bảo mật và thanh toán" },
+      "vouchers": { "title": "Kho Voucher", "description": "Lưu trữ các mã ưu đãi đặc quyền của bạn" },
+      "orders": { "title": "Đơn mua", "description": "Theo dõi đơn hàng đang giao và lịch sử" },
+      "settings": { "title": "Cài đặt hệ thống", "description": "Ngôn ngữ, chế độ hiển thị và quyền riêng tư" },
+      "notifications": { "title": "Thông báo", "description": "Cập nhật về bộ sưu tập và đơn hàng" },
+      "help": { "title": "Trung tâm trợ giúp", "description": "Liên hệ đội ngũ hỗ trợ 24/7" }
+    },
+    "stats": {
+      "orders": "ĐƠN HÀNG",
+      "voucher": "VOUCHER",
+      "coffeeCoin": "COFFEE COIN",
+      "loadingShort": "...",
+      "topupPaypal": "Nạp bằng PayPal"
+    },
+    "identity": {
+      "sectionTitle": "THÔNG TIN CÁ NHÂN",
+      "accountLabel": "TÀI KHOẢN",
+      "emailLabel": "EMAIL",
+      "fieldName": "HỌ VÀ TÊN",
+      "fieldPhone": "SỐ ĐIỆN THOẠI",
+      "fieldAddress": "ĐỊA CHỈ",
+      "placeholderName": "Nhập họ và tên...",
+      "placeholderPhone": "Nhập số điện thoại...",
+      "placeholderAddress": "Nhập địa chỉ...",
+      "cancelEdit": "HỦY",
+      "saveChangesCaps": "LƯU THAY ĐỔI",
+      "editProfileCaps": "CHỈNH SỬA"
+    },
     "orders": {
       "productInfoPending": "Đang xử lý thông tin sản phẩm...",
       "reloginToBuyAgain": "Vui lòng đăng nhập lại để mua lại.",
       "addToCartSuccess": "Đã thêm vào giỏ hàng!",
-      "addToCartError": "Không thể thêm sản phẩm vào giỏ."
+      "addToCartError": "Không thể thêm sản phẩm vào giỏ.",
+      "tabs": {
+        "all": "Tất cả",
+        "pending": "Chờ thanh toán",
+        "shipping": "Vận chuyển",
+        "toReceive": "Chờ giao hàng",
+        "completed": "Hoàn thành",
+        "cancelled": "Đã hủy",
+        "refund": "Trả hàng/Hoàn tiền"
+      },
+      "loadingOrders": "Đang tải đơn hàng...",
+      "emptyTitle": "Chưa có đơn hàng nào",
+      "emptySubtitle": "Hãy khám phá các sản phẩm cà phê tuyệt vời của chúng tôi.",
+      "shopNow": "MUA SẮM NGAY",
+      "favoriteBadge": "YÊU THÍCH",
+      "storeName": "Phan Coffee Official",
+      "status": {
+        "refunded": "ĐÃ HOÀN TIỀN",
+        "delivered": "ĐÃ GIAO HÀNG",
+        "pending": "CHỜ XÁC NHẬN",
+        "confirmed": "ĐÃ XÁC NHẬN",
+        "processing": "ĐANG XỬ LÝ",
+        "shipping": "ĐANG GIAO",
+        "shipped": "ĐANG GIAO",
+        "sent": "ĐÃ GỬI",
+        "completed": "HOÀN THÀNH",
+        "cancelled": "ĐÃ HỦY",
+        "refund_requested": "YÊU CẦU HOÀN TIỀN"
+      },
+      "footerHintCancel": "Đơn đang chờ xử lý, bạn có thể hủy.",
+      "footerHintRefund": "Không nhận được hàng?",
+      "requestRefund": "Yêu cầu hoàn tiền",
+      "requestRefundLoading": "Đang gửi yêu cầu...",
+      "requestReturn": "Yêu cầu trả hàng",
+      "cancelOrder": "Hủy đơn",
+      "subtotalLabel": "Thành tiền",
+      "messages": {
+        "orderIdMissing": "Không xác định được mã đơn hàng.",
+        "cancelOrderConfirm": "Bạn có chắc muốn hủy đơn hàng này không?",
+        "cancelOrderSuccess": "Đã hủy đơn hàng.",
+        "cancelOrderError": "Không thể hủy đơn hàng ở trạng thái hiện tại.",
+        "refundSuccess": "Đã gửi yêu cầu hoàn tiền.",
+        "refundError": "Không thể gửi yêu cầu hoàn tiền."
+      }
+    },
+    "wallet": {
+      "topup": "Nạp PayPal",
+      "refund": "Hoàn tiền đơn hàng",
+      "spend": "Thanh toán Coffee Coin",
+      "transactionFallback": "Giao dịch ví",
+      "noTransactions": "Chưa có giao dịch Coffee Coin.",
+      "balanceLabel": "Số dư:",
+      "topupModalTitle": "Nạp Coffee Coin bằng PayPal",
+      "topupInputHint": "Nhập số Coin muốn nạp (1 Coin = 1 VND)",
+      "paypalEstimate": "Tạm tính PayPal: ${{amount}}",
+      "reloadPaypalButton": "Tải lại nút PayPal",
+      "processingPayment": "Đang xử lý thanh toán...",
+      "historyTitle": "LỊCH SỬ COFFEE COIN",
+      "coinSuffix": "Coin",
+      "topupSuccess": "Nạp Coffee Coin thành công",
+      "topupFailed": "Nạp Coffee Coin thất bại",
+      "paypalPaymentFailed": "PayPal thanh toán thất bại",
+      "paypalSdkLoadFailed": "Không thể tải PayPal SDK",
+      "paypalInitFailed": "Không thể khởi tạo PayPal",
+      "paypalButtonsInitFailed": "Không thể khởi tạo nút PayPal",
+      "paypalNotReady": "PayPal chưa sẵn sàng trên trình duyệt này.",
+      "paypalRenderFailed": "Không thể hiển thị nút PayPal",
+      "missingPayPalClientId": "Thiếu PAYPAL_CLIENT_ID"
+    },
+    "membership": {
+      "bannerLabel": "HỘI VIÊN ĐỘC QUYỀN",
+      "bannerTitle": "Trải nghiệm điều phi thường"
     }
   },
   "contact": {
@@ -725,6 +838,28 @@
     "botResponse2": "Bạn có thể xem thực đơn tại phần 'Cà phê' trên thanh menu nhé!",
     "botResponse3": "Phan Coffee có dịch vụ giao hàng tận nơi tại Kon Tum và toàn quốc.",
     "botResponse4": "Cảm ơn bạn đã quan tâm, chúng tôi sẽ sớm có nhân viên hỗ trợ trực tiếp."
+  },
+  "supportChat": {
+    "title": "Trò chuyện hỗ trợ",
+    "supportTitle": "Hỗ trợ",
+    "loginRequired": "Yêu cầu đăng nhập",
+    "supportConnecting": "Hỗ trợ (đang kết nối...)",
+    "startConversation": "Bắt đầu cuộc trò chuyện với hỗ trợ",
+    "offlineError": "Chat đang ngoại tuyến. Vui lòng thử lại sau giây lát.",
+    "conversationLabel": "Cuộc trò chuyện {{id}}",
+    "joinedById": "Đã tham gia bằng ID",
+    "loginToChat": "Vui lòng đăng nhập để trò chuyện.",
+    "selectConversationFirst": "Vui lòng chọn cuộc trò chuyện trước.",
+    "sendFailed": "Gửi tin nhắn thất bại",
+    "activeNow": "Đang hoạt động",
+    "offline": "Ngoại tuyến",
+    "notAuthenticated": "Chưa xác thực",
+    "live": "trực tuyến",
+    "down": "mất kết nối",
+    "info": "Thông tin",
+    "more": "Thêm",
+    "staffEmptyState": "Chọn một cuộc trò chuyện bên trái để bắt đầu.",
+    "customerEmptyState": "Chọn một cuộc trò chuyện bên trái hoặc bấm \"Liên hệ hỗ trợ\"."
   },
   "footer": {
     "brandDescription": "Tôn vinh truyền thống cà phê Việt Nam từ năm 2010. Chúng tôi hợp tác trực tiếp với nông hộ tại Tây Nguyên để mang đến những hạt cà phê bền vững, chất lượng.",

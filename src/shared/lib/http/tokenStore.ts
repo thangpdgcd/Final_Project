@@ -48,5 +48,8 @@ export const clearAuthStorage = () => {
   safeRemove(STORAGE_KEYS.legacyToken);
   safeRemove(STORAGE_KEYS.user);
   safeRemove(STORAGE_KEYS.userId);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('auth:cleared'));
+  }
 };
 

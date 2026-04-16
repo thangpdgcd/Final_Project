@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Loader2,
@@ -11,12 +11,10 @@ import {
   Headphones,
   Tag,
   Camera,
-  Award,
 } from 'lucide-react';
 import { ProfileCard, MenuCard } from '@/features/users/components/profile';
 import { useTheme } from '@/store/ThemeContext';
-import { Sun, Moon } from 'lucide-react';
-import { App } from 'antd';
+import { App, Modal, InputNumber, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/AuthContext';
 import * as profileApi from '@/api/profileApi';
@@ -25,18 +23,25 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useOrders, ordersService, OrderItemCard, type OrderItemRowAction } from '@/features/orders';
 import { useAddToCart } from '@/features/cart';
 import { useProducts } from '@/features/products';
+import {
+  formatPrice,
+  getWalletTransactionLabel,
+  PROFILE_THEME_TOKENS,
+} from '@/features/users/utils/profileConstants';
 import type { Order, Product } from '@/types';
+import axios from 'axios';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-const formatPrice = (v: number) =>
-  new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    maximumFractionDigits: 0,
-  }).format(v || 0);
+const PAYPAL_CONFIG_PATHS = ['/payment/config', '/paypal/config', '/config/paypal'] as const;
+const paypalDebug = (...args: unknown[]) => {
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('[PayPalTopup]', ...args);
+  }
+};
 
 // ---------------------------------------------------------------------------
 // OrderItemsSummary — completely unchanged logic
@@ -49,6 +54,7 @@ const OrderItemsSummary: React.FC<{
   onContactSeller: () => void;
   busyRowKey: string | null;
 }> = ({ orderId, onBuyAgainItem, onViewProduct, onContactSeller, busyRowKey }) => {
+  const { t } = useTranslation();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { data: products = [] } = useProducts();
@@ -138,7 +144,7 @@ const OrderItemsSummary: React.FC<{
   if (!mergedItems.length)
     return (
       <div className="text-xs text-[#d1c5b6]/50 italic py-2">
-        Đang xử lý thông tin sản phẩm...
+        {t('profile.orders.productInfoPending')}
       </div>
     );
 
@@ -164,42 +170,58 @@ const OrderItemsSummary: React.FC<{
 };
 
 // ---------------------------------------------------------------------------
-// Design tokens — dark / light variants
-// ---------------------------------------------------------------------------
-
-const DARK_T = {
-  bg: '#131313', surfaceLow: '#1c1b1b', surfaceLowest: '#0e0e0e', surfaceHigh: '#2a2a2a',
-  onSurface: '#e5e2e1', onSurfaceVariant: '#d1c5b6',
-  gold: '#e5c18b', goldDeep: '#c5a370',
-  ringColor: '#131313',
-};
-
-const LIGHT_T = {
-  bg: '#faf8f5', surfaceLow: '#ffffff', surfaceLowest: '#f3f0ea', surfaceHigh: '#ede9e1',
-  onSurface: '#1a0a00', onSurfaceVariant: '#5c3d2e',
-  gold: '#b8892a', goldDeep: '#9a7020',
-  ringColor: '#faf8f5',
-};
-
-// ---------------------------------------------------------------------------
 // ProfilePage
 // ---------------------------------------------------------------------------
 
 const ProfilePage: React.FC = () => {
   const { message } = App.useApp();
   const { user, login } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const addToCart = useAddToCart();
 
-  const { dark, toggleDark } = useTheme();
-  const T = dark ? DARK_T : LIGHT_T;
+  const { dark } = useTheme();
+  const T = dark ? PROFILE_THEME_TOKENS.dark : PROFILE_THEME_TOKENS.light;
+  const walletTransactionLabels = useMemo(
+    () => ({
+      topup: t('profile.wallet.topup'),
+      refund: t('profile.wallet.refund'),
+      spend: t('profile.wallet.spend'),
+      fallback: t('profile.wallet.transactionFallback'),
+    }),
+    [t],
+  );
 
   const [isEditing, setIsEditing] = useState(false);
   const [activeMenuKey, setActiveMenuKey] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [buyAgainRowKey, setBuyAgainRowKey] = useState<string | null>(null);
+  const [refundBusyOrderId, setRefundBusyOrderId] = useState<number | null>(null);
+  const [refundConfirmOrder, setRefundConfirmOrder] = useState<Order | null>(null);
+  const [walletXu, setWalletXu] = useState<number>(0);
+  const [walletTransactions, setWalletTransactions] = useState<Array<{
+    id?: number;
+    type?: string;
+    amountXu?: number;
+    balanceAfter?: number;
+    source?: string;
+    referenceId?: string;
+    note?: string;
+    createdAt?: string;
+  }>>([]);
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [topupModalOpen, setTopupModalOpen] = useState(false);
+  const [topupXu, setTopupXu] = useState<number>(50000);
+  const [topupBusy, setTopupBusy] = useState(false);
+  const [topupSdkReady, setTopupSdkReady] = useState(false);
+  const [topupSdkLoading, setTopupSdkLoading] = useState(false);
+  const [topupError, setTopupError] = useState('');
+  const [topupRenderKey, setTopupRenderKey] = useState(0);
+  const [topupModalReady, setTopupModalReady] = useState(false);
+  const [topupButtonRendered, setTopupButtonRendered] = useState(false);
+  const topupPaypalRef = useRef<HTMLDivElement | null>(null);
+  const topupRenderedRef = useRef(false);
 
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -219,7 +241,10 @@ const ProfilePage: React.FC = () => {
   const activeSideKey = currentTab === 'orders' ? 'orders' : currentSection;
 
   // ── Orders ────────────────────────────────────────────────────────────────
-  const { data: allOrdersRaw, isLoading: ordersLoading } = useOrders();
+  const { data: allOrdersRaw, isLoading: ordersLoading, refetch: refetchOrders } = useOrders({
+    // Keep order list live while user is in Orders tab (no manual reload needed).
+    refetchInterval: currentTab === 'orders' ? 2000 : false,
+  });
   const allOrders = useMemo<Order[]>(() => {
     if (Array.isArray(allOrdersRaw)) return allOrdersRaw;
     const v = allOrdersRaw as any;
@@ -242,23 +267,215 @@ const ProfilePage: React.FC = () => {
       });
   }, [allOrders, user]);
 
-  const orderTabs = [
-    { key: 'all', label: 'Tất cả' },
-    { key: 'Pending', label: 'Chờ thanh toán' },
-    { key: 'Shipping', label: 'Vận chuyển' },
-    { key: 'To Receive', label: 'Chờ giao hàng' },
-    { key: 'Completed', label: 'Hoàn thành' },
-    { key: 'Cancelled', label: 'Đã hủy' },
-    { key: 'Refund', label: 'Trả hàng/Hoàn tiền' },
-  ];
+  type OrderTabKey = 'all' | 'Pending' | 'Shipping' | 'To Receive' | 'Completed' | 'Cancelled' | 'Refund';
 
+  const normalizeOrderStatus = (raw: unknown): string => {
+    const key = String(raw || '').trim().toLowerCase().replace(/[\s_-]+/g, '');
+    const map: Record<string, string> = {
+      paid: 'confirmed',
+      accepted: 'confirmed',
+      preparing: 'processing',
+      inprogress: 'processing',
+      delivering: 'shipped',
+      outfordelivery: 'shipped',
+      ontheway: 'shipped',
+      dangiao: 'shipped',
+      complete: 'completed',
+      done: 'completed',
+      refundrequested: 'refund_requested',
+      refundrequest: 'refund_requested',
+      canceled: 'cancelled',
+      refund: 'refunded',
+      returned: 'refunded',
+      return: 'refunded',
+    };
+    return map[key] ?? key;
+  };
+
+  const matchesOrderTab = (rawStatus: unknown, tabKey: OrderTabKey): boolean => {
+    const status = normalizeOrderStatus(rawStatus);
+    switch (tabKey) {
+      case 'all':
+        return true;
+      case 'Pending':
+        return status === 'pending' || status === 'confirmed';
+      case 'To Receive':
+        return status === 'shipped';
+      case 'Shipping':
+        return status === 'shipping' || status === 'processing';
+      case 'Completed':
+        return status === 'completed' || status === 'sent';
+      case 'Cancelled':
+        return status === 'cancelled';
+      case 'Refund':
+        return status === 'refund_requested' || status === 'refunded';
+      default:
+        return false;
+    }
+  };
+
+  const canUserCancelOrder = (rawStatus: unknown): boolean => {
+    const status = normalizeOrderStatus(rawStatus);
+    return ['pending', 'confirmed', 'processing'].includes(status);
+  };
+
+  const canUserRequestRefund = (rawStatus: unknown): boolean => {
+    const status = normalizeOrderStatus(rawStatus);
+    return status === 'completed' || status === 'shipped' || status === 'sent';
+  };
+
+  const getOrderStatusLabel = useCallback((normalizedStatus: string, raw: unknown) => {
+    if (normalizedStatus === 'refund_requested') return t('profile.orders.status.refund_requested');
+    if (normalizedStatus === 'refunded') return t('profile.orders.status.refunded');
+    if (normalizedStatus === 'completed') return t('profile.orders.status.delivered');
+    const known = [
+      'pending',
+      'confirmed',
+      'processing',
+      'shipping',
+      'shipped',
+      'sent',
+      'cancelled',
+    ] as const;
+    if ((known as readonly string[]).includes(normalizedStatus)) {
+      return t(`profile.orders.status.${normalizedStatus}`);
+    }
+    const rawStr = String(raw ?? '').trim();
+    if (rawStr) return rawStr.toUpperCase();
+    return t('profile.orders.status.pending');
+  }, [t]);
+
+  const walletDateLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+
+  const orderTabs = useMemo<Array<{ key: OrderTabKey; label: string }>>(
+    () => [
+      { key: 'all', label: t('profile.orders.tabs.all') },
+      { key: 'Pending', label: t('profile.orders.tabs.pending') },
+      { key: 'Shipping', label: t('profile.orders.tabs.shipping') },
+      { key: 'To Receive', label: t('profile.orders.tabs.toReceive') },
+      { key: 'Completed', label: t('profile.orders.tabs.completed') },
+      { key: 'Cancelled', label: t('profile.orders.tabs.cancelled') },
+      { key: 'Refund', label: t('profile.orders.tabs.refund') },
+    ],
+    [t],
+  );
+
+  const activeOrderTab = (searchParams.get('status') || 'all') as OrderTabKey;
   const filteredOrders = useMemo<Order[]>(() => {
-    const status = searchParams.get('status') || 'all';
-    if (status === 'all') return userOrders;
-    return userOrders.filter(
-      (o: Order) => String(o.status || '').toLowerCase() === status.toLowerCase()
-    );
-  }, [userOrders, searchParams]);
+    return userOrders.filter((o: Order) => matchesOrderTab(o.status, activeOrderTab));
+  }, [userOrders, activeOrderTab]);
+  const shouldScrollOrders =
+    filteredOrders.length > 3 || activeOrderTab === 'Cancelled' || activeOrderTab === 'Refund';
+
+  const fetchWallet = async (opts?: { silent?: boolean }) => {
+    if (!user?.user_ID) return;
+    try {
+      if (!opts?.silent) setWalletLoading(true);
+      const payload = await profileApi.getWallet();
+      const walletValue = Number(
+        (payload as any)?.walletCoin ??
+          (payload as any)?.walletXu ??
+          (payload as any)?.data?.walletCoin ??
+          (payload as any)?.data?.walletXu ??
+          (payload as any)?.data?.result?.walletXu ??
+          0
+      );
+      setWalletXu(Number.isFinite(walletValue) ? walletValue : 0);
+      const txs =
+        (payload as any)?.transactions ??
+        (payload as any)?.data?.transactions ??
+        (payload as any)?.data?.result?.transactions ??
+        [];
+      setWalletTransactions(Array.isArray(txs) ? txs : []);
+    } catch {
+      // Keep current wallet values on transient API errors.
+    } finally {
+      if (!opts?.silent) setWalletLoading(false);
+    }
+  };
+
+  const getPaypalClientId = async (): Promise<string> => {
+    const envClientId = (import.meta.env.VITE_PAYPAL_CLIENT_ID as string | undefined)?.trim();
+    if (envClientId) return envClientId;
+    const apiUrl = ((import.meta.env.VITE_API_URL as string | undefined) || '').trim();
+    const normalizedApi = apiUrl.replace(/\/+$/, '');
+    const hostBase = normalizedApi.endsWith('/api') ? normalizedApi.slice(0, -4) : normalizedApi;
+    const candidateUrls = [
+      ...new Set([
+        ...PAYPAL_CONFIG_PATHS.map((path) => `${window.location.origin}${path}`),
+        ...(hostBase ? PAYPAL_CONFIG_PATHS.map((path) => `${hostBase}${path}`) : []),
+        ...(normalizedApi ? PAYPAL_CONFIG_PATHS.map((path) => `${normalizedApi}${path}`) : []),
+      ]),
+    ];
+
+    for (const url of candidateUrls) {
+      try {
+        paypalDebug('Fetching client id from', url);
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const data = (await res.json()) as any;
+        const clientId =
+          data?.data?.clientId ?? data?.data?.clientID ?? data?.clientId ?? data?.clientID ?? data?.data;
+        if (typeof clientId === 'string' && clientId.trim()) return clientId.trim();
+      } catch {
+        // try next candidate
+      }
+    }
+    throw new Error('missing_paypal_client_id');
+  };
+
+  const loadTopupPaypalScript = async () => {
+    try {
+      setTopupError('');
+      setTopupSdkLoading(true);
+      if ((window as any).paypal) {
+        paypalDebug('PayPal SDK already loaded');
+        setTopupSdkReady(true);
+        setTopupSdkLoading(false);
+        return;
+      }
+      const clientId = await getPaypalClientId();
+      paypalDebug('Resolved PayPal client id');
+      const script = document.createElement('script');
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&intent=capture`;
+      script.setAttribute('data-paypal-sdk-topup', '1');
+      script.onload = () => {
+        paypalDebug('PayPal SDK loaded');
+        setTopupSdkReady(true);
+        setTopupSdkLoading(false);
+      };
+      script.onerror = () => {
+        paypalDebug('PayPal SDK load failed');
+        setTopupError(t('profile.wallet.paypalSdkLoadFailed'));
+        setTopupSdkLoading(false);
+      };
+      document.body.appendChild(script);
+    } catch (e) {
+      setTopupSdkLoading(false);
+      const msg = (e as Error).message || '';
+      if (msg === 'missing_paypal_client_id') {
+        setTopupError(t('profile.wallet.missingPayPalClientId'));
+      } else {
+        setTopupError(msg || t('profile.wallet.paypalInitFailed'));
+      }
+    }
+  };
+
+  const handleOpenTopupModal = async () => {
+    setTopupModalOpen(true);
+    setTopupError('');
+    setTopupBusy(false);
+    setTopupButtonRendered(false);
+    setTopupModalReady(false);
+    topupRenderedRef.current = false;
+    setTopupRenderKey((v) => v + 1);
+    if (!topupSdkReady) await loadTopupPaypalScript();
+  };
+
+  const topupAmountUSD = useMemo(() => {
+    const usd = Number(topupXu || 0) / 24000;
+    return usd > 0 ? usd.toFixed(2) : '0.00';
+  }, [topupXu]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const resolveUserIdForCart = () =>
@@ -270,7 +487,7 @@ const ProfilePage: React.FC = () => {
   const handleBuyAgainOneItem = async (args: OrderItemRowAction) => {
     const resolvedUserId = resolveUserIdForCart();
     if (!Number.isFinite(resolvedUserId) || resolvedUserId <= 0) {
-      message.warning('Vui lòng đăng nhập lại để mua lại.');
+      message.warning(t('profile.orders.reloginToBuyAgain'));
       return;
     }
     if (!Number.isFinite(args.productId) || args.productId <= 0) return;
@@ -282,15 +499,62 @@ const ProfilePage: React.FC = () => {
         quantity: args.quantity,
         price: args.price,
       });
-      message.success('Đã thêm vào giỏ hàng!');
+      message.success(t('profile.orders.addToCartSuccess'));
       navigate('/cart');
     } catch (err) {
       console.error(err);
-      message.error('Không thể thêm sản phẩm vào giỏ.');
+      message.error(t('profile.orders.addToCartError'));
     } finally {
       setBuyAgainRowKey(null);
     }
   };
+
+  const handleCancelOrder = async (order: Order) => {
+    const orderId = Number(order.order_ID || (order as any).orderId || 0);
+    if (!Number.isFinite(orderId) || orderId <= 0) {
+      message.error(t('profile.orders.messages.orderIdMissing'));
+      return;
+    }
+    const ok = window.confirm(t('profile.orders.messages.cancelOrderConfirm'));
+    if (!ok) return;
+    try {
+      await ordersService.cancelOrder(orderId, { note: 'Customer cancelled from profile page' });
+      message.success(t('profile.orders.messages.cancelOrderSuccess'));
+      await refetchOrders();
+    } catch (err) {
+      const msg =
+        axios.isAxiosError(err) &&
+        typeof (err.response?.data as { message?: unknown } | undefined)?.message === 'string'
+          ? String((err.response?.data as { message: string }).message)
+          : t('profile.orders.messages.cancelOrderError');
+      message.error(msg);
+    }
+  };
+
+  const submitRefundRequest = async (order: Order) => {
+    const orderId = Number(order.order_ID || (order as any).orderId || 0);
+    if (!Number.isFinite(orderId) || orderId <= 0) {
+      message.error(t('profile.orders.messages.orderIdMissing'));
+      return;
+    }
+    setRefundBusyOrderId(orderId);
+    try {
+      await ordersService.requestRefund(orderId, { note: 'Customer requested refund from profile page' });
+      message.success(t('profile.orders.messages.refundSuccess'));
+      await refetchOrders();
+    } catch (err) {
+      const msg =
+        axios.isAxiosError(err) &&
+        typeof (err.response?.data as { message?: unknown } | undefined)?.message === 'string'
+          ? String((err.response?.data as { message: string }).message)
+          : t('profile.orders.messages.refundError');
+      message.error(msg);
+    } finally {
+      setRefundBusyOrderId(null);
+    }
+  };
+
+  const handleRequestRefund = (order: Order) => setRefundConfirmOrder(order);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -368,52 +632,243 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    void fetchWallet();
+  }, [user?.user_ID]);
+
+  useEffect(() => {
+    if (currentTab !== 'orders') return;
+    const timer = window.setInterval(() => {
+      void fetchWallet({ silent: true });
+    }, 2500);
+    return () => window.clearInterval(timer);
+  }, [currentTab, user?.user_ID]);
+
+  useEffect(() => {
+    const w = window as any;
+    if (
+      !topupModalOpen ||
+      !topupModalReady ||
+      !topupSdkReady ||
+      !w.paypal ||
+      !topupPaypalRef.current ||
+      topupRenderedRef.current
+    ) {
+      return;
+    }
+    const container = topupPaypalRef.current;
+    container.innerHTML = '';
+    topupRenderedRef.current = true;
+
+    const renderPaypalButtons = async () => {
+      paypalDebug('Rendering PayPal buttons', { topupAmountUSD, topupXu });
+      const buttons = w.paypal?.Buttons?.({
+        style: { layout: 'vertical', label: 'paypal' },
+        createOrder: (_d: any, actions: any) =>
+          actions.order.create({ purchase_units: [{ amount: { currency_code: 'USD', value: topupAmountUSD } }] }),
+        onApprove: async (data: any, actions: any) => {
+          try {
+            setTopupBusy(true);
+            paypalDebug('onApprove fired');
+            let captureId = '';
+            try {
+              const capture = await actions.order.capture();
+              captureId = String((capture as any)?.id ?? data?.orderID ?? data?.orderId ?? '').trim();
+              paypalDebug('Capture success', captureId);
+            } catch (captureError: any) {
+              const captureMsg = String(captureError?.message || '');
+              const closedEarly = captureMsg.toLowerCase().includes('window closed before response');
+              const fallbackId = String(data?.orderID ?? data?.orderId ?? '').trim();
+              if (closedEarly && fallbackId) {
+                // PayPal popup can close before capture response is returned.
+                // Backend currently stores reference only, so fallback to orderID to avoid silent no-op.
+                captureId = fallbackId;
+                paypalDebug('Capture fallback by orderID', captureId);
+              } else {
+                throw captureError;
+              }
+            }
+            if (!captureId) {
+              throw new Error('Missing PayPal reference id');
+            }
+            const topupRes = await profileApi.topupWallet({
+              amountXu: Math.max(1000, Math.trunc(Number(topupXu) || 0)),
+              paypalCaptureId: captureId,
+              note: 'Wallet top-up via PayPal',
+            });
+            const nextWallet = Number(
+              (topupRes as any)?.walletCoin ??
+              (topupRes as any)?.walletXu ??
+              (topupRes as any)?.data?.walletCoin ??
+              (topupRes as any)?.data?.walletXu ??
+              (topupRes as any)?.data?.result?.walletXu ??
+              0
+            );
+            if (Number.isFinite(nextWallet) && nextWallet >= 0) setWalletXu(nextWallet);
+            else await fetchWallet();
+            // Refresh history list right after successful top-up.
+            await fetchWallet();
+            message.success(t('profile.wallet.topupSuccess'));
+            setTopupModalOpen(false);
+            topupRenderedRef.current = false;
+          } catch (e) {
+            const msg = String((e as Error)?.message || '');
+            paypalDebug('onApprove error', msg);
+            if (msg.toLowerCase().includes('window closed before response')) {
+              setTopupError('');
+              topupRenderedRef.current = false;
+            } else {
+              setTopupError(msg || t('profile.wallet.topupFailed'));
+            }
+          } finally {
+            setTopupBusy(false);
+          }
+        },
+        onCancel: () => {
+          paypalDebug('onCancel fired');
+          setTopupError('');
+          setTopupBusy(false);
+          topupRenderedRef.current = false;
+        },
+        onError: (err: any) => {
+          const msg = String(err?.message || '');
+          paypalDebug('onError fired', msg);
+          if (msg.toLowerCase().includes('window closed before response')) {
+            setTopupError('');
+            topupRenderedRef.current = false;
+            return;
+          }
+          setTopupError(msg || t('profile.wallet.paypalPaymentFailed'));
+          topupRenderedRef.current = false;
+        },
+      });
+
+      if (!buttons) {
+        setTopupError(t('profile.wallet.paypalButtonsInitFailed'));
+        setTopupButtonRendered(false);
+        topupRenderedRef.current = false;
+        return;
+      }
+      if (typeof buttons.isEligible === 'function' && !buttons.isEligible()) {
+        setTopupError(t('profile.wallet.paypalNotReady'));
+        setTopupButtonRendered(false);
+        topupRenderedRef.current = false;
+        return;
+      }
+      try {
+        await buttons.render(container);
+        paypalDebug('PayPal buttons rendered');
+        setTopupButtonRendered(true);
+        setTopupError('');
+      } catch (err: any) {
+        const msg = String(err?.message || '');
+        paypalDebug('PayPal render failed', msg);
+        setTopupError(msg || t('profile.wallet.paypalRenderFailed'));
+        setTopupButtonRendered(false);
+        topupRenderedRef.current = false;
+      }
+    };
+
+    const tid = window.setTimeout(() => {
+      void renderPaypalButtons();
+    }, 250);
+    return () => window.clearTimeout(tid);
+  }, [topupModalOpen, topupModalReady, topupSdkReady, topupAmountUSD, topupXu, message, topupRenderKey, t]);
+
   // ── Menu grid items ───────────────────────────────────────────────────────
-  const menuItems = [
-    {
-      icon: <User size={20} />,
-      label: 'Tài khoản của tôi',
-      sub: 'Thông tin cá nhân, bảo mật, và thanh toán',
-      action: () => setSearchParams({ tab: 'profile' }),
-    },
-    {
-      icon: <Ticket size={20} />,
-      label: 'Kho Voucher',
-      sub: 'Lưu trữ các mã ưu đãi đặc quyền của bạn',
-      action: () => {},
-    },
-    {
-      icon: <ShoppingBag size={20} />,
-      label: 'Đơn mua',
-      sub: 'Theo dõi các đơn hàng đang giao và lịch sử',
-      action: () => setSearchParams({ tab: 'orders' }),
-    },
-    {
-      icon: <Settings size={20} />,
-      label: 'Cài đặt hệ thống',
-      sub: 'Ngôn ngữ, chế độ hiển thị và quyền riêng tư',
-      action: () => {},
-    },
-    {
-      icon: <Bell size={20} />,
-      label: 'Thông báo',
-      sub: 'Cập nhật mới nhất về bộ sưu tập và đơn hàng',
-      action: () => {},
-    },
-    {
-      icon: <Headphones size={20} />,
-      label: 'Trung tâm trợ giúp',
-      sub: 'Liên hệ đội ngũ hỗ trợ 24/7 của chúng tôi',
-      action: () => navigate('/support'),
-    },
-  ];
+  const menuItems = useMemo(
+    () => [
+      {
+        icon: <User size={20} />,
+        label: t('profile.menu.myAccount.title'),
+        sub: t('profile.menu.myAccount.description'),
+        action: () => setSearchParams({ tab: 'profile' }),
+      },
+      {
+        icon: <Ticket size={20} />,
+        label: t('profile.menu.vouchers.title'),
+        sub: t('profile.menu.vouchers.description'),
+        action: () => {},
+      },
+      {
+        icon: <ShoppingBag size={20} />,
+        label: t('profile.menu.orders.title'),
+        sub: t('profile.menu.orders.description'),
+        action: () => setSearchParams({ tab: 'orders' }),
+      },
+      {
+        icon: <Settings size={20} />,
+        label: t('profile.menu.settings.title'),
+        sub: t('profile.menu.settings.description'),
+        action: () => {},
+      },
+      {
+        icon: <Bell size={20} />,
+        label: t('profile.menu.notifications.title'),
+        sub: t('profile.menu.notifications.description'),
+        action: () => {},
+      },
+      {
+        icon: <Headphones size={20} />,
+        label: t('profile.menu.help.title'),
+        sub: t('profile.menu.help.description'),
+        action: () => navigate('/contacts'),
+      },
+    ],
+    [navigate, setSearchParams, t],
+  );
 
   // ── Sidebar nav items ─────────────────────────────────────────────────────
-  const sideNavItems = [
-    { key: 'identity',    icon: <User size={14} />,      label: 'TÀI KHOẢN', tab: 'profile', section: 'identity'   },
-    { key: 'orders',      icon: <ShoppingBag size={14} />, label: 'ĐƠN HÀNG', tab: 'orders',  section: null         },
-    { key: 'promotions',  icon: <Tag size={14} />,        label: 'PROMOTION', tab: 'profile', section: 'promotions' },
-  ];
+  const sideNavItems = useMemo(
+    () => [
+      {
+        key: 'identity',
+        icon: <User size={14} />,
+        label: t('profile.sideNav.account'),
+        tab: 'profile' as const,
+        section: 'identity' as const,
+      },
+      {
+        key: 'orders',
+        icon: <ShoppingBag size={14} />,
+        label: t('profile.sideNav.orders'),
+        tab: 'orders' as const,
+        section: null,
+      },
+      {
+        key: 'promotions',
+        icon: <Tag size={14} />,
+        label: t('profile.sideNav.promotions'),
+        tab: 'profile' as const,
+        section: 'promotions' as const,
+      },
+    ],
+    [t],
+  );
+
+  const profileStats = useMemo(
+    () => [
+      {
+        key: 'orders',
+        label: t('profile.stats.orders'),
+        value: userOrders.length,
+        icon: <ShoppingBag size={16} />,
+      },
+      {
+        key: 'voucher',
+        label: t('profile.stats.voucher'),
+        value: '—',
+        icon: <Ticket size={16} />,
+      },
+      {
+        key: 'coffeeCoin',
+        label: t('profile.stats.coffeeCoin'),
+        value: walletLoading ? t('profile.stats.loadingShort') : walletXu.toLocaleString(i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US'),
+        icon: <Wallet size={16} />,
+      },
+    ],
+    [i18n.language, t, userOrders.length, walletLoading, walletXu],
+  );
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -445,6 +900,10 @@ const ProfilePage: React.FC = () => {
                   src={getImageSrc(previewAvatar || user?.avatar)}
                   alt="avatar"
                   className="w-full h-full object-cover"
+                  onError={e => {
+                    (e.currentTarget as HTMLImageElement).src =
+                      'https://ui-avatars.com/api/?name=User&background=1c1b1b&color=e5c18b&size=128';
+                  }}
                 />
               </div>
               {/* Camera overlay */}
@@ -467,7 +926,7 @@ const ProfilePage: React.FC = () => {
                   letterSpacing: '-0.01em',
                 }}
               >
-                {user?.name || 'Guest'}
+                {user?.name || t('profile.guest')}
               </p>
               <span
                 style={{
@@ -480,7 +939,7 @@ const ProfilePage: React.FC = () => {
                 }}
                 className="inline-block mt-1 px-2 py-0.5 rounded-full"
               >
-                PREMIUM MEMBER
+                {t('profile.premiumMemberBadge')}
               </span>
             </div>
           </div>
@@ -520,75 +979,6 @@ const ProfilePage: React.FC = () => {
             })}
           </nav>
 
-          {/* Dark / Light toggle */}
-          <div className="px-4 pb-2 flex items-center justify-between">
-            <span
-              style={{
-                color: T.onSurfaceVariant,
-                fontFamily: "'Manrope', sans-serif",
-                fontSize: '0.65rem',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                opacity: 0.6,
-              }}
-            >
-              {dark ? 'DARK MODE' : 'LIGHT MODE'}
-            </span>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={toggleDark}
-              title={dark ? 'Chuyển sang Light' : 'Chuyển sang Dark'}
-              style={{
-                background: `${T.gold}18`,
-                border: `1px solid ${T.gold}30`,
-                color: T.gold,
-                borderRadius: '50%',
-                width: 32,
-                height: 32,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'all 300ms ease',
-              }}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={dark ? 'sun' : 'moon'}
-                  initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                  exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.2, ease: 'easeInOut' }}
-                >
-                  {dark ? <Sun size={14} /> : <Moon size={14} />}
-                </motion.div>
-              </AnimatePresence>
-            </motion.button>
-          </div>
-
-          {/* Upgrade CTA */}
-          <div className="p-4">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              style={{
-                background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
-                color: T.surfaceLowest,
-                fontFamily: "'Manrope', sans-serif",
-                fontWeight: 800,
-                fontSize: '0.7rem',
-                letterSpacing: '0.1em',
-                borderRadius: '0.75rem',
-                boxShadow: `0 8px 40px -8px ${T.gold}40`,
-                transition: 'all 300ms ease-out',
-              }}
-              className="w-full py-3 flex items-center justify-center gap-2"
-            >
-              <Award size={14} />
-              UPGRADE TO GOLD
-            </motion.button>
-          </div>
         </aside>
 
         {/* ================================================================
@@ -615,15 +1005,11 @@ const ProfilePage: React.FC = () => {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="grid grid-cols-3 gap-4"
+            className="grid grid-cols-2 md:grid-cols-3 gap-4"
           >
-            {[
-              { label: 'ĐƠN HÀNG', value: userOrders.length, icon: <ShoppingBag size={16} /> },
-              { label: 'VOUCHER', value: '—', icon: <Ticket size={16} /> },
-              { label: 'ĐIỂM', value: '—', icon: <Award size={16} /> },
-            ].map(stat => (
+            {profileStats.map(stat => (
               <div
-                key={stat.label}
+                key={stat.key}
                 style={{ background: T.surfaceLow }}
                 className="rounded-2xl p-5 flex flex-col gap-3"
               >
@@ -653,6 +1039,22 @@ const ProfilePage: React.FC = () => {
                 >
                   {stat.value}
                 </span>
+                {stat.key === 'coffeeCoin' && (
+                  <button
+                    type="button"
+                    onClick={() => void handleOpenTopupModal()}
+                    style={{
+                      marginTop: 8,
+                      color: T.gold,
+                      fontFamily: "'Manrope', sans-serif",
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                    }}
+                    className="text-left hover:underline"
+                  >
+                    {t('profile.stats.topupPaypal')}
+                  </button>
+                )}
               </div>
             ))}
           </motion.div>
@@ -682,7 +1084,7 @@ const ProfilePage: React.FC = () => {
                     opacity: 0.6,
                   }}
                 >
-                  THÔNG TIN CÁ NHÂN
+                  {t('profile.identity.sectionTitle')}
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -697,7 +1099,7 @@ const ProfilePage: React.FC = () => {
                         letterSpacing: '0.07em',
                       }}
                     >
-                      TÀI KHOẢN
+                      {t('profile.identity.accountLabel')}
                     </label>
                     <div
                       style={{
@@ -724,7 +1126,7 @@ const ProfilePage: React.FC = () => {
                         letterSpacing: '0.07em',
                       }}
                     >
-                      EMAIL
+                      {t('profile.identity.emailLabel')}
                     </label>
                     <div
                       style={{
@@ -742,9 +1144,9 @@ const ProfilePage: React.FC = () => {
 
                   {/* Editable fields */}
                   {[
-                    { name: 'name', label: 'HỌ VÀ TÊN', placeholder: 'Nhập họ và tên...' },
-                    { name: 'phoneNumber', label: 'SỐ ĐIỆN THOẠI', placeholder: 'Nhập số điện thoại...' },
-                    { name: 'address', label: 'ĐỊA CHỈ', placeholder: 'Nhập địa chỉ...' },
+                    { name: 'name', label: t('profile.identity.fieldName'), placeholder: t('profile.identity.placeholderName') },
+                    { name: 'phoneNumber', label: t('profile.identity.fieldPhone'), placeholder: t('profile.identity.placeholderPhone') },
+                    { name: 'address', label: t('profile.identity.fieldAddress'), placeholder: t('profile.identity.placeholderAddress') },
                   ].map(field => (
                     <div
                       key={field.name}
@@ -814,7 +1216,7 @@ const ProfilePage: React.FC = () => {
                       }}
                       className="px-5 py-2.5"
                     >
-                      HỦY
+                      {t('profile.identity.cancelEdit')}
                     </motion.button>
                   )}
                   <motion.button
@@ -836,7 +1238,7 @@ const ProfilePage: React.FC = () => {
                     className="px-8 py-2.5 inline-flex items-center gap-2 disabled:opacity-60"
                   >
                     {isLoading && <Loader2 size={14} className="animate-spin" />}
-                    {isEditing ? 'LƯU THAY ĐỔI' : 'CHỈNH SỬA'}
+                    {isEditing ? t('profile.identity.saveChangesCaps') : t('profile.identity.editProfileCaps')}
                   </motion.button>
                 </div>
 
@@ -886,6 +1288,7 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 {/* Order cards */}
+                <div className="min-h-[520px]">
                 {ordersLoading ? (
                   <div
                     style={{ background: T.surfaceLow }}
@@ -897,7 +1300,7 @@ const ProfilePage: React.FC = () => {
                       style={{ color: T.gold }}
                     />
                     <p style={{ color: T.onSurfaceVariant, fontSize: '0.875rem' }}>
-                      Đang tải đơn hàng...
+                      {t('profile.orders.loadingOrders')}
                     </p>
                   </div>
                 ) : filteredOrders.length === 0 ? (
@@ -919,10 +1322,10 @@ const ProfilePage: React.FC = () => {
                         fontSize: '1rem',
                       }}
                     >
-                      Chưa có đơn hàng nào
+                      {t('profile.orders.emptyTitle')}
                     </p>
                     <p style={{ color: T.onSurfaceVariant, fontSize: '0.82rem', opacity: 0.7 }}>
-                      Hãy khám phá các sản phẩm cà phê tuyệt vời của chúng tôi.
+                      {t('profile.orders.emptySubtitle')}
                     </p>
                     <Link
                       to="/products"
@@ -939,28 +1342,41 @@ const ProfilePage: React.FC = () => {
                         display: 'inline-block',
                       }}
                     >
-                      MUA SẮM NGAY
+                      {t('profile.orders.shopNow')}
                     </Link>
                   </div>
                 ) : (
-                  filteredOrders.map((order: Order, orderIdx: number) => {
-                    const orderID = order.order_ID || (order as any).orderId;
-                    const isCompleted =
-                      String(order.status).toLowerCase() === 'completed';
-                    return (
-                      <motion.div
-                        key={orderID}
-                        layout
-                        initial={{ opacity: 0, y: 14 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{
-                          duration: 0.4,
-                          delay: orderIdx * 0.05,
-                          ease: [0.22, 1, 0.36, 1],
-                        }}
-                        style={{ background: T.surfaceLow }}
-                        className="rounded-2xl overflow-hidden"
-                      >
+                  <div
+                    className={`space-y-4 pr-1 ${
+                      shouldScrollOrders ? 'max-h-[760px] overflow-y-auto' : ''
+                    }`}
+                    style={{
+                      scrollbarGutter: 'stable',
+                    }}
+                  >
+                    {filteredOrders.map((order: Order, orderIdx: number) => {
+                      const orderID = order.order_ID || (order as any).orderId;
+                      const canCancel = canUserCancelOrder(order.status);
+                      const canRefund = canUserRequestRefund(order.status);
+                      const normalizedStatus = normalizeOrderStatus(order.status);
+                      const isCompleted = normalizedStatus === 'completed';
+                      const isRefundFlow =
+                        normalizedStatus === 'refund_requested' || normalizedStatus === 'refunded';
+                      const statusLabel = getOrderStatusLabel(normalizedStatus, order.status);
+                      return (
+                        <motion.div
+                          key={orderID}
+                          layout
+                          initial={{ opacity: 0, y: 14 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.4,
+                            delay: orderIdx * 0.05,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
+                          style={{ background: T.surfaceLow }}
+                          className="rounded-2xl overflow-hidden"
+                        >
                         {/* Order header */}
                         <div
                           style={{
@@ -982,7 +1398,7 @@ const ProfilePage: React.FC = () => {
                                 padding: '2px 6px',
                               }}
                             >
-                              YÊU THÍCH
+                              {t('profile.orders.favoriteBadge')}
                             </span>
                             <span
                               style={{
@@ -992,22 +1408,20 @@ const ProfilePage: React.FC = () => {
                                 fontSize: '0.875rem',
                               }}
                             >
-                              Phan Coffee Official
+                              {t('profile.orders.storeName')}
                             </span>
                           </div>
                           <div className="flex items-center gap-4">
                             <span
                               style={{
-                                color: isCompleted ? '#4ade80' : T.gold,
+                                color: isRefundFlow ? '#fb7185' : isCompleted ? '#4ade80' : T.gold,
                                 fontFamily: "'Manrope', sans-serif",
                                 fontWeight: 700,
                                 fontSize: '0.7rem',
                                 letterSpacing: '0.1em',
                               }}
                             >
-                              {isCompleted
-                                ? 'ĐÃ GIAO HÀNG'
-                                : String(order.status || 'CHỜ XÁC NHẬN').toUpperCase()}
+                              {statusLabel}
                             </span>
                             <span
                               style={{
@@ -1049,15 +1463,55 @@ const ProfilePage: React.FC = () => {
                           className="px-6 py-4 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-3"
                         >
                           <span style={{ color: T.onSurfaceVariant, fontSize: '0.75rem', opacity: 0.6 }}>
-                            Không nhận được hàng?{' '}
-                            <button style={{ color: T.gold }} className="hover:underline font-medium">
-                              Yêu cầu trả hàng
-                            </button>
+                            {canCancel ? t('profile.orders.footerHintCancel') : t('profile.orders.footerHintRefund')}
+                            {!canCancel && (
+                              <>
+                                {' '}
+                                {canRefund ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => void handleRequestRefund(order)}
+                                    disabled={refundBusyOrderId === Number(orderID)}
+                                    style={{
+                                      color: refundBusyOrderId === Number(orderID) ? T.onSurfaceVariant : T.gold,
+                                      opacity: refundBusyOrderId === Number(orderID) ? 0.75 : 1,
+                                    }}
+                                    className="hover:underline cursor-pointer font-medium disabled:cursor-not-allowed"
+                                  >
+                                    {refundBusyOrderId === Number(orderID)
+                                      ? t('profile.orders.requestRefundLoading')
+                                      : t('profile.orders.requestRefund')}
+                                  </button>
+                                ) : (
+                                  <button style={{ color: T.gold }} className="hover:underline font-medium">
+                                    {t('profile.orders.requestReturn')}
+                                  </button>
+                                )}
+                              </>
+                            )}
                           </span>
                           <div className="flex items-center gap-3">
+                            {canCancel && (
+                              <button
+                                type="button"
+                                onClick={() => void handleCancelOrder(order)}
+                                style={{
+                                  border: `1px solid ${T.onSurface}20`,
+                                  color: '#ef4444',
+                                  background: 'transparent',
+                                  borderRadius: '0.6rem',
+                                  padding: '0.4rem 0.75rem',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 600,
+                                }}
+                                className="hover:opacity-80 transition-opacity"
+                              >
+                                {t('profile.orders.cancelOrder')}
+                              </button>
+                            )}
                             <Wallet size={18} style={{ color: T.gold }} />
                             <span style={{ color: T.onSurfaceVariant, fontSize: '0.82rem' }}>
-                              Thành tiền:
+                              {t('profile.orders.subtotalLabel')}:
                             </span>
                             <span
                               style={{
@@ -1072,15 +1526,88 @@ const ProfilePage: React.FC = () => {
                             </span>
                           </div>
                         </div>
-                      </motion.div>
-                    );
-                  })
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
 
           {/* ── Menu grid (visible on profile tab) ──────────────────── */}
+          {currentTab === 'profile' && (
+            <div style={{ background: T.surfaceLow }} className="rounded-2xl p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3
+                  style={{
+                    color: T.onSurface,
+                    fontFamily: "'Manrope', sans-serif",
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {t('profile.wallet.historyTitle')}
+                </h3>
+                <button
+                  type="button"
+                  style={{ color: T.gold, fontSize: '0.75rem' }}
+                  className="hover:underline"
+                  onClick={() => void fetchWallet()}
+                >
+                  {t('common.refresh')}
+                </button>
+              </div>
+              {walletTransactions.length === 0 ? (
+                <p style={{ color: T.onSurfaceVariant, fontSize: '0.8rem', opacity: 0.8 }}>
+                  {t('profile.wallet.noTransactions')}
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                  {walletTransactions.slice(0, 20).map((tx, idx) => (
+                    <div
+                      key={String(tx.id ?? idx)}
+                      style={{ background: T.surfaceLowest }}
+                      className="rounded-xl px-3 py-2 flex items-center justify-between"
+                    >
+                      <div>
+                        <p style={{ color: T.onSurface, fontSize: '0.78rem', fontWeight: 600 }}>
+                          {getWalletTransactionLabel(
+                            String(tx.type || ''),
+                            walletTransactionLabels,
+                          )}
+                        </p>
+                        <p style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}>
+                          {tx.createdAt ? new Date(tx.createdAt).toLocaleString(walletDateLocale) : ''}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p
+                          style={{
+                            color: String(tx.type || '').toUpperCase() === 'SPEND' ? '#ef4444' : '#22c55e',
+                            fontWeight: 700,
+                            fontSize: '0.8rem',
+                          }}
+                        >
+                          {String(tx.type || '').toUpperCase() === 'SPEND' ? '-' : '+'}
+                          {Number(((tx as any).amountCoin ?? tx.amountXu) || 0).toLocaleString(walletDateLocale)}{' '}
+                          {t('profile.wallet.coinSuffix')}
+                        </p>
+                        <p style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}>
+                          {t('profile.wallet.balanceLabel')}{' '}
+                          {Number(((tx as any).balanceCoin ?? tx.balanceAfter) || 0).toLocaleString(walletDateLocale)}{' '}
+                          {t('profile.wallet.coinSuffix')}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {currentTab === 'profile' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {menuItems.map((item, i) => (
@@ -1138,7 +1665,7 @@ const ProfilePage: React.FC = () => {
                   opacity: 0.8,
                 }}
               >
-                EXCLUSIVE MEMBERSHIP
+                {t('profile.membership.bannerLabel')}
               </p>
               <h3
                 style={{
@@ -1149,12 +1676,103 @@ const ProfilePage: React.FC = () => {
                   letterSpacing: '-0.03em',
                 }}
               >
-                Experience the Extraordinary
+                {t('profile.membership.bannerTitle')}
               </h3>
             </motion.div>
           )}
         </div>
       </div>
+
+      <Modal
+        title={t('profile.refund.modalTitle')}
+        open={Boolean(refundConfirmOrder)}
+        centered
+        onCancel={() => setRefundConfirmOrder(null)}
+        footer={[
+          <button
+            key="cancel"
+            type="button"
+            onClick={() => setRefundConfirmOrder(null)}
+            className="px-4 py-2 rounded-md bg-stone-200 text-stone-700 font-semibold hover:bg-stone-300 transition-colors"
+          >
+            {t('common.cancel')}
+          </button>,
+          <button
+            key="confirm"
+            type="button"
+            onClick={() => {
+              if (refundConfirmOrder) void submitRefundRequest(refundConfirmOrder);
+              setRefundConfirmOrder(null);
+            }}
+            className="px-4 py-2 rounded-md bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-colors"
+          >
+            {t('profile.refund.submitRequest')}
+          </button>,
+        ]}
+      >
+        <p className="text-sm text-stone-600">{t('profile.refund.confirmMessage')}</p>
+      </Modal>
+
+      <Modal
+        title={t('profile.wallet.topupModalTitle')}
+        open={topupModalOpen}
+        destroyOnHidden
+        afterOpenChange={(open) => {
+          setTopupModalReady(open);
+          if (open) {
+            topupRenderedRef.current = false;
+            setTopupRenderKey((v) => v + 1);
+          } else {
+            setTopupButtonRendered(false);
+          }
+        }}
+        onCancel={() => {
+          setTopupModalOpen(false);
+          topupRenderedRef.current = false;
+          setTopupButtonRendered(false);
+        }}
+        footer={null}
+      >
+        <div className="pt-2 space-y-3">
+          <div className="text-sm text-stone-600">{t('profile.wallet.topupInputHint')}</div>
+          <InputNumber
+            min={1000}
+            step={1000}
+            value={topupXu}
+            onChange={(v) => setTopupXu(Number(v || 0))}
+            style={{ width: '100%' }}
+          />
+          <div className="text-xs text-stone-500">
+            {t('profile.wallet.paypalEstimate', { amount: topupAmountUSD })}
+          </div>
+          {topupSdkLoading && (
+            <div className="text-center py-2">
+              <Spin />
+            </div>
+          )}
+          {topupError && <div className="text-sm text-red-500">{topupError}</div>}
+          {!topupSdkLoading && !topupButtonRendered && (
+            <button
+              type="button"
+              className="text-sm text-blue-500 hover:underline"
+              onClick={() => {
+                setTopupError('');
+                topupRenderedRef.current = false;
+                setTopupRenderKey((v) => v + 1);
+                void loadTopupPaypalScript();
+              }}
+            >
+              {t('profile.wallet.reloadPaypalButton')}
+            </button>
+          )}
+          {!topupBusy && <div ref={topupPaypalRef} />}
+          {topupBusy && (
+            <div className="text-center py-2 text-sm text-stone-600">
+              {t('profile.wallet.processingPayment')}
+            </div>
+          )}
+        </div>
+      </Modal>
 
       {/* Always-mounted file input so avatar click works on any tab */}
       <input

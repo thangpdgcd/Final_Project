@@ -6,8 +6,9 @@ let orderItemsUnsupported = false;
 let orderItemsGetRoute: string | null | undefined = undefined;
 
 export const ordersService = {
+  /** Current user's orders (JWT). Prefer over GET /orders (all orders, staff-only use case). */
   getAll: async (): Promise<Order[]> => {
-    const res = await axiosInstance.get<any>('/orders');
+    const res = await axiosInstance.get<any>('/my-orders');
     const data = res.data;
     if (Array.isArray(data)) return data as Order[];
     if (data && Array.isArray(data.orders)) return data.orders as Order[];
@@ -21,26 +22,25 @@ export const ordersService = {
     return res.data;
   },
 
+  /**
+   * Creates an order from the server-side cart (backend copies cart → order lines).
+   * Body is only `status`; totals and items come from the cart — sync cart before calling.
+   */
   create: async (payload: CreateOrderPayload): Promise<Order> => {
-    const userId = Number((payload as any)?.user_ID ?? (payload as any)?.userId ?? (payload as any)?.id);
-    const totalAmount = Number((payload as any)?.total_Amount ?? (payload as any)?.totalAmount ?? 0);
-
-    const body: Record<string, unknown> = {
-      user_ID: Number.isFinite(userId) ? userId : (payload as any)?.user_ID,
-      total_Amount: Number.isFinite(totalAmount) ? totalAmount : payload.total_Amount,
-      status: payload.status ?? 'Pending',
-      shipping_Address: payload.shipping_Address ?? '',
-    };
-
-    if (payload.paymentMethod != null) body.paymentMethod = payload.paymentMethod;
-    if (payload.paypalCaptureId !== undefined) body.paypalCaptureId = payload.paypalCaptureId;
-
+    const status = String(payload.status ?? 'pending').trim() || 'pending';
+    const paymentMethod = String(payload.paymentMethod ?? 'COD').trim() || 'COD';
+    const body: Record<string, unknown> = { status, paymentMethod };
+    if (payload.paypalCaptureId) body.paypalCaptureId = payload.paypalCaptureId;
+    if (payload.shipping_Address) body.note = payload.shipping_Address;
     const res = await axiosInstance.post<any>('/create-orders', body);
     const data = res.data;
+    const inner = data?.data ?? data;
     const order =
+      inner?.order ??
       data?.order ??
       data?.data?.order ??
       data?.result?.order ??
+      (inner && typeof inner === 'object' && 'orderId' in inner ? inner : null) ??
       data?.data ??
       data?.result ??
       data;
@@ -50,6 +50,33 @@ export const ordersService = {
   update: async (id: number, payload: Partial<Order>): Promise<Order> => {
     const res = await axiosInstance.put<Order>(`/orders/${id}`, payload);
     return res.data;
+  },
+
+  /** Customer cancels own order (allowed only in early statuses by backend). */
+  cancelOrder: async (id: number, payload?: { note?: string }): Promise<Order> => {
+    const res = await axiosInstance.patch<any>(`/orders/${id}/cancel`, payload ?? {});
+    const data = res.data;
+    const order =
+      data?.order ??
+      data?.data?.order ??
+      data?.data ??
+      data?.result?.order ??
+      data?.result ??
+      data;
+    return order as Order;
+  },
+
+  requestRefund: async (id: number, payload?: { note?: string }): Promise<Order> => {
+    const res = await axiosInstance.patch<any>(`/orders/${id}/refund-request`, payload ?? {});
+    const data = res.data;
+    const order =
+      data?.order ??
+      data?.data?.order ??
+      data?.data ??
+      data?.result?.order ??
+      data?.result ??
+      data;
+    return order as Order;
   },
 
   delete: async (id: number): Promise<{ message: string }> => {
