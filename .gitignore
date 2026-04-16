@@ -10,6 +10,13 @@
 
 # production
 /build
+/dist
+/public/dist
+
+# build artifacts accidentally generated into public/assets
+/public/assets/*.js
+/public/assets/*.css
+/public/assets/*.map
 
 # misc
 .DS_Store

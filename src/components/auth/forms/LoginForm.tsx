@@ -9,7 +9,7 @@ import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/store/AuthContext';
-import { authService } from '@/features/auth/services/auth.service';
+import { authService } from '@/features/auth';
 import type { LoginPayload } from '@/types';
 
 import type { AuthView } from '../AuthModal';

@@ -37,7 +37,13 @@ export const ordersService = {
 
     const res = await axiosInstance.post<any>('/create-orders', body);
     const data = res.data;
-    const order = data?.order ?? data?.data ?? data?.result ?? data;
+    const order =
+      data?.order ??
+      data?.data?.order ??
+      data?.result?.order ??
+      data?.data ??
+      data?.result ??
+      data;
     return order as Order;
   },
 
@@ -54,7 +60,6 @@ export const ordersService = {
   getItemsByOrderId: async (order_ID: number): Promise<OrderItem[]> => {
     if (orderItemsUnsupported) return [];
 
-    // If we already know the working endpoint shape, avoid probing.
     if (orderItemsGetRoute === null) return [];
     if (typeof orderItemsGetRoute === 'string') {
       try {
@@ -75,7 +80,6 @@ export const ordersService = {
             : (data?.items ?? data?.orderItems ?? data?.orderitems ?? data?.data ?? data?.rows ?? []);
         return (Array.isArray(list) ? list : []) as OrderItem[];
       } catch (err) {
-        // If previously working route starts 404-ing, fall back to probing again once.
         if (axios.isAxiosError(err) && err.response?.status === 404) {
           orderItemsGetRoute = undefined;
         } else {
@@ -109,13 +113,11 @@ export const ordersService = {
       }
     }
 
-    // Endpoint not supported on backend; cache this to avoid spamming console/network.
     orderItemsGetRoute = null;
     return [];
   },
 
   createItem: async (payload: CreateOrderItemPayload): Promise<OrderItem> => {
-    // If BE doesn't expose orderitems endpoints, don't keep spamming requests.
     if (orderItemsUnsupported) return null as unknown as OrderItem;
 
     const orderIdNum = Number((payload as any)?.order_ID);
@@ -123,13 +125,9 @@ export const ordersService = {
     const quantity = Number((payload as any)?.quantity);
     const price = Number((payload as any)?.price);
 
-    // Prefer the most common BE route in this project: POST /api/orderitems
-    // Some backends also support /create-orderitems or /orders/:id/items.
     const urls: string[] = ['/orderitems', '/create-orderitems'];
     if (Number.isFinite(orderIdNum) && orderIdNum > 0) urls.push(`/orders/${orderIdNum}/items`);
 
-    // Try payload shapes commonly used by different BE implementations.
-    // Note: many BE require order_ID inside body when posting to /orderitems.
     const bodyVariants: Record<string, unknown>[] = [
       { order_ID: orderIdNum, product_ID: productId, quantity, price },
       { orderId: orderIdNum, productId, quantity, price },
@@ -149,7 +147,6 @@ export const ordersService = {
           lastErr = err;
           if (!axios.isAxiosError(err)) throw err;
           const status = err.response?.status;
-          // Try next variant/endpoint for typical "wrong shape/route" errors.
           if (status === 404) break;
           if (status === 400 || status === 405 || status === 415 || status === 500) continue;
           throw err;
@@ -157,7 +154,6 @@ export const ordersService = {
       }
     }
 
-    // Mark unsupported if backend is missing endpoints (404) or rejects all variants.
     if (axios.isAxiosError(lastErr)) {
       const status = lastErr.response?.status;
       if (status === 404 || status === 405) {
@@ -173,3 +169,4 @@ export const ordersService = {
     return res.data;
   },
 };
+

@@ -32,9 +32,7 @@ export const productsService = {
           []);
 
     const list = Array.isArray(raw) ? raw : [];
-    return list
-      .map(mapProduct)
-      .filter((p) => Number.isFinite(p.product_ID) && p.product_ID > 0);
+    return list.map(mapProduct).filter((p) => Number.isFinite(p.product_ID) && p.product_ID > 0);
   },
 
   getById: async (id: number): Promise<Product> => {
@@ -57,3 +55,4 @@ export const productsService = {
     return res.data;
   },
 };
+

@@ -8,7 +8,7 @@ import { Mail, Lock, User } from 'lucide-react';
 import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 
-import { authService } from '@/features/auth/services/auth.service';
+import { authService } from '@/features/auth';
 import type { RegisterPayload } from '@/types';
 
 import type { AuthView } from '../AuthModal';

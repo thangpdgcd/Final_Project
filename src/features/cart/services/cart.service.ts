@@ -17,8 +17,8 @@ const unwrapList = (resData: unknown): CartItem[] => {
   if (Array.isArray(resData)) list = resData;
   else {
     const data = resData as Record<string, unknown>;
-    if (Array.isArray(data?.data)) list = data.data;
-    else if (Array.isArray(data?.cartItems)) list = data.cartItems;
+    if (Array.isArray(data?.data)) list = data.data as any[];
+    else if (Array.isArray(data?.cartItems)) list = data.cartItems as any[];
   }
   return list.map(mapCartItem);
 };
@@ -93,20 +93,15 @@ export const cartService = {
 
         const status = err.response?.status;
 
-        // If the first endpoint 404s, try the fallback endpoint once.
         if (status === 404) {
           if (i === 0) continue;
-          // Both endpoints 404: treat as already removed / unsupported route.
           return { message: 'Cart item not found' };
         }
 
-        // These typically mean "wrong route / wrong shape / already removed on BE".
-        // Don't block checkout/cart flow; return a soft success.
         if (status === 400 || status === 405 || status === 415) {
           return { message: 'Remove cart item skipped' };
         }
 
-        // 500 means BE error; don't keep retrying, but also don't crash UI flows.
         if (status === 500) {
           return { message: 'Remove cart item failed on server' };
         }
@@ -121,3 +116,4 @@ export const cartService = {
     throw lastErr ?? new Error('REMOVE_CART_ITEM_FAILED');
   },
 };
+

@@ -6,6 +6,7 @@
     "back": "Quay lại",
     "submit": "Gửi",
     "cancel": "Hủy",
+    "clear": "Đặt lại",
     "theme": "Giao diện",
     "darkMode": "Chế độ tối",
     "lightMode": "Chế độ sáng",
@@ -15,15 +16,23 @@
       "vi": "VN"
     }
   },
+  "header": {
+    "breadcrumbBrand": "Phan Coffee Shop"
+  },
   "nav": {
     "home": "Trang chủ",
     "coffee": "Cà phê",
     "contact": "Liên hệ",
     "about": "Giới thiệu",
+    "blog": "Blog",
     "cart": "Giỏ hàng",
     "user": "Tài khoản",
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
+    "wishlist": "Yêu thích",
+    "orders": "Đơn hàng",
+    "shop": "Cửa hàng",
+    "register": "Đăng ký",
     "searchPlaceholder": "Tìm kiếm cà phê..."
   },
   "order": {
@@ -74,68 +83,49 @@
     }
   },
   "aboutPage": {
-    "heroLabel": "CÂU CHUYỆN CỦA CHÚNG TÔI",
-    "heroTitle": "Phan Coffee",
-    "heroSubtitle": "Khởi nguồn từ tình yêu với hạt cà phê Kon Tum, chúng tôi mang đến hương vị nguyên bản - không tẩm ướp, không phụ gia.",
-    "heroCta": "Khám phá sản phẩm",
+    "heroLabel": "Thành lập 2020 — Tây Nguyên",
+    "heroTitle": "Ươm mầm giữa sương núi.",
+    "heroSubtitle": "Phan Coffee mang linh hồn Tây Nguyên—sương mát, đất đỏ bazan và đôi tay am hiểu từng mùa thu hoạch. Chúng tôi rang có chừng để hương vị cao nguyên vẫn rõ ràng trong từng tách.",
+    "heroCtaPrimary": "Khám phá di sản",
+    "heroCtaGhost": "Xem mùa thu hoạch",
+    "sustainCardTitle": "Bền vững từ thiên nhiên",
+    "sustainCardDesc": "Thu mua trực tiếp tại vườn, canh tác thân thiện tán che và bao bì được chọn để giảm dấu chân lên vùng đất chúng tôi nợ ơn.",
     "origin": {
       "label": "Nguồn gốc",
-      "titleLine1": "Từ đất Kon Tum",
-      "titleLine2": "đến từng tách cà phê",
-      "p1": "Phan Coffee ra đời tại mảnh đất cao nguyên Kon Tum, nơi có độ cao lý tưởng, khí hậu mát mẻ và đất đỏ bazan màu mỡ - những điều kiện tạo nên hạt cà phê đặc biệt.",
-      "p2": "Chúng tôi làm việc trực tiếp với nông hộ địa phương, đảm bảo thu mua công bằng và canh tác bền vững. Mỗi mẻ rang đều được theo dõi kỹ lưỡng để giữ hương vị nhất quán."
+      "title": "Xuất phát từ vùng Tây Nguyên.",
+      "p1": "Kon Tum là nơi độ cao, sương mù và đất bazan gặp nhau. Tam giác ấy tạo nên nền tảng cho Robusta của chúng tôi—hương đậm, đắng sạch và hậu vị kéo dài như sương sớm.",
+      "p2": "Mùa nào cũng trở lại cùng những hộ nông dân quen thuộc, cupping trước khi mua và rang từng mẻ nhỏ để bạn cảm nhận cao nguyên, không phải công thức.",
+      "stat1Value": "1500m",
+      "stat1Unit": "ĐỘ CAO SO VỚI MỰC NƯỚC BIỂN",
+      "stat2Value": "Đất bazan",
+      "stat2Unit": "THÀNH PHẦN ĐẤT"
     },
-    "process": {
-      "label": "Quy trình",
-      "title": "Từ vườn đến ly cà phê",
-      "steps": [
-        {
-          "icon": "🌱",
-          "title": "Tuyển chọn hạt",
-          "desc": "Hạt cà phê được tuyển chọn kỹ lưỡng từ các vườn Kon Tum để đảm bảo chất lượng đầu vào."
-        },
-        {
-          "icon": "🔥",
-          "title": "Rang thủ công",
-          "desc": "Rang theo phong cách truyền thống, kiểm soát nhiệt độ và thời gian để đạt hương vị tốt nhất."
-        },
-        {
-          "icon": "📦",
-          "title": "Đóng gói tươi",
-          "desc": "Đóng gói ngay sau rang để giữ mùi thơm. Van thoát khí một chiều giúp cà phê tươi lâu hơn."
-        },
-        {
-          "icon": "🚀",
-          "title": "Giao hàng nhanh",
-          "desc": "Giao trong ngày tại Kon Tum và toàn quốc trong 2-3 ngày để bạn luôn nhận được cà phê mới."
-        }
-      ]
-    },
-    "values": {
-      "label": "Cam kết",
-      "title": "Giá trị cốt lõi",
-      "items": [
-        {
-          "icon": "🌿",
-          "title": "Nguyên chất 100%",
-          "desc": "Không tẩm ướp, không chất bảo quản. Chỉ có hạt cà phê rang mộc đúng chuẩn."
-        },
-        {
-          "icon": "🤝",
-          "title": "Thương mại công bằng",
-          "desc": "Hợp tác trực tiếp với nông dân để đảm bảo thu nhập bền vững cho cộng đồng."
-        },
-        {
-          "icon": "♻️",
-          "title": "Bền vững môi trường",
-          "desc": "Bao bì thân thiện môi trường và quy trình sản xuất tiết kiệm năng lượng."
-        }
-      ]
+    "collections": {
+      "label": "Bộ sưu tập",
+      "title": "Chọn lọc hạt cà phê chất lượng.",
+      "robusta": {
+        "title": "Robusta Kon Tum",
+        "cta": "Mua ngay"
+      },
+      "phinCraft": {
+        "title": "Nghệ thuật phin",
+        "cta": "Khám phá"
+      },
+      "monthly": {
+        "title": "Hương vị hàng tháng",
+        "desc": "Hạt được tuyển gửi đúng lịch—rang tươi, không phải đoán mò.",
+        "cta": "Tìm hiểu thêm"
+      },
+      "heritage": {
+        "title": "Di sản phin",
+        "desc": "Nhỏ giọt chậm, tinh thần mạnh mẽ—nghi thức quen thuộc, tinh chỉnh cho hôm nay.",
+        "cta": "Mua ngay"
+      }
     },
     "cta": {
-      "title": "Sẵn sàng thưởng thức?",
-      "subtitle": "Khám phá bộ sưu tập cà phê rang mộc nguyên chất của chúng tôi.",
-      "button": "Mua ngay"
+      "title": "Thưởng thức cao nguyên tại nhà",
+      "subtitle": "Robusta single-origin, blend và mức xay cho phin—tất cả rang tại Kon Tum.",
+      "button": "Xem bộ sưu tập"
     }
   },
   "home": {
@@ -291,6 +281,14 @@
     "zoomAria": "Phóng to",
     "filterAria": "Bộ lọc",
     "viewDetailsAria": "Xem chi tiết",
+    "filters": {
+      "title": "Bộ lọc",
+      "reset": "Đặt lại",
+      "price": "Giá",
+      "availability": "Tình trạng",
+      "inStock": "Còn hàng",
+      "outOfStock": "Hết hàng"
+    },
     "tabs": {
       "all": "Tất cả cà phê"
     },
@@ -308,7 +306,86 @@
     "heroTitle": "Cà Phê Phan",
     "heroSubtitle": "Rang mộc nguyên chất từ mảnh đất Kon Tum - hương thơm, vị đậm, không tạp chất.",
     "loadError": "Lỗi tải sản phẩm",
-    "byId": {}
+    "addToCart": "Thêm vào giỏ hàng",
+    "addToCartAria": "Thêm sản phẩm vào giỏ hàng",
+    "addToCartSuccess": "☕ Đã thêm vào giỏ hàng",
+    "addToCartError": "Không thể thêm vào giỏ hàng",
+    "badges": {
+      "bestSeller": "Bán chạy",
+      "new": "Mới"
+    },
+    "pagination": {
+      "prev": "Trước",
+      "next": "Sau"
+    },
+    "footerTagline": "Trải nghiệm cà phê cao cấp",
+    "byId": {},
+    "byName": {
+      "vietnamese_black_coffee": {
+        "name": "Cà phê đen Việt Nam",
+        "description": "Cà phê đen đá đậm vị pha bằng phin"
+      },
+      "vietnamese_milk_coffee": {
+        "name": "Cà phê sữa Việt Nam",
+        "description": "Cà phê sữa truyền thống với sữa đặc"
+      },
+      "peach_tea": {
+        "name": "Trà đào",
+        "description": "Trà đào kèm lát trái cây"
+      },
+      "butter_croissant": {
+        "name": "Bánh sừng bò bơ",
+        "description": "Bánh sừng bò tươi, bơ thơm, giòn rụm"
+      },
+      "premium_notebook_a5": {
+        "name": "Sổ tay A5 cao cấp",
+        "description": "Sổ bìa cứng A5, giấy mịn, thân thiện với mực"
+      },
+      "gel_pen_set_10_pack": {
+        "name": "Bộ bút gel (10 cây)",
+        "description": "Bút gel khô nhanh, mực đều, nét viết sạch"
+      },
+      "laptop_stand": {
+        "name": "Giá đỡ laptop",
+        "description": "Giá nhôm tản nhiệt, điều chỉnh độ cao thoải mái"
+      },
+      "laptop_stand_aluminum": {
+        "name": "Giá đỡ laptop nhôm",
+        "description": "Thiết kế nhôm gọn nhẹ, ổn định cho laptop"
+      },
+      "desk_organizer_tray": {
+        "name": "Khay sắp xếp bàn làm việc",
+        "description": "Khay đựng đồ dùng văn phòng gọn gàng, dễ lấy"
+      },
+      "keychain_card_holder": {
+        "name": "Móc khóa đựng thẻ",
+        "description": "Vỏ đựng thẻ tiện lợi, móc khóa chắc chắn"
+      },
+      "reusable_water_bottle": {
+        "name": "Bình nước tái sử dụng",
+        "description": "Bình giữ nhiệt, an toàn cho sức khỏe và môi trường"
+      },
+      "wireless_mouse": {
+        "name": "Chuột không dây",
+        "description": "Chuột không dây êm ái, phản hồi nhanh và chính xác"
+      },
+      "usb_c_fast_charger": {
+        "name": "Sạc nhanh USB-C",
+        "description": "Củ sạc gọn 20W cho điện thoại và máy tính bảng"
+      },
+      "portable_bluetooth_speaker": {
+        "name": "Loa Bluetooth di động",
+        "description": "Loa nhỏ gọn, âm thanh rõ ràng cho không gian làm việc"
+      },
+      "sticky_notes_pastel": {
+        "name": "Giấy note màu pastel",
+        "description": "Giấy ghi chú pastel cho nhắc việc và đánh dấu trang"
+      },
+      "cable_management_clips": {
+        "name": "Kẹp cố định dây cáp",
+        "description": "Kẹp dán giữ dây sạc và cáp gọn gàng"
+      }
+    }
   },
   "categories": {
     "byId": {}
@@ -425,33 +502,147 @@
     "noName": "Không có tên",
     "historyOrdersSearchPlaceholder":
       "Bạn có thể tìm kiếm theo tên Shop, ID đơn hàng hoặc Tên Sản phẩm",
-    "notFound": "Không tìm thấy người dùng"
+    "notFound": "Không tìm thấy người dùng",
+    "sidebar": {
+      "account": "Tài Khoản Của Tôi",
+      "orders": "Đơn Mua",
+      "notifications": "Thông Báo",
+      "vouchers": "Kho Voucher"
+    },
+    "section": {
+      "title": "Hồ Sơ Của Tôi",
+      "subtitle": "Quản lý thông tin hồ sơ để bảo mật tài khoản"
+    },
+    "fields": {
+      "username": "Tên đăng nhập"
+    },
+    "actions": {
+      "editProfile": "Sửa Hồ Sơ",
+      "saveChanges": "Lưu Thay Đổi"
+    },
+    "avatar": {
+      "chooseImage": "Chọn Ảnh",
+      "maxFileSize": "Dung lượng file tối đa 1 MB",
+      "formats": "Định dạng: .JPEG, .PNG"
+    },
+    "orders": {
+      "productInfoPending": "Đang xử lý thông tin sản phẩm...",
+      "reloginToBuyAgain": "Vui lòng đăng nhập lại để mua lại.",
+      "addToCartSuccess": "Đã thêm vào giỏ hàng!",
+      "addToCartError": "Không thể thêm sản phẩm vào giỏ."
+    }
   },
   "contact": {
     "heroLabel": "LIÊN HỆ",
-    "heroTitle": "Nói chuyện với chúng tôi",
-    "heroSubtitle": "Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn",
+    "heroTitle": "Kết nối tinh thần Tây Nguyên.",
+    "heroSubtitle": "Dù bạn muốn hỏi về hạt rang, bán sỉ hay chuyến thăm vùng cao nguyên — chúng tôi đọc từng lời nhắn.",
     "success": "✅ Cảm ơn! Chúng tôi sẽ liên hệ bạn sớm nhất.",
     "addressLabel": "Địa chỉ",
     "phoneLabel": "Điện thoại",
     "emailLabel": "Email",
     "hoursLabel": "Giờ làm việc",
+    "roasteryTitle": "Xưởng rang",
+    "directLinesTitle": "Liên hệ trực tiếp",
+    "socialTitle": "Cộng đồng",
+    "socialInstagram": "Instagram",
+    "socialFacebook": "Facebook",
+    "socialTwitter": "Twitter",
+    "quote": "Từ làn sương cao nguyên đến tách cà phê buổi sáng của bạn.",
+    "mapTitle": "Ghé nguồn cội",
+    "mapDescription": "Rễ cây của chúng tôi vươn qua đất đỏ bazan Tây Nguyên — gần Măng Yang và rừng Kon Tum.",
+    "mapDirections": "Chỉ đường",
     "form": {
       "infoTitle": "Thông tin liên hệ",
       "title": "Gửi tin nhắn",
       "nameLabel": "Họ và tên",
       "nameRequired": "Vui lòng nhập tên",
-      "namePlaceholder": "Nguyễn Văn A",
-      "emailLabel": "Email",
+      "namePlaceholder": "Họ và tên",
+      "emailLabel": "Địa chỉ email",
+      "emailRequired": "Vui lòng nhập email",
       "emailInvalid": "Email không hợp lệ",
       "emailPlaceholder": "your@email.com",
-      "messageLabel": "Tin nhắn",
+      "inquiryTypeLabel": "Loại yêu cầu",
+      "inquiryGeneral": "Tư vấn chung",
+      "inquiryWholesale": "Bán sỉ",
+      "inquiryPress": "Báo chí & truyền thông",
+      "inquiryOther": "Khác",
+      "messageLabel": "Nội dung",
       "messageRequired": "Vui lòng nhập tin nhắn",
-      "messagePlaceholder": "Nhập tin nhắn của bạn...",
+      "messagePlaceholder": "Chia sẻ điều bạn muốn gửi gắm...",
       "customerMessagePlaceholder": "Chia sẻ câu chuyện hoặc thắc mắc của bạn...",
       "subjectPlaceholder": "Ví dụ: Góp ý về sản phẩm",
+      "newsletterLabel": "Nhận bản tin Highland Digest",
       "submit": "Gửi tin nhắn"
     }
+  },
+  "pages": {
+    "about": {
+      "documentTitle": "Giới thiệu — Phan Coffee"
+    },
+    "contact": {
+      "documentTitle": "Liên hệ — Phan Coffee"
+    },
+    "home": {
+      "documentTitle": "Trang chủ — Phan Coffee"
+    },
+    "login": {
+      "documentTitle": "Đăng nhập — Phan Coffee"
+    },
+    "register": {
+      "documentTitle": "Đăng ký — Phan Coffee"
+    },
+    "products": {
+      "documentTitle": "Cà phê — Phan Coffee"
+    },
+    "productDetail": {
+      "documentTitle": "{{name}} — Phan Coffee",
+      "loadingDocumentTitle": "Sản phẩm — Phan Coffee",
+      "notFoundDocumentTitle": "Không tìm thấy sản phẩm — Phan Coffee"
+    },
+    "cart": {
+      "documentTitle": "Giỏ hàng — Phan Coffee"
+    },
+    "orders": {
+      "documentTitle": "Thanh toán — Phan Coffee"
+    },
+    "profile": {
+      "documentTitle": "Tài khoản — Phan Coffee"
+    },
+    "wishlist": {
+      "documentTitle": "Yêu thích — Phan Coffee"
+    },
+    "shop": {
+      "documentTitle": "Cửa hàng — Phan Coffee"
+    },
+    "blog": {
+      "documentTitle": "Blog — Phan Coffee"
+    },
+    "blogDetail": {
+      "documentTitle": "{{title}} — Phan Coffee",
+      "notFoundDocumentTitle": "Không tìm thấy bài viết — Phan Coffee"
+    },
+    "notFound": {
+      "documentTitle": "Không tìm thấy trang — Phan Coffee"
+    }
+  },
+  "notFoundPage": {
+    "documentTitle": "Không tìm thấy trang",
+    "heading": "Trang không tồn tại",
+    "description": "Có vẻ như trang bạn tìm kiếm đã được mang đi rang như những hạt cà phê của chúng tôi…",
+    "cta": "Về trang chủ"
+  },
+  "blogPage": {
+    "documentTitle": "Blog — Phan Coffee",
+    "eyebrow": "Tạp chí",
+    "title": "Câu chuyện cà phê & hướng dẫn",
+    "subtitle": "Nguồn gốc, cách pha, văn hóa và kỹ thuật latte—bài đọc ngắn để nâng tầm thói quen mỗi ngày."
+  },
+  "blogDetail": {
+    "backToBlog": "Quay lại Blog",
+    "notFoundTitle": "Không tìm thấy bài viết",
+    "notFoundDescription": "Bài viết này không tồn tại hoặc đã bị thay đổi.",
+    "notFoundCta": "Quay lại Blog",
+    "conclusionHeading": "Kết luận"
   },
   "wishlist": {
     "premiumGrade": "Hạng Premium",

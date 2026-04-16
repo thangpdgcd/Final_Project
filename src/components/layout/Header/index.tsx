@@ -12,12 +12,13 @@ import {
 } from 'lucide-react';
 import { useTheme } from '@/store/ThemeContext';
 import { useAuth } from '@/store/AuthContext';
-import { useCart } from '@/hooks/useCart';
+import { useCart } from '@/features/cart';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage } from '@/translates/i18n';
 import Logo from '@/components/common/Logo';
 import UserMenu from './UserMenu';
 import { getImageSrc } from '@/utils/image';
+import type { IconButtonProps } from './header.types';
 
 // --- CONSTANTS ---
 const NAV_ITEMS = [
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { label: 'nav.coffee', href: '/products' },
   { label: 'nav.about', href: '/about' },
   { label: 'nav.contact', href: '/contacts' },
+   { label: 'nav.blog', href: '/blog' },
 ];
 
 // --- COMPONENTS ---
@@ -32,40 +34,57 @@ const NAV_ITEMS = [
 /**
  * IconButton: Reusable premium icon button with consistent styling and micro-interactions
  */
-const IconButton = React.forwardRef<HTMLButtonElement, {
-  icon: React.ReactNode;
-  onClick?: () => void;
-  badge?: number;
-  className?: string;
-  active?: boolean;
-  cartTarget?: boolean;
-  bounceBadge?: boolean;
-}>(({ icon, onClick, badge, className = "", active = false, cartTarget = false, bounceBadge = false }, ref) => (
-  <motion.button
-    ref={ref}
-    whileHover={{ scale: 1.1 }}
-    whileTap={{ scale: 0.95 }}
-    onClick={onClick}
-    data-cart-target={cartTarget ? 'header' : undefined}
-    className={`relative flex items-center justify-center w-10 h-10 rounded-full border-[2.5px] transition-all duration-300 group
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-stone-900
-      ${active
-        ? 'bg-stone-800 dark:bg-stone-200 border-stone-800 dark:border-stone-200 text-white dark:text-stone-900'
-        : 'border-transparent bg-transparent text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800/50 hover:text-orange-600 dark:hover:text-orange-400'
-      } ${className}`}
-  >
-    {badge !== undefined && (
-      <motion.span
-        animate={bounceBadge ? { scale: [1, 1.26, 1] } : undefined}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
-        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--gold)] text-[10px] font-bold text-[var(--coffee-brown)] border-2 border-white dark:border-[#1c1716]"
+const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+  (
+    {
+      icon,
+      onClick,
+      badge,
+      className = '',
+      active = false,
+      cartTarget = false,
+      bounceBadge = false,
+    },
+    ref,
+  ) => {
+    const base =
+      'relative flex items-center justify-center w-10 h-10 rounded-full border-[2.5px] transition-all duration-300 group ' +
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 ' +
+      'focus-visible:ring-offset-white dark:focus-visible:ring-offset-stone-900';
+
+    const stateClass = active
+      ? 'bg-stone-800 dark:bg-stone-200 border-stone-800 dark:border-stone-200 text-white dark:text-stone-900'
+      : 'border-transparent bg-transparent text-stone-700 dark:text-stone-300 ' +
+        'hover:bg-stone-100 dark:hover:bg-stone-800/50 hover:text-orange-600 dark:hover:text-orange-400';
+
+    const buttonClass = [base, stateClass, className].filter(Boolean).join(' ');
+
+    return (
+      <motion.button
+        ref={ref}
+        type="button"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={onClick}
+        data-cart-target={cartTarget ? 'header' : undefined}
+        className={buttonClass}
       >
-        {badge}
-      </motion.span>
-    )}
-    {icon}
-  </motion.button>
-));
+        {badge !== undefined && (
+          <motion.span
+            animate={bounceBadge ? { scale: [1, 1.26, 1] } : undefined}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+            className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--gold)] text-[10px] font-bold text-[var(--coffee-brown)] border-2 border-white dark:border-[#1c1716]"
+          >
+            {badge}
+          </motion.span>
+        )}
+        {icon}
+      </motion.button>
+    );
+  },
+);
+
+IconButton.displayName = 'IconButton';
 
 const HeaderPage: React.FC = () => {
   const navigate = useNavigate();
@@ -163,6 +182,9 @@ const HeaderPage: React.FC = () => {
     0,
   );
 
+  /** Breadcrumb segment after brand (updates when route changes). */
+  // Breadcrumb removed per UI requirements.
+
   const headerClass = isScrolled
     ? 'h-20 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md shadow-md border-b border-stone-200 dark:border-stone-800'
     : 'h-24 bg-white/30 dark:bg-[#121212]/30 backdrop-blur-sm border-b border-transparent dark:border-transparent';
@@ -182,9 +204,14 @@ const HeaderPage: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
 
-          {/* Logo Section (Left) */}
-          <Link to="/" className="flex-shrink-0 min-w-0">
-            <Logo size={42} />
+          {/* Logo + brand */}
+          <Link to="/" className="flex min-w-0 max-w-[min(100%,14rem)] flex-shrink-0 items-center gap-2.5 no-underline sm:max-w-[min(100%,22rem)] md:max-w-none md:gap-3">
+            <Logo size={42} showText={false} className="shrink-0" />
+            <div className="min-w-0 flex-1 text-left">
+              <div className="flex min-w-0 items-center gap-1 text-[11px] font-black uppercase tracking-[0.12em] text-stone-800 dark:text-stone-100 sm:text-xs sm:tracking-[0.16em]">
+                <span className="truncate">{t('header.breadcrumbBrand')}</span>
+              </div>
+            </div>
           </Link>
 
           {/* Navigation Menu (Center) */}

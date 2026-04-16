@@ -6,6 +6,7 @@
     "back": "Back",
     "submit": "Submit",
     "cancel": "Cancel",
+    "clear": "Reset",
     "theme": "Theme",
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
@@ -27,15 +28,23 @@
     "itemsEmpty": "No items found for this order yet.",
     "productFallback": "Product #{{id}}"
   },
+  "header": {
+    "breadcrumbBrand": "Phan Coffee Shop"
+  },
   "nav": {
     "home": "Home",
     "coffee": "Coffee",
     "contact": "Contact",
     "about": "About",
+    "blog": "Blog",
     "cart": "Cart",
     "user": "User",
     "login": "Login",
     "logout": "Logout",
+    "wishlist": "Wishlist",
+    "orders": "Orders",
+    "shop": "Shop",
+    "register": "Register",
     "searchPlaceholder": "Search coffee..."
   },
   "about": {
@@ -74,68 +83,49 @@
     }
   },
   "aboutPage": {
-    "heroLabel": "OUR STORY",
-    "heroTitle": "Phan Coffee",
-    "heroSubtitle": "Born from our love for Kon Tum beans, we deliver authentic flavor with no additives and no compromise.",
-    "heroCta": "Explore Products",
+    "heroLabel": "Est. 2020 — Central Highlands",
+    "heroTitle": "Cultivated in the mist of the hills.",
+    "heroSubtitle": "Phan Coffee carries the soul of Tây Nguyên—cool mist, red basalt, and hands that know every harvest. We roast with restraint so the highlands speak clearly in every cup.",
+    "heroCtaPrimary": "Explore the heritage",
+    "heroCtaGhost": "Watch the harvest",
+    "sustainCardTitle": "Sustainable by nature",
+    "sustainCardDesc": "Direct trade with growers, shade-friendly plots, and packaging chosen to tread lightly on the land we owe everything to.",
     "origin": {
       "label": "Origin",
-      "titleLine1": "From Kon Tum soil",
-      "titleLine2": "to every coffee cup",
-      "p1": "Phan Coffee was born in the highlands of Kon Tum, where ideal altitude, cool weather, and fertile basalt soil create exceptional coffee beans.",
-      "p2": "We work directly with local farmers to ensure fair sourcing and sustainable cultivation. Every roast batch is monitored carefully for consistent taste."
+      "title": "It originates from the Central Highlands region.",
+      "p1": "Kon Tum sits where altitude, mist, and volcanic soil meet. That triangle is what gives our Robusta its backbone—dense aroma, clean bitterness, and a finish that lingers like morning fog.",
+      "p2": "We visit the same farms season after season, cupping before we buy and roasting in small batches so what you taste is the highlands, not a recipe.",
+      "stat1Value": "1500m",
+      "stat1Unit": "SEA ELEVATION",
+      "stat2Value": "Volcanic",
+      "stat2Unit": "SOIL COMPOSITION"
     },
-    "process": {
-      "label": "Process",
-      "title": "From farm to cup",
-      "steps": [
-        {
-          "icon": "🌱",
-          "title": "Bean selection",
-          "desc": "Beans are selected carefully from Kon Tum coffee farms to ensure top-quality raw input."
-        },
-        {
-          "icon": "🔥",
-          "title": "Artisan roasting",
-          "desc": "Traditional hand-roasting with precise control of heat and time for the best possible flavor."
-        },
-        {
-          "icon": "📦",
-          "title": "Fresh packaging",
-          "desc": "Packed right after roasting to preserve aroma. One-way valves keep coffee fresher for longer."
-        },
-        {
-          "icon": "🚀",
-          "title": "Fast delivery",
-          "desc": "Same-day shipping in Kon Tum and nationwide delivery in 2-3 days for maximum freshness."
-        }
-      ]
-    },
-    "values": {
-      "label": "Commitment",
-      "title": "Core values",
-      "items": [
-        {
-          "icon": "🌿",
-          "title": "100% pure",
-          "desc": "No flavoring and no preservatives. Only carefully roasted coffee beans."
-        },
-        {
-          "icon": "🤝",
-          "title": "Fair trade",
-          "desc": "Direct collaboration with farmers to support sustainable income for local communities."
-        },
-        {
-          "icon": "♻️",
-          "title": "Sustainable",
-          "desc": "Eco-friendly packaging and production processes designed to save energy."
-        }
-      ]
+    "collections": {
+      "label": "The collections",
+      "title": "Selecting high-quality coffee beans.",
+      "robusta": {
+        "title": "The Robusta Kon Tum",
+        "cta": "Shop now"
+      },
+      "phinCraft": {
+        "title": "The craft of the phin",
+        "cta": "Discover"
+      },
+      "monthly": {
+        "title": "Monthly Essence",
+        "desc": "Curated beans delivered on your schedule—fresh roast, zero guesswork.",
+        "cta": "Learn more"
+      },
+      "heritage": {
+        "title": "The Phin Heritage",
+        "desc": "Slow drip, bold spirit—the ritual we grew up with, refined for today.",
+        "cta": "Shop now"
+      }
     },
     "cta": {
-      "title": "Ready for your next cup?",
-      "subtitle": "Discover our collection of pure roasted coffee.",
-      "button": "Shop now"
+      "title": "Taste the highlands at home",
+      "subtitle": "Browse single-origin Robusta, blends, and phin-ready grinds—all roasted in Kon Tum.",
+      "button": "Shop the collection"
     }
   },
   "home": {
@@ -292,6 +282,14 @@
     "zoomAria": "Zoom",
     "filterAria": "Filter",
     "viewDetailsAria": "View details",
+    "filters": {
+      "title": "Filters",
+      "reset": "Reset",
+      "price": "Price",
+      "availability": "Availability",
+      "inStock": "In stock",
+      "outOfStock": "Out of stock"
+    },
     "tabs": {
       "all": "All Coffees"
     },
@@ -309,7 +307,86 @@
     "heroTitle": "Phan Coffee",
     "heroSubtitle": "Pure roasted coffee from Kon Tum - rich aroma, bold flavor, no additives.",
     "loadError": "Failed to load products",
-    "byId": {}
+    "addToCart": "Add to cart",
+    "addToCartAria": "Add product to cart",
+    "addToCartSuccess": "☕ Added to your cart",
+    "addToCartError": "Unable to add to cart",
+    "badges": {
+      "bestSeller": "Best Seller",
+      "new": "New"
+    },
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next"
+    },
+    "footerTagline": "Premium coffee experience",
+    "byId": {},
+    "byName": {
+      "vietnamese_black_coffee": {
+        "name": "Vietnamese Black Coffee",
+        "description": "Strong iced black coffee brewed by phin filter"
+      },
+      "vietnamese_milk_coffee": {
+        "name": "Vietnamese Milk Coffee",
+        "description": "Classic milk coffee with condensed milk"
+      },
+      "peach_tea": {
+        "name": "Peach Tea",
+        "description": "Peach tea with fruit slices"
+      },
+      "butter_croissant": {
+        "name": "Butter Croissant",
+        "description": "Fresh buttery croissant with a crisp, flaky texture"
+      },
+      "premium_notebook_a5": {
+        "name": "Premium Notebook A5",
+        "description": "A5 hardcover notebook with smooth, ink-friendly pages"
+      },
+      "gel_pen_set_10_pack": {
+        "name": "Gel Pen Set (10-pack)",
+        "description": "Quick-drying gel pens with consistent ink flow"
+      },
+      "laptop_stand": {
+        "name": "Laptop Stand",
+        "description": "Aluminum stand with adjustable height for better ergonomics"
+      },
+      "laptop_stand_aluminum": {
+        "name": "Aluminum Laptop Stand",
+        "description": "Lightweight aluminum stand for stable laptop placement"
+      },
+      "desk_organizer_tray": {
+        "name": "Desk Organizer Tray",
+        "description": "Keep desk essentials tidy and within reach"
+      },
+      "keychain_card_holder": {
+        "name": "Keychain Card Holder",
+        "description": "Slim card holder with a sturdy key ring"
+      },
+      "reusable_water_bottle": {
+        "name": "Reusable Water Bottle",
+        "description": "Insulated bottle for daily hydration"
+      },
+      "wireless_mouse": {
+        "name": "Wireless Mouse",
+        "description": "Comfortable wireless mouse with responsive tracking"
+      },
+      "usb_c_fast_charger": {
+        "name": "USB-C Fast Charger",
+        "description": "Compact USB-C charger for phones and tablets (20W)"
+      },
+      "portable_bluetooth_speaker": {
+        "name": "Portable Bluetooth Speaker",
+        "description": "Compact speaker with clear sound for your desk"
+      },
+      "sticky_notes_pastel": {
+        "name": "Sticky Notes (Pastel)",
+        "description": "Pastel sticky notes for reminders and bookmarks"
+      },
+      "cable_management_clips": {
+        "name": "Cable Management Clips",
+        "description": "Adhesive clips to keep charging cables tidy"
+      }
+    }
   },
   "categories": {
     "byId": {}
@@ -427,33 +504,147 @@
     "noName": "No name",
     "historyOrdersSearchPlaceholder":
       "You can search by shop name, order ID, or product name",
-    "notFound": "User not found"
+    "notFound": "User not found",
+    "sidebar": {
+      "account": "My Account",
+      "orders": "Orders",
+      "notifications": "Notifications",
+      "vouchers": "Vouchers"
+    },
+    "section": {
+      "title": "My Profile",
+      "subtitle": "Manage your profile information to keep your account secure."
+    },
+    "fields": {
+      "username": "Username"
+    },
+    "actions": {
+      "editProfile": "Edit Profile",
+      "saveChanges": "Save Changes"
+    },
+    "avatar": {
+      "chooseImage": "Choose Image",
+      "maxFileSize": "Max file size: 1 MB",
+      "formats": "Formats: .JPEG, .PNG"
+    },
+    "orders": {
+      "productInfoPending": "Processing product information...",
+      "reloginToBuyAgain": "Please log in again to buy again.",
+      "addToCartSuccess": "Added to cart.",
+      "addToCartError": "Unable to add product to cart."
+    }
   },
   "contact": {
-    "heroLabel": "CONTACT",
-    "heroTitle": "Talk to us",
-    "heroSubtitle": "We're always ready to listen and support you.",
+    "heroLabel": "GET IN TOUCH",
+    "heroTitle": "Connect with the Highland Spirit.",
+    "heroSubtitle": "Whether you have a question about our roasts, wholesale, or a visit to the highlands — we read every note.",
     "success": "Thank you! We'll get back to you as soon as possible.",
     "addressLabel": "Address",
     "phoneLabel": "Phone",
     "emailLabel": "Email",
     "hoursLabel": "Working hours",
+    "roasteryTitle": "The Roastery",
+    "directLinesTitle": "Direct Lines",
+    "socialTitle": "Social Hearth",
+    "socialInstagram": "Instagram",
+    "socialFacebook": "Facebook",
+    "socialTwitter": "Twitter",
+    "quote": "From the highland mist to your morning cup.",
+    "mapTitle": "Visit the Source",
+    "mapDescription": "Our roots run through the red basalt soils of the Central Highlands — not far from Mang Yang and the forests of Kon Tum.",
+    "mapDirections": "Get directions",
     "form": {
       "infoTitle": "Contact Information",
       "title": "Send a message",
-      "nameLabel": "Full name",
+      "nameLabel": "Your name",
       "nameRequired": "Please enter your name",
-      "namePlaceholder": "Nguyen Van A",
-      "emailLabel": "Email",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email address",
+      "emailRequired": "Please enter your email",
       "emailInvalid": "Invalid email",
       "emailPlaceholder": "your@email.com",
-      "messageLabel": "Message",
+      "inquiryTypeLabel": "Inquiry type",
+      "inquiryGeneral": "General inquiry",
+      "inquiryWholesale": "Wholesale",
+      "inquiryPress": "Press & media",
+      "inquiryOther": "Other",
+      "messageLabel": "Your message",
       "messageRequired": "Please enter your message",
-      "messagePlaceholder": "Type your message...",
+      "messagePlaceholder": "Tell us what’s on your mind...",
       "customerMessagePlaceholder": "Share your story or questions...",
       "subjectPlaceholder": "Example: Product feedback",
+      "newsletterLabel": "Join the Highland Digest",
       "submit": "Send message"
     }
+  },
+  "pages": {
+    "about": {
+      "documentTitle": "About — Phan Coffee"
+    },
+    "contact": {
+      "documentTitle": "Contact — Phan Coffee"
+    },
+    "home": {
+      "documentTitle": "Home — Phan Coffee"
+    },
+    "login": {
+      "documentTitle": "Sign in — Phan Coffee"
+    },
+    "register": {
+      "documentTitle": "Register — Phan Coffee"
+    },
+    "products": {
+      "documentTitle": "Coffee — Phan Coffee"
+    },
+    "productDetail": {
+      "documentTitle": "{{name}} — Phan Coffee",
+      "loadingDocumentTitle": "Product — Phan Coffee",
+      "notFoundDocumentTitle": "Product not found — Phan Coffee"
+    },
+    "cart": {
+      "documentTitle": "Cart — Phan Coffee"
+    },
+    "orders": {
+      "documentTitle": "Checkout — Phan Coffee"
+    },
+    "profile": {
+      "documentTitle": "My account — Phan Coffee"
+    },
+    "wishlist": {
+      "documentTitle": "Wishlist — Phan Coffee"
+    },
+    "shop": {
+      "documentTitle": "Shop — Phan Coffee"
+    },
+    "blog": {
+      "documentTitle": "Blog — Phan Coffee"
+    },
+    "blogDetail": {
+      "documentTitle": "{{title}} — Phan Coffee",
+      "notFoundDocumentTitle": "Post not found — Phan Coffee"
+    },
+    "notFound": {
+      "documentTitle": "Page not found — Phan Coffee"
+    }
+  },
+  "notFoundPage": {
+    "documentTitle": "Page not found",
+    "heading": "Page not found",
+    "description": "The page you’re looking for seems to have gone off to be roasted like our beans…",
+    "cta": "Back to home"
+  },
+  "blogPage": {
+    "documentTitle": "Blog — Phan Coffee",
+    "eyebrow": "Journal",
+    "title": "Coffee stories & tutorials",
+    "subtitle": "Origins, brewing methods, culture, and latte technique—short reads to upgrade your daily ritual."
+  },
+  "blogDetail": {
+    "backToBlog": "Back to Blog",
+    "notFoundTitle": "Post not found",
+    "notFoundDescription": "This post doesn’t exist or may have been moved.",
+    "notFoundCta": "Back to Blog",
+    "conclusionHeading": "Conclusion"
   },
   "wishlist": {
     "premiumGrade": "Premium Grade",

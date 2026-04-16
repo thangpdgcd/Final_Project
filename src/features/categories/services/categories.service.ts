@@ -43,3 +43,4 @@ export const categoriesService = {
     return res.data;
   },
 };
+

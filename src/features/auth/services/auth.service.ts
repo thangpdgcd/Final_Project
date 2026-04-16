@@ -1,18 +1,10 @@
 import api from '@/api/axiosInstance';
 import type { LoginPayload, RegisterPayload, RegisterResponse, AuthUser } from '@/types';
 
-/**
- * Backend login response (from authController.js):
- * {
- *   message: string,
- *   user: { id: number, name: string, email: string, roleID: string },
- *   accessToken: string
- * }
- */
-
 type RawLoginResponse = {
   message?: string;
   accessToken?: string;
+  token?: string;
   user?: {
     id?: number;
     user_ID?: number;
@@ -49,11 +41,13 @@ export const authService = {
       email: String(payload.email ?? '').trim(),
       password: payload.password,
     };
-    const res = await api.post<RawLoginResponse>('/login', body);
+    const res = await api.post('/login', body);
 
-    const data = res.data;
-    const accessToken = data.accessToken;
-    const user = normalizeUser(data.user);
+    const raw: any = res.data;
+    const payloadData: RawLoginResponse = (raw && typeof raw === 'object' && 'data' in raw ? raw.data : raw) as any;
+
+    const accessToken = payloadData?.accessToken ?? payloadData?.token;
+    const user = normalizeUser(payloadData?.user);
 
     if (!accessToken || !user) {
       throw new Error('INVALID_LOGIN_RESPONSE');
@@ -67,3 +61,4 @@ export const authService = {
     return res.data;
   },
 };
+

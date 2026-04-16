@@ -1,216 +1,196 @@
-import React, { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  MessageCircle,
-  X,
-  Send,
-  Coffee,
-  MoreVertical
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Talk from 'talkjs';
+import { MessageCircle, X } from 'lucide-react';
+import { useTheme } from '@/store/ThemeContext';
 
-interface Message {
-  id: string;
-  sender: "user" | "bot";
-  timestamp: Date;
-  text?: string;
-  textKey?: string;
+type AnyUser = Record<string, any> | null | undefined;
+
+const safeUserFields = (user: AnyUser) => {
+  const id =
+    user?.id ??
+    user?.user_ID ??
+    user?.userId ??
+    user?.userid ??
+    user?.email ??
+    'user';
+  const name = user?.name ?? user?.fullName ?? user?.username ?? user?.email ?? 'User';
+  const email = user?.email ?? '';
+  const photoUrl = user?.avatar ?? user?.photoUrl ?? user?.image ?? undefined;
+  return { id: String(id), name: String(name), email: String(email), photoUrl };
 }
 
-const TypingIndicator = () => (
-  <div className="flex gap-1 px-2 py-1">
-    {[0, 0.2, 0.4].map((delay) => (
-      <motion.span
-        key={delay}
-        animate={{ opacity: [0.4, 1, 0.4] }}
-        transition={{ duration: 1.2, repeat: Infinity, delay }}
-        className="w-1.5 h-1.5 bg-gray-400 rounded-full"
-      />
-    ))}
-  </div>
-);
+interface ChatboxProps {
+  loggedInUser?: AnyUser;
+}
 
-const Chatbox: React.FC = () => {
-  const { t } = useTranslation();
+const Chatbox: React.FC<ChatboxProps> = ({ loggedInUser = null }) => {
+  const appId = (import.meta as any).env?.VITE_TALKJS_APP_ID as string | undefined;
+  const talkThemeEnv = (import.meta as any).env?.VITE_TALKJS_THEME as string | undefined;
+  const { dark } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [chatboxReady, setChatboxReady] = useState(false);
+  const [initError, setInitError] = useState<string | null>(null);
+  const [isInitLoading, setIsInitLoading] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const chatboxRef = useRef<any>(null);
+  const sessionRef = useRef<any>(null);
 
-  const BOT_RESPONSE_KEYS = [
-    "chatbox.botResponse1",
-    "chatbox.botResponse2",
-    "chatbox.botResponse3",
-    "chatbox.botResponse4",
-  ] as const;
-
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      sender: "bot",
-      textKey: "chatbox.greeting",
-      timestamp: new Date(),
-    },
-  ]);
-  const [inputValue, setInputValue] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const me = useMemo(() => safeUserFields(loggedInUser), [loggedInUser]);
+  const talkTheme = useMemo(() => {
+    if (talkThemeEnv && String(talkThemeEnv).trim()) return String(talkThemeEnv).trim();
+    return dark ? 'default_dark' : 'default';
+  }, [dark, talkThemeEnv]);
 
   useEffect(() => {
-    if (isOpen) {
-      scrollToBottom();
+    setInitError(null);
+    setChatboxReady(false);
+
+    if (!appId) return;
+    if (String(appId).trim().toUpperCase() === 'YOUR_APP_ID') {
+      setInitError('Missing TalkJS App ID. Set VITE_TALKJS_APP_ID in .env.');
+      return;
     }
-  }, [messages, isTyping, isOpen]);
+    if (!loggedInUser) return;
+    if (!me?.id) return;
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+    let mounted = true;
+    setIsInitLoading(true);
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputValue,
-      sender: "user",
-      timestamp: new Date(),
+    Talk.ready
+      .then(() => {
+        if (!mounted) return;
+
+        const session = new Talk.Session({
+          appId,
+          me: new Talk.User({
+            id: me.id,
+            name: me.name,
+            email: me.email ? [me.email] : undefined,
+            photoUrl: me.photoUrl,
+            role: 'user',
+          }),
+        });
+
+        sessionRef.current = session;
+
+        const admin = new Talk.User({
+          id: 'admin',
+          name: 'Admin Support',
+          email: ['admin@support.local'],
+          role: 'admin',
+        });
+
+        const conversationId = Talk.oneOnOneId(session.me, admin);
+        const conversation = session.getOrCreateConversation(conversationId);
+        conversation.setParticipant(session.me);
+        conversation.setParticipant(admin);
+
+        // TalkJS typings prefer (conversation, options) overload
+        const chatbox = (session as any).createChatbox(conversation, {
+          showChatHeader: true,
+          theme: talkTheme,
+        });
+
+        chatboxRef.current = chatbox;
+        setChatboxReady(true);
+        setIsInitLoading(false);
+
+        // Unread badge
+        const inbox = (session as any).createInbox({ selected: conversation });
+        (inbox as any).on('unreadCountChange', (count: number) => {
+          if (!mounted) return;
+          setUnreadCount(Number(count) || 0);
+        });
+
+        if (containerRef.current && isOpen) {
+          chatbox.mount(containerRef.current);
+        }
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setIsInitLoading(false);
+        setInitError(
+          'TalkJS failed to load. Please verify App ID and allow network access.',
+        );
+        // Intentionally not logging to console to keep UX clean.
+      });
+
+    return () => {
+      mounted = false;
+      try {
+        chatboxRef.current?.destroy?.();
+      } catch { }
+      chatboxRef.current = null;
+      setChatboxReady(false);
+
+      try {
+        sessionRef.current?.destroy?.();
+      } catch { }
+      sessionRef.current = null;
+      setIsInitLoading(false);
     };
+  }, [appId, loggedInUser, me.id, me.name, me.email, me.photoUrl, isOpen, talkTheme]);
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInputValue("");
-    setIsTyping(true);
+  useEffect(() => {
+    if (!isOpen) return;
+    const chatbox = chatboxRef.current;
+    if (!chatbox) return;
+    if (!containerRef.current) return;
+    try {
+      chatbox.mount(containerRef.current);
+    } catch { }
+  }, [isOpen, chatboxReady]);
 
-    // Simulate bot response
-    setTimeout(() => {
-      setIsTyping(false);
-      const randomKey =
-        BOT_RESPONSE_KEYS[Math.floor(Math.random() * BOT_RESPONSE_KEYS.length)];
-
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        sender: "bot",
-        textKey: randomKey,
-        timestamp: new Date(),
-      };
-
-      setMessages((prev) => [...prev, botMessage]);
-    }, 1500);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  if (!appId || !loggedInUser) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] font-sans">
+    <div className="fixed bottom-5 right-5 z-[60]">
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen((v) => !v)}
+          className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#d6c59a] text-black shadow-[0_16px_40px_rgba(0,0,0,0.35)] hover:brightness-95 transition"
+          aria-label={isOpen ? 'Close chat' : 'Open chat'}
+        >
+          {isOpen ? <X size={20} /> : <MessageCircle size={20} />}
+          {unreadCount > 0 && !isOpen && (
+            <span className="absolute -top-2 -right-2 grid h-6 min-w-6 place-items-center rounded-full bg-black px-1 text-xs font-bold text-[#d6c59a] border border-white/10">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+        </button>
+      </div>
+
       <AnimatePresence>
-        {!isOpen ? (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            onClick={() => setIsOpen(true)}
-            className="mb-4 p-4 bg-[#4B3621] text-white rounded-full shadow-2xl shadow-black/20 border border-white/10 hover:bg-[#3d2c1b] active:scale-95 transition-all"
-            aria-label="Open chat"
-            type="button"
-          >
-            <MessageCircle size={20} />
-          </motion.button>
-        ) : (
+        {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95, transformOrigin: "bottom right" }}
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="mb-4 w-[calc(100vw-2rem)] max-w-[380px] h-[70vh] max-h-[520px] bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl shadow-black/20 border border-gray-100 dark:border-zinc-800 flex flex-col overflow-hidden"
+            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            transition={{ duration: 0.18 }}
+            className="mt-3 w-[92vw] max-w-[380px] h-[68vh] max-h-[560px] overflow-hidden rounded-2xl border border-white/10 bg-black/60 backdrop-blur shadow-[0_22px_70px_rgba(0,0,0,0.55)]"
           >
-            {/* Header */}
-            <div className="px-6 py-5 bg-[#4B3621] text-white flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                    <Coffee size={20} className="text-amber-200" />
-                  </div>
-                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-[#4B3621] rounded-full" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm leading-none mb-1">
-                    {t("common.brandName")}
-                  </h3>
-                  <p className="text-[10px] text-amber-200/70 font-bold uppercase tracking-widest">
-                    {t("chatbox.alwaysOnline")}
-                  </p>
+            {initError ? (
+              <div className="h-full w-full p-4 text-sm text-zinc-200">
+                <div className="font-semibold text-[#d6c59a]">Chat unavailable</div>
+                <div className="mt-2 text-zinc-200/90">{initError}</div>
+                <div className="mt-3 text-xs text-zinc-400">
+                  After updating <code className="text-zinc-200">.env</code>, restart{' '}
+                  <code className="text-zinc-200">npm run dev</code>.
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-white/10 rounded-full transition-colors" type="button">
-                  <MoreVertical size={18} />
-                </button>
-                <button
-                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                  onClick={() => setIsOpen(false)}
-                  type="button"
-                >
-                  <X size={18} />
-                </button>
+            ) : isInitLoading && !chatboxReady ? (
+              <div className="h-full w-full grid place-items-center">
+                <div className="text-xs text-zinc-300">Loading chat…</div>
               </div>
-            </div>
-
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-zinc-700">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`flex flex-col max-w-[80%] ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                    <div className={`p-4 rounded-2xl text-sm leading-relaxed shadow-sm
-                      ${msg.sender === 'user'
-                        ? 'bg-[#4B3621] text-white rounded-tr-none'
-                        : 'bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 rounded-tl-none'
-                      }`}
-                    >
-                      {msg.textKey ? t(msg.textKey) : msg.text}
-                    </div>
-                    <span className="text-[10px] text-gray-400 mt-1 font-medium px-1">
-                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-100 dark:bg-zinc-800 p-2 rounded-2xl rounded-tl-none shadow-sm">
-                    <TypingIndicator />
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Area */}
-            <div className="p-4 bg-gray-50 dark:bg-zinc-900/50 border-t border-gray-100 dark:border-zinc-800">
-              <div className="relative flex items-center bg-white dark:bg-zinc-800 rounded-2xl border border-gray-200 dark:border-zinc-700 shadow-sm focus-within:ring-2 focus-within:ring-[#4B3621]/20 transition-all overflow-hidden">
-                <input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={t("chatbox.placeholder")}
-                  className="w-full py-4 pl-5 pr-14 bg-transparent outline-none text-sm dark:text-zinc-200"
-                />
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!inputValue.trim()}
-                  className="absolute right-2 p-3 bg-[#4B3621] text-white rounded-xl disabled:opacity-30 disabled:grayscale transition-all hover:bg-[#3d2c1b] active:scale-95 shadow-lg shadow-[#4B3621]/20"
-                >
-                  <Send size={16} />
-                </button>
-              </div>
-            </div>
+            ) : (
+              <div className="h-full w-full" ref={containerRef} />
+            )}
           </motion.div>
         )}
       </AnimatePresence>
-
-   
     </div>
   );
 };
