@@ -12,6 +12,15 @@ const toString = (value: unknown, fallback = '') => {
   return String(value);
 };
 
+const pickString = (...values: unknown[]): string | undefined => {
+  for (const value of values) {
+    if (typeof value !== 'string') continue;
+    const trimmed = value.trim();
+    if (trimmed) return trimmed;
+  }
+  return undefined;
+};
+
 const pickArray = (data: any): any[] => {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.data)) return data.data;
@@ -24,15 +33,71 @@ const pickArray = (data: any): any[] => {
 
 const mapUser = (raw: any): SupportWidgetUser | undefined => {
   if (!raw || typeof raw !== 'object') return undefined;
-  const userId = toNumber(raw.userId ?? raw.user_ID ?? raw.id ?? raw.senderUserId ?? raw.fromUserId ?? raw.staffId, 0);
+  const userId = toNumber(
+    raw.userId ??
+      raw.user_ID ??
+      raw.id ??
+      raw.senderUserId ??
+      raw.fromUserId ??
+      raw.staffId ??
+      raw.staffUserId ??
+      raw.sender_id ??
+      raw.user?.userId ??
+      raw.user?.user_ID ??
+      raw.user?.id ??
+      raw.staff?.userId ??
+      raw.staff?.user_ID ??
+      raw.staff?.id,
+    0,
+  );
   if (!userId) return undefined;
+  const name =
+    pickString(
+      raw.name,
+      raw.displayName,
+      raw.display_name,
+      raw.username,
+      raw.fullName,
+      raw.full_name,
+      raw.senderName,
+      raw.sender_name,
+      raw.staffName,
+      raw.staff_name,
+      raw.userName,
+      raw.user_name,
+      raw.fromUserName,
+      raw.from_user_name,
+      raw.profile?.name,
+      raw.profile?.displayName,
+      raw.user?.name,
+      raw.user?.displayName,
+      raw.user?.username,
+      raw.staff?.name,
+      raw.staff?.displayName,
+      raw.staff?.username,
+    ) ?? `User ${userId}`;
+
+  const avatarUrl = pickString(
+    raw.avatarUrl,
+    raw.avatar_url,
+    raw.avatar,
+    raw.photoUrl,
+    raw.photo_url,
+    raw.imageUrl,
+    raw.image_url,
+    raw.image,
+    raw.profile?.avatarUrl,
+    raw.profile?.avatar,
+    raw.user?.avatarUrl,
+    raw.user?.avatar,
+    raw.staff?.avatarUrl,
+    raw.staff?.avatar,
+  );
+
   return {
     userId,
-    name: toString(
-      raw.name ?? raw.username ?? raw.fullName ?? raw.senderName ?? raw.staffName ?? raw.userName ?? raw.fromUserName,
-      `User ${userId}`,
-    ),
-    avatarUrl: typeof raw.avatarUrl === 'string' ? raw.avatarUrl : typeof raw.avatar === 'string' ? raw.avatar : undefined,
+    name,
+    avatarUrl,
   };
 };
 
@@ -79,6 +144,7 @@ const mapConversation = (raw: any): SupportWidgetConversation | null => {
     .map((p: any) => ({
       userId: toNumber(p?.userId ?? p?.user_ID ?? p?.id, 0),
       roleAtJoin: typeof p?.roleAtJoin === 'string' ? p.roleAtJoin : typeof p?.role === 'string' ? p.role : undefined,
+      name: pickString(p?.name, p?.displayName, p?.display_name, p?.username, p?.fullName, p?.full_name),
     }))
     .filter((p: any) => p.userId > 0);
 

@@ -9,34 +9,96 @@ type Options = {
 };
 
 export const useSupportWidgetConnection = ({ enabled }: Options) => {
+  const pickString = (...values: unknown[]): string | undefined => {
+    for (const value of values) {
+      if (typeof value !== 'string') continue;
+      const trimmed = value.trim();
+      if (trimmed) return trimmed;
+    }
+    return undefined;
+  };
+
+  const pickNumber = (...values: unknown[]): number => {
+    for (const value of values) {
+      const n = Number(value);
+      if (Number.isFinite(n) && n > 0) return n;
+    }
+    return 0;
+  };
+
+  const mapAvatar = (raw: any): string | undefined =>
+    pickString(
+      raw?.avatarUrl,
+      raw?.avatar_url,
+      raw?.avatar,
+      raw?.photoUrl,
+      raw?.photo_url,
+      raw?.imageUrl,
+      raw?.image_url,
+      raw?.image,
+      raw?.profile?.avatarUrl,
+      raw?.profile?.avatar,
+      raw?.user?.avatarUrl,
+      raw?.user?.avatar,
+      raw?.staff?.avatarUrl,
+      raw?.staff?.avatar,
+    );
+
+  const mapName = (raw: any): string | undefined =>
+    pickString(
+      raw?.name,
+      raw?.displayName,
+      raw?.display_name,
+      raw?.fullName,
+      raw?.full_name,
+      raw?.username,
+      raw?.userName,
+      raw?.user_name,
+      raw?.senderName,
+      raw?.sender_name,
+      raw?.fromUserName,
+      raw?.from_user_name,
+      raw?.staffName,
+      raw?.staff_name,
+      raw?.profile?.name,
+      raw?.profile?.displayName,
+      raw?.user?.name,
+      raw?.user?.displayName,
+      raw?.user?.username,
+      raw?.staff?.name,
+      raw?.staff?.displayName,
+      raw?.staff?.username,
+    );
+
   const mapSender = (raw: any): { userId: number; name: string; avatarUrl?: string } | undefined => {
     if (!raw || typeof raw !== 'object') return undefined;
-    const userId = Number(raw.userId ?? raw.user_ID ?? raw.id ?? raw.senderUserId ?? raw.fromUserId ?? raw.sender_id ?? 0);
-    if (!Number.isFinite(userId) || userId <= 0) return undefined;
-    const name =
-      typeof raw.name === 'string'
-        ? raw.name
-        : typeof raw.username === 'string'
-          ? raw.username
-          : typeof raw.fullName === 'string'
-            ? raw.fullName
-            : typeof raw.senderName === 'string'
-              ? raw.senderName
-              : typeof raw.staffName === 'string'
-                ? raw.staffName
-                : `User ${userId}`;
-    const avatarUrl =
-      typeof raw.avatarUrl === 'string'
-        ? raw.avatarUrl
-        : typeof raw.avatar === 'string'
-          ? raw.avatar
-          : undefined;
+    const userId = pickNumber(
+      raw.userId,
+      raw.user_ID,
+      raw.id,
+      raw.senderUserId,
+      raw.fromUserId,
+      raw.staffId,
+      raw.staffUserId,
+      raw.sender_id,
+      raw.user?.userId,
+      raw.user?.user_ID,
+      raw.user?.id,
+      raw.staff?.userId,
+      raw.staff?.user_ID,
+      raw.staff?.id,
+      raw.profile?.userId,
+      raw.profile?.id,
+    );
+    if (!userId) return undefined;
+    const name = mapName(raw) ?? `User ${userId}`;
+    const avatarUrl = mapAvatar(raw);
     return { userId, name, avatarUrl };
   };
 
   const mapSenderFromFlatFields = (raw: any): { userId: number; name: string; avatarUrl?: string } | undefined => {
     if (!raw || typeof raw !== 'object') return undefined;
-    const userId = Number(
+    const userId = pickNumber(
       raw.senderUserId ??
         raw.fromUserId ??
         raw.staffId ??
@@ -45,24 +107,19 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
         raw.user_ID ??
         raw.sender_id ??
         raw.id ??
-        0,
+        raw.sender?.userId ??
+        raw.sender?.user_ID ??
+        raw.sender?.id ??
+        raw.fromUser?.userId ??
+        raw.fromUser?.user_ID ??
+        raw.fromUser?.id ??
+        raw.user?.userId ??
+        raw.user?.user_ID ??
+        raw.user?.id,
     );
-    if (!Number.isFinite(userId) || userId <= 0) return undefined;
-    const name =
-      typeof raw.senderName === 'string'
-        ? raw.senderName
-        : typeof raw.staffName === 'string'
-          ? raw.staffName
-          : typeof raw.fromUserName === 'string'
-            ? raw.fromUserName
-            : typeof raw.userName === 'string'
-              ? raw.userName
-              : typeof raw.username === 'string'
-                ? raw.username
-                : typeof raw.fullName === 'string'
-                  ? raw.fullName
-                  : `User ${userId}`;
-    const avatarUrl = typeof raw.avatarUrl === 'string' ? raw.avatarUrl : typeof raw.avatar === 'string' ? raw.avatar : undefined;
+    if (!userId) return undefined;
+    const name = mapName(raw) ?? `User ${userId}`;
+    const avatarUrl = mapAvatar(raw);
     return { userId, name, avatarUrl };
   };
 

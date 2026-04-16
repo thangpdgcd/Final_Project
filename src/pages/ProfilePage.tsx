@@ -300,18 +300,53 @@ const ProfilePage: React.FC = () => {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!user) {
+      message.error(t('profile.avatarError') || 'Upload failed');
+      e.target.value = '';
+      return;
+    }
+
+    const previousAvatar = previewAvatar || user.avatar || null;
     const reader = new FileReader();
     reader.onloadend = () => setPreviewAvatar(reader.result as string);
     reader.readAsDataURL(file);
     try {
       setIsLoading(true);
-      const res = await profileApi.uploadAvatar(file);
+      const uploadRes = await profileApi.uploadAvatar(file);
+      const uploadedAvatar = uploadRes.avatarUrl;
+
+      // Persist avatar to profile so reloading uses server data too.
+      let mergedUser: Record<string, unknown> = { ...user, avatar: uploadedAvatar };
+      try {
+        const profileRes = await profileApi.updateProfile({
+          avatar: uploadedAvatar,
+          avatarUrl: uploadedAvatar,
+        });
+        const profileUser = profileApi.pickUserFromProfileResponse(profileRes);
+        if (profileUser) {
+          mergedUser = {
+            ...mergedUser,
+            ...profileUser,
+            avatar:
+              (profileUser.avatar as string | undefined) ||
+              (profileUser.avatarUrl as string | undefined) ||
+              uploadedAvatar,
+          };
+        }
+      } catch (persistError) {
+        console.warn('Failed to persist avatar via /profile:', persistError);
+      }
+
+      login('', mergedUser as any);
+      setPreviewAvatar(uploadedAvatar);
       message.success(t('profile.avatarSuccess') || 'Avatar updated!');
-      if (user) login('', { ...user, avatar: res.avatarUrl });
-    } catch {
+    } catch (error) {
+      console.error('Avatar upload failed:', error);
+      setPreviewAvatar(previousAvatar);
       message.error(t('profile.avatarError') || 'Upload failed');
     } finally {
       setIsLoading(false);
+      e.target.value = '';
     }
   };
 

@@ -17,9 +17,20 @@ type Props = {
 
 export const SupportMessageList: React.FC<Props> = ({ myUserId, messages, loading }) => {
   const staffUserId = useSupportWidgetStore((s) => s.staffUserId);
+  const lastKnownConversation = useSupportWidgetStore((s) => s.lastKnownConversation);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
   const [autoStick, setAutoStick] = useState(true);
+
+  const staffNameFromConversation = useMemo(() => {
+    const staff = (lastKnownConversation?.participants ?? []).find((p) => {
+      const role = String(p.roleAtJoin ?? '').toLowerCase();
+      return role === 'staff' || role === 'admin' || role === 'support';
+    });
+    return String(staff?.name ?? '').trim();
+  }, [lastKnownConversation?.participants]);
+
+  const isGenericStaffName = (name: string) => /^(user|staff)\s*#?\s*\d+$/i.test(name.trim());
 
   const sorted = useMemo(() => {
     return [...messages]
@@ -68,7 +79,13 @@ export const SupportMessageList: React.FC<Props> = ({ myUserId, messages, loadin
           const endsGroup = !next || nextMine !== mine || gapToNext > 5 * 60_000;
 
           const senderName = !mine
-            ? ((m.sender?.name ?? '').trim() || (staffUserId ? `Staff #${staffUserId}` : '') || 'Support')
+            ? (() => {
+                const raw = (m.sender?.name ?? '').trim();
+                if (raw && !isGenericStaffName(raw)) return raw;
+                if (staffNameFromConversation) return staffNameFromConversation;
+                if (raw) return raw;
+                return staffUserId ? `Staff #${staffUserId}` : 'Support';
+              })()
             : '';
           const avatarText = (senderName?.trim()?.[0] ?? 'S').toUpperCase();
           const text = m.type === 'text' ? m.content : `Action: ${m.action}`;

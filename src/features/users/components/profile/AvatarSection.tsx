@@ -70,16 +70,26 @@ const AvatarSection: React.FC<AvatarSectionProps> = ({ src, onClick, size = 'lg'
       <motion.div
         variants={overlayVariants}
         className={`absolute inset-0 ${radius} flex flex-col items-center justify-center gap-1 pointer-events-none`}
-        style={{ background: 'rgba(14,14,14,0.72)', color: '#e5c18b', top: 0 }}
+        style={{
+          background: 'linear-gradient(180deg, rgba(14,14,14,0.4) 0%, rgba(14,14,14,0.82) 100%)',
+          color: '#f6d6a2',
+          top: 0,
+          backdropFilter: 'blur(1px)',
+        }}
       >
-        <Camera size={isLarge ? 20 : 16} />
+        <Camera size={isLarge ? 22 : 16} />
         {isLarge && (
           <span
             style={{
-              fontSize: '0.58rem',
-              fontWeight: 700,
-              letterSpacing: '0.08em',
+              fontSize: '0.68rem',
+              fontWeight: 800,
+              letterSpacing: '0.12em',
               fontFamily: "'Manrope', sans-serif",
+              background: 'rgba(0,0,0,0.35)',
+              border: '1px solid rgba(229,193,139,0.55)',
+              borderRadius: '999px',
+              padding: '0.15rem 0.5rem',
+              textShadow: '0 1px 6px rgba(0,0,0,0.6)',
             }}
           >
             THAY ĐỔI

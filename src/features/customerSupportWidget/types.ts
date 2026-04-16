@@ -15,6 +15,7 @@ export type SupportWidgetConversation = {
   participants?: Array<{
     userId: number;
     roleAtJoin?: string;
+    name?: string;
   }>;
 };
 

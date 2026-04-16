@@ -16,16 +16,40 @@ export const SupportWidgetPanel: React.FC<Props> = ({ onClose, statusText, loadi
   const { user } = useAuth();
   const myUserId = Number((user as any)?.user_ID ?? (user as any)?.userId ?? (user as any)?.id ?? 0) || 0;
   const messages = useSupportWidgetStore((s) => s.messages);
-  const staffUserId = useSupportWidgetStore((s) => s.staffUserId);
+  const lastKnownConversation = useSupportWidgetStore((s) => s.lastKnownConversation);
+
+  const isGenericStaffName = (name: string) => /^(user|staff)\s*#?\s*\d+$/i.test(name.trim());
 
   const supportName = useMemo(() => {
-    const lastFromStaff = [...messages]
+    const staffMessages = [...messages]
       .reverse()
-      .find((m) => (m.sender?.userId ?? 0) !== myUserId && (m.sender?.name ?? '').trim());
-    if (lastFromStaff?.sender?.name) return lastFromStaff.sender.name;
-    if (staffUserId && staffUserId > 0) return `Staff #${staffUserId}`;
+      .filter((m) => (m.sender?.userId ?? 0) !== myUserId);
+
+    const namedStaff = staffMessages.find((m) => {
+      const n = (m.sender?.name ?? '').trim();
+      return !!n && !isGenericStaffName(n);
+    });
+    if (namedStaff?.sender?.name) return namedStaff.sender.name.trim();
+
+    const staffParticipant = (lastKnownConversation?.participants ?? []).find((p) => {
+      const role = String(p.roleAtJoin ?? '').toLowerCase();
+      return role === 'staff' || role === 'admin' || role === 'support';
+    });
+    const participantName = String(staffParticipant?.name ?? '').trim();
+    if (participantName) return participantName;
+
+    const conversationTitle = String(lastKnownConversation?.title ?? '').trim();
+    if (conversationTitle && !/^(support|conversation\s*\d+)$/i.test(conversationTitle)) {
+      return conversationTitle;
+    }
+
+    const anyStaffName = staffMessages
+      .map((m) => (m.sender?.name ?? '').trim())
+      .find((n) => !!n);
+    if (anyStaffName) return anyStaffName;
+
     return 'Support';
-  }, [messages, myUserId, staffUserId]);
+  }, [lastKnownConversation?.participants, lastKnownConversation?.title, messages, myUserId]);
 
   const isMobile = useMemo(() => {
     if (typeof window === 'undefined') return false;
