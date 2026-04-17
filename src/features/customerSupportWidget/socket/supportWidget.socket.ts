@@ -6,6 +6,7 @@ type SocketStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'erro
 
 let socketSingleton: Socket | null = null;
 let status: SocketStatus = 'idle';
+let socketIoUnsupported = false;
 
 const stripTrailingApi = (raw: string): string => raw.replace(/\/api\/?$/i, '').replace(/\/+$/, '');
 
@@ -27,6 +28,11 @@ export const getSupportWidgetSocketStatus = () => status;
 export const getSupportWidgetSocket = () => socketSingleton;
 
 export const connectSupportWidgetSocket = () => {
+  if (socketIoUnsupported) {
+    status = 'error';
+    // Return the existing instance if any (but do not attempt reconnects).
+    return socketSingleton as Socket;
+  }
   const token = getAccessToken();
 
   // If we already have a socket instance, always refresh auth in case the widget
@@ -67,8 +73,23 @@ export const connectSupportWidgetSocket = () => {
   socketSingleton.on('disconnect', () => {
     status = 'disconnected';
   });
-  socketSingleton.on('connect_error', () => {
+  socketSingleton.on('connect_error', (err: any) => {
     status = 'error';
+    const msg = String(err?.message ?? err ?? '');
+    if (msg.includes('404') || msg.toLowerCase().includes('unexpected response code: 404')) {
+      socketIoUnsupported = true;
+      try {
+        (socketSingleton as any).io.opts.reconnection = false;
+        (socketSingleton as any).io.opts.autoConnect = false;
+      } catch {
+        // ignore
+      }
+      try {
+        socketSingleton?.disconnect();
+      } catch {
+        // ignore
+      }
+    }
   });
 
   return socketSingleton;

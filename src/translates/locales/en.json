@@ -3,6 +3,8 @@
     "brandName": "Phan Coffee",
     "loading": "Loading...",
     "error": "Error",
+    "notAvailable": "Not available",
+    "notAvailableShort": "N/A",
     "back": "Back",
     "submit": "Submit",
     "cancel": "Cancel",
@@ -505,6 +507,12 @@
     "noName": "No name",
     "historyOrdersSearchPlaceholder":
       "You can search by shop name, order ID, or product name",
+    "orders": {
+      "apiNotAvailableHint": "Orders API is not available on the backend for this account."
+    },
+    "wallet": {
+      "apiNotAvailableHint": "Wallet/Coffee Coin API is not available on the backend."
+    },
     "notFound": "User not found",
     "sidebar": {
       "account": "My Account",

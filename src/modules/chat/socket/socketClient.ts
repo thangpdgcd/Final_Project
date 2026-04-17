@@ -5,6 +5,7 @@ type SocketStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'erro
 
 let socketSingleton: Socket | null = null;
 let status: SocketStatus = 'idle';
+let socketIoUnsupported = false;
 
 const stripTrailingApi = (raw: string): string => raw.replace(/\/api\/?$/i, '').replace(/\/+$/, '');
 
@@ -27,6 +28,10 @@ export const getSocketStatus = () => status;
 export const getSocket = () => socketSingleton;
 
 export const connectSocket = () => {
+  if (socketIoUnsupported) {
+    status = 'error';
+    return socketSingleton as Socket;
+  }
   if (socketSingleton && socketSingleton.connected) return socketSingleton;
   if (socketSingleton && socketSingleton.active) return socketSingleton;
 
@@ -52,8 +57,23 @@ export const connectSocket = () => {
   socketSingleton.on('disconnect', () => {
     status = 'disconnected';
   });
-  socketSingleton.on('connect_error', () => {
+  socketSingleton.on('connect_error', (err: any) => {
     status = 'error';
+    const msg = String(err?.message ?? err ?? '');
+    if (msg.includes('404') || msg.toLowerCase().includes('unexpected response code: 404')) {
+      socketIoUnsupported = true;
+      try {
+        (socketSingleton as any).io.opts.reconnection = false;
+        (socketSingleton as any).io.opts.autoConnect = false;
+      } catch {
+        // ignore
+      }
+      try {
+        socketSingleton?.disconnect();
+      } catch {
+        // ignore
+      }
+    }
   });
 
   return socketSingleton;

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Alert, Spin, Modal, Form, Input } from 'antd';
 import { EnvironmentOutlined, ShopOutlined, MessageOutlined, TagOutlined, CarOutlined } from '@ant-design/icons';
@@ -15,6 +15,9 @@ import { ordersService } from '../services/orders.service';
 import { CART_KEY, syncCartToSelectionForCheckout } from '@/features/cart';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import * as profileApi from '@/api/profileApi';
+import { VoucherInput } from '@/features/voucher/components/VoucherInput';
+import { VoucherSummary } from '@/features/voucher/components/VoucherSummary';
+import { useApplyVoucher } from '@/features/voucher/hooks/useApplyVoucher';
 
 const API_BASE = ((import.meta.env.VITE_API_URL as string) || 'http://localhost:8080').replace(/\/+$/, '');
 const API_HOST = API_BASE.endsWith('/api') ? API_BASE.slice(0, -4) : API_BASE;
@@ -43,6 +46,10 @@ const OrderPage: React.FC = () => {
   const [shippingFee] = useState(17000);
   const [walletCoin, setWalletCoin] = useState<number | null>(null);
   const [walletLoading, setWalletLoading] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
+  const [payableTotal, setPayableTotal] = useState<number>(0);
+  const voucher = useApplyVoucher();
+  const autoAppliedRef = useRef(false);
 
   const [shipping, setShipping] = useState({
     fullName: user?.name || '',
@@ -65,10 +72,83 @@ const OrderPage: React.FC = () => {
 
   const grandTotal = productsTotal + shippingFee;
 
-  const amountUSD = useMemo(() => {
-    const usd = grandTotal / 24000;
-    return usd > 0 ? usd.toFixed(2) : '0.00';
+  useEffect(() => {
+    setPayableTotal(grandTotal);
+    if (voucher.isSuccess || voucher.discount != null || voucher.finalPrice != null || voucher.message || voucher.errorMessage) {
+      voucher.reset();
+    }
   }, [grandTotal]);
+
+  const amountUSD = useMemo(() => {
+    const usd = payableTotal / 24000;
+    return usd > 0 ? usd.toFixed(2) : '0.00';
+  }, [payableTotal]);
+
+  const ensureDraftOrderId = useCallback(async (method?: 'paypal' | 'cod' | 'coffee_coin') => {
+    if (createdOrderId && Number.isFinite(createdOrderId) && createdOrderId > 0) return createdOrderId;
+
+    const fallbackUserId = Number(
+      user?.user_ID ?? (typeof window !== 'undefined' ? localStorage.getItem('user_ID') : null),
+    );
+    const userIdToUse = Number.isFinite(fallbackUserId) ? fallbackUserId : (user?.user_ID as any);
+    if (!userIdToUse) throw new Error('MISSING_USER_ID');
+
+    await syncCartToSelectionForCheckout(userIdToUse, cartItems);
+
+    const newOrder = await createOrder.mutateAsync({
+      user_ID: userIdToUse,
+      status: 'pending',
+      total_Amount: payableTotal,
+      shipping_Address: `${shipping.fullName} | ${shipping.phone} | ${shipping.address}`,
+      paymentMethod: method === 'coffee_coin' ? 'COFFEE_COIN' : method === 'paypal' ? 'PayPal' : 'COD',
+    });
+
+    const id = Number(
+      (newOrder as any)?.order_ID ??
+        (newOrder as any)?.orderId ??
+        (newOrder as any)?.id ??
+        (newOrder as any)?.data?.order_ID ??
+        (newOrder as any)?.data?.orderId ??
+        (newOrder as any)?.data?.id,
+    );
+
+    if (!Number.isFinite(id) || id <= 0) throw new Error('INVALID_ORDER_ID');
+    setCreatedOrderId(id);
+    return id;
+  }, [createdOrderId, user?.user_ID, cartItems, payableTotal, shipping.fullName, shipping.phone, shipping.address, createOrder]);
+
+  const handleApplyVoucher = useCallback(async (codeOverride?: string) => {
+    const codeToUse = String(codeOverride ?? voucher.trimmedCode).trim();
+    if (!codeToUse) {
+      voucher.applyVoucher({ orderId: '0', code: '' });
+      return;
+    }
+
+    try {
+      const orderId = await ensureDraftOrderId(paymentMethod);
+      const res = await voucher.applyVoucher({ orderId: String(orderId), code: codeToUse });
+      if (res?.success && Number.isFinite(res.finalPrice) && res.finalPrice >= 0) {
+        setPayableTotal(res.finalPrice);
+      }
+    } catch (err) {
+      const msg = axios.isAxiosError(err)
+        ? (err.response?.data as any)?.message ?? (err.response?.data as any)?.error
+        : (err as Error)?.message;
+      toast.error(msg ? String(msg) : 'Could not apply voucher');
+    }
+  }, [voucher.trimmedCode, voucher.applyVoucher, ensureDraftOrderId, paymentMethod]);
+
+  useEffect(() => {
+    const search = String(location.search ?? '');
+    const code = new URLSearchParams(search).get('voucher')?.trim() ?? '';
+    if (!code) return;
+    if (autoAppliedRef.current) return;
+    if (!cartItems.length) return;
+
+    voucher.setCode(code);
+    autoAppliedRef.current = true;
+    void handleApplyVoucher(code);
+  }, [location.search, cartItems.length, handleApplyVoucher]);
 
   const fetchWalletCoin = async () => {
     if (!user?.user_ID) return;
@@ -161,34 +241,7 @@ const OrderPage: React.FC = () => {
     if (savingOnceRef.current) return;
     savingOnceRef.current = true;
     try {
-      const fallbackUserId = Number(
-        user?.user_ID ?? (typeof window !== 'undefined' ? localStorage.getItem('user_ID') : null),
-      );
-      const userIdToUse = Number.isFinite(fallbackUserId) ? fallbackUserId : (user?.user_ID as any);
-      if (!userIdToUse) throw new Error('MISSING_USER_ID');
-
-      await syncCartToSelectionForCheckout(userIdToUse, cartItems);
-
-      const newOrder = await createOrder.mutateAsync({
-        user_ID: userIdToUse,
-        status: opts.method === 'paypal' ? 'Paid' : 'pending',
-        total_Amount: grandTotal,
-        shipping_Address: `${shipping.fullName} | ${shipping.phone} | ${shipping.address}`,
-        paymentMethod: opts.method === 'coffee_coin' ? 'COFFEE_COIN' : opts.method === 'paypal' ? 'PayPal' : 'COD',
-        paypalCaptureId: opts.method === 'paypal' ? opts.captureId : undefined,
-      });
-
-      const createdOrderId = Number(
-        (newOrder as any)?.order_ID ??
-          (newOrder as any)?.orderId ??
-          (newOrder as any)?.id ??
-          (newOrder as any)?.data?.order_ID ??
-          (newOrder as any)?.data?.orderId ??
-          (newOrder as any)?.data?.id,
-      );
-      if (!Number.isFinite(createdOrderId) || createdOrderId <= 0) {
-        throw new Error('INVALID_ORDER_ID');
-      }
+      const orderId = await ensureDraftOrderId(opts.method);
 
       const shipLine = `${shipping.fullName} | ${shipping.phone} | ${shipping.address}`;
       const payNote =
@@ -198,11 +251,20 @@ const OrderPage: React.FC = () => {
             ? 'Coffee Coin'
             : 'COD';
       try {
-        await ordersService.update(createdOrderId, {
+        await ordersService.update(orderId, {
+          status: opts.method === 'paypal' ? 'Paid' : 'pending',
+          total_Amount: payableTotal,
           shipping_Address: `${shipLine} | ${payNote}`,
+          paymentMethod: opts.method === 'coffee_coin' ? 'COFFEE_COIN' : opts.method === 'paypal' ? 'PayPal' : 'COD',
+          paypalCaptureId: opts.method === 'paypal' ? String(opts.captureId ?? '') : null,
         });
       } catch (e) {
-        console.warn('Could not persist shipping note on order:', e);
+        if (axios.isAxiosError(e) && e.response?.status === 403) {
+          // Some backends do not allow customers to update orders via PUT /orders/:id.
+          // Checkout should still succeed because the order was already created.
+        } else {
+          console.warn('Could not persist shipping note on order:', e);
+        }
       }
 
       const uid = Number(user?.user_ID ?? (typeof window !== 'undefined' ? localStorage.getItem('user_ID') : null));
@@ -360,7 +422,27 @@ const OrderPage: React.FC = () => {
               <div className="flex items-center gap-2 text-sm">
                 <TagOutlined className="text-orange-600" />
                 <span>Voucher của Shop</span>
-                <button className="text-blue-500 hover:underline ml-auto">Chọn Voucher</button>
+              </div>
+              <div className="max-w-xl">
+                <VoucherInput
+                  code={voucher.code}
+                  onCodeChange={voucher.setCode}
+                  onApply={(trimmed) => void handleApplyVoucher(trimmed)}
+                  isApplying={voucher.isApplying}
+                  errorMessage={voucher.errorMessage}
+                  helperText="Tip: you can also pick a voucher from Voucher Vault and it will auto-fill here."
+                />
+                <VoucherSummary
+                  discount={voucher.discount}
+                  finalPrice={voucher.finalPrice}
+                  message={voucher.message}
+                  isSuccess={voucher.isSuccess}
+                  formatPrice={formatPrice}
+                  onClear={() => {
+                    voucher.reset();
+                    setPayableTotal(grandTotal);
+                  }}
+                />
               </div>
             </div>
             <div className="border-l border-dashed border-stone-100 dark:border-stone-800 pl-0 md:pl-8 space-y-4">
@@ -385,7 +467,7 @@ const OrderPage: React.FC = () => {
 
           <div className="px-6 py-4 border-t border-stone-50 dark:border-stone-800 bg-[#fafdff] dark:bg-[#1a1c1d] flex justify-end items-center gap-4">
             <span className="text-sm text-stone-500">Tổng số tiền ({cartItems.length} sản phẩm):</span>
-            <span className="text-xl font-bold text-orange-600">{formatPrice(grandTotal)}</span>
+            <span className="text-xl font-bold text-orange-600">{formatPrice(payableTotal)}</span>
           </div>
         </div>
 
@@ -444,8 +526,14 @@ const OrderPage: React.FC = () => {
               <span className="text-stone-900 dark:text-stone-100">{formatPrice(productsTotal)}</span>
               <span>Phí vận chuyển</span>
               <span className="text-stone-900 dark:text-stone-100">{formatPrice(shippingFee)}</span>
+              {voucher.discount != null && voucher.isSuccess && (
+                <>
+                  <span>Giảm giá voucher</span>
+                  <span className="text-green-700 dark:text-green-400">- {formatPrice(Number(voucher.discount ?? 0))}</span>
+                </>
+              )}
               <span className="text-lg mt-2 font-medium">Tổng thanh toán:</span>
-              <span className="text-3xl font-bold text-orange-600 mt-2">{formatPrice(grandTotal)}</span>
+              <span className="text-3xl font-bold text-orange-600 mt-2">{formatPrice(payableTotal)}</span>
             </div>
 
             {error && <Alert type="error" showIcon message={error} className="w-full max-w-md mt-4" />}
@@ -461,7 +549,7 @@ const OrderPage: React.FC = () => {
                     paymentMethod === 'coffee_coin' &&
                     !walletLoading &&
                     walletCoin != null &&
-                    walletCoin < grandTotal
+                    walletCoin < payableTotal
                   }
                   onClick={handlePlaceOrder}
                 >

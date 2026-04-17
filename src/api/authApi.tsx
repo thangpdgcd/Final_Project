@@ -10,16 +10,55 @@ function normalizeApiBaseUrl(raw: string): string {
 const apiHost =
   (import.meta.env.VITE_API_URL as string | undefined) || process.env.VITE_API_URL;
 
-// - Prefer explicit API_URL_LOGIN/API_URL_REGISTER if you set them in Vercel
-// - Otherwise derive from VITE_API_URL
-const apilogin =
-  process.env.API_URL_LOGIN ||
-  (apiHost ? `${normalizeApiBaseUrl(apiHost)}/api/login` : "http://localhost:8080/api/login");
-const apiregister =
-  process.env.API_URL_REGISTER ||
-  (apiHost
-    ? `${normalizeApiBaseUrl(apiHost)}/api/register`
-    : "http://localhost:8080/api/register");
+const apiBase = (() => {
+  const fallback = "http://localhost:8080/api";
+  const host = apiHost ? normalizeApiBaseUrl(apiHost) : fallback;
+  const trimmed = String(host).replace(/\/+$/, "");
+  return trimmed.endsWith("/api") ? trimmed : `${trimmed}/api`;
+})();
+
+const postWithFallback = async <T,>(
+  paths: string[],
+  payload: unknown,
+): Promise<T> => {
+  const looksLikeMissingRoute = (raw: unknown) => {
+    const text = typeof raw === "string" ? raw : (raw as any)?.message;
+    if (typeof text !== "string") return false;
+    const t = text.toLowerCase().trim();
+    return (
+      t.includes("cannot post") ||
+      t.includes("cannot get") ||
+      t.includes("route") ||
+      t.includes("endpoint") ||
+      t.includes("no route")
+    );
+  };
+  let lastErr: unknown;
+  for (const p of paths) {
+    try {
+      const res = await axiosWithCreds.post(`${apiBase}${p}`, payload);
+      return res.data as T;
+    } catch (err) {
+      lastErr = err;
+      const status = (err as any)?.response?.status;
+      const data = (err as any)?.response?.data;
+      const msg =
+        (typeof data === "string" ? data : null) ??
+        data?.message ??
+        data?.error ??
+        data?.data?.message ??
+        data?.result?.message ??
+        "";
+      const msgLower = String(msg || "").toLowerCase();
+
+      // Try next endpoint only when it looks like a missing/blocked route.
+      if (status === 404 && looksLikeMissingRoute(data)) continue;
+      if ((status === 401 || status === 403) && msgLower.includes("not authorized")) continue;
+      throw err;
+    }
+  }
+  throw lastErr ?? new Error("AUTH_ENDPOINT_NOT_FOUND");
+};
 
 const axiosWithCreds = axios.create({
   withCredentials: true,
@@ -53,13 +92,17 @@ export interface RegisterResponse {
 
 export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
   // withCredentials is required so browser can store HttpOnly refresh cookies cross-site
-  const res = await axiosWithCreds.post(`${apilogin}`, payload);
-  return res.data;
+  return await postWithFallback<LoginResponse>(
+    ["/login"],
+    payload,
+  );
 };
 
 export const register = async (
   payload: RegisterPayload
 ): Promise<RegisterResponse> => {
-  const res = await axiosWithCreds.post(`${apiregister}`, payload);
-  return res.data;
+  return await postWithFallback<RegisterResponse>(
+    ["/register"],
+    payload,
+  );
 };

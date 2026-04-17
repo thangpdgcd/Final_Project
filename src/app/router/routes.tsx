@@ -19,6 +19,7 @@ const CartPage = lazy(() => import('@/pages/store/CartPage'));
 const OrderPage = lazy(() => import('@/pages/store/OrderPage'));
 const ProfilePage = lazy(() => import('@/pages/store/ProfilePage'));
 const WishlistPage = lazy(() => import('@/pages/store/WishlistPage'));
+const VoucherVaultPage = lazy(() => import('@/pages/store/VoucherVaultPage'));
 
 const ProductPage = lazy(() => import('@/pages/shop/ProductPage'));
 
@@ -50,6 +51,8 @@ const AppRoutes = () => (
         <Route path="/order" element={<OrderPage />} />
         <Route path="/orders" element={<OrderPage />} />
         <Route path="/wishlist" element={<WishlistPage />} />
+        {/* Voucher Vault — uses auth context user_ID to fetch customer's vouchers */}
+        <Route path="/vouchers" element={<VoucherVaultPage />} />
       </Route>
     </Route>
 

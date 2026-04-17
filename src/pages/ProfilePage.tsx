@@ -240,6 +240,32 @@ const ProfilePage: React.FC = () => {
   const currentSection = searchParams.get('section') || 'identity';
   const activeSideKey = currentTab === 'orders' ? 'orders' : currentSection;
 
+  const isWalletApiDisabled = (() => {
+    try {
+      return typeof window !== 'undefined' && localStorage.getItem('wallet:get_disabled') === '1';
+    } catch {
+      return false;
+    }
+  })();
+
+  const isOrdersApiDisabled = (() => {
+    try {
+      const raw = localStorage.getItem('user');
+      const roleID = raw ? String((JSON.parse(raw) as any)?.roleID ?? (JSON.parse(raw) as any)?.role ?? '') : '';
+      const normalized =
+        roleID === '1' || roleID.toLowerCase() === 'customer' || roleID.toLowerCase() === 'user'
+          ? '1'
+          : roleID === '2' || roleID.toLowerCase() === 'admin'
+            ? '2'
+            : roleID === '3' || roleID.toLowerCase() === 'staff'
+              ? '3'
+              : 'unknown';
+      return typeof window !== 'undefined' && localStorage.getItem(`orders:list_disabled:${normalized}`) === '1';
+    } catch {
+      return false;
+    }
+  })();
+
   // ── Orders ────────────────────────────────────────────────────────────────
   const { data: allOrdersRaw, isLoading: ordersLoading, refetch: refetchOrders } = useOrders({
     // Keep order list live while user is in Orders tab (no manual reload needed).
@@ -851,7 +877,7 @@ const ProfilePage: React.FC = () => {
       {
         key: 'orders',
         label: t('profile.stats.orders'),
-        value: userOrders.length,
+        value: isOrdersApiDisabled ? t('common.notAvailableShort') : userOrders.length,
         icon: <ShoppingBag size={16} />,
       },
       {
@@ -863,11 +889,15 @@ const ProfilePage: React.FC = () => {
       {
         key: 'coffeeCoin',
         label: t('profile.stats.coffeeCoin'),
-        value: walletLoading ? t('profile.stats.loadingShort') : walletXu.toLocaleString(i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US'),
+        value: isWalletApiDisabled
+          ? t('common.notAvailableShort')
+          : walletLoading
+            ? t('profile.stats.loadingShort')
+            : walletXu.toLocaleString(i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US'),
         icon: <Wallet size={16} />,
       },
     ],
-    [i18n.language, t, userOrders.length, walletLoading, walletXu],
+    [i18n.language, isOrdersApiDisabled, isWalletApiDisabled, t, userOrders.length, walletLoading, walletXu],
   );
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -1039,7 +1069,7 @@ const ProfilePage: React.FC = () => {
                 >
                   {stat.value}
                 </span>
-                {stat.key === 'coffeeCoin' && (
+                {stat.key === 'coffeeCoin' && !isWalletApiDisabled && (
                   <button
                     type="button"
                     onClick={() => void handleOpenTopupModal()}
@@ -1303,6 +1333,31 @@ const ProfilePage: React.FC = () => {
                       {t('profile.orders.loadingOrders')}
                     </p>
                   </div>
+                ) : isOrdersApiDisabled ? (
+                  <div
+                    style={{ background: T.surfaceLow }}
+                    className="p-20 rounded-2xl flex flex-col items-center gap-4"
+                  >
+                    <div
+                      style={{ background: T.surfaceLowest }}
+                      className="w-20 h-20 rounded-full flex items-center justify-center"
+                    >
+                      <ShoppingBag size={40} style={{ color: T.onSurfaceVariant, opacity: 0.3 }} />
+                    </div>
+                    <p
+                      style={{
+                        fontFamily: "'Manrope', sans-serif",
+                        color: T.onSurface,
+                        fontWeight: 700,
+                        fontSize: '1rem',
+                      }}
+                    >
+                      {t('common.notAvailable')}
+                    </p>
+                    <p style={{ color: T.onSurfaceVariant, fontSize: '0.82rem', opacity: 0.7 }}>
+                      {t('profile.orders.apiNotAvailableHint')}
+                    </p>
+                  </div>
                 ) : filteredOrders.length === 0 ? (
                   <div
                     style={{ background: T.surfaceLow }}
@@ -1556,13 +1611,14 @@ const ProfilePage: React.FC = () => {
                   style={{ color: T.gold, fontSize: '0.75rem' }}
                   className="hover:underline"
                   onClick={() => void fetchWallet()}
+                  disabled={isWalletApiDisabled}
                 >
                   {t('common.refresh')}
                 </button>
               </div>
               {walletTransactions.length === 0 ? (
                 <p style={{ color: T.onSurfaceVariant, fontSize: '0.8rem', opacity: 0.8 }}>
-                  {t('profile.wallet.noTransactions')}
+                  {isWalletApiDisabled ? t('profile.wallet.apiNotAvailableHint') : t('profile.wallet.noTransactions')}
                 </p>
               ) : (
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-1">

@@ -100,7 +100,7 @@ const AboutPage: React.FC = () => {
                 className="absolute inset-0 h-full w-full object-cover object-center"
                 loading="eager"
                 decoding="async"
-                fetchPriority="high"
+             
               />
               <div
                 className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[color-mix(in_srgb,var(--hl-primary)_18%,transparent)] via-transparent to-transparent"

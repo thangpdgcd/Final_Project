@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import type { AuthUser } from '@/types';
 import api, { setAccessToken } from '@/api/axiosInstance';
+import axios from 'axios';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -24,6 +25,8 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const ME_ENDPOINT_DISABLED_KEY = 'auth:me_endpoint_disabled';
+
   const normalizeUser = (raw: unknown): AuthUser | null => {
     if (!raw || typeof raw !== 'object') return null;
     const u = raw as any;
@@ -73,8 +76,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const hydrateFromServer = async () => {
       const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
       if (!token) return;
+      if (localStorage.getItem(ME_ENDPOINT_DISABLED_KEY) === '1') return;
       try {
-        const res = await api.get('/me');
+        const candidates = ['/users/me', '/me'];
+        let res: any = null;
+        for (const url of candidates) {
+          try {
+            res = await api.get(url);
+            break;
+          } catch (err) {
+            if (axios.isAxiosError(err)) {
+              const status = err.response?.status;
+              if (status === 404 || status === 403) {
+                localStorage.setItem(ME_ENDPOINT_DISABLED_KEY, '1');
+                return;
+              }
+            }
+            throw err;
+          }
+        }
+        if (!res) return;
         const rawUser =
           (res.data as any)?.user ??
           (res.data as any)?.data?.user ??
@@ -86,8 +107,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(normalized));
         localStorage.setItem('user_ID', String(normalized.user_ID));
-      } catch {
-        // Keep current local state if /me fails.
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          const status = err.response?.status;
+          if (status === 401 || status === 403) {
+            // Backend may not allow /users/me for this token/session shape.
+            // Do NOT auto-logout on refresh; keep local session and let user continue.
+            localStorage.setItem(ME_ENDPOINT_DISABLED_KEY, '1');
+            return;
+          }
+        }
+        // Keep current local state if /me fails for other reasons.
       }
     };
     void hydrateFromServer();

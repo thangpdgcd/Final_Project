@@ -52,6 +52,7 @@ const LoginPage: React.FC = () => {
 
   const loginMutation = useMutation({
     mutationFn: (payload: LoginPayload) => authService.login(payload),
+    retry: 0,
     onSuccess: (data) => {
       if (!data.accessToken || !data.user) {
         messageApi.error(t('auth.loginError'));
@@ -71,19 +72,18 @@ const LoginPage: React.FC = () => {
         return;
       }
 
-      const errorMessage =
-        typeof error === 'object' &&
-        error !== null &&
-        'response' in error &&
-        typeof (error as any).response === 'object' &&
-        (error as any).response !== null &&
-        'data' in (error as any).response &&
-        typeof (error as any).response.data === 'object' &&
-        (error as any).response.data !== null &&
-        'message' in (error as any).response.data &&
-        typeof (error as any).response.data.message === 'string'
-          ? (error as any).response.data.message
-          : fallbackMessage;
+      const directErrorMessage = error instanceof Error ? error.message : '';
+      const respData = (error as any)?.response?.data;
+      const responseMessage =
+        typeof respData === 'string'
+          ? respData
+          : typeof respData?.message === 'string'
+            ? respData.message
+            : typeof respData?.error === 'string'
+              ? respData.error
+              : '';
+
+      const errorMessage = String(responseMessage || directErrorMessage || fallbackMessage).trim();
 
       messageApi.error(errorMessage);
     },

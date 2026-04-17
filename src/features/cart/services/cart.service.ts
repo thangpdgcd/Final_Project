@@ -25,10 +25,39 @@ const unwrapList = (resData: unknown): CartItem[] => {
 
 export const cartService = {
   getByUserId: async (user_ID: number): Promise<CartItem[]> => {
+    const CART_GET_DISABLED_KEY = 'cart:get_disabled';
     const uid = Number(user_ID);
     if (!Number.isFinite(uid) || uid <= 0) return [];
-    const res = await axiosInstance.get('/carts', { params: { user_ID: uid } });
-    return unwrapList(res.data);
+    if (typeof window !== 'undefined' && localStorage.getItem(CART_GET_DISABLED_KEY) === '1') return [];
+    const candidates: Array<{ url: string; params?: Record<string, unknown> }> = [
+      { url: '/carts', params: { user_ID: uid } },
+      { url: '/cart', params: { user_ID: uid } },
+      { url: '/cart-items', params: { user_ID: uid } },
+      { url: '/cartitems', params: { user_ID: uid } },
+    ];
+
+    let lastErr: unknown;
+    for (const c of candidates) {
+      try {
+        const res = await axiosInstance.get(c.url, c.params ? { params: c.params } : undefined);
+        return unwrapList(res.data);
+      } catch (err) {
+        lastErr = err;
+        if (axios.isAxiosError(err) && err.response?.status === 404) continue;
+        throw err;
+      }
+    }
+
+    // Backend may not implement cart retrieval yet — treat as empty cart.
+    if (axios.isAxiosError(lastErr) && lastErr.response?.status === 404) {
+      try {
+        localStorage.setItem(CART_GET_DISABLED_KEY, '1');
+      } catch {
+        // ignore
+      }
+      return [];
+    }
+    return [];
   },
 
   addToCart: async (payload: AddToCartPayload): Promise<AddToCartResponse> => {

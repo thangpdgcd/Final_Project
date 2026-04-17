@@ -3,6 +3,8 @@
     "brandName": "Phan Coffee",
     "loading": "Đang tải...",
     "error": "Lỗi",
+    "notAvailable": "Chưa hỗ trợ",
+    "notAvailableShort": "N/A",
     "back": "Quay lại",
     "submit": "Gửi",
     "cancel": "Hủy",
@@ -504,6 +506,12 @@
     "historyOrdersSearchPlaceholder":
       "Bạn có thể tìm kiếm theo tên Shop, ID đơn hàng hoặc Tên Sản phẩm",
     "notFound": "Không tìm thấy người dùng",
+    "orders": {
+      "apiNotAvailableHint": "Backend chưa có API đơn hàng cho tài khoản này."
+    },
+    "wallet": {
+      "apiNotAvailableHint": "Backend chưa có API ví/Coffee Coin."
+    },
     "sidebar": {
       "account": "Tài Khoản Của Tôi",
       "orders": "Đơn Mua",

@@ -2,8 +2,9 @@ export type SupportChatRole = 'customer' | 'staff';
 
 const normalizeRole = (roleID: unknown): 'admin' | 'staff' | 'user' => {
   const raw = String(roleID ?? '').toLowerCase().trim();
-  if (raw === 'admin' || raw === '1') return 'admin';
-  if (raw === 'staff' || raw === '2') return 'staff';
+  // Backend convention: 1=customer, 2=admin, 3=staff
+  if (raw === 'admin' || raw === '2') return 'admin';
+  if (raw === 'staff' || raw === '3') return 'staff';
   return 'user';
 };
 

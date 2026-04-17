@@ -47,6 +47,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
 
   const loginMutation = useMutation({
     mutationFn: (payload: LoginPayload) => authService.login(payload),
+    retry: 0,
     onSuccess: (data) => {
       if (!data?.accessToken || !data?.user) {
         messageApi.error(t('auth.loginError'));

@@ -1,4 +1,5 @@
 import api from "./axiosInstance";
+import axios from "axios";
 
 export interface UpdateProfilePayload {
   name?: string;
@@ -71,13 +72,51 @@ export const uploadAvatar = async (file: File) => {
 };
 
 export const getMe = async () => {
-  const res = await api.get("/me");
-  return res.data;
+  const candidates = ["/users/me", "/me"];
+  let lastErr: unknown;
+  for (const url of candidates) {
+    try {
+      const res = await api.get(url);
+      return res.data;
+    } catch (err) {
+      lastErr = err;
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        if (status === 404) continue;
+        if (status === 401 || status === 403) return null;
+      }
+      throw err;
+    }
+  }
+  throw lastErr ?? new Error("ME_NOT_AVAILABLE");
 };
 
 export const getWallet = async () => {
-  const res = await api.get("/wallet");
-  return res.data;
+  const WALLET_DISABLED_KEY = "wallet:get_disabled";
+  const candidates = ["/wallet", "/users/wallet", "/users/me/wallet", "/wallets"];
+  for (const url of candidates) {
+    try {
+      const res = await api.get(url);
+      // Wallet endpoint works → clear any stale disable flag.
+      try {
+        localStorage.removeItem(WALLET_DISABLED_KEY);
+      } catch {
+        // ignore
+      }
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        if (status === 404) continue;
+        // Do NOT permanently disable wallet on 401/403. Tokens may refresh, backend may change,
+        // or the user may log in again — allow retry on next render.
+        if (status === 401 || status === 403) return { walletCoin: 0, walletXu: 0 };
+      }
+      throw err;
+    }
+  }
+  // Backend may not implement wallet — return a safe empty payload
+  return { walletCoin: 0, walletXu: 0 };
 };
 
 export const topupWallet = async (payload: WalletTopupPayload) => {

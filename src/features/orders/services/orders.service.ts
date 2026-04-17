@@ -1,19 +1,64 @@
 import axiosInstance from '@/services/axios';
 import axios from 'axios';
 import type { Order, CreateOrderPayload, OrderItem, CreateOrderItemPayload } from '@/types';
+import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
 
 let orderItemsUnsupported = false;
 let orderItemsGetRoute: string | null | undefined = undefined;
 
+const getNormalizedRoleID = (): '1' | '2' | '3' | null => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.user);
+    if (!raw) return null;
+    const u = JSON.parse(raw) as any;
+    const v = String(u?.roleID ?? u?.roleId ?? u?.role ?? '').trim().toLowerCase();
+    if (!v) return null;
+    if (v === '1' || v === 'customer' || v === 'user') return '1';
+    if (v === '2' || v === 'admin') return '2';
+    if (v === '3' || v === 'staff') return '3';
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 export const ordersService = {
   /** Current user's orders (JWT). Prefer over GET /orders (all orders, staff-only use case). */
   getAll: async (): Promise<Order[]> => {
-    const res = await axiosInstance.get<any>('/my-orders');
-    const data = res.data;
-    if (Array.isArray(data)) return data as Order[];
-    if (data && Array.isArray(data.orders)) return data.orders as Order[];
-    if (data && Array.isArray(data.data)) return data.data as Order[];
-    if (data && Array.isArray(data.result)) return data.result as Order[];
+    const roleID = getNormalizedRoleID();
+    const ORDERS_LIST_DISABLED_KEY = `orders:list_disabled:${roleID ?? 'unknown'}`;
+    // Customer should NEVER call staff/admin endpoints like GET /orders (403).
+    // Staff/admin prefer staff endpoints.
+    const candidates =
+      roleID === '1'
+        ? ['/my-orders', '/orders/my', '/orders/me']
+        : ['/staff/orders', '/orders', '/my-orders', '/orders/my', '/orders/me'];
+
+    for (const url of candidates) {
+      try {
+        const res = await axiosInstance.get<any>(url);
+        const data = res.data;
+        // Orders endpoint works → clear any stale disable flag.
+        try {
+          localStorage.removeItem(ORDERS_LIST_DISABLED_KEY);
+        } catch {
+          // ignore
+        }
+        if (Array.isArray(data)) return data as Order[];
+        if (data && Array.isArray(data.orders)) return data.orders as Order[];
+        if (data && Array.isArray(data.data)) return data.data as Order[];
+        if (data && Array.isArray(data.result)) return data.result as Order[];
+        return [];
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          const status = err.response?.status;
+          if (status === 404) continue;
+          if (status === 403) continue;
+        }
+        throw err;
+      }
+    }
+
     return [];
   },
 
