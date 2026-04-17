@@ -1,8 +1,6 @@
-// src/routes/ordersRoutes.js
 import express from "express";
-import OrdersController from "../controllers/ordersController.js";
+import orderController from "../modules/order/order.controller.js";
 import OrderItemsController from "../controllers/orderItemsController.js";
-import authMiddleware from "../middlewares/auth.js";
 import {
   isCustomer,
   isStaffOrAdmin,
@@ -11,182 +9,74 @@ import {
 
 const router = express.Router();
 
-/**
- * @swagger
- * tags:
- *   name: Orders
- *   description: Orders management APIs
- */
+// Staff/Admin - monitor all orders
+router.get("/orders", verifyToken, isStaffOrAdmin, orderController.getAllOrders);
 
-/**
- * @swagger
- * /api/orders:
- *   get:
- *     summary: Get all orders
- *     tags: [Orders]
- *     responses:
- *       200:
- *         description: Get orders successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *       500:
- *         description: Server error
- */
-router.get("/orders", authMiddleware, OrdersController.getAllOrders);
-
-/**
- * @swagger
- * /api/create-orders:
- *   post:
- *     summary: Create new order
- *     tags: [Orders]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - totalPrice
- *             properties:
- *               userId:
- *                 type: integer
- *               totalPrice:
- *                 type: number
- *               status:
- *                 type: string
- *                 example: pending
- *               note:
- *                 type: string
- *     responses:
- *       201:
- *         description: Order created successfully
- *       400:
- *         description: Bad request
- */
+// User - create order from cart (backward-compatible endpoints)
 router.post(
   "/create-orders",
   verifyToken,
   isCustomer,
-  OrdersController.createOrders,
+  orderController.createOrder,
 );
 router.post(
   "/orders",
   verifyToken,
   isCustomer,
-  OrdersController.createOrders,
+  orderController.createOrder,
 );
 
 /** Current user's orders (JWT). */
-router.get("/my-orders", verifyToken, OrdersController.getMyOrders);
+router.get("/my-orders", verifyToken, orderController.getMyOrders);
+router.get("/orders/:id", verifyToken, orderController.getOrderById);
+router.get("/staff/orders", verifyToken, isStaffOrAdmin, orderController.getStaffOrders);
 
-/**
- * @swagger
- * /api/orders/{id}:
- *   get:
- *     summary: Get order by ID
- *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Order ID
- *     responses:
- *       200:
- *         description: Get order successfully
- *       404:
- *         description: Order not found
- */
-router.get("/orders/:id", authMiddleware, OrdersController.getOrderById);
+// Role-based status flow
+router.patch(
+  "/orders/:id/status",
+  verifyToken,
+  isStaffOrAdmin,
+  orderController.patchOrderStatus,
+);
+router.patch(
+  "/orders/:id/assign",
+  verifyToken,
+  isStaffOrAdmin,
+  orderController.assignOrder,
+);
+router.patch(
+  "/orders/:id/cancel",
+  verifyToken,
+  isCustomer,
+  orderController.cancelOrder,
+);
+router.patch(
+  "/orders/:id/refund-request",
+  verifyToken,
+  isCustomer,
+  orderController.requestRefund,
+);
+router.patch(
+  "/orders/:id/refund",
+  verifyToken,
+  isStaffOrAdmin,
+  orderController.resolveRefund,
+);
 
-/**
- * @swagger
- * /api/orders/{id}:
- *   put:
- *     summary: Update order
- *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               status:
- *                 type: string
- *                 example: completed
- *               totalPrice:
- *                 type: number
- *               note:
- *                 type: string
- *     responses:
- *       200:
- *         description: Order updated successfully
- *       404:
- *         description: Order not found
- */
-router.put("/orders/:id", verifyToken, OrdersController.updateOrders);
+// Backward-compatible update endpoint (used by old clients)
+router.put("/orders/:id", verifyToken, orderController.updateOrder);
 
-/**
- * @swagger
- * /api/orders/{id}:
- *   delete:
- *     summary: Delete order
- *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Order deleted successfully
- *       404:
- *         description: Order not found
- */
-router.delete("/orders/:id", authMiddleware, OrdersController.deleteOrders);
-
-/**
- * @swagger
- * /api/orders/approve/{id}:
- *   post:
- *     summary: Approve an order (staff/admin only)
- *     tags: [Orders]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: Order ID
- *     responses:
- *       200:
- *         description: Order approved successfully
- *       403:
- *         description: Forbidden
- *       404:
- *         description: Order not found
- */
+// Backward-compatible approval endpoint
 router.post(
   "/orders/approve/:id",
   verifyToken,
   isStaffOrAdmin,
-  OrdersController.approveOrder,
+  orderController.approveOrder,
 );
+
+// Order chat
+router.get("/orders/:id/messages", verifyToken, orderController.getOrderMessages);
+router.post("/orders/:id/messages", verifyToken, orderController.createOrderMessage);
 
 /**
  * Order Items (nested REST)

@@ -11,6 +11,7 @@ import initNotfoundRoutes from "./notfoundRoutes.js";
 import initPaymentsRoutes from "./paymentsRoutes.js";
 import initChatRoutes from "./chatRoutes.js";
 import initPresenceRoutes from "./presenceRoutes.js";
+import { buildStaffRouter } from "../modules/staff/staff.routes.js";
 
 const router = express.Router();
 
@@ -60,6 +61,7 @@ const initRoutes = (app) => {
   initPresenceRoutes(app);
   initNotfoundRoutes(app);
   initPaymentsRoutes(app);
+  app.use("/api", buildStaffRouter());
 };
 
 export default initRoutes;

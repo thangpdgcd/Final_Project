@@ -5,6 +5,7 @@ import { joinDefaultRooms } from "../../modules/chat/rooms/room.manager.js";
 import { rooms } from "./rooms.js";
 import { events } from "./events.js";
 import { presence } from "./presence.js";
+import models from "../../models/index.js";
 
 let ioInstance = null;
 
@@ -21,10 +22,32 @@ export const emitOrderUpdate = (order) => {
   const payload = toPayload(order);
   if (!payload) return;
   const uid = payload.userId ?? payload.user_ID;
+  const status = String(payload.status ?? "")
+    .trim()
+    .toLowerCase();
+  const shouldEmitToStaff = status !== "cancelled";
   if (uid != null && uid !== "") {
-    io.to(rooms.user(uid)).to(rooms.staff()).emit(events.order.update, payload);
+    io.to(rooms.user(uid)).emit(events.order.update, payload);
+    io.to(rooms.user(uid)).emit(events.order.updated, payload);
+    if (shouldEmitToStaff) {
+      io.to(rooms.staff()).emit(events.order.update, payload);
+      io.to(rooms.staff()).emit(events.order.updated, payload);
+    }
   } else {
-    io.to(rooms.staff()).emit(events.order.update, payload);
+    if (shouldEmitToStaff) {
+      io.to(rooms.staff()).emit(events.order.update, payload);
+      io.to(rooms.staff()).emit(events.order.updated, payload);
+    }
+  }
+  if (payload.orderId != null && payload.orderId !== "") {
+    io.to(rooms.order(payload.orderId)).emit(events.order.updated, payload);
+  }
+  if (status === "cancelled") {
+    if (uid != null && uid !== "") io.to(rooms.user(uid)).emit(events.order.cancelled, payload);
+  }
+  if (status === "completed") {
+    io.to(rooms.staff()).emit(events.order.completed, payload);
+    if (uid != null && uid !== "") io.to(rooms.user(uid)).emit(events.order.completed, payload);
   }
 };
 
@@ -36,8 +59,13 @@ export const emitOrderNew = (order) => {
   const uid = payload.userId ?? payload.user_ID;
   if (uid != null && uid !== "") {
     io.to(rooms.user(uid)).to(rooms.staff()).emit(events.order.created, payload);
+    io.to(rooms.staff()).emit(events.order.receive, payload);
   } else {
     io.to(rooms.staff()).emit(events.order.created, payload);
+    io.to(rooms.staff()).emit(events.order.receive, payload);
+  }
+  if (payload.orderId != null && payload.orderId !== "") {
+    io.to(rooms.order(payload.orderId)).emit(events.order.receive, payload);
   }
 };
 
@@ -69,7 +97,7 @@ export const attachSocketServer = (httpServer, { registerModules } = {}) => {
 
   ioInstance = io;
 
-  io.use((socket, next) => {
+  io.use(async (socket, next) => {
     const token = socket.handshake.auth?.token;
     const secret = process.env.JWT_SECRET;
     if (!token || !secret) {
@@ -78,7 +106,7 @@ export const attachSocketServer = (httpServer, { registerModules } = {}) => {
     try {
       const decoded = jwt.verify(token, secret);
       const userId = decoded?.id ?? decoded?.userId;
-      const roleID =
+      let roleID =
         decoded?.roleID != null
           ? String(decoded.roleID)
           : decoded?.roleId != null
@@ -87,6 +115,13 @@ export const attachSocketServer = (httpServer, { registerModules } = {}) => {
       if (userId == null || userId === "") {
         return next(new Error("Authentication error"));
       }
+      if (!roleID) {
+        const user = await models.Users.findByPk(userId, {
+          attributes: ["roleID"],
+        });
+        roleID = user?.roleID != null ? String(user.roleID) : "";
+      }
+
       const role = normalizeRole(decoded.role) || roleIdToRole(roleID);
       const normalized = normalizeRole(role);
       socket.data.userId = userId;
@@ -106,6 +141,8 @@ export const attachSocketServer = (httpServer, { registerModules } = {}) => {
 
     if (uid != null && uid !== "") {
       presence.onConnect({ userId: uid, role, socketId: socket.id });
+      // Notify staff dashboards about presence changes
+      io.to(rooms.staff()).emit("presence:update", { userId: String(uid), role, online: true });
     }
 
     socketLogger.info("connected", "Socket connected", {
@@ -116,6 +153,9 @@ export const attachSocketServer = (httpServer, { registerModules } = {}) => {
 
     socket.on("disconnect", (reason) => {
       presence.onDisconnect({ userId: uid, socketId: socket.id });
+      if (uid != null && uid !== "") {
+        io.to(rooms.staff()).emit("presence:update", { userId: String(uid), role, online: presence.isOnline(uid) });
+      }
       socketLogger.info("disconnected", "Socket disconnected", {
         socketId: socket.id,
         userId: uid,

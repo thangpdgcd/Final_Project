@@ -1,6 +1,6 @@
 import { sendSuccess, sendError } from "../../utils/response.js";
 
-export const createStaffController = ({ staffService }) => {
+export const createStaffController = ({ staffService, voucherService, orderService }) => {
   const getAllUsers = async (req, res) => {
     try {
       const data = await staffService.getAllUsers();
@@ -54,12 +54,156 @@ export const createStaffController = ({ staffService }) => {
     }
   };
 
+  const createManualVoucher = async (req, res) => {
+    try {
+      const { userId, type, value } = req.body ?? {};
+      const staffId = req.user?.id;
+      if (!userId) return sendError(res, 400, "userId is required", null);
+
+      const voucher = await staffService.createManualVoucher({
+        voucherService,
+        userId,
+        type,
+        value,
+        staffId,
+      });
+
+      return sendSuccess(
+        res,
+        201,
+        {
+          code: voucher.code,
+          expiresAt: voucher.expiresAt,
+          type: voucher.type,
+          value: voucher.value,
+          maxDiscountValue: voucher.maxDiscountValue,
+        },
+        "Created",
+      );
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const listVouchers = async (req, res) => {
+    try {
+      const { q, userId, page, pageSize } = req.query ?? {};
+      const data = await staffService.listVouchers({ q, userId, page, pageSize });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const updateVoucher = async (req, res) => {
+    try {
+      const id = req.params.id;
+      const data = await staffService.updateVoucher({ id, patch: req.body });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const deleteVoucher = async (req, res) => {
+    try {
+      const id = req.params.id;
+      await staffService.deleteVoucher({ id });
+      return sendSuccess(res, 200, null, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const getProfile = async (req, res) => {
+    try {
+      const staffId = req.user?.id;
+      const data = await staffService.getStaffProfile({ staffId });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const updateProfile = async (req, res) => {
+    try {
+      const staffId = req.user?.id;
+      const data = await staffService.updateStaffProfile({ staffId, patch: req.body });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const changePassword = async (req, res) => {
+    try {
+      const staffId = req.user?.id;
+      const { currentPassword, newPassword } = req.body ?? {};
+      await staffService.changeStaffPassword({ staffId, currentPassword, newPassword });
+      return sendSuccess(res, 200, null, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const uploadAvatar = async (req, res) => {
+    try {
+      const staffId = req.user?.id;
+      const avatarUrl = req.file?.path ?? req.file?.secure_url ?? null;
+      const data = await staffService.uploadStaffAvatar({ staffId, avatarUrl });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const sendEmail = async (req, res) => {
+    try {
+      const staffId = req.user?.id;
+      const { toUserId, subject, content } = req.body ?? {};
+      const data = await staffService.sendEmailToUser({ staffId, toUserId, subject, content });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const getAnalytics = async (req, res) => {
+    try {
+      const { range } = req.query ?? {};
+      const data = await orderService.getAnalytics({ range });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
   return {
     getAllUsers,
     getUsersById,
     createAdmin,
     updateUsers,
     deleteUsers,
+    createManualVoucher,
+    listVouchers,
+    updateVoucher,
+    deleteVoucher,
+    getProfile,
+    updateProfile,
+    changePassword,
+    uploadAvatar,
+    sendEmail,
+    getAnalytics,
   };
 };
 

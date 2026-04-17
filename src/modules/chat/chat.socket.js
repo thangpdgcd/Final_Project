@@ -1,7 +1,7 @@
 import { AppError } from "../../core/utils/AppError.js";
 import { socketLogger } from "../../core/utils/socketLogger.js";
 import { createReceiveMessageEmitter } from "./events/receive.message.js";
-import { registerSendMessageHandler } from "./events/send.message.js";
+import { registerSendMessageAliases, registerSendMessageHandler } from "./events/send.message.js";
 import { roomManager } from "./rooms/room.manager.js";
 
 const defaultEvents = {
@@ -168,6 +168,13 @@ export const registerChatSocket = ({
     logger,
   });
 
+  registerSendMessageAliases({
+    socket,
+    roomManager: rooms,
+    emitReceiveMessage,
+    logger,
+  });
+
   socket.on(events.chat.join, (payload) => {
     joinConversation(payload).catch((err) => {
       logger.warn("join_failed", "Failed to join room", {
@@ -286,7 +293,42 @@ export const registerChatSocket = ({
   });
 
   socket.on(events.chat.typing, (payload) => {
-    socket.broadcast.emit(events.chat.typing, payload);
+    const role = String(socket.data.role ?? socket.data.user?.role ?? "");
+    const toUserId = payload?.toUserId ?? payload?.recipientUserId ?? payload?.userId ?? null;
+    const conversationId = payload?.conversationId ?? payload?.roomId ?? null;
+
+    if (conversationId != null && conversationId !== "") {
+      socket.to(rooms.conversation(conversationId)).emit(events.chat.typing, payload);
+      return;
+    }
+
+    if (role === "user") {
+      socket.to(rooms.staff()).emit(events.chat.typing, payload);
+      return;
+    }
+    if ((role === "staff" || role === "admin") && toUserId) {
+      socket.to(rooms.user(toUserId)).emit(events.chat.typing, payload);
+      return;
+    }
+  });
+
+  socket.on("chat:seen", (payload = {}) => {
+    const role = String(socket.data.role ?? socket.data.user?.role ?? "");
+    const toUserId = payload?.toUserId ?? payload?.recipientUserId ?? payload?.userId ?? null;
+    const conversationId = payload?.conversationId ?? payload?.roomId ?? null;
+
+    if (conversationId != null && conversationId !== "") {
+      socket.to(rooms.conversation(conversationId)).emit("chat:seen", payload);
+      return;
+    }
+
+    if (role === "user") {
+      socket.to(rooms.staff()).emit("chat:seen", payload);
+      return;
+    }
+    if ((role === "staff" || role === "admin") && toUserId) {
+      socket.to(rooms.user(toUserId)).emit("chat:seen", payload);
+    }
   });
 };
 

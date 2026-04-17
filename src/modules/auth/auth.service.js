@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { AppError } from "../../utils/AppError.js";
+import { getUserAvatar } from "../../utils/userAvatar.js";
 
 const allowedRoles = ["1", "2", "3"]; // 1=customer, 2=admin, 3=staff
 
@@ -8,6 +9,23 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^[0-9+]{9,15}$/;
 
 export const createAuthService = ({ authRepository }) => {
+  const normalizeRoleID = (raw) => {
+    const v = raw == null ? "" : String(raw).trim().toLowerCase();
+    if (!v) return null;
+    if (v === "1" || v === "customer" || v === "user") return "1";
+    if (v === "2" || v === "admin") return "2";
+    if (v === "3" || v === "staff") return "3";
+    return null;
+  };
+
+  const roleFromRoleID = (roleID) => {
+    const id = normalizeRoleID(roleID);
+    if (id === "1") return "customer";
+    if (id === "2") return "admin";
+    if (id === "3") return "staff";
+    return null;
+  };
+
   const generateTokens = (user) => {
     const accessSecret = process.env.JWT_SECRET;
     const refreshSecret = process.env.REFRESH_TOKEN_SECRET;
@@ -15,7 +33,9 @@ export const createAuthService = ({ authRepository }) => {
       throw new AppError(500, "Server configuration error");
     }
 
-    const payload = { id: user.userId, roleID: user.roleID };
+    const roleID = normalizeRoleID(user.roleID) ?? "1";
+    const role = roleFromRoleID(roleID) ?? "customer";
+    const payload = { id: user.userId, roleID, role };
     const accessToken = jwt.sign(payload, accessSecret, { expiresIn: "3h" });
     const refreshToken = jwt.sign(payload, refreshSecret, { expiresIn: "7d" });
 
@@ -81,6 +101,9 @@ export const createAuthService = ({ authRepository }) => {
 
     const { accessToken, refreshToken } = generateTokens(user);
 
+    const avatar = await getUserAvatar(user.userId);
+    const normalizedRoleID = normalizeRoleID(user.roleID) ?? "1";
+
     return {
       accessToken,
       refreshToken,
@@ -88,7 +111,10 @@ export const createAuthService = ({ authRepository }) => {
         id: user.userId,
         name: user.name,
         email: user.email,
-        roleID: user.roleID,
+        roleID: normalizedRoleID,
+        avatar,
+        phoneNumber: user.phoneNumber ?? null,
+        address: user.address ?? null,
       },
     };
   };

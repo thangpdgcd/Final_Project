@@ -51,42 +51,61 @@ if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
 const httpServer = http.createServer(app);
 initSocket({ httpServer, registerModules: registerSocketModules });
 
-const listenWithRetry = (startPort, maxAttempts = 10) => {
-  let attempts = 0;
-  let currentPort = startPort;
+const isBackendAlreadyRunning = async (port) => {
+  const url = `http://127.0.0.1:${port}/api/health`;
+  const timeoutMs = 800;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal });
+    return res.ok;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+};
 
-  const tryListen = () => {
-    const onListening = () => {
-      httpServer.off("error", onError);
-      console.log(`✅ Server listening on: http://localhost:${currentPort}`);
-      console.log(`Swagger UI: http://localhost:${currentPort}/api-docs`);
-      console.log(`Socket.IO: ws://localhost:${currentPort}/socket.io/`);
-      httpServer.ref?.();
-    };
-
-    const onError = (err) => {
-      httpServer.off("listening", onListening);
-
-      if (err?.code === "EADDRINUSE" && attempts < maxAttempts) {
-        attempts += 1;
-        console.warn(
-          `⚠️ Port ${currentPort} is in use. Retrying on ${currentPort + 1}... (${attempts}/${maxAttempts})`,
-        );
-        currentPort += 1;
-        setTimeout(tryListen, 150);
-        return;
-      }
-
-      console.error("❌ Server listen error:", err);
-      process.exitCode = 1;
-    };
-
-    httpServer.once("error", onError);
-    httpServer.once("listening", onListening);
-    httpServer.listen(currentPort, "0.0.0.0");
+const listenOnPort = (port) => {
+  const onListening = () => {
+    httpServer.off("error", onError);
+    console.log(`✅ Server listening on: http://localhost:${port}`);
+    console.log(`Swagger UI: http://localhost:${port}/api-docs`);
+    console.log(`Socket.IO: ws://localhost:${port}/socket.io/`);
+    httpServer.ref?.();
   };
 
-  tryListen();
+  const onError = (err) => {
+    httpServer.off("listening", onListening);
+    if (err?.code === "EADDRINUSE") {
+      // If our backend is already running, exit cleanly to avoid “port in use” noise
+      // when the dev server is started twice.
+      isBackendAlreadyRunning(port)
+        .then((ok) => {
+          if (ok) {
+            console.log(`ℹ️ Backend is already running on port ${port}.`);
+            process.exit(0);
+          }
+          console.error(
+            `❌ Port ${port} is already in use by another process. Stop it, then restart the backend.`,
+          );
+          process.exit(1);
+        })
+        .catch(() => {
+          console.error(
+            `❌ Port ${port} is already in use. Stop the process using it, then restart the backend.`,
+          );
+          process.exit(1);
+        });
+      return;
+    }
+    console.error("❌ Server listen error:", err);
+    process.exitCode = 1;
+  };
+
+  httpServer.once("error", onError);
+  httpServer.once("listening", onListening);
+  httpServer.listen(port, "0.0.0.0");
 };
 
 try {
@@ -95,6 +114,6 @@ try {
   console.error("[chat-seed] Failed:", e?.message || e);
 }
 
-listenWithRetry(PORT);
+listenOnPort(PORT);
 
 export default app;

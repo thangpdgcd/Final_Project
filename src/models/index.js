@@ -52,6 +52,7 @@ for (const file of files) {
 // Module-owned models (kept outside src/models/)
 const moduleModelDirs = [
   path.resolve(__dirname, "../modules/chat/chat.models"),
+  path.resolve(__dirname, "../modules/order/order.models"),
 ];
 
 for (const dir of moduleModelDirs) {

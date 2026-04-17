@@ -6,6 +6,7 @@ export const roomManager = {
   admin: () => "admin",
   role: (role) => `role:${toId(role)}`,
   conversation: (conversationId) => `conversation:${toId(conversationId)}`,
+  order: (orderId) => `order:${toId(orderId)}`,
 };
 
 export const joinDefaultRooms = ({ socket, userId, role }) => {

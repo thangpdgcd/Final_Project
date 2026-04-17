@@ -24,6 +24,62 @@ const resolveTarget = ({ role, toUserId, roomManager }) => {
   return null;
 };
 
+const handleSendMessage = ({
+  socket,
+  roomManager,
+  emitReceiveMessage,
+  logger,
+  payload,
+  ack,
+  inboundEventName = "send_message",
+}) => {
+  const fromUserId = socket.data.userId ?? socket.data.user?.id;
+  const fromRole = socket.data.role ?? socket.data.user?.role;
+  const toUserId = pickToUserId(payload);
+
+  const fail = (message, code = "BAD_REQUEST") => {
+    logger?.warn("send_rejected", `Rejected ${inboundEventName}`, {
+      socketId: socket.id,
+      fromUserId,
+      fromRole,
+      code,
+      message,
+      inboundEventName,
+    });
+    if (typeof ack === "function") ack({ ok: false, code, message });
+    socket.emit("error", { message });
+  };
+
+  if (!fromUserId || !fromRole) return fail("Unauthorized", "UNAUTHORIZED");
+
+  const target = resolveTarget({ role: fromRole, toUserId, roomManager });
+  if (!target && fromRole === "staff") {
+    return fail("toUserId is required for staff messages", "MISSING_TO_USER");
+  }
+  if (!target) return fail("Invalid role", "INVALID_ROLE");
+
+  logger?.info("send_accepted", `Accepted ${inboundEventName}`, {
+    socketId: socket.id,
+    fromUserId,
+    fromRole,
+    flow: target.flow,
+    toUserId: target.toUserId,
+    toRoom: target.toRoom,
+    inboundEventName,
+  });
+
+  emitReceiveMessage({
+    fromUserId,
+    fromRole,
+    toRoom: target.toRoom,
+    toUserId: target.toUserId,
+    payload,
+    socketId: socket.id,
+  });
+
+  if (typeof ack === "function") ack({ ok: true });
+};
+
 export const registerSendMessageHandler = ({
   socket,
   roomManager,
@@ -31,48 +87,38 @@ export const registerSendMessageHandler = ({
   logger,
 }) => {
   socket.on("send_message", (payload, ack) => {
-    const fromUserId = socket.data.userId ?? socket.data.user?.id;
-    const fromRole = socket.data.role ?? socket.data.user?.role;
-    const toUserId = pickToUserId(payload);
-
-    const fail = (message, code = "BAD_REQUEST") => {
-      logger?.warn("send_rejected", "Rejected send_message", {
-        socketId: socket.id,
-        fromUserId,
-        fromRole,
-        code,
-        message,
-      });
-      if (typeof ack === "function") ack({ ok: false, code, message });
-      socket.emit("error", { message });
-    };
-
-    if (!fromUserId || !fromRole) return fail("Unauthorized", "UNAUTHORIZED");
-
-    const target = resolveTarget({ role: fromRole, toUserId, roomManager });
-    if (!target && fromRole === "staff") {
-      return fail("toUserId is required for staff messages", "MISSING_TO_USER");
-    }
-    if (!target) return fail("Invalid role", "INVALID_ROLE");
-
-    logger?.info("send_accepted", "Accepted send_message", {
-      socketId: socket.id,
-      fromUserId,
-      fromRole,
-      flow: target.flow,
-      toUserId: target.toUserId,
-      toRoom: target.toRoom,
-    });
-
-    emitReceiveMessage({
-      fromUserId,
-      fromRole,
-      toRoom: target.toRoom,
-      toUserId: target.toUserId,
+    handleSendMessage({
+      socket,
+      roomManager,
+      emitReceiveMessage,
+      logger,
       payload,
-      socketId: socket.id,
+      ack,
+      inboundEventName: "send_message",
     });
-
-    if (typeof ack === "function") ack({ ok: true });
   });
+};
+
+export const registerSendMessageAliases = ({
+  socket,
+  roomManager,
+  emitReceiveMessage,
+  logger,
+}) => {
+  const bind = (eventName) => {
+    socket.on(eventName, (payload, ack) => {
+      handleSendMessage({
+        socket,
+        roomManager,
+        emitReceiveMessage,
+        logger,
+        payload,
+        ack,
+        inboundEventName: eventName,
+      });
+    });
+  };
+
+  bind("staff_send_message");
+  bind("user_send_message");
 };

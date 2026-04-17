@@ -1,4 +1,10 @@
 import models from "../../models/index.js";
+import {
+  getWalletXu,
+  addWalletXu,
+  recordWalletTransaction,
+  listWalletTransactions,
+} from "../../utils/walletCoin.js";
 
 const { Users } = models;
 
@@ -12,6 +18,20 @@ export const createUserRepository = () => {
     return user;
   };
 
-  return { findById, updateById };
+  const readWalletXu = async (userId) => getWalletXu(userId);
+  const increaseWalletXu = async ({ userId, amountXu }) =>
+    addWalletXu({ userId, amountXu });
+  const addWalletTx = async (payload) => recordWalletTransaction(payload);
+  const getWalletTxHistory = async ({ userId, limit }) =>
+    listWalletTransactions({ userId, limit });
+
+  return {
+    findById,
+    updateById,
+    readWalletXu,
+    increaseWalletXu,
+    addWalletTx,
+    getWalletTxHistory,
+  };
 };
 

@@ -33,6 +33,54 @@ export const createUserController = ({ userService }) => {
     }
   };
 
-  return { updateProfile, uploadAvatar };
+  const getWallet = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const result = await userService.getWallet({ userId });
+      return sendSuccess(res, 200, result, "Wallet loaded");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const topupWallet = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { amountXu, paypalCaptureId, note } = req.body ?? {};
+      const result = await userService.topupWalletByPaypal({
+        userId,
+        amountXu,
+        paypalCaptureId,
+        note,
+      });
+      return sendSuccess(res, 200, result, "Wallet top-up successful");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const getWalletTransactions = async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const result = await userService.getWalletTransactions({
+        userId,
+        limit: req.query?.limit,
+      });
+      return sendSuccess(res, 200, result, "Wallet transactions loaded");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  return {
+    updateProfile,
+    uploadAvatar,
+    getWallet,
+    topupWallet,
+    getWalletTransactions,
+  };
 };
 
