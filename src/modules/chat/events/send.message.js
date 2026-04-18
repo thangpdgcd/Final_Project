@@ -75,6 +75,7 @@ const handleSendMessage = ({
     toUserId: target.toUserId,
     payload,
     socketId: socket.id,
+    socket,
   });
 
   if (typeof ack === "function") ack({ ok: true });

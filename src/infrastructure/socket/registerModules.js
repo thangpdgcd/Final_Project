@@ -4,7 +4,7 @@ import { registerChatSocket } from "../../modules/chat/chat.socket.js";
 import { registerOrderSocket } from "../../modules/order/order.socket.js";
 import { createUserRepository } from "../../modules/user/user.repository.js";
 import { createStaffRepository } from "../../modules/staff/staff.repository.js";
-import { registerVoucherSocket } from "../../sockets/voucher.socket.js";
+import { registerVoucherSocket } from "../../socket/voucher.socket.js";
 import { registerStaffInternalSocket } from "../../modules/staff/staff.internal.socket.js";
 
 export const registerSocketModules = ({ io, socket, rooms, events }) => {

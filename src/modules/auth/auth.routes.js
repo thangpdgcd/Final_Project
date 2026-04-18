@@ -31,6 +31,12 @@ export const buildAuthRouter = () => {
   router.post("/logout", authController.logout);
   router.post("/refresh-token", authController.refreshToken);
 
+  // Aliases for frontend clients that use `/api/auth/*` (base URL already includes `/api`).
+  router.post("/auth/refresh", authController.refreshToken);
+  router.post("/auth/logout", authController.logout);
+  router.post("/auth/change-password", authMiddleware, authController.changePassword);
+  router.get("/users/me", authMiddleware, authController.getMe);
+
   return router;
 };
 

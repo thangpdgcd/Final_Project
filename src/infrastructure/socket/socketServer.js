@@ -141,8 +141,14 @@ export const attachSocketServer = (httpServer, { registerModules } = {}) => {
 
     if (uid != null && uid !== "") {
       presence.onConnect({ userId: uid, role, socketId: socket.id });
-      // Notify staff dashboards about presence changes
-      io.to(rooms.staff()).emit("presence:update", { userId: String(uid), role, online: true });
+      const presencePayload = { userId: String(uid), role, online: true };
+      // Customers: notify staff inbox only. Admin/staff: notify both so internal team chat sees peers.
+      if (role === "user") {
+        io.to(rooms.staff()).emit("presence:update", presencePayload);
+      } else {
+        io.to(rooms.staff()).emit("presence:update", presencePayload);
+        io.to(rooms.admin()).emit("presence:update", presencePayload);
+      }
     }
 
     socketLogger.info("connected", "Socket connected", {
@@ -154,7 +160,13 @@ export const attachSocketServer = (httpServer, { registerModules } = {}) => {
     socket.on("disconnect", (reason) => {
       presence.onDisconnect({ userId: uid, socketId: socket.id });
       if (uid != null && uid !== "") {
-        io.to(rooms.staff()).emit("presence:update", { userId: String(uid), role, online: presence.isOnline(uid) });
+        const presencePayload = { userId: String(uid), role, online: presence.isOnline(uid) };
+        if (role === "user") {
+          io.to(rooms.staff()).emit("presence:update", presencePayload);
+        } else {
+          io.to(rooms.staff()).emit("presence:update", presencePayload);
+          io.to(rooms.admin()).emit("presence:update", presencePayload);
+        }
       }
       socketLogger.info("disconnected", "Socket disconnected", {
         socketId: socket.id,

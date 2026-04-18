@@ -14,7 +14,7 @@ export default (sequelize, DataTypes) => {
       },
       userId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         field: "user_id",
       },
       type: {
@@ -30,10 +30,32 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         field: "max_discount_value",
       },
+      maxUsage: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
+        field: "max_usage",
+      },
+      usedCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        field: "used_count",
+      },
+      status: {
+        type: DataTypes.ENUM("active", "inactive", "pending"),
+        allowNull: false,
+        defaultValue: "active",
+      },
       expiresAt: {
         type: DataTypes.DATE,
         allowNull: false,
         field: "expires_at",
+      },
+      deletedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        field: "deleted_at",
       },
       createdByStaffId: {
         type: DataTypes.INTEGER,
@@ -60,7 +82,6 @@ export default (sequelize, DataTypes) => {
   );
 
   Vouchers.associate = (models) => {
-    // Optional associations (only if Users model exists with matching PK)
     if (models?.Users) {
       Vouchers.belongsTo(models.Users, {
         foreignKey: "userId",
@@ -77,4 +98,3 @@ export default (sequelize, DataTypes) => {
 
   return Vouchers;
 };
-

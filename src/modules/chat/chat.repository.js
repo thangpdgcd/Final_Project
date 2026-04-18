@@ -1,6 +1,6 @@
 import models from "../../models/index.js";
 
-const { Conversations, ConversationParticipants, Messages } = models;
+const { Conversations, ConversationParticipants, Messages, Users } = models;
 
 export const createChatRepository = () => {
   const clampLimit = (limit, defaultValue = 20, max = 50) => {
@@ -48,6 +48,16 @@ export const createChatRepository = () => {
         ? lastMessageByConversationId.get(c.id).toJSON()
         : null,
     }));
+  };
+
+  /** Một conversation đã enrich (participants + lastMessage) — dùng cho GET /conversations/:id */
+  const getConversationEnrichedById = async ({ conversationId }) => {
+    const id = Number(conversationId);
+    if (!Number.isFinite(id) || id <= 0) return null;
+    const conv = await Conversations.findByPk(id);
+    if (!conv) return null;
+    const enriched = await enrichConversations({ conversations: [conv] });
+    return enriched[0] ?? null;
   };
 
   const createConversation = async ({ createdByUserId, type = "support" }) => {
@@ -181,6 +191,14 @@ export const createChatRepository = () => {
   const listMessages = async ({ conversationId, limit = 50, offset = 0 }) => {
     return Messages.findAll({
       where: { conversationId },
+      include: [
+        {
+          model: Users,
+          as: "sender",
+          attributes: ["userId", "roleID", "name"],
+          required: false,
+        },
+      ],
       order: [["createdAt", "DESC"]],
       limit,
       offset,
@@ -266,6 +284,7 @@ export const createChatRepository = () => {
     getLastMessage,
     listConversationsForUser,
     listConversationsGlobal,
+    getConversationEnrichedById,
   };
 };
 

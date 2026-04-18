@@ -76,8 +76,22 @@ export const registerChatSocket = ({
       conversationId,
       user: socket.data.user,
     });
-    const payload = { conversationId, roomId: String(conversationId), message: saved };
+    const plainMessage =
+      saved && typeof saved.toJSON === "function"
+        ? saved.toJSON()
+        : saved && typeof saved.get === "function"
+          ? saved.get({ plain: true })
+          : saved;
+    const payload = {
+      conversationId,
+      roomId: String(conversationId),
+      message: plainMessage,
+    };
 
+    // Everyone who joined this conversation (join_room / chat:message) — reliable for admin↔staff threads.
+    io.to(conversationRoom(conversationId)).emit("receive_message", payload);
+
+    // Per-user rooms (socket joins user:${id} on connect) — backup + clients not in conv room yet.
     ids.forEach((uid) => {
       io.to(userRoom(uid)).emit("receive_message", payload);
     });
@@ -189,7 +203,9 @@ export const registerChatSocket = ({
     const maybeCreateAndJoin = async () => {
       const joinRoomState = getJoinRoomState();
       const now = Date.now();
+      const keyForThrottle = buildJoinRoomKey(payload);
       if (now - joinRoomState.lastAttemptAt < JOIN_ROOM_RATE_LIMIT_MS) {
+        const cached = joinRoomState.byKey.get(keyForThrottle);
         logger.warn("join_room_throttled", "join_room request throttled", {
           socketId: socket.id,
           rateLimitMs: JOIN_ROOM_RATE_LIMIT_MS,
@@ -198,6 +214,7 @@ export const registerChatSocket = ({
           ack({
             ok: true,
             throttled: true,
+            conversationId: cached?.lastConversationId ?? null,
             message: "join_room throttled",
           });
         }
@@ -277,18 +294,22 @@ export const registerChatSocket = ({
       });
 
       if (typeof ack === "function") {
-        ack({ conversationId, roomId: String(conversationId), message: saved });
+        ack({ ok: true, conversationId, roomId: String(conversationId), message: saved });
       }
 
       await emitToParticipants({ conversationId, saved });
     };
 
     run().catch((err) => {
+      const message = err?.message || "Error";
       logger.warn("conversation_send_failed", "chat:message failed", {
         socketId: socket.id,
-        error: err?.message || "Error",
+        error: message,
       });
-      socket.emit("error", { message: err?.message || "Error" });
+      if (typeof ack === "function") {
+        ack({ ok: false, message });
+      }
+      socket.emit("error", { message });
     });
   });
 

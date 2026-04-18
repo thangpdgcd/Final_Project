@@ -156,7 +156,7 @@ export const buildPresenceRouter = ({
   router.get("/staff/online", authenticateMiddleware, handlers.getStaffOnline);
 
 /**
- * @swagger
+ * @swaggerhiện tại vẫn chưa connect tin nhắn với admin
  * /api/users/online:
  *   get:
  *     summary: List online users (all roles)

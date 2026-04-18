@@ -22,6 +22,61 @@ const router = buildChatRouter();
 
 /**
  * @swagger
+ * /api/conversations/direct:
+ *   post:
+ *     summary: Find or create a 1-1 conversation with recipientUserId (admin/staff/user rules apply)
+ *     tags: [Chat]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [recipientUserId]
+ *             properties:
+ *               recipientUserId:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+
+/**
+ * @swagger
+ * /api/conversations/{conversationId}:
+ *   get:
+ *     summary: Get one conversation (participant only)
+ *     tags: [Chat]
+ *     parameters:
+ *       - in: path
+ *         name: conversationId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+
+/**
+ * @swagger
+ * /api/chat/conversations/{conversationId}:
+ *   get:
+ *     summary: Get one conversation (alias of GET /conversations/{conversationId})
+ *     tags: [Chat]
+ *     parameters:
+ *       - in: path
+ *         name: conversationId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: OK
+ */
+
+/**
+ * @swagger
  * /api/messages/{conversationId}:
  *   get:
  *     summary: Get messages in a conversation

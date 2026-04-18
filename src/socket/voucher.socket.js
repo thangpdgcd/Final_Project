@@ -1,0 +1,99 @@
+import { socketLogger } from "../core/utils/socketLogger.js";
+import { createVoucherService } from "../services/voucher.service.js";
+
+export const registerVoucherSocket = ({ io, socket, rooms }) => {
+  const voucherService = createVoucherService();
+
+  socket.on("send_voucher", async (payload = {}, ack) => {
+    const reply = (data) => {
+      if (typeof ack === "function") ack(data);
+    };
+
+    const actor = socket.data.user;
+    const role = String(actor?.role ?? "").trim().toLowerCase();
+    const isStaffOrAdmin = role === "staff" || role === "admin";
+    const isAdmin = role === "admin";
+    if (!isStaffOrAdmin) return reply({ ok: false, message: "Forbidden" });
+
+    const userId = payload?.userId;
+    let code = String(payload?.code ?? "").trim();
+    const message = String(payload?.message ?? "").trim();
+
+    const wantsCreate =
+      !code &&
+      payload?.type != null &&
+      payload?.value != null &&
+      (payload.type === "fixed" || payload.type === "percent");
+
+    // Staff cannot create vouchers via socket; only admin can.
+    if (wantsCreate && !isAdmin) {
+      return reply({ ok: false, message: "Only admin can create vouchers" });
+    }
+
+    if (wantsCreate) {
+      try {
+        const voucher = await voucherService.createManualVoucher({
+          userId,
+          type: payload.type,
+          value: payload.value,
+          staffId: actor?.id,
+        });
+        code = String(voucher?.code ?? "").trim();
+      } catch (e) {
+        const msg = e?.message || "Failed to create voucher";
+        socketLogger.warn("voucher_create_failed", msg, {
+          socketId: socket.id,
+          staffId: actor?.id,
+          userId,
+        });
+        return reply({ ok: false, message: msg });
+      }
+    }
+
+    if (!userId || !code) {
+      return reply({
+        ok: false,
+        message: "userId and code are required (or type + value to create)",
+      });
+    }
+
+    try {
+      // Voucher may belong to different sources (e.g. promo voucher codes).
+      // We still audit the send event even if it doesn't exist in `vouchers`.
+      let voucher = null;
+      try {
+        voucher = await voucherService.findVoucherByCodeForUser({ code, userId });
+      } catch {
+        voucher = null;
+      }
+      await voucherService.auditSendVoucher({
+        voucherId: voucher?.id ?? null,
+        staffId: actor?.id,
+        userId,
+        code,
+        message,
+      });
+    } catch (e) {
+      socketLogger.warn("voucher_audit_failed", "Voucher audit failed", {
+        socketId: socket.id,
+        message: e?.message || "Error",
+      });
+    }
+
+    io.to(rooms.user(userId)).emit("send_voucher", {
+      userId,
+      code,
+      message,
+    });
+
+    socketLogger.info("voucher_sent", "Voucher sent to user room", {
+      socketId: socket.id,
+      staffId: actor?.id,
+      userId,
+      code,
+    });
+
+    return reply({ ok: true, code });
+  });
+};
+

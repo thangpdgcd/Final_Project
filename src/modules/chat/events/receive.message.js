@@ -6,7 +6,7 @@ const toMessageBody = (payload) => {
 };
 
 export const createReceiveMessageEmitter = ({ io, logger }) => {
-  return ({ fromUserId, fromRole, toRoom, toUserId, payload, socketId }) => {
+  return ({ fromUserId, fromRole, toRoom, toUserId, payload, socketId, socket }) => {
     const out = {
       from: { userId: fromUserId, role: fromRole },
       to: { room: toRoom, ...(toUserId ? { userId: toUserId } : {}) },
@@ -23,6 +23,10 @@ export const createReceiveMessageEmitter = ({ io, logger }) => {
     });
 
     io.to(toRoom).emit("receive_message", out);
+    // Staff→user (and similar) only targeted the peer room; echo so the sender sees their own line.
+    if (socket && typeof socket.emit === "function") {
+      socket.emit("receive_message", out);
+    }
     return out;
   };
 };

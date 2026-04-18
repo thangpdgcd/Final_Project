@@ -15,9 +15,11 @@ export const buildChatRouter = () => {
   const chatService = createChatService({ chatRepository, userRepository, staffRepository });
   const chatController = createChatController({ chatService });
 
-  // Required endpoints
+  // Static paths must be registered before `/conversations/:conversationId` (avoid "me"/"direct" captured as id).
   router.get("/conversations/me", authenticate, chatController.listMyConversations);
   router.get("/conversations", authenticate, chatController.listConversations);
+  router.post("/conversations/direct", authenticate, chatController.findOrCreateDirectConversation);
+  router.get("/conversations/:conversationId", authenticate, chatController.getConversation);
   router.get("/messages/:conversationId", authenticate, chatController.getMessages);
   router.post("/messages", authenticate, chatController.postMessage);
 
@@ -27,6 +29,8 @@ export const buildChatRouter = () => {
     authenticate,
     chatController.getMessages,
   );
+  /** Same as GET /conversations/:conversationId — under /chat for clients that only use the /chat/conversations prefix. */
+  router.get("/chat/conversations/:conversationId", authenticate, chatController.getConversation);
 
   return router;
 };

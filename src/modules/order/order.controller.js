@@ -28,6 +28,14 @@ const getMyOrders = asyncHandler(async (req, res) => {
   return sendSuccess(res, 200, data, "OK");
 });
 
+const getUserOrders = asyncHandler(async (req, res) => {
+  const data = await orderService.listUserOrders({
+    userId: req.params.userId,
+    status: req.query?.status,
+  });
+  return sendSuccess(res, 200, data, "OK");
+});
+
 const getStaffOrders = asyncHandler(async (req, res) => {
   const data = await orderService.listStaffOrders({
     staffId: req.user?.id ?? req.user?.userId,
@@ -133,6 +141,7 @@ export default {
   getAllOrders,
   getOrderById,
   getMyOrders,
+  getUserOrders,
   getStaffOrders,
   createOrder,
   createOrders: createOrder, // backward compatibility

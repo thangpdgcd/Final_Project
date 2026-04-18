@@ -1,5 +1,29 @@
 import { AppError } from "../../core/utils/AppError.js";
+import models from "../../models/index.js";
 import { presenceManager as presence } from "./rooms/presence.manager.js";
+
+const serializeMessageForApi = (msg, fallbackSenderRoleId) => {
+  if (!msg) return null;
+  const row = typeof msg.toJSON === "function" ? msg.toJSON() : msg;
+  const sender = row.sender;
+  const senderRoleId =
+    sender?.roleID != null
+      ? String(sender.roleID)
+      : fallbackSenderRoleId != null
+        ? String(fallbackSenderRoleId)
+        : undefined;
+  return {
+    id: row.id,
+    conversationId: row.conversationId,
+    senderUserId: row.senderUserId,
+    type: row.type,
+    content: row.text ?? null,
+    action: row.action ?? null,
+    meta: row.meta ?? null,
+    createdAt: row.createdAt,
+    senderRoleId,
+  };
+};
 
 const normalizeRole = (role) => {
   const r = role == null ? "" : String(role).trim().toLowerCase();
@@ -290,7 +314,17 @@ export const createChatService = ({ chatRepository, userRepository, staffReposit
       await applyActionSideEffects({ sender, action, meta });
     }
 
-    return msg;
+    const reloaded = await models.Messages.findByPk(msg.id, {
+      include: [
+        {
+          model: models.Users,
+          as: "sender",
+          attributes: ["userId", "roleID", "name"],
+          required: false,
+        },
+      ],
+    });
+    return serializeMessageForApi(reloaded ?? msg, sender?.roleID);
   };
 
   const sendMessageFromApi = async ({ sender, body }) => {
@@ -341,7 +375,7 @@ export const createChatService = ({ chatRepository, userRepository, staffReposit
   const getHistory = async ({ conversationId, user, limit, offset }) => {
     await ensureParticipant({ conversationId, user });
     const messages = await chatRepository.listMessages({ conversationId, limit, offset });
-    return messages;
+    return messages.map((m) => serializeMessageForApi(m));
   };
 
   const listParticipantUserIds = async ({ conversationId, user }) => {
@@ -352,9 +386,33 @@ export const createChatService = ({ chatRepository, userRepository, staffReposit
       .filter((id) => Number.isFinite(id) && id > 0);
   };
 
+  const getConversation = async ({ conversationId, user }) => {
+    const id = Number(conversationId);
+    if (!Number.isFinite(id) || id <= 0) {
+      throw new AppError("Invalid conversationId", 400);
+    }
+    await ensureParticipant({ conversationId: id, user });
+    const row = await chatRepository.getConversationEnrichedById({ conversationId: id });
+    if (!row) throw new AppError("Conversation not found", 404);
+    return toConversationPreview(row);
+  };
+
+  /** REST: tìm hoặc tạo DM admin↔staff / staff↔admin / user↔staff… (cùng rule findOrCreateConversationWithUser). */
+  const findOrCreateDirectConversation = async ({ user, recipientUserId }) => {
+    const convId = await findOrCreateConversationWithUser({
+      createdByUser: user,
+      otherUserId: recipientUserId,
+    });
+    const row = await chatRepository.getConversationEnrichedById({ conversationId: convId });
+    if (!row) throw new AppError("Conversation not found", 404);
+    return toConversationPreview(row);
+  };
+
   return {
     createSupportConversation,
     listConversations,
+    getConversation,
+    findOrCreateDirectConversation,
     findOrCreateConversationWithUser,
     findOrCreateSupportConversationAutoAssign,
     sendMessage,

@@ -76,7 +76,8 @@ export const createAuthController = ({ authService }) => {
         await authService.refreshAccessToken({ refreshToken: token });
 
       res.cookie("refresh_token", newRefreshToken, cookieSecureOptions(req));
-      return sendSuccess(res, 200, { accessToken }, "OK");
+      // `token` alias: some clients expect `data.token` instead of `data.accessToken`
+      return sendSuccess(res, 200, { accessToken, token: accessToken }, "OK");
     } catch (error) {
       const status = Number(error?.statusCode || error?.status) || 401;
       return sendError(res, status, error?.message || "Unauthorized", null);
@@ -84,7 +85,7 @@ export const createAuthController = ({ authService }) => {
   };
 
   const getMe = (req, res) => {
-    return sendSuccess(res, 200, { user: req.user }, "OK");
+    return sendSuccess(res, 200, req.user, "OK");
   };
 
   const logout = (req, res) => {
@@ -95,12 +96,25 @@ export const createAuthController = ({ authService }) => {
     return sendSuccess(res, 200, null, "Logout successful.");
   };
 
+  const changePassword = async (req, res) => {
+    try {
+      const userId = req.user?.userId ?? req.user?.id;
+      const { oldPassword, newPassword } = req.body ?? {};
+      await authService.changePassword({ userId, oldPassword, newPassword });
+      return sendSuccess(res, 200, null, "Password changed");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 400;
+      return sendError(res, status, error?.message || "Change password failed", null);
+    }
+  };
+
   return {
     registerUser,
     login,
     refreshToken,
     getMe,
     logout,
+    changePassword,
   };
 };
 

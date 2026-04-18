@@ -34,7 +34,7 @@ export default (sequelize) => {
         type: DataTypes.STRING,
       },
       roleID: {
-        type: DataTypes.STRING, // "1" for user, "2" for admin, "3" for manager
+        type: DataTypes.STRING, 
         allowNull: false,
       },
     },

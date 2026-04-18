@@ -144,11 +144,35 @@ export const createAuthService = ({ authRepository }) => {
     return { accessToken: tokens.accessToken, refreshToken: tokens.refreshToken };
   };
 
+  const changePassword = async ({ userId, oldPassword, newPassword }) => {
+    const uid = Number(userId);
+    if (!Number.isInteger(uid) || uid <= 0) throw new AppError(401, "Unauthorized");
+
+    const oldPw = String(oldPassword ?? "");
+    const newPw = String(newPassword ?? "");
+    if (!oldPw) throw new AppError(400, "oldPassword is required");
+    if (!newPw || newPw.length < 6) {
+      throw new AppError(400, "newPassword must be at least 6 characters long.");
+    }
+
+    const user = await authRepository.findById(uid);
+    if (!user) throw new AppError(404, "User not found.");
+
+    const ok = await bcrypt.compare(oldPw, String(user.password ?? ""));
+    if (!ok) throw new AppError(400, "Current password is incorrect");
+
+    const passwordHash = await bcrypt.hash(newPw, 10);
+    await authRepository.updatePasswordHash({ userId: uid, passwordHash });
+
+    return { ok: true };
+  };
+
   return {
     registerUser,
     login,
     generateTokens,
     refreshAccessToken,
+    changePassword,
   };
 };
 

@@ -16,18 +16,23 @@ router.get("/orders", verifyToken, isStaffOrAdmin, orderController.getAllOrders)
 router.post(
   "/create-orders",
   verifyToken,
-  isCustomer,
   orderController.createOrder,
 );
 router.post(
   "/orders",
   verifyToken,
-  isCustomer,
   orderController.createOrder,
 );
 
 /** Current user's orders (JWT). */
 router.get("/my-orders", verifyToken, orderController.getMyOrders);
+// Admin/Staff - orders of a specific user
+router.get(
+  "/users/:userId/orders",
+  verifyToken,
+  isStaffOrAdmin,
+  orderController.getUserOrders,
+);
 router.get("/orders/:id", verifyToken, orderController.getOrderById);
 router.get("/staff/orders", verifyToken, isStaffOrAdmin, orderController.getStaffOrders);
 

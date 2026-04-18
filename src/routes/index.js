@@ -11,7 +11,9 @@ import initNotfoundRoutes from "./notfoundRoutes.js";
 import initPaymentsRoutes from "./paymentsRoutes.js";
 import initChatRoutes from "./chatRoutes.js";
 import initPresenceRoutes from "./presenceRoutes.js";
-import { buildStaffRouter } from "../modules/staff/staff.routes.js";
+import initVoucherAdminRoutes from "./voucherAdminRoutes.js";
+import { initAdminVoucherRoutes } from "./adminVoucherRoutes.js";
+import { initVoucherRoutes } from "./voucherRoutes.js";
 
 const router = express.Router();
 
@@ -51,17 +53,23 @@ router.get("/api/health", async (req, res) => {
  */
 const initRoutes = (app) => {
   app.use("/", router);
+  // Auth before user/staff routes so `GET /api/users/me` matches the current-user handler,
+  // not `GET /api/users/:id` (staff) with id "me".
+  initAuthRoutes(app);
+  // Presence routes must register before staff `GET /api/users/:id`, otherwise `online`/`basic`
+  // are captured as :id and return 404.
+  initPresenceRoutes(app);
   initUserRoutes(app);
   initProductsRoutes(app);
   initCategoriesRoutes(app);
   initOrdersRoutes(app);
   initCartRoutes(app);
-  initAuthRoutes(app);
   initChatRoutes(app);
-  initPresenceRoutes(app);
+  initVoucherAdminRoutes(app);
+  initAdminVoucherRoutes(app);
+  initVoucherRoutes(app);
   initNotfoundRoutes(app);
   initPaymentsRoutes(app);
-  app.use("/api", buildStaffRouter());
 };
 
 export default initRoutes;

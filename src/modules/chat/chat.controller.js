@@ -90,10 +90,40 @@ export const createChatController = ({ chatService }) => {
     }
   };
 
+  const getConversation = async (req, res) => {
+    try {
+      const conversationId = Number(req.params.conversationId);
+      const data = await chatService.getConversation({
+        conversationId,
+        user: req.user,
+      });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
+  const findOrCreateDirectConversation = async (req, res) => {
+    try {
+      const recipientUserId = req.body?.recipientUserId ?? req.body?.recipient_user_id;
+      const data = await chatService.findOrCreateDirectConversation({
+        user: req.user,
+        recipientUserId,
+      });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
   return {
     listConversations,
     listMyConversations,
     createConversation,
+    getConversation,
+    findOrCreateDirectConversation,
     getMessages,
     postMessage,
   };

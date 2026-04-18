@@ -32,11 +32,21 @@ export const createAuthRepository = () => {
     return Users.findByPk(id);
   };
 
+  const updatePasswordHash = async ({ userId, passwordHash }) => {
+    return Users.update(
+      { password: passwordHash },
+      {
+        where: { userId: Number(userId) },
+      },
+    );
+  };
+
   return {
     findByEmail,
     existsByEmail,
     createUser,
     findById,
+    updatePasswordHash,
   };
 };
 

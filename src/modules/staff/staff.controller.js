@@ -188,6 +188,18 @@ export const createStaffController = ({ staffService, voucherService, orderServi
     }
   };
 
+  /** Query: role=2 (admins) | role=3 (staff) — for internal messaging */
+  const listTeamMembers = async (req, res) => {
+    try {
+      const role = req.query?.role ?? req.query?.roleID ?? "2";
+      const data = await staffService.listUsersByRoleId(role);
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
   return {
     getAllUsers,
     getUsersById,
@@ -204,6 +216,7 @@ export const createStaffController = ({ staffService, voucherService, orderServi
     uploadAvatar,
     sendEmail,
     getAnalytics,
+    listTeamMembers,
   };
 };
 
