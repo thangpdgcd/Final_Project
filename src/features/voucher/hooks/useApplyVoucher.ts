@@ -11,7 +11,7 @@ export type UseApplyVoucherState = {
   discount: number | null;
   finalPrice: number | null;
   isSuccess: boolean;
-  applyVoucher: (args: { orderId: string; code?: string }) => Promise<{
+  applyVoucher: (args: { orderValue: number; code?: string }) => Promise<{
     success: boolean;
     discount: number;
     finalPrice: number;
@@ -39,7 +39,7 @@ export const useApplyVoucher = (): UseApplyVoucherState => {
     setIsSuccess(false);
   }, []);
 
-  const applyVoucher = useCallback(async ({ orderId, code: overrideCode }: { orderId: string; code?: string }) => {
+  const applyVoucher = useCallback(async ({ orderValue, code: overrideCode }: { orderValue: number; code?: string }) => {
     const nextCode = String(overrideCode ?? trimmedCode).trim();
     if (!nextCode) {
       setErrorMessage('Please enter a voucher code.');
@@ -47,9 +47,9 @@ export const useApplyVoucher = (): UseApplyVoucherState => {
       return null;
     }
 
-    const safeOrderId = String(orderId ?? '').trim();
-    if (!safeOrderId) {
-      setErrorMessage('Missing order id. Please try again.');
+    const ov = Number(orderValue ?? 0);
+    if (!Number.isFinite(ov) || ov < 0) {
+      setErrorMessage('Invalid order value. Please try again.');
       setIsSuccess(false);
       return null;
     }
@@ -60,7 +60,7 @@ export const useApplyVoucher = (): UseApplyVoucherState => {
     setIsSuccess(false);
 
     try {
-      const res = await voucherService.apply({ code: nextCode, orderId: safeOrderId });
+      const res = await voucherService.apply({ code: nextCode, orderValue: ov });
 
       setMessage(res.message || (res.success ? 'Voucher applied.' : 'Could not apply voucher.'));
       setDiscount(res.discount);

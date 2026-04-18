@@ -11,6 +11,7 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [imageFits, setImageFits] = useState<Record<number, "cover" | "contain">>({});
 
   const slides = t("home.hero", { returnObjects: true }) as Array<{
     title: string;
@@ -41,6 +42,19 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
     },
   };
 
+  const handleImageLoad = (index: number) => (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    const { naturalWidth, naturalHeight } = img;
+    if (!naturalWidth || !naturalHeight) return;
+
+    // If the image is close to square/portrait, `cover` crops too aggressively on wide hero.
+    // Use `contain` to keep the whole subject visible.
+    const ratio = naturalWidth / naturalHeight;
+    const fit: "cover" | "contain" = ratio < 1.35 ? "contain" : "cover";
+
+    setImageFits((prev) => (prev[index] === fit ? prev : { ...prev, [index]: fit }));
+  };
+
   return (
     <section className="relative h-screen w-full overflow-hidden bg-black flex items-center justify-center">
       {/* Background Slider */}
@@ -58,7 +72,11 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
           <img
             src={slides[currentSlide].image}
             alt="Hero Background"
-            className="w-full h-full object-cover"
+            onLoad={handleImageLoad(currentSlide)}
+            className={[
+              "w-full h-full",
+              imageFits[currentSlide] === "contain" ? "object-contain bg-black" : "object-cover",
+            ].join(" ")}
           />
         </motion.div>
       </AnimatePresence>

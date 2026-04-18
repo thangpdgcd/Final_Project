@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import type { AuthUser } from '@/types';
 import api, { setAccessToken } from '@/api/axiosInstance';
 import axios from 'axios';
+import { queryClient } from '@/lib/queryClient';
+import { CART_KEY } from '@/features/cart/hooks/useCart';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -107,6 +109,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(normalized));
         localStorage.setItem('user_ID', String(normalized.user_ID));
+        void queryClient.invalidateQueries({ queryKey: CART_KEY });
       } catch (err) {
         if (axios.isAxiosError(err)) {
           const status = err.response?.status;
@@ -142,6 +145,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('token', accessToken);
     }
     const normalized = normalizeUser(newUser) ?? newUser;
+    void queryClient.removeQueries({ queryKey: CART_KEY });
     setUser(normalized);
     localStorage.setItem('user', JSON.stringify(normalized));
     if ((normalized as any)?.user_ID) {
@@ -163,6 +167,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
       localStorage.removeItem('user_ID');
+      void queryClient.removeQueries({ queryKey: CART_KEY });
     }
   }, []);
 

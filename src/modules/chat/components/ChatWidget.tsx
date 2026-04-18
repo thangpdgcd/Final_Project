@@ -118,7 +118,7 @@ export const ChatWidget: React.FC = () => {
                 connected={connected}
                 onSendText={(text) => {
                   if (!selectedRoomId || !myRef) return;
-                  chatEvents.sendMessage(
+                  chatEvents.sendChatMessage(
                     { roomId: selectedRoomId, message: { type: 'text', text } },
                     (ack: any) => {
                       // Prefer server-acknowledged saved message to avoid sender-side duplication.

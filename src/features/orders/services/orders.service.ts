@@ -6,6 +6,30 @@ import { STORAGE_KEYS } from '@/shared/constants/storageKeys';
 let orderItemsUnsupported = false;
 let orderItemsGetRoute: string | null | undefined = undefined;
 
+/** Map backend variants (camelCase / strings) to our Order shape. */
+const normalizeOrderRow = (raw: Record<string, unknown>): Order => {
+  const r = raw as any;
+  const order_ID = Number(r.order_ID ?? r.orderId ?? r.order_id ?? 0);
+  const user_ID = Number(r.user_ID ?? r.userId ?? r.user_id ?? 0);
+  const totalRaw = r.total_Amount ?? r.totalAmount ?? r.total_amount ?? 0;
+  const total_Amount =
+    typeof totalRaw === 'string'
+      ? Number(String(totalRaw).replace(/[^0-9.-]/g, ''))
+      : Number(totalRaw);
+  return {
+    ...r,
+    order_ID: Number.isFinite(order_ID) ? order_ID : 0,
+    user_ID: Number.isFinite(user_ID) ? user_ID : 0,
+    total_Amount: Number.isFinite(total_Amount) ? total_Amount : 0,
+    status: r.status != null ? String(r.status) : r.status,
+    shipping_Address: r.shipping_Address ?? r.shippingAddress ?? r.shipping_address,
+    paymentMethod: r.paymentMethod ?? r.payment_method,
+    paypalCaptureId: r.paypalCaptureId ?? r.paypal_capture_id,
+    createdAt: r.createdAt ?? r.created_at,
+    updatedAt: r.updatedAt ?? r.updated_at,
+  };
+};
+
 const getNormalizedRoleID = (): '1' | '2' | '3' | null => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.user);
@@ -27,12 +51,66 @@ export const ordersService = {
   getAll: async (): Promise<Order[]> => {
     const roleID = getNormalizedRoleID();
     const ORDERS_LIST_DISABLED_KEY = `orders:list_disabled:${roleID ?? 'unknown'}`;
-    // Customer should NEVER call staff/admin endpoints like GET /orders (403).
-    // Staff/admin prefer staff endpoints.
+    // IMPORTANT:
+    // In the customer app, the profile "Orders" tab should show the CURRENT user's orders
+    // even if they are logged in with an admin/staff account.
+    // So we always try "my orders" endpoints first, then fall back to staff/admin endpoints.
+    const userIdFromStorage = (() => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.userId);
+        const n = Number(raw);
+        return Number.isFinite(n) && n > 0 ? n : undefined;
+      } catch {
+        return undefined;
+      }
+    })();
+
+    const byUserCandidates = userIdFromStorage
+      ? [
+          `/orders/user/${userIdFromStorage}`,
+          `/orders/users/${userIdFromStorage}`,
+          `/users/${userIdFromStorage}/orders`,
+          `/orders?user_ID=${userIdFromStorage}`,
+          `/orders?userId=${userIdFromStorage}`,
+          `/orders/by-user/${userIdFromStorage}`,
+        ]
+      : [];
+
     const candidates =
       roleID === '1'
-        ? ['/my-orders', '/orders/my', '/orders/me']
-        : ['/staff/orders', '/orders', '/my-orders', '/orders/my', '/orders/me'];
+        ? ['/my-orders', '/orders/my', '/orders/me', ...byUserCandidates]
+        : ['/my-orders', '/orders/my', '/orders/me', ...byUserCandidates, '/staff/orders', '/orders'];
+
+    const extractList = (payload: any): unknown[] | null => {
+      if (!payload) return null;
+      if (Array.isArray(payload)) return payload;
+
+      // Common shapes:
+      // - { success, message, data: [...] }
+      // - { data: [...] }
+      // - { orders: [...] }
+      // - { result: [...] }
+      // - { data: { data: [...] } } or { data: { orders: [...] } }
+      const direct =
+        (Array.isArray(payload.orders) && payload.orders) ||
+        (Array.isArray(payload.data) && payload.data) ||
+        (Array.isArray(payload.result) && payload.result) ||
+        null;
+      if (direct) return direct;
+
+      const inner = payload?.data ?? payload?.result ?? payload?.payload ?? null;
+      if (inner) {
+        if (Array.isArray(inner)) return inner;
+        if (Array.isArray(inner.orders)) return inner.orders;
+        if (Array.isArray(inner.data)) return inner.data;
+        if (Array.isArray(inner.rows)) return inner.rows;
+        if (Array.isArray(inner.items)) return inner.items;
+      }
+
+      if (Array.isArray(payload.rows)) return payload.rows;
+      if (Array.isArray(payload.items)) return payload.items;
+      return null;
+    };
 
     for (const url of candidates) {
       try {
@@ -44,11 +122,11 @@ export const ordersService = {
         } catch {
           // ignore
         }
-        if (Array.isArray(data)) return data as Order[];
-        if (data && Array.isArray(data.orders)) return data.orders as Order[];
-        if (data && Array.isArray(data.data)) return data.data as Order[];
-        if (data && Array.isArray(data.result)) return data.result as Order[];
-        return [];
+        const asList = extractList(data);
+        if (asList) return (asList as Record<string, unknown>[]).map(normalizeOrderRow);
+
+        // Endpoint exists but returned unexpected shape; try the next candidate.
+        continue;
       } catch (err) {
         if (axios.isAxiosError(err)) {
           const status = err.response?.status;
@@ -74,9 +152,27 @@ export const ordersService = {
   create: async (payload: CreateOrderPayload): Promise<Order> => {
     const status = String(payload.status ?? 'pending').trim() || 'pending';
     const paymentMethod = String(payload.paymentMethod ?? 'COD').trim() || 'COD';
+    // Backend implementations vary:
+    // - some create orders purely from server cart (need only status)
+    // - others require { user_ID, total_Amount, shipping_Address }
+    // We send the full payload when available, while keeping cart-based behavior compatible.
     const body: Record<string, unknown> = { status, paymentMethod };
+    const userId = Number((payload as any)?.user_ID ?? (payload as any)?.userId);
+    if (Number.isFinite(userId) && userId > 0) {
+      body.user_ID = userId;
+      body.userId = userId;
+    }
+    const totalAmount = Number((payload as any)?.total_Amount ?? (payload as any)?.totalAmount);
+    if (Number.isFinite(totalAmount) && totalAmount >= 0) {
+      body.total_Amount = totalAmount;
+      body.totalAmount = totalAmount;
+    }
     if (payload.paypalCaptureId) body.paypalCaptureId = payload.paypalCaptureId;
-    if (payload.shipping_Address) body.note = payload.shipping_Address;
+    if (payload.shipping_Address) {
+      body.shipping_Address = payload.shipping_Address;
+      body.shippingAddress = payload.shipping_Address;
+      body.note = payload.shipping_Address;
+    }
     const res = await axiosInstance.post<any>('/create-orders', body);
     const data = res.data;
     const inner = data?.data ?? data;

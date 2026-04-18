@@ -1,4 +1,26 @@
-export const blogs = [
+export type BlogSection = {
+  title: string;
+  bullets: string[];
+};
+
+export type BlogContent = {
+  intro?: string;
+  sections?: BlogSection[];
+  conclusion?: string;
+};
+
+export type BlogPost = {
+  id: string;
+  title: string;
+  author: string;
+  date: string;
+  excerpt: string;
+  image: string;
+  tags?: string[];
+  content?: BlogContent;
+};
+
+export const blogs: BlogPost[] = [
   {
     id: 'robusta',
     title: 'Robusta: Mạnh mẽ, dày body và “đá” caffeine',
@@ -143,11 +165,7 @@ export const blogs = [
       sections: [
         {
           title: 'Profile vị thường gặp',
-          bullets: [
-            'Cacao, hạt dẻ, caramel',
-            'Body tròn, hậu vị sạch',
-            'Rất hợp phin, espresso blend và cold brew',
-          ],
+          bullets: ['Cacao, hạt dẻ, caramel', 'Body tròn, hậu vị sạch', 'Rất hợp phin, espresso blend và cold brew'],
         },
         {
           title: 'Yếu tố tạo nên khác biệt',

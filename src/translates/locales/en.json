@@ -32,7 +32,7 @@
     "productFallback": "Product #{{id}}"
   },
   "header": {
-    "breadcrumbBrand": "Phan Coffee Shop"
+    "breadcrumbBrand": "Phan Coffee"
   },
   "nav": {
     "home": "Home",
@@ -146,12 +146,12 @@
       {
         "title": "Highland <span>Heritage.</span>",
         "subtitle": "Connecting directly with farmers to bring you the finest sustainably sourced beans.",
-        "image": "https://images.unsplash.com/photo-1447933682048-511d1cddf4b7?auto=format&fit=crop&q=80&w=1920"
+        "image": "https://res.cloudinary.com/dfjecxrnl/image/upload/v1775892152/6ebb4a99-d6d7-41a3-be99-efb831190352.png"
       },
       {
         "title": "Handpicked <span>Quality.</span>",
         "subtitle": "Small-batch roasting ensures every bean reaches its maximum flavor potential.",
-        "image": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&q=80&w=1920"
+        "image": "https://res.cloudinary.com/dfjecxrnl/image/upload/v1776495925/474444915_613126367879367_7697490495693450663_n_rkwo3y.jpg"
       }
     ],
     "introRoastedTitle": "ROASTED IN KONTUM",
@@ -584,8 +584,8 @@
       "addToCartError": "Unable to add product to cart.",
       "tabs": {
         "all": "All",
-        "pending": "Awaiting payment",
-        "shipping": "Shipping",
+        "pending": "Awaiting confirmation",
+        "shipping": "In transit",
         "toReceive": "Awaiting delivery",
         "completed": "Completed",
         "cancelled": "Cancelled",
@@ -599,16 +599,16 @@
       "storeName": "Phan Coffee Official",
       "status": {
         "refunded": "REFUNDED",
-        "delivered": "DELIVERED",
-        "pending": "PENDING",
-        "confirmed": "CONFIRMED",
-        "processing": "PROCESSING",
-        "shipping": "SHIPPING",
-        "shipped": "SHIPPED",
+        "delivered": "COMPLETED",
+        "pending": "AWAITING SHOP CONFIRMATION",
+        "confirmed": "CONFIRMED — PREPARING",
+        "processing": "IN TRANSIT",
+        "shipping": "OUT FOR DELIVERY",
+        "shipped": "AWAITING DELIVERY",
         "sent": "SENT",
         "completed": "COMPLETED",
         "cancelled": "CANCELLED",
-        "refund_requested": "REFUND REQUESTED"
+        "refund_requested": "REFUND PENDING REVIEW"
       },
       "footerHintCancel": "Your order is pending — you can cancel.",
       "footerHintRefund": "Didn't receive your order?",

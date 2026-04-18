@@ -20,7 +20,7 @@
     }
   },
   "header": {
-    "breadcrumbBrand": "Phan Coffee Shop"
+    "breadcrumbBrand": "Phan Coffee"
   },
   "nav": {
     "home": "Trang chủ",
@@ -146,12 +146,12 @@
       {
         "title": "Di sản <span>Tây Nguyên.</span>",
         "subtitle": "Hợp tác trực tiếp với nông gia để mang đến những hạt cà phê hảo hạng, nguồn gốc bền vững.",
-        "image": "https://images.unsplash.com/photo-1447933682048-511d1cddf4b7?auto=format&fit=crop&q=80&w=1920"
+        "image": "https://res.cloudinary.com/dfjecxrnl/image/upload/v1775892152/6ebb4a99-d6d7-41a3-be99-efb831190352.png"
       },
       {
         "title": "Chất lượng <span>Thủ công.</span>",
         "subtitle": "Rang mẻ nhỏ tỉ mỉ giúp mỗi hạt cà phê đạt đến độ chín muồi về hương vị.",
-        "image": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&q=80&w=1920"
+        "image": "https://res.cloudinary.com/dfjecxrnl/image/upload/v1776495925/474444915_613126367879367_7697490495693450663_n_rkwo3y.jpg"
       }
     ],
     "introRoastedTitle": "RANG TẠI KONTUM",
@@ -582,7 +582,7 @@
       "addToCartError": "Không thể thêm sản phẩm vào giỏ.",
       "tabs": {
         "all": "Tất cả",
-        "pending": "Chờ thanh toán",
+        "pending": "Chờ xác nhận",
         "shipping": "Vận chuyển",
         "toReceive": "Chờ giao hàng",
         "completed": "Hoàn thành",
@@ -597,16 +597,16 @@
       "storeName": "Phan Coffee Official",
       "status": {
         "refunded": "ĐÃ HOÀN TIỀN",
-        "delivered": "ĐÃ GIAO HÀNG",
-        "pending": "CHỜ XÁC NHẬN",
-        "confirmed": "ĐÃ XÁC NHẬN",
-        "processing": "ĐANG XỬ LÝ",
+        "delivered": "HOÀN THÀNH",
+        "pending": "CHỜ CỬA HÀNG XÁC NHẬN",
+        "confirmed": "ĐÃ DUYỆT — CHỜ ĐÓNG HÀNG",
+        "processing": "VẬN CHUYỂN",
         "shipping": "ĐANG GIAO",
-        "shipped": "ĐANG GIAO",
+        "shipped": "CHỜ GIAO HÀNG",
         "sent": "ĐÃ GỬI",
         "completed": "HOÀN THÀNH",
         "cancelled": "ĐÃ HỦY",
-        "refund_requested": "YÊU CẦU HOÀN TIỀN"
+        "refund_requested": "CHỜ XÉT HOÀN TIỀN"
       },
       "footerHintCancel": "Đơn đang chờ xử lý, bạn có thể hủy.",
       "footerHintRefund": "Không nhận được hàng?",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import {
@@ -18,6 +18,7 @@ import { changeLanguage } from '@/translates/i18n';
 import Logo from '@/components/common/Logo';
 import UserMenu from './UserMenu';
 import { getImageSrc } from '@/utils/image';
+import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
 import type { IconButtonProps } from './header.types';
 
 // --- CONSTANTS ---
@@ -91,14 +92,8 @@ const HeaderPage: React.FC = () => {
   const location = useLocation();
   const { dark, toggleDark } = useTheme();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
-  const effectiveUserId = useMemo(() => {
-    if (user?.user_ID) return Number(user.user_ID);
-    const rawId = localStorage.getItem('user_ID');
-    const parsed = Number(rawId);
-    if (Number.isFinite(parsed) && parsed > 0) return parsed;
-    return undefined;
-  }, [user]);
+  useAuth(); // keep context subscription (UserMenu relies on it)
+  const effectiveUserId = useEffectiveUserId();
   const { data: cartItems = [] } = useCart(effectiveUserId);
 
   // UI State

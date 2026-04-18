@@ -1,4 +1,4 @@
-import React, { startTransition, useMemo, useState } from 'react';
+import React, { startTransition, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Typography, Alert, Skeleton, Checkbox } from 'antd';
 import { ShoppingOutlined, ShopOutlined, CreditCardOutlined, TagOutlined } from '@ant-design/icons';
@@ -14,6 +14,10 @@ import CartItem from '../components/CartItem';
 import { ProductCard } from '@/features/products';
 import { getImageSrc } from '@/utils/image';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
+import { VoucherInput } from '@/features/voucher/components/VoucherInput';
+import { VoucherSummary } from '@/features/voucher/components/VoucherSummary';
+import { useApplyVoucher } from '@/features/voucher/hooks/useApplyVoucher';
 
 const { Title } = Typography;
 
@@ -24,16 +28,10 @@ const CartPage: React.FC = () => {
   useDocumentTitle('pages.cart.documentTitle');
 
   const navigate = useNavigate();
-  const { user } = useAuth();
+  useAuth(); // keep subscription; page behavior depends on auth state
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const userId = useMemo(() => {
-    if (user?.user_ID) return Number(user.user_ID);
-    const rawId = localStorage.getItem('user_ID');
-    const parsedId = Number(rawId);
-    if (Number.isFinite(parsedId) && parsedId > 0) return parsedId;
-    return undefined;
-  }, [user]);
+  const userId = useEffectiveUserId();
 
   const { data: cartItems = [], isLoading, error } = useCart(userId);
   const removeItem = useRemoveCartItem();
@@ -83,6 +81,24 @@ const CartPage: React.FC = () => {
     () => selectedItems.reduce((sum, item) => sum + (item.products?.price || item.price || 0) * item.quantity, 0),
     [selectedItems],
   );
+
+  const voucher = useApplyVoucher();
+  const payable = voucher.isSuccess && voucher.finalPrice != null ? voucher.finalPrice : totalAmount;
+
+  useEffect(() => {
+    // Auto-fill voucher from vault "Use in cart" or direct URL `?voucher=CODE`
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromQuery = params.get('voucher')?.trim() ?? '';
+      const fromStorage = localStorage.getItem('checkout_voucher_code')?.trim() ?? '';
+      const code = (fromQuery || fromStorage).trim();
+      if (!code) return;
+      voucher.setCode(code);
+      localStorage.removeItem('checkout_voucher_code');
+    } catch {
+      // ignore
+    }
+  }, [voucher]);
 
   const handleCheckout = () => {
     if (!selectedItems.length) {
@@ -230,7 +246,30 @@ const CartPage: React.FC = () => {
                   <TagOutlined className="text-orange-600" />
                   Voucher giảm đến 20k
                 </div>
-                <button className="text-blue-500 hover:underline">Xem thêm voucher</button>
+                <button className="text-blue-500 hover:underline" onClick={() => navigate('/vouchers')}>
+                  Xem thêm voucher
+                </button>
+              </div>
+
+              <div className="px-4 pb-4">
+                <VoucherInput
+                  code={voucher.code}
+                  onCodeChange={(v) => voucher.setCode(v)}
+                  onApply={(trimmedCode) => {
+                    void voucher.applyVoucher({ orderValue: totalAmount, code: trimmedCode });
+                  }}
+                  isApplying={voucher.isApplying}
+                  errorMessage={voucher.errorMessage || undefined}
+                  helperText={selectedItems.length === 0 ? 'Chọn sản phẩm để áp dụng voucher.' : undefined}
+                />
+                <VoucherSummary
+                  discount={voucher.discount}
+                  finalPrice={voucher.finalPrice}
+                  message={voucher.message}
+                  isSuccess={voucher.isSuccess}
+                  formatPrice={(v) => formatPrice(v)}
+                  onClear={() => voucher.reset()}
+                />
               </div>
 
               <div className="flex items-center gap-2 border-t border-[color:color-mix(in_srgb,var(--hl-outline-variant)_18%,transparent)] bg-[color:color-mix(in_srgb,#16a34a_08%,var(--hl-surface-low))] px-4 py-4 text-xs text-green-700 dark:text-green-400">
@@ -294,9 +333,15 @@ const CartPage: React.FC = () => {
                 <div className="flex flex-col items-end">
                   <div className="flex items-center gap-2 text-stone-800 dark:text-stone-200">
                     <span className="text-sm">Tổng cộng ({selectedIds.length} sản phẩm):</span>
-                    <span className="text-xl font-bold text-orange-600">{formatPrice(totalAmount)}</span>
+                    <span className="text-xl font-bold text-orange-600">{formatPrice(payable)}</span>
                   </div>
-                  <span className="text-[10px] text-stone-500 dark:text-stone-400">Tiết kiệm {formatPrice(totalAmount * 0.1)}</span>
+                  {voucher.isSuccess && voucher.discount != null ? (
+                    <span className="text-[10px] text-green-600">
+                      Giảm {formatPrice(voucher.discount)}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-stone-500 dark:text-stone-400">Tiết kiệm {formatPrice(totalAmount * 0.1)}</span>
+                  )}
                 </div>
                 <Button
                   type="primary"

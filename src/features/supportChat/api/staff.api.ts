@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { httpClient } from '@/shared/lib/http/client';
 import type { OnlineStaffUser } from '../types';
 
@@ -35,9 +36,17 @@ const mapStaffUser = (raw: any): OnlineStaffUser | null => {
 
 export const staffApi = {
   getOnlineStaff: async (): Promise<OnlineStaffUser[]> => {
-    const res = await httpClient.get('/staff/online');
-    const list = pickArray(res.data);
-    return list.map(mapStaffUser).filter(Boolean) as OnlineStaffUser[];
+    try {
+      const res = await httpClient.get('/staff/online');
+      const list = pickArray(res.data);
+      return list.map(mapStaffUser).filter(Boolean) as OnlineStaffUser[];
+    } catch (err) {
+      // Customers may not have permission for staff presence; treat as "no staff online".
+      if (axios.isAxiosError(err) && (err.response?.status === 401 || err.response?.status === 403)) {
+        return [];
+      }
+      return [];
+    }
   },
 };
 

@@ -3,7 +3,7 @@ import axiosInstance from '@/services/axios';
 
 export type ApplyVoucherRequest = {
   code: string;
-  orderId: string;
+  orderValue: number;
 };
 
 export type ApplyVoucherResponse = {
@@ -15,12 +15,14 @@ export type ApplyVoucherResponse = {
 
 const normalizeApplyVoucherResponse = (payload: unknown): ApplyVoucherResponse => {
   const root = payload as any;
+  // backend `sendSuccess(res, 200, data, "OK")` → { success, message, data }
   const data = root?.data ?? root?.result ?? root;
+  const inner = data?.data ?? data;
 
   const success = Boolean(data?.success ?? root?.success ?? false);
-  const discount = Number(data?.discount ?? root?.discount ?? 0);
-  const finalPrice = Number(data?.finalPrice ?? root?.finalPrice ?? 0);
-  const message = String(data?.message ?? root?.message ?? '');
+  const discount = Number(inner?.discountAmount ?? inner?.discount ?? 0);
+  const finalPrice = Number(inner?.finalPrice ?? 0);
+  const message = String(data?.message ?? inner?.message ?? root?.message ?? '');
 
   return {
     success,
@@ -33,9 +35,10 @@ const normalizeApplyVoucherResponse = (payload: unknown): ApplyVoucherResponse =
 export const voucherService = {
   apply: async (req: ApplyVoucherRequest): Promise<ApplyVoucherResponse> => {
     const code = String(req.code ?? '').trim();
-    const orderId = String(req.orderId ?? '').trim();
+    const orderValue = Number(req.orderValue ?? 0);
+    const safeOrderValue = Number.isFinite(orderValue) ? orderValue : 0;
 
-    const res = await axiosInstance.post('/voucher/apply', { code, orderId });
+    const res = await axiosInstance.post('/vouchers/apply', { code, orderValue: safeOrderValue });
     return normalizeApplyVoucherResponse(res.data);
   },
 

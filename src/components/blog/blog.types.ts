@@ -1,10 +1,16 @@
 export type BlogPost = {
-  id: string | number;
+  id: string;
   image: string;
   title: string;
   author: string;
-  date: string | number | Date;
+  date: string;
   excerpt: string;
+  tags?: string[];
+  content?: {
+    intro?: string;
+    sections?: { title: string; bullets: string[] }[];
+    conclusion?: string;
+  };
 };
 
 export type BlogCardProps = {

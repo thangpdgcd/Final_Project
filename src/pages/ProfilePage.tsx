@@ -4,7 +4,9 @@ import {
   Loader2,
   ShoppingBag,
   Bell,
+  Copy,
   Ticket,
+  Trash2,
   Wallet,
   User,
   Settings,
@@ -30,6 +32,8 @@ import {
 } from '@/features/users/utils/profileConstants';
 import type { Order, Product } from '@/types';
 import axios from 'axios';
+import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
+import { useVoucherVaultStore } from '@/features/voucher/store/useVoucherVaultStore';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -40,6 +44,14 @@ const paypalDebug = (...args: unknown[]) => {
   if (import.meta.env.DEV) {
     // eslint-disable-next-line no-console
     console.log('[PayPalTopup]', ...args);
+  }
+};
+
+const formatVaultTime = (ms: number) => {
+  try {
+    return new Date(ms).toLocaleString();
+  } catch {
+    return '';
   }
 };
 
@@ -176,6 +188,7 @@ const OrderItemsSummary: React.FC<{
 const ProfilePage: React.FC = () => {
   const { message } = App.useApp();
   const { user, login } = useAuth();
+  const effectiveUserId = useEffectiveUserId();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -232,6 +245,15 @@ const ProfilePage: React.FC = () => {
   const [previewAvatar, setPreviewAvatar] = useState<string | null>(user?.avatar || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const voucherVault = useVoucherVaultStore((s) => s.vouchers);
+  const hydrateVoucherVault = useVoucherVaultStore((s) => s.hydrate);
+  const removeVaultVoucher = useVoucherVaultStore((s) => s.remove);
+  const clearVault = useVoucherVaultStore((s) => s.clear);
+
+  useEffect(() => {
+    hydrateVoucherVault();
+  }, [hydrateVoucherVault]);
+
   // tab: 'profile' (IDENTITY) | 'orders'
   const currentTab = searchParams.get('tab') || 'profile';
 
@@ -268,30 +290,63 @@ const ProfilePage: React.FC = () => {
 
   // ── Orders ────────────────────────────────────────────────────────────────
   const { data: allOrdersRaw, isLoading: ordersLoading, refetch: refetchOrders } = useOrders({
-    // Keep order list live while user is in Orders tab (no manual reload needed).
-    refetchInterval: currentTab === 'orders' ? 2000 : false,
+    // Avoid tight polling (my-orders + wallet) — refetch on focus / after mutations instead.
+    refetchInterval: false,
   });
   const allOrders = useMemo<Order[]>(() => {
-    if (Array.isArray(allOrdersRaw)) return allOrdersRaw;
-    const v = allOrdersRaw as any;
-    if (v && Array.isArray(v.orders)) return v.orders as Order[];
-    if (v && Array.isArray(v.data)) return v.data as Order[];
-    if (v && Array.isArray(v.result)) return v.result as Order[];
-    return [];
+    const normalize = (r: any): Order => {
+      const order_ID = Number(r?.order_ID ?? r?.orderId ?? r?.order_id ?? 0);
+      const user_ID = Number(r?.user_ID ?? r?.userId ?? r?.user_id ?? 0);
+      const totalRaw = r?.total_Amount ?? r?.totalAmount ?? r?.total_amount ?? 0;
+      const total_Amount =
+        typeof totalRaw === 'string' ? Number(String(totalRaw).replace(/[^0-9.-]/g, '')) : Number(totalRaw);
+      return {
+        ...(r ?? {}),
+        order_ID: Number.isFinite(order_ID) ? order_ID : 0,
+        user_ID: Number.isFinite(user_ID) ? user_ID : 0,
+        total_Amount: Number.isFinite(total_Amount) ? total_Amount : 0,
+      } as Order;
+    };
+
+    const extract = (v: any): any[] | null => {
+      if (!v) return null;
+      if (Array.isArray(v)) return v;
+      if (Array.isArray(v.orders)) return v.orders;
+      if (Array.isArray(v.data)) return v.data;
+      if (Array.isArray(v.result)) return v.result;
+      const inner = v.data ?? v.result ?? null;
+      if (inner) {
+        if (Array.isArray(inner)) return inner;
+        if (Array.isArray(inner.orders)) return inner.orders;
+        if (Array.isArray(inner.data)) return inner.data;
+        if (Array.isArray(inner.rows)) return inner.rows;
+        if (Array.isArray(inner.items)) return inner.items;
+      }
+      if (Array.isArray(v.rows)) return v.rows;
+      if (Array.isArray(v.items)) return v.items;
+      return null;
+    };
+
+    const list = extract(allOrdersRaw as any);
+    return list ? (list as any[]).map(normalize) : [];
   }, [allOrdersRaw]);
 
   const userOrders = useMemo<Order[]>(() => {
-    return allOrders
-      .filter((o: Order) => {
-        const orderUserId = o.user_ID || (o as any).UserID || (o as any).userId;
-        return Number(orderUserId) === Number(user?.user_ID);
-      })
-      .sort((a: Order, b: Order) => {
-        const idA = a.order_ID || (a as any).orderId || 0;
-        const idB = b.order_ID || (b as any).orderId || 0;
-        return Number(idB) - Number(idA);
-      });
-  }, [allOrders, user]);
+    const uid = Number(effectiveUserId);
+    const base = Number.isFinite(uid) && uid > 0
+      ? allOrders.filter((o: Order) => {
+          const orderUserId = o.user_ID || (o as any).UserID || (o as any).userId;
+          // Use effective user id (context may hydrate after orders fetch).
+          return Number(orderUserId) === uid;
+        })
+      : allOrders;
+
+    return base.sort((a: Order, b: Order) => {
+      const idA = a.order_ID || (a as any).orderId || 0;
+      const idB = b.order_ID || (b as any).orderId || 0;
+      return Number(idB) - Number(idA);
+    });
+  }, [allOrders, effectiveUserId]);
 
   type OrderTabKey = 'all' | 'Pending' | 'Shipping' | 'To Receive' | 'Completed' | 'Cancelled' | 'Refund';
 
@@ -353,7 +408,7 @@ const ProfilePage: React.FC = () => {
   const getOrderStatusLabel = useCallback((normalizedStatus: string, raw: unknown) => {
     if (normalizedStatus === 'refund_requested') return t('profile.orders.status.refund_requested');
     if (normalizedStatus === 'refunded') return t('profile.orders.status.refunded');
-    if (normalizedStatus === 'completed') return t('profile.orders.status.delivered');
+    if (normalizedStatus === 'completed') return t('profile.orders.status.completed');
     const known = [
       'pending',
       'confirmed',
@@ -649,7 +704,15 @@ const ProfilePage: React.FC = () => {
         address: formData.address,
       });
       message.success(t('profile.updateSuccess') || 'Profile updated!');
-      if (user) login('', { ...user, ...res.user });
+      const next = profileApi.pickUserFromProfileResponse(res);
+      if (user && next) login('', { ...user, ...next });
+      else if (user)
+        login('', {
+          ...user,
+          name: formData.name,
+          phoneNumber: formData.phoneNumber,
+          address: formData.address,
+        });
       setIsEditing(false);
     } catch {
       message.error(t('profile.updateError') || 'Update failed');
@@ -664,10 +727,8 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     if (currentTab !== 'orders') return;
-    const timer = window.setInterval(() => {
-      void fetchWallet({ silent: true });
-    }, 2500);
-    return () => window.clearInterval(timer);
+    void fetchWallet({ silent: true });
+    void refetchOrders();
   }, [currentTab, user?.user_ID]);
 
   useEffect(() => {
@@ -814,7 +875,7 @@ const ProfilePage: React.FC = () => {
         icon: <Ticket size={20} />,
         label: t('profile.menu.vouchers.title'),
         sub: t('profile.menu.vouchers.description'),
-        action: () => {},
+        action: () => navigate('/vouchers'),
       },
       {
         icon: <ShoppingBag size={20} />,
@@ -883,7 +944,7 @@ const ProfilePage: React.FC = () => {
       {
         key: 'voucher',
         label: t('profile.stats.voucher'),
-        value: '—',
+        value: voucherVault.length,
         icon: <Ticket size={16} />,
       },
       {
@@ -897,7 +958,7 @@ const ProfilePage: React.FC = () => {
         icon: <Wallet size={16} />,
       },
     ],
-    [i18n.language, isOrdersApiDisabled, isWalletApiDisabled, t, userOrders.length, walletLoading, walletXu],
+    [i18n.language, isOrdersApiDisabled, isWalletApiDisabled, t, userOrders.length, walletLoading, walletXu, voucherVault.length],
   );
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -1095,7 +1156,7 @@ const ProfilePage: React.FC = () => {
           <AnimatePresence mode="wait">
             {currentTab === 'profile' && (
               <motion.div
-                key="identity"
+                key={`profile-${currentSection}`}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -1103,19 +1164,189 @@ const ProfilePage: React.FC = () => {
                 style={{ background: T.surfaceLow }}
                 className="rounded-2xl p-6"
               >
-                <h2
-                  style={{
-                    fontFamily: "'Manrope', sans-serif",
-                    color: T.onSurface,
-                    fontWeight: 700,
-                    fontSize: '0.8rem',
-                    letterSpacing: '0.1em',
-                    marginBottom: '1.5rem',
-                    opacity: 0.6,
-                  }}
-                >
-                  {t('profile.identity.sectionTitle')}
-                </h2>
+                {currentSection === 'promotions' ? (
+                  <>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h2
+                          style={{
+                            fontFamily: "'Manrope', sans-serif",
+                            color: T.onSurface,
+                            fontWeight: 800,
+                            fontSize: '0.9rem',
+                            letterSpacing: '0.1em',
+                            opacity: 0.8,
+                          }}
+                        >
+                          {t('profile.sideNav.promotions')}
+                        </h2>
+                        <p className="mt-2 text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
+                          Voucher staff gửi cho bạn sẽ tự lưu ở đây. Bạn có thể copy hoặc dùng trực tiếp ở giỏ hàng.
+                        </p>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => navigate('/cart')}
+                          style={{
+                            background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
+                            color: T.surfaceLowest,
+                            fontFamily: "'Manrope', sans-serif",
+                            fontWeight: 800,
+                            fontSize: '0.72rem',
+                            letterSpacing: '0.08em',
+                            borderRadius: '0.75rem',
+                            boxShadow: `0 8px 32px -8px ${T.gold}50`,
+                          }}
+                          className="px-4 py-2.5"
+                        >
+                          DÙNG Ở GIỎ
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => clearVault()}
+                          style={{
+                            color: T.onSurfaceVariant,
+                            border: `1px solid ${T.onSurface}15`,
+                            fontFamily: "'Manrope', sans-serif",
+                            fontWeight: 700,
+                            fontSize: '0.72rem',
+                            letterSpacing: '0.06em',
+                            borderRadius: '0.75rem',
+                            background: 'transparent',
+                          }}
+                          className="px-4 py-2.5"
+                        >
+                          XÓA TẤT CẢ
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 space-y-3">
+                      {voucherVault.length === 0 ? (
+                        <div
+                          style={{ background: T.surfaceLowest, border: `1px solid ${T.onSurface}12` }}
+                          className="rounded-2xl p-6 text-center"
+                        >
+                          <div className="text-sm font-semibold" style={{ color: T.onSurface }}>
+                            Chưa có voucher
+                          </div>
+                          <div className="mt-2 text-xs" style={{ color: `${T.onSurfaceVariant}` }}>
+                            Khi staff gửi voucher qua chat, mã sẽ tự động xuất hiện tại đây.
+                          </div>
+                        </div>
+                      ) : (
+                        voucherVault.map((v) => (
+                          <div
+                            key={v.id}
+                            style={{ background: T.surfaceLowest, border: `1px solid ${T.gold}25` }}
+                            className="rounded-2xl p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                          >
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <code
+                                  style={{ border: `1px solid ${T.gold}50`, color: T.gold, background: `${T.gold}12` }}
+                                  className="rounded-xl px-3 py-1 text-sm font-black"
+                                >
+                                  {v.code}
+                                </code>
+                                <span className="text-xs" style={{ color: `${T.onSurfaceVariant}` }}>
+                                  Nhận lúc {formatVaultTime(v.receivedAt)}
+                                </span>
+                              </div>
+                              {v.message ? (
+                                <div className="mt-2 text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
+                                  {v.message}
+                                </div>
+                              ) : null}
+                            </div>
+
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  try {
+                                    localStorage.setItem('checkout_voucher_code', v.code);
+                                  } catch {}
+                                  navigate(`/cart?voucher=${encodeURIComponent(v.code)}`);
+                                }}
+                                style={{
+                                  background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
+                                  color: T.surfaceLowest,
+                                  fontFamily: "'Manrope', sans-serif",
+                                  fontWeight: 800,
+                                  fontSize: '0.72rem',
+                                  letterSpacing: '0.08em',
+                                  borderRadius: '0.75rem',
+                                  boxShadow: `0 8px 24px -10px ${T.gold}60`,
+                                }}
+                                className="px-3 py-2.5 inline-flex items-center gap-2"
+                              >
+                                <Ticket size={16} />
+                                DÙNG
+                              </button>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  try {
+                                    await navigator.clipboard.writeText(v.code);
+                                  } catch {}
+                                }}
+                                style={{
+                                  color: T.onSurfaceVariant,
+                                  border: `1px solid ${T.onSurface}15`,
+                                  borderRadius: '0.75rem',
+                                  background: 'transparent',
+                                  fontFamily: "'Manrope', sans-serif",
+                                  fontWeight: 700,
+                                  fontSize: '0.72rem',
+                                  letterSpacing: '0.06em',
+                                }}
+                                className="px-3 py-2.5 inline-flex items-center gap-2"
+                              >
+                                <Copy size={16} />
+                                COPY
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeVaultVoucher(v.id)}
+                                style={{
+                                  color: '#ef4444',
+                                  border: `1px solid ${T.onSurface}15`,
+                                  borderRadius: '0.75rem',
+                                  background: 'transparent',
+                                  fontFamily: "'Manrope', sans-serif",
+                                  fontWeight: 700,
+                                  fontSize: '0.72rem',
+                                  letterSpacing: '0.06em',
+                                }}
+                                className="px-3 py-2.5 inline-flex items-center gap-2"
+                              >
+                                <Trash2 size={16} />
+                                XÓA
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h2
+                      style={{
+                        fontFamily: "'Manrope', sans-serif",
+                        color: T.onSurface,
+                        fontWeight: 700,
+                        fontSize: '0.8rem',
+                        letterSpacing: '0.1em',
+                        marginBottom: '1.5rem',
+                        opacity: 0.6,
+                      }}
+                    >
+                      {t('profile.identity.sectionTitle')}
+                    </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Read-only email / username */}
@@ -1271,6 +1502,8 @@ const ProfilePage: React.FC = () => {
                     {isEditing ? t('profile.identity.saveChangesCaps') : t('profile.identity.editProfileCaps')}
                   </motion.button>
                 </div>
+                  </>
+                )}
 
               </motion.div>
             )}

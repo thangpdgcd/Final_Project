@@ -18,6 +18,7 @@ import * as profileApi from '@/api/profileApi';
 import { VoucherInput } from '@/features/voucher/components/VoucherInput';
 import { VoucherSummary } from '@/features/voucher/components/VoucherSummary';
 import { useApplyVoucher } from '@/features/voucher/hooks/useApplyVoucher';
+import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
 
 const API_BASE = ((import.meta.env.VITE_API_URL as string) || 'http://localhost:8080').replace(/\/+$/, '');
 const API_HOST = API_BASE.endsWith('/api') ? API_BASE.slice(0, -4) : API_BASE;
@@ -33,6 +34,7 @@ const OrderPage: React.FC = () => {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { user } = useAuth();
+  const effectiveUserId = useEffectiveUserId();
   const cartItems: CartItem[] = useMemo(
     () => (location.state as { cartItems?: CartItem[] })?.cartItems || [],
     [location.state],
@@ -87,10 +89,7 @@ const OrderPage: React.FC = () => {
   const ensureDraftOrderId = useCallback(async (method?: 'paypal' | 'cod' | 'coffee_coin') => {
     if (createdOrderId && Number.isFinite(createdOrderId) && createdOrderId > 0) return createdOrderId;
 
-    const fallbackUserId = Number(
-      user?.user_ID ?? (typeof window !== 'undefined' ? localStorage.getItem('user_ID') : null),
-    );
-    const userIdToUse = Number.isFinite(fallbackUserId) ? fallbackUserId : (user?.user_ID as any);
+    const userIdToUse = Number(effectiveUserId);
     if (!userIdToUse) throw new Error('MISSING_USER_ID');
 
     await syncCartToSelectionForCheckout(userIdToUse, cartItems);
@@ -115,18 +114,17 @@ const OrderPage: React.FC = () => {
     if (!Number.isFinite(id) || id <= 0) throw new Error('INVALID_ORDER_ID');
     setCreatedOrderId(id);
     return id;
-  }, [createdOrderId, user?.user_ID, cartItems, payableTotal, shipping.fullName, shipping.phone, shipping.address, createOrder]);
+  }, [createdOrderId, effectiveUserId, cartItems, payableTotal, shipping.fullName, shipping.phone, shipping.address, createOrder]);
 
   const handleApplyVoucher = useCallback(async (codeOverride?: string) => {
     const codeToUse = String(codeOverride ?? voucher.trimmedCode).trim();
     if (!codeToUse) {
-      voucher.applyVoucher({ orderId: '0', code: '' });
+      voucher.applyVoucher({ orderValue: payableTotal, code: '' });
       return;
     }
 
     try {
-      const orderId = await ensureDraftOrderId(paymentMethod);
-      const res = await voucher.applyVoucher({ orderId: String(orderId), code: codeToUse });
+      const res = await voucher.applyVoucher({ orderValue: payableTotal, code: codeToUse });
       if (res?.success && Number.isFinite(res.finalPrice) && res.finalPrice >= 0) {
         setPayableTotal(res.finalPrice);
       }
@@ -267,7 +265,7 @@ const OrderPage: React.FC = () => {
         }
       }
 
-      const uid = Number(user?.user_ID ?? (typeof window !== 'undefined' ? localStorage.getItem('user_ID') : null));
+      const uid = Number(effectiveUserId);
       if (Number.isFinite(uid) && uid > 0) {
         await qc.invalidateQueries({ queryKey: CART_KEY });
       }

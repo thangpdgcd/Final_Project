@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
-import type { ChatMessage, ChatUserRef } from '../types';
+import type { ChatMessage, ChatUserRef, ReceiveMessagePayload } from '../types';
 import { chatEvents } from '../socket/chatEvents';
 import { connectSocket, disconnectSocket } from '../socket/socketClient';
 import { useChatStore } from '../store/useChatStore';
+import { useVoucherVaultStore } from '@/features/voucher/store/useVoucherVaultStore';
 
 const createId = () => {
   try {
@@ -15,6 +16,50 @@ const createId = () => {
 type Options = {
   enabled: boolean;
   myRef: ChatUserRef | null;
+};
+
+/** Server `emitToParticipants` sends DB rows; map to UI `ChatMessage`. */
+const toReceivePayload = (payload: unknown, myUserId: string): ReceiveMessagePayload | null => {
+  const p = payload as Record<string, unknown>;
+  const rawMsg = p?.message as Record<string, unknown> | undefined;
+  if (
+    rawMsg &&
+    typeof rawMsg === 'object' &&
+    rawMsg.sender &&
+    typeof (rawMsg as { text?: unknown }).text === 'string'
+  ) {
+    return payload as ReceiveMessagePayload;
+  }
+
+  const roomId = String(p?.roomId ?? p?.conversationId ?? '');
+  if (!roomId || !rawMsg || typeof rawMsg !== 'object') return null;
+
+  const plain = (rawMsg as { dataValues?: Record<string, unknown> }).dataValues ?? rawMsg;
+  const senderUserId = String(plain.senderUserId ?? plain.sender_user_id ?? '');
+  const text = String(plain.text ?? plain.content ?? '');
+  const id = String(plain.id ?? createId());
+  const createdAt =
+    plain.createdAt != null
+      ? typeof plain.createdAt === 'number'
+        ? plain.createdAt
+        : Date.parse(String(plain.createdAt)) || Date.now()
+      : Date.now();
+  const isMine = senderUserId === String(myUserId);
+
+  const message: ChatMessage = {
+    id,
+    roomId,
+    type: 'text',
+    text,
+    createdAt,
+    sender: {
+      id: senderUserId || 'unknown',
+      name: isMine ? 'You' : 'Support',
+      role: isMine ? 'user' : 'staff',
+    },
+  };
+
+  return { roomId, message };
 };
 
 export const useChatSocket = ({ enabled, myRef }: Options) => {
@@ -31,6 +76,9 @@ export const useChatSocket = ({ enabled, myRef }: Options) => {
     const socket = connectSocket();
     useChatStore.getState().setConnectionStatus('connecting');
 
+    // Hydrate voucher vault once when socket is enabled (best-effort).
+    useVoucherVaultStore.getState().hydrate();
+
     const onConnect = () => useChatStore.getState().setConnectionStatus('connected');
     const onDisconnect = () => useChatStore.getState().setConnectionStatus('disconnected');
     const onError = () => useChatStore.getState().setConnectionStatus('error');
@@ -40,8 +88,19 @@ export const useChatSocket = ({ enabled, myRef }: Options) => {
     socket.on('connect_error', onError);
 
     const offReceive = chatEvents.onReceiveMessage((payload) => {
-      useChatStore.getState().appendMessage(payload, { incrementUnreadIfNotSelected: true });
+      const normalized = toReceivePayload(payload, myRef.id);
+      if (!normalized) return;
+      useChatStore.getState().appendMessage(normalized, { incrementUnreadIfNotSelected: true });
     });
+
+    const onVoucher = (payload: any) => {
+      const code = typeof payload?.code === 'string' ? payload.code.trim() : '';
+      const message = typeof payload?.message === 'string' ? payload.message.trim() : '';
+      if (!code) return;
+      useVoucherVaultStore.getState().add({ code, message: message || undefined });
+    };
+
+    socket.on('send_voucher', onVoucher);
 
     const onActionResult = (payload: any) => {
       const correlationId = typeof payload?.correlationId === 'string' ? payload.correlationId : '';
@@ -73,6 +132,7 @@ export const useChatSocket = ({ enabled, myRef }: Options) => {
 
     return () => {
       offReceive();
+      socket.off('send_voucher', onVoucher);
       socket.off('action_event', onActionResult);
       socket.off('action_event_result', onActionResult);
       socket.off('connect', onConnect);

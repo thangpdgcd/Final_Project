@@ -2,7 +2,7 @@ import axios from 'axios';
 import axiosInstance from '@/services/axios';
 import type { CartItem, AddToCartPayload, AddToCartResponse } from '@/types';
 
-const mapCartItem = (data: any): CartItem => ({
+export const mapCartItem = (data: any): CartItem => ({
   ...data,
   cartitem_ID: data?.cartitem_ID ?? data?.cartItemId,
   cart_ID: data?.cart_ID ?? data?.cartId,
@@ -19,16 +19,16 @@ const unwrapList = (resData: unknown): CartItem[] => {
     const data = resData as Record<string, unknown>;
     if (Array.isArray(data?.data)) list = data.data as any[];
     else if (Array.isArray(data?.cartItems)) list = data.cartItems as any[];
+    else if (Array.isArray(data?.items)) list = data.items as any[];
+    else if (Array.isArray(data?.result)) list = data.result as any[];
   }
   return list.map(mapCartItem);
 };
 
 export const cartService = {
   getByUserId: async (user_ID: number): Promise<CartItem[]> => {
-    const CART_GET_DISABLED_KEY = 'cart:get_disabled';
     const uid = Number(user_ID);
     if (!Number.isFinite(uid) || uid <= 0) return [];
-    if (typeof window !== 'undefined' && localStorage.getItem(CART_GET_DISABLED_KEY) === '1') return [];
     const candidates: Array<{ url: string; params?: Record<string, unknown> }> = [
       { url: '/carts', params: { user_ID: uid } },
       { url: '/cart', params: { user_ID: uid } },
@@ -48,13 +48,7 @@ export const cartService = {
       }
     }
 
-    // Backend may not implement cart retrieval yet — treat as empty cart.
     if (axios.isAxiosError(lastErr) && lastErr.response?.status === 404) {
-      try {
-        localStorage.setItem(CART_GET_DISABLED_KEY, '1');
-      } catch {
-        // ignore
-      }
       return [];
     }
     return [];
@@ -74,8 +68,21 @@ export const cartService = {
     let lastErr: unknown;
     for (const body of variants) {
       try {
-        const res = await axiosInstance.post<AddToCartResponse>('/add-to-cart', body);
-        return res.data;
+        const res = await axiosInstance.post<any>('/add-to-cart', body);
+        const envelope = res.data as Record<string, unknown> | undefined;
+        const inner = envelope?.data as Record<string, unknown> | CartItem | undefined;
+        const rawItem =
+          inner && typeof inner === 'object' && !Array.isArray(inner) && 'cart' in inner
+            ? (inner as { cart?: unknown }).cart
+            : inner;
+        const mapped =
+          rawItem && typeof rawItem === 'object' && !Array.isArray(rawItem)
+            ? mapCartItem(rawItem)
+            : undefined;
+        return {
+          message: typeof envelope?.message === 'string' ? envelope.message : undefined,
+          data: mapped,
+        };
       } catch (err) {
         lastErr = err;
         if (axios.isAxiosError(err) && err.response?.status === 400) continue;

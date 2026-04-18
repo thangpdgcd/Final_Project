@@ -6,7 +6,6 @@ import { ChevronDown, Filter, RotateCcw, Search, SlidersHorizontal, XCircle } fr
 import { useProducts } from '../hooks/useProducts';
 import { useCategories } from '@/features/categories';
 import { useAddToCart } from '@/features/cart';
-import { useAuth } from '@/store/AuthContext';
 import Chatbox from '@/components/chatbox';
 import ProductGrid from '../components/ProductGrid';
 import type { SortKey, CategoryFilter } from '@/types';
@@ -15,6 +14,7 @@ import { getImageSrc } from '@/utils/image';
 import { productSlugKey } from '@/utils/productSlug';
 import { translatedProductDescription, translatedProductName } from '@/utils/productI18n';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
 
 const formatPrice = (value: number, locale = 'vi-VN'): string =>
   new Intl.NumberFormat(locale, { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value || 0);
@@ -43,7 +43,7 @@ const ProductsPage: React.FC = () => {
   const { message } = App.useApp();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const effectiveUserId = useEffectiveUserId();
   const addToCart = useAddToCart();
   const [activeCategoryId, setActiveCategoryId] = useState<CategoryFilter>('all');
   const [query, setQuery] = useState('');
@@ -332,7 +332,7 @@ const ProductsPage: React.FC = () => {
 
   const handleAddToCart = useCallback(
     (productId: number, price: number, imageEl: HTMLImageElement | null) => {
-      const userId = Number(user?.user_ID);
+      const userId = Number(effectiveUserId);
       if (!Number.isFinite(userId) || userId <= 0) {
         navigate('/login', { state: { from: { pathname: '/products' } } });
         return;
@@ -353,7 +353,7 @@ const ProductsPage: React.FC = () => {
         },
       );
     },
-    [addToCart, animateFlyToCart, message, navigate, t, user?.user_ID],
+    [addToCart, animateFlyToCart, effectiveUserId, message, navigate, t],
   );
 
   const handleClearFilters = useCallback(() => {

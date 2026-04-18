@@ -18,6 +18,25 @@ export const chatEvents = {
     socket.emit('send_message', payload, ack);
   },
 
+  /** Persists and broadcasts to all participants (preferred when roomId is a conversation id). */
+  sendChatMessage: (payload: SendMessagePayload, ack?: (res: any) => void) => {
+    const socket = connectSocket();
+    const roomId = payload?.roomId;
+    if (!roomId) {
+      if (ack) ack({ ok: false, message: 'roomId required' });
+      return;
+    }
+    socket.emit(
+      'chat:message',
+      {
+        ...payload,
+        roomId: String(roomId),
+        message: payload.message,
+      },
+      ack,
+    );
+  },
+
   onReceiveMessage: (handler: (payload: ReceiveMessagePayload) => void) => {
     const socket = connectSocket();
     socket.on('receive_message', handler);
