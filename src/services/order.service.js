@@ -3,9 +3,10 @@ import { Op } from "sequelize";
 import { emitOrderNew, emitOrderUpdate } from "../infrastructure/socket/socketServer.js";
 import { createNotificationService } from "./notification.service.js";
 import { emitNotificationsToUsers } from "../infrastructure/socket/notificationEmitter.js";
+import { emitNotificationToUser } from "../infrastructure/socket/notificationEmitter.js";
 import { AppError } from "../utils/AppError.js";
 import {
-  addWalletXu,
+  addWalletCoin,
   ensureWalletCoinColumn,
   ensureWalletTransactionsTable,
   recordWalletTransaction,
@@ -379,6 +380,16 @@ const createOrderFromCart = async ({ userId, note, paymentMethod, paypalCaptureI
     });
     emitOrderNew(order);
 
+    // Notify the customer who created the order.
+    try {
+      const row = await notificationService.create({
+        userId: uid,
+        type: "order",
+        message: `Đơn hàng #${created.orderId} đã được tạo thành công`,
+      });
+      emitNotificationToUser({ userId: uid, notification: row });
+    } catch {}
+
     // Notify staff/admin about new order (per-user notifications, no broadcast)
     try {
       const staffAdmins = await Users.findAll({
@@ -519,7 +530,7 @@ const resolveRefundDecision = async ({ orderId, actor, approved, note }) => {
   if (approved) {
     const refundXu = Math.max(0, Math.trunc(Number(order.total_Amount ?? 0)));
     if (refundXu > 0) {
-      const nextBalance = await addWalletXu({ userId: order.userId, amountXu: refundXu });
+      const nextBalance = await addWalletCoin({ userId: order.userId, amountXu: refundXu });
       await recordWalletTransaction({
         userId: order.userId,
         type: "REFUND",

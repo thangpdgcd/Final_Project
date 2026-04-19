@@ -114,7 +114,7 @@ export const getWalletXu = async (userId) => {
   return normalizeXu(rows?.[0]?.walletXu ?? 0);
 };
 
-export const addWalletXu = async ({ userId, amountXu }) => {
+export const addWalletCoin = async ({ userId, amountXu }) => {
   await ensureWalletCoinColumn();
   await ensureWalletTransactionsTable();
   const delta = normalizeXu(amountXu);
@@ -180,7 +180,7 @@ export default {
   ensureWalletCoinColumn,
   ensureWalletTransactionsTable,
   getWalletXu,
-  addWalletXu,
+  addWalletCoin,
   recordWalletTransaction,
   listWalletTransactions,
 };

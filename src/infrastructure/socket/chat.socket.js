@@ -200,6 +200,19 @@ export const registerChatSocket = ({
   });
 
   socket.on("join_room", (payload, ack) => {
+    // This Socket.IO server also uses `join_room` for notifications (payload: { userId }).
+    // Ignore those payloads here to avoid attempting to create/join a chat conversation.
+    if (
+      payload &&
+      typeof payload === "object" &&
+      "userId" in payload &&
+      !("recipientUserId" in payload) &&
+      !("conversationId" in payload) &&
+      !("roomId" in payload)
+    ) {
+      return;
+    }
+
     const maybeCreateAndJoin = async () => {
       const joinRoomState = getJoinRoomState();
       const now = Date.now();
