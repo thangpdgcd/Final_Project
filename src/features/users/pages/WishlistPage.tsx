@@ -10,6 +10,7 @@ import { useWishlist } from '@/hooks/useWishlist';
 import { useAuth } from '@/store/AuthContext';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { getImageSrc } from '@/utils/image';
+import { translatedProductName } from '@/utils/productI18n';
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat('vi-VN', {
@@ -27,6 +28,10 @@ type WishlistItemProps = {
 const WishlistItem: React.FC<WishlistItemProps> = ({ product, onRemove, onAdd }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const displayName = translatedProductName(t, {
+    product_ID: Number(product.product_ID),
+    name: String(product.name ?? ''),
+  });
 
   return (
     <motion.div
@@ -43,7 +48,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ product, onRemove, onAdd })
       >
         <img
           src={getImageSrc(product.image)}
-          alt={product.name}
+          alt={displayName}
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#4B3621]/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -80,7 +85,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ product, onRemove, onAdd })
         </div>
 
         <h3 className="mb-6 line-clamp-2 text-xl font-black leading-none tracking-tight text-[#4B3621] dark:text-amber-100">
-          {product.name}
+          {displayName}
         </h3>
 
         <div className="mt-auto flex items-center justify-between">

@@ -17,7 +17,8 @@
     "lang": {
       "en": "EN",
       "vi": "VN"
-    }
+    },
+    "requestFailed": "We couldn't complete that action. Please try again."
   },
   "order": {
     "buyAgain": "Buy again",
@@ -29,7 +30,54 @@
     "completed": "Completed",
     "loadingItems": "Loading items...",
     "itemsEmpty": "No items found for this order yet.",
-    "productFallback": "Product #{{id}}"
+    "productFallback": "Product #{{id}}",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "paid": "Paid",
+      "processing": "Processing",
+      "shipping": "Shipping",
+      "shipped": "Shipped",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refundRequested": "Refund requested",
+      "refunded": "Refunded",
+      "sent": "Sent",
+      "unknown": "Unknown"
+    },
+    "payment": {
+      "cod": "Cash on delivery",
+      "paypal": "PayPal",
+      "coffeeCoin": "Coffee Coin",
+      "momo": "MoMo",
+      "vnpay": "VNPay",
+      "bankTransfer": "Bank transfer",
+      "stripe": "Card (Stripe)",
+      "card": "Card",
+      "zalopay": "ZaloPay",
+      "applePay": "Apple Pay",
+      "googlePay": "Google Pay",
+      "other": "Other"
+    },
+    "shipping": {
+      "standard": "Standard shipping",
+      "express": "Express shipping",
+      "pickup": "Pickup"
+    },
+    "shippingStatus": {
+      "pending": "Awaiting shipment",
+      "preparing": "Preparing",
+      "packed": "Packed",
+      "picked": "Picked up",
+      "shipped": "Shipped",
+      "inTransit": "In transit",
+      "outForDelivery": "Out for delivery",
+      "delivered": "Delivered",
+      "failed": "Delivery failed",
+      "returned": "Returned",
+      "cancelled": "Cancelled",
+      "unknown": "Unknown"
+    }
   },
   "header": {
     "breadcrumbBrand": "Phan Coffee"
@@ -274,7 +322,9 @@
     "viewFullBasket": "VIEW FULL BASKET",
     "emptyTitle": "Empty Cart",
     "emptyDesc": "Your coffee adventure hasn't started yet. Browse our selection and pick a blend!",
-    "shopNow": "Shop Now"
+    "shopNow": "Shop Now",
+    "qtyShort": "Qty",
+    "totalShort": "Total"
   },
   "products": {
     "title": "Products",
@@ -336,6 +386,18 @@
       "peach_tea": {
         "name": "Peach Tea",
         "description": "Peach tea with fruit slices"
+      },
+      "phin_pha_ca_phe_inox": {
+        "name": "Stainless steel phin filter",
+        "description": "Durable Vietnamese phin brewer in stainless steel."
+      },
+      "ca_phe_robusta_honey": {
+        "name": "Robusta Honey coffee",
+        "description": "Honey-processed Robusta with mellow sweetness and full body."
+      },
+      "ca_phe_arabica_mang_den": {
+        "name": "Pure Arabica Măng Đen",
+        "description": "Single-origin Arabica from Măng Đen — clean aroma, balanced cup."
       },
       "butter_croissant": {
         "name": "Butter Croissant",
@@ -413,6 +475,7 @@
     "joinNow": "Join Phan Coffee",
     "loginSuccess": "Login successful!",
     "loginError": "Incorrect email or password!",
+    "roleNotAllowed": "This account is not allowed to sign in to the user site.",
     "registerTitle": "CREATE ACCOUNT",
     "registerDivider": "sign up with email",
     "loginEmailLabel": "Email Address",
@@ -507,12 +570,6 @@
     "noName": "No name",
     "historyOrdersSearchPlaceholder":
       "You can search by shop name, order ID, or product name",
-    "orders": {
-      "apiNotAvailableHint": "Orders API is not available on the backend for this account."
-    },
-    "wallet": {
-      "apiNotAvailableHint": "Wallet/Coffee Coin API is not available on the backend."
-    },
     "notFound": "User not found",
     "sidebar": {
       "account": "My Account",
@@ -578,6 +635,7 @@
       "editProfileCaps": "EDIT PROFILE"
     },
     "orders": {
+      "apiNotAvailableHint": "Orders API is not available on the backend for this account.",
       "productInfoPending": "Processing product information...",
       "reloginToBuyAgain": "Please log in again to buy again.",
       "addToCartSuccess": "Added to cart.",
@@ -616,6 +674,8 @@
       "requestRefundLoading": "Sending request...",
       "requestReturn": "Request return",
       "cancelOrder": "Cancel order",
+      "paymentLabel": "Payment",
+      "shippingStatusLabel": "Shipping",
       "subtotalLabel": "Subtotal",
       "messages": {
         "orderIdMissing": "Could not determine order ID.",
@@ -627,6 +687,7 @@
       }
     },
     "wallet": {
+      "apiNotAvailableHint": "Wallet/Coffee Coin API is not available on the backend.",
       "topup": "PayPal top-up",
       "refund": "Order refund",
       "spend": "Coffee Coin payment",
@@ -824,6 +885,32 @@
     "selectedItems": "Selected {{count}} products",
     "totalLabel": "Total:",
     "checkout": "Checkout",
+    "eyebrow": "Phan Coffee",
+    "pageHeading": "Cart",
+    "loginTitle": "Please sign in",
+    "loginSubtitle": "Sign in to view and pay for your cart.",
+    "loginCta": "Sign in",
+    "loadErrorDetail": "Unable to load cart. Please try again later.",
+    "emptyTitle": "Your cart is empty",
+    "emptyCta": "Shop now",
+    "sellerFavorite": "Favorite",
+    "storeOfficial": "Phan Coffee Official",
+    "voucherBanner": "Save up to 20k with vouchers",
+    "moreVouchers": "More vouchers",
+    "shippingBanner": "Save 15.000₫ on shipping (min. order 0₫)",
+    "learnMore": "Learn more",
+    "voucherHelperSelect": "Select products to apply a voucher.",
+    "recommendedHeading": "You may also like",
+    "recommendedViewAll": "View all",
+    "purchaseBar": {
+      "selectAll": "Select all ({{count}})",
+      "clearSelection": "Remove",
+      "saveToWishlist": "Save to wishlist",
+      "totalLabel": "Total ({{count}} items):",
+      "discountApplied": "Saved {{amount}}",
+      "savingsEstimate": "Save {{amount}}",
+      "checkout": "Checkout"
+    },
     "columns": {
       "product": "Product",
       "unitPrice": "Unit Price",
@@ -832,13 +919,96 @@
       "actions": "Actions"
     },
     "actions": {
-      "remove": "Remove"
+      "remove": "Remove",
+      "similar": "Find similar products"
+    },
+    "badges": {
+      "freeReturns15": "15-day free returns"
     },
     "fallback": {
       "productAlt": "product",
       "noName": "No name",
       "categoryLabel": "Category: Default"
     }
+  },
+  "toast": {
+    "cart": {
+      "removeSuccess": "Item removed from cart",
+      "removeError": "Could not remove item",
+      "checkoutNeedSelection": "Please select at least one product to checkout",
+      "loginToAdd": "Please log in to add items to your cart",
+      "addSuccess": "Added {{name}} to cart",
+      "addError": "Failed to add to cart"
+    },
+    "order": {
+      "created": "Order placed successfully",
+      "voucherApplyFailed": "Could not apply voucher",
+      "saveFailed": "Could not save order"
+    },
+    "support": {
+      "loadMessagesFailed": "Failed to load messages",
+      "loadConversationsFailed": "Failed to load conversations",
+      "loginToChat": "Please log in to chat.",
+      "joinThreadFailed": "Unable to join this thread. Starting a new conversation…",
+      "sendFailed": "Failed to send message",
+      "chatError": "Chat error"
+    },
+    "product": {
+      "loginRequired": "Please log in"
+    }
+  },
+  "checkout": {
+    "shippingTitle": "Shipping address",
+    "defaultBadge": "Default",
+    "change": "Change",
+    "tableProduct": "Product",
+    "tableUnit": "Unit price",
+    "tableQty": "Quantity",
+    "tableLine": "Line total",
+    "sellerFavorite": "Favorite",
+    "storeOfficial": "Phan Coffee Official",
+    "chatNow": "Chat now",
+    "categoryDefault": "Category: Default",
+    "noteLabel": "Note:",
+    "notePlaceholder": "Note for seller…",
+    "shopVoucher": "Shop voucher",
+    "voucherHelper": "Tip: pick a voucher from Voucher Vault and it will auto-fill here.",
+    "shippingCarrier": "Carrier: Express",
+    "shippingEta": "Estimated delivery Mar 29 – Apr 3",
+    "inspection": "Inspection on delivery",
+    "totalWithCount": "Total ({{count}} items):",
+    "paymentTitle": "Payment method",
+    "payCod": "Cash on delivery",
+    "payPaypal": "PayPal",
+    "payCoffeeCoin": "Coffee Coin",
+    "walletLabel": "Coffee Coin balance:",
+    "walletLoading": "Loading…",
+    "walletInsufficient": "Insufficient balance for this order.",
+    "summarySubtotal": "Subtotal",
+    "summaryShipping": "Shipping fee",
+    "summaryVoucher": "Voucher discount",
+    "summaryTotal": "Total due:",
+    "termsHint": "By placing an order you agree to Phan Coffee terms.",
+    "placeOrder": "Place order",
+    "loadingPaypal": "Loading PayPal…",
+    "back": "Back",
+    "modalTitle": "Change shipping address",
+    "modalOk": "Done",
+    "modalCancel": "Cancel",
+    "formName": "Full name",
+    "formPhone": "Phone",
+    "formAddress": "Address",
+    "formNameRequired": "Please enter your name",
+    "formPhoneRequired": "Please enter your phone",
+    "formAddressRequired": "Please enter your address",
+    "formNamePlaceholder": "Enter full name",
+    "formPhonePlaceholder": "Enter phone number",
+    "formAddressPlaceholder": "Enter shipping address",
+    "redirecting": "Redirecting to cart…",
+    "paypalError": "PayPal error",
+    "paypalSdkError": "Could not load PayPal SDK",
+    "paypalLoadError": "Error loading PayPal",
+    "saveOrderError": "Save order failed"
   },
   "chatbox": {
     "greeting": "Hi! How can Phan Coffee help you today?",

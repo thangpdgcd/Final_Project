@@ -2,6 +2,8 @@ import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import type { Product } from '@/types';
 import { getImageSrc } from '@/utils/image';
+import { translatedProductName } from '@/utils/productI18n';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { OrderItemActions, OrderItemImage, type OrderItemRowAction } from './OrderItemActions';
 
 const formatPrice = (v: number) =>
@@ -22,15 +24,17 @@ export const OrderItemCard = forwardRef<HTMLDivElement, OrderItemCardProps>(func
   { raw, idx, orderId, productMap, onBuyAgainItem, onViewProduct, onContactSeller, busyRowKey },
   ref,
 ) {
+  const { t } = useAppTranslation();
   const productId = Number(raw?.product_ID ?? raw?.productId ?? raw?.products?.product_ID ?? raw?.products?.id);
   const quantity = Number(raw?.quantity ?? 0);
   const unitPrice = Number(raw?.price ?? 0);
   const fallbackProduct = Number.isFinite(productId) && productId > 0 ? productMap.get(productId) : undefined;
 
+  const apiName = String(raw?.products?.name ?? fallbackProduct?.name ?? '');
   const name =
-    raw?.products?.name ??
-    fallbackProduct?.name ??
-    (Number.isFinite(productId) && productId > 0 ? `Sản phẩm #${productId}` : 'Sản phẩm');
+    Number.isFinite(productId) && productId > 0
+      ? translatedProductName(t, { product_ID: productId, name: apiName })
+      : t('order.productFallback', { id: '—' });
 
   const image =
     raw?.products?.image ??

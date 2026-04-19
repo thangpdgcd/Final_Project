@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Camera } from 'lucide-react';
+import { AVATAR_DISPLAY_IMG_CLASS } from '@/utils/image';
 
 interface AvatarSectionProps {
   src: string;
@@ -57,7 +58,7 @@ const AvatarSection: React.FC<AvatarSectionProps> = ({ src, onClick, size = 'lg'
           <img
             src={src}
             alt="avatar"
-            className="w-full h-full object-cover"
+            className={AVATAR_DISPLAY_IMG_CLASS}
             onError={e => {
               (e.currentTarget as HTMLImageElement).src =
                 `https://ui-avatars.com/api/?name=User&background=1c1b1b&color=e5c18b&size=128`;

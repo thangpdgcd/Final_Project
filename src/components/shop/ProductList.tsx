@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import ProductCard from '@/components/shop/ProductCard';
 import type { Product, ViewMode } from '@/components/shop/shop.types';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { translatedShopProductName } from '@/utils/productI18n';
 
 type RatingProps = {
   value: number;
@@ -35,11 +37,14 @@ type ProductListProps = {
 
 const ProductList = ({ products, viewMode, selectedId, onSelect }: ProductListProps) => {
   const { format } = useCurrency() as any;
+  const { t } = useTranslation();
 
   if (viewMode === 'list') {
     return (
       <div className="flex flex-col gap-3">
-        {products.map((p) => (
+        {products.map((p) => {
+          const displayName = translatedShopProductName(t, p);
+          return (
           <motion.button
             key={p.id}
             type="button"
@@ -53,14 +58,14 @@ const ProductList = ({ products, viewMode, selectedId, onSelect }: ProductListPr
             ].join(' ')}
           >
             <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[160px_1fr]">
-              <img src={p.image} alt={p.name} className="h-full w-full object-cover" loading="lazy" />
+              <img src={p.image} alt={displayName} className="h-full w-full object-cover" loading="lazy" />
               <div className="flex items-start justify-between gap-4 p-3 sm:p-4">
                 <div>
                   <div
                     className="text-sm font-medium text-[color:var(--hl-primary)]"
                     style={{ fontFamily: 'var(--font-highland-display)' }}
                   >
-                    {p.name}
+                    {displayName}
                   </div>
                   <div className="mt-1">
                     <Rating value={p.rating} />
@@ -77,7 +82,8 @@ const ProductList = ({ products, viewMode, selectedId, onSelect }: ProductListPr
               </div>
             </div>
           </motion.button>
-        ))}
+          );
+        })}
       </div>
     );
   }

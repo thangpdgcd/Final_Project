@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/store/AuthContext';
 import Dropdown from './Dropdown';
 import { useTranslation } from 'react-i18next';
-import { getImageSrc } from '@/utils/image';
+import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/image';
 
 interface UserMenuProps {
   onLoginClick: () => void;
@@ -95,7 +95,11 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
         <div className="absolute inset-0 bg-[#FFD700]/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
         <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-white/5 flex items-center justify-center overflow-hidden relative z-10 border border-stone-200 dark:border-white/5">
           {isAuthenticated && user?.avatar ? (
-            <img src={getImageSrc(user.avatar)} alt="Avatar" className="w-full h-full object-cover" />
+            <img
+              src={getAvatarImageSrc(user.avatar)}
+              alt="Avatar"
+              className={AVATAR_DISPLAY_IMG_CLASS}
+            />
           ) : isAuthenticated && user?.name ? (
             <span className="text-[#FFD700] font-black text-sm uppercase">
               {user.name.charAt(0)}

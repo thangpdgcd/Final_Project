@@ -22,6 +22,12 @@ const normalizeOrderRow = (raw: Record<string, unknown>): Order => {
     user_ID: Number.isFinite(user_ID) ? user_ID : 0,
     total_Amount: Number.isFinite(total_Amount) ? total_Amount : 0,
     status: r.status != null ? String(r.status) : r.status,
+    shippingStatus:
+      r.shippingStatus ??
+      r.shipping_status ??
+      r.deliveryStatus ??
+      r.delivery_status ??
+      r.deliverystatus,
     shipping_Address: r.shipping_Address ?? r.shippingAddress ?? r.shipping_address,
     paymentMethod: r.paymentMethod ?? r.payment_method,
     paypalCaptureId: r.paypalCaptureId ?? r.paypal_capture_id,

@@ -6,7 +6,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCreateOrder } from '../hooks/useOrders';
 import { useAuth } from '@/store/AuthContext';
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import type { CartItem } from '@/types';
 import Chatbox from '@/components/chatbox';
 import EditorialPageShell from '@/components/layout/EditorialPageShell';
@@ -19,6 +18,10 @@ import { VoucherInput } from '@/features/voucher/components/VoucherInput';
 import { VoucherSummary } from '@/features/voucher/components/VoucherSummary';
 import { useApplyVoucher } from '@/features/voucher/hooks/useApplyVoucher';
 import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
+import { translatedProductName } from '@/utils/productI18n';
+import { i18nKeys } from '@/constants/i18nKeys';
+import { toastSuccess, toastErrorWithFallback } from '@/lib/toast/i18nToast';
 
 const API_BASE = ((import.meta.env.VITE_API_URL as string) || 'http://localhost:8080').replace(/\/+$/, '');
 const API_HOST = API_BASE.endsWith('/api') ? API_BASE.slice(0, -4) : API_BASE;
@@ -29,6 +32,7 @@ const formatPrice = (v: number) =>
 
 const OrderPage: React.FC = () => {
   useDocumentTitle('pages.orders.documentTitle');
+  const { t } = useAppTranslation();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -116,25 +120,28 @@ const OrderPage: React.FC = () => {
     return id;
   }, [createdOrderId, effectiveUserId, cartItems, payableTotal, shipping.fullName, shipping.phone, shipping.address, createOrder]);
 
-  const handleApplyVoucher = useCallback(async (codeOverride?: string) => {
-    const codeToUse = String(codeOverride ?? voucher.trimmedCode).trim();
-    if (!codeToUse) {
-      voucher.applyVoucher({ orderValue: payableTotal, code: '' });
-      return;
-    }
-
-    try {
-      const res = await voucher.applyVoucher({ orderValue: payableTotal, code: codeToUse });
-      if (res?.success && Number.isFinite(res.finalPrice) && res.finalPrice >= 0) {
-        setPayableTotal(res.finalPrice);
+  const handleApplyVoucher = useCallback(
+    async (codeOverride?: string) => {
+      const codeToUse = String(codeOverride ?? voucher.trimmedCode).trim();
+      if (!codeToUse) {
+        voucher.applyVoucher({ orderValue: payableTotal, code: '' });
+        return;
       }
-    } catch (err) {
-      const msg = axios.isAxiosError(err)
-        ? (err.response?.data as any)?.message ?? (err.response?.data as any)?.error
-        : (err as Error)?.message;
-      toast.error(msg ? String(msg) : 'Could not apply voucher');
-    }
-  }, [voucher.trimmedCode, voucher.applyVoucher, ensureDraftOrderId, paymentMethod]);
+
+      try {
+        const res = await voucher.applyVoucher({ orderValue: payableTotal, code: codeToUse });
+        if (res?.success && Number.isFinite(res.finalPrice) && res.finalPrice >= 0) {
+          setPayableTotal(res.finalPrice);
+        }
+      } catch (err) {
+        const msg = axios.isAxiosError(err)
+          ? (err.response?.data as any)?.message ?? (err.response?.data as any)?.error
+          : (err as Error)?.message;
+        toastErrorWithFallback(i18nKeys.toast.order.voucherApplyFailed, msg ? String(msg) : undefined);
+      }
+    },
+    [voucher, payableTotal],
+  );
 
   useEffect(() => {
     const search = String(location.search ?? '');
@@ -225,13 +232,13 @@ const OrderPage: React.FC = () => {
         setLoadingSdk(false);
       };
       script.onerror = () => {
-        setError('Không thể tải PayPal SDK');
+        setError(t('checkout.paypalSdkError'));
         setLoadingSdk(false);
       };
       document.body.appendChild(script);
     } catch (e) {
       setLoadingSdk(false);
-      setError((e as Error).message || 'Lỗi tải PayPal');
+      setError((e as Error).message || t('checkout.paypalLoadError'));
     }
   };
 
@@ -258,8 +265,7 @@ const OrderPage: React.FC = () => {
         });
       } catch (e) {
         if (axios.isAxiosError(e) && e.response?.status === 403) {
-          // Some backends do not allow customers to update orders via PUT /orders/:id.
-          // Checkout should still succeed because the order was already created.
+          // backend may forbid PUT
         } else {
           console.warn('Could not persist shipping note on order:', e);
         }
@@ -273,7 +279,7 @@ const OrderPage: React.FC = () => {
         await fetchWalletCoin();
       }
 
-      toast.success('✅ Order created successfully!');
+      toastSuccess(i18nKeys.toast.order.created);
       navigate('/profile?tab=orders&status=Pending');
     } catch (err) {
       console.error('Save order failed:', err);
@@ -283,7 +289,7 @@ const OrderPage: React.FC = () => {
           (typeof err.response?.data === 'string' ? err.response?.data : null)
         : null;
 
-      setError(serverMsg ? `Save order failed: ${serverMsg}` : 'Save order failed');
+      setError(serverMsg ? `${t('checkout.saveOrderError')}: ${serverMsg}` : t('checkout.saveOrderError'));
       savingOnceRef.current = false;
     }
   };
@@ -317,12 +323,12 @@ const OrderPage: React.FC = () => {
         },
         onError: (err: any) => {
           console.error(err);
-          setError('PayPal lỗi');
+          setError(t('checkout.paypalError'));
           renderedRef.current = false;
         },
       })
       .render(paypalRef.current!);
-  }, [showPaypal, sdkReady, amountUSD]);
+  }, [showPaypal, sdkReady, amountUSD, t]);
 
   useEffect(() => {
     if (!cartItems.length) {
@@ -342,7 +348,7 @@ const OrderPage: React.FC = () => {
       <EditorialPageShell innerClassName="flex min-h-[40vh] flex-col items-center justify-center px-5 py-20 text-center">
         <div className="flex flex-col items-center gap-3">
           <Spin size="large" />
-          <span className="text-sm text-stone-500">Redirecting to cart...</span>
+          <span className="text-sm text-stone-500 dark:text-stone-400">{t('checkout.redirecting')}</span>
         </div>
       </EditorialPageShell>
     );
@@ -351,75 +357,103 @@ const OrderPage: React.FC = () => {
   return (
     <EditorialPageShell innerClassName="pb-20">
       <div className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="bg-white dark:bg-[#1a1a1a] shadow-sm rounded-sm p-6">
-          <div className="flex items-center gap-2 text-orange-600 mb-4">
+        <div className="rounded-sm bg-white p-6 shadow-sm dark:bg-[#1a1a1a]">
+          <div className="mb-4 flex items-center gap-2 text-orange-600">
             <EnvironmentOutlined className="text-xl" />
-            <span className="text-lg font-medium">Địa Chỉ Nhận Hàng</span>
+            <span className="text-lg font-medium">{t('checkout.shippingTitle')}</span>
           </div>
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <div className="font-bold text-stone-900 dark:text-stone-100 uppercase tracking-wide min-w-[200px]">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="min-w-[200px] font-bold uppercase tracking-wide text-stone-900 dark:text-stone-100">
               {shipping.fullName} ({shipping.phone})
             </div>
             <div className="flex-1 text-stone-700 dark:text-stone-300">
               {shipping.address}
-              <span className="ml-4 text-[10px] border border-orange-600 text-orange-600 px-1 py-0.5 rounded">Mặc định</span>
+              <span className="ml-4 rounded border border-orange-600 px-1 py-0.5 text-[10px] text-orange-600">
+                {t('checkout.defaultBadge')}
+              </span>
             </div>
             <button
+              type="button"
               onClick={() => {
                 form.setFieldsValue(shipping);
                 setIsModalOpen(true);
               }}
-              className="text-blue-500 text-sm font-medium hover:underline"
+              className="text-sm font-medium text-blue-500 hover:underline"
             >
-              Thay Đổi
+              {t('checkout.change')}
             </button>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#1a1a1a] shadow-sm rounded-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-stone-50 dark:border-stone-800 grid grid-cols-12 text-sm text-stone-500 font-medium">
-            <div className="col-span-12 md:col-span-6 font-bold text-stone-900 dark:text-stone-100 text-lg">Sản phẩm</div>
-            <div className="hidden md:block col-span-2 text-center">Đơn giá</div>
-            <div className="hidden md:block col-span-2 text-center">Số lượng</div>
-            <div className="hidden md:block col-span-2 text-right">Thành tiền</div>
+        <div className="overflow-hidden rounded-sm bg-white shadow-sm dark:bg-[#1a1a1a]">
+          <div className="grid grid-cols-12 border-b border-stone-50 px-6 py-4 text-sm font-medium text-stone-500 dark:border-stone-800">
+            <div className="col-span-12 text-lg font-bold text-stone-900 dark:text-stone-100 md:col-span-6">
+              {t('checkout.tableProduct')}
+            </div>
+            <div className="col-span-2 hidden text-center md:block">{t('checkout.tableUnit')}</div>
+            <div className="col-span-2 hidden text-center md:block">{t('checkout.tableQty')}</div>
+            <div className="col-span-2 hidden text-right md:block">{t('checkout.tableLine')}</div>
           </div>
 
-          <div className="px-6 py-3 border-b border-stone-50 dark:border-stone-800 flex items-center gap-2">
-            <span className="bg-orange-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">Yêu thích</span>
-            <span className="text-sm font-bold flex items-center gap-1">
-              Phan Coffee Official <ShopOutlined />
+          <div className="flex items-center gap-2 border-b border-stone-50 px-6 py-3 dark:border-stone-800">
+            <span className="rounded bg-orange-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              {t('checkout.sellerFavorite')}
             </span>
-            <span className="text-xs text-green-600 flex items-center gap-1 ml-4 border-l border-stone-200 dark:border-stone-800 pl-4">
-              <MessageOutlined /> Chat ngay
+            <span className="flex items-center gap-1 text-sm font-bold">
+              {t('checkout.storeOfficial')} <ShopOutlined />
+            </span>
+            <span className="ml-4 flex items-center gap-1 border-l border-stone-200 pl-4 text-xs text-green-600 dark:border-stone-800">
+              <MessageOutlined /> {t('checkout.chatNow')}
             </span>
           </div>
 
           {cartItems.map((item) => (
-            <div key={item.cartitem_ID} className="px-6 py-6 border-b last:border-0 border-stone-50 dark:border-stone-800 grid grid-cols-12 items-center gap-4">
-              <div className="col-span-12 md:col-span-6 flex gap-4">
-                <img src={getImageSrc(item.products?.image)} alt="" className="w-12 h-12 rounded object-cover border border-stone-100" />
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm text-stone-900 dark:text-stone-100 line-clamp-1">{item.products?.name}</h4>
-                  <div className="text-[10px] text-stone-400 mt-1 uppercase tracking-tighter">Phân loại: Default</div>
+            <div
+              key={item.cartitem_ID}
+              className="grid grid-cols-12 items-center gap-4 border-b border-stone-50 px-6 py-6 last:border-0 dark:border-stone-800"
+            >
+              <div className="col-span-12 flex gap-4 md:col-span-6">
+                <img
+                  src={getImageSrc(item.products?.image)}
+                  alt=""
+                  className="h-12 w-12 rounded border border-stone-100 object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <h4 className="line-clamp-1 text-sm text-stone-900 dark:text-stone-100">
+                    {item.products
+                      ? translatedProductName(t, {
+                          product_ID: item.product_ID,
+                          name: item.products.name ?? '',
+                        })
+                      : t('order.productFallback', { id: item.product_ID })}
+                  </h4>
+                  <div className="mt-1 text-[10px] uppercase tracking-tighter text-stone-400">
+                    {t('checkout.categoryDefault')}
+                  </div>
                 </div>
               </div>
-              <div className="col-span-4 md:col-span-2 text-center text-sm">{formatPrice(item.products?.price || item.price || 0)}</div>
-              <div className="col-span-4 md:col-span-2 text-center text-sm">{item.quantity}</div>
-              <div className="col-span-4 md:col-span-2 text-right text-sm font-medium">
+              <div className="col-span-4 text-center text-sm md:col-span-2">
+                {formatPrice(item.products?.price || item.price || 0)}
+              </div>
+              <div className="col-span-4 text-center text-sm md:col-span-2">{item.quantity}</div>
+              <div className="col-span-4 text-right text-sm font-medium md:col-span-2">
                 {formatPrice((item.products?.price || item.price || 0) * item.quantity)}
               </div>
             </div>
           ))}
 
-          <div className="bg-blue-50/20 dark:bg-blue-900/5 px-6 py-6 border-t border-dashed border-stone-100 dark:border-stone-800 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          <div className="grid grid-cols-1 items-start gap-8 border-t border-dashed border-stone-100 bg-blue-50/20 px-6 py-6 dark:border-stone-800 dark:bg-blue-900/5 md:grid-cols-2">
             <div className="space-y-4">
-              <div className="flex items-center gap-4 max-w-md">
-                <span className="text-sm whitespace-nowrap min-w-[60px]">Lời nhắn:</span>
-                <input className="flex-1 bg-white dark:bg-[#222] border border-stone-200 dark:border-stone-800 px-3 py-2 rounded text-sm outline-none placeholder:text-stone-400" placeholder="Lưu ý cho Người bán..." />
+              <div className="flex max-w-md items-center gap-4">
+                <span className="min-w-[60px] whitespace-nowrap text-sm">{t('checkout.noteLabel')}</span>
+                <input
+                  className="flex-1 rounded border border-stone-200 bg-white px-3 py-2 text-sm outline-none placeholder:text-stone-400 dark:border-stone-800 dark:bg-[#222]"
+                  placeholder={t('checkout.notePlaceholder')}
+                />
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <TagOutlined className="text-orange-600" />
-                <span>Voucher của Shop</span>
+                <span>{t('checkout.shopVoucher')}</span>
               </div>
               <div className="max-w-xl">
                 <VoucherInput
@@ -428,7 +462,7 @@ const OrderPage: React.FC = () => {
                   onApply={(trimmed) => void handleApplyVoucher(trimmed)}
                   isApplying={voucher.isApplying}
                   errorMessage={voucher.errorMessage}
-                  helperText="Tip: you can also pick a voucher from Voucher Vault and it will auto-fill here."
+                  helperText={t('checkout.voucherHelper')}
                 />
                 <VoucherSummary
                   discount={voucher.discount}
@@ -443,105 +477,114 @@ const OrderPage: React.FC = () => {
                 />
               </div>
             </div>
-            <div className="border-l border-dashed border-stone-100 dark:border-stone-800 pl-0 md:pl-8 space-y-4">
+            <div className="space-y-4 border-dashed border-stone-100 pl-0 md:border-l md:pl-8 dark:border-stone-800">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CarOutlined className="text-green-600" />
                   <div className="text-sm">
-                    <div className="font-medium text-green-600">Đơn vị vận chuyển: Vận Chuyển Nhanh</div>
-                    <div className="text-[10px] text-stone-400">Nhận hàng vào 29 Th03 - 3 Th04</div>
+                    <div className="font-medium text-green-600">{t('checkout.shippingCarrier')}</div>
+                    <div className="text-[10px] text-stone-400">{t('checkout.shippingEta')}</div>
                     <div className="text-[10px] text-stone-400">
-                      Được đồng kiểm <EnvironmentOutlined className="text-[8px]" />
+                      {t('checkout.inspection')} <EnvironmentOutlined className="text-[8px]" />
                     </div>
                   </div>
                 </div>
                 <div className="text-sm">
-                  <button className="text-blue-500 hover:underline mr-4">Thay Đổi</button>
+                  <button type="button" className="mr-4 text-blue-500 hover:underline">
+                    {t('checkout.change')}
+                  </button>
                   <span className="font-medium">{formatPrice(shippingFee)}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="px-6 py-4 border-t border-stone-50 dark:border-stone-800 bg-[#fafdff] dark:bg-[#1a1c1d] flex justify-end items-center gap-4">
-            <span className="text-sm text-stone-500">Tổng số tiền ({cartItems.length} sản phẩm):</span>
+          <div className="flex items-center justify-end gap-4 border-t border-stone-50 bg-[#fafdff] px-6 py-4 dark:border-stone-800 dark:bg-[#1a1c1d]">
+            <span className="text-sm text-stone-500 dark:text-stone-400">
+              {t('checkout.totalWithCount', { count: cartItems.length })}
+            </span>
             <span className="text-xl font-bold text-orange-600">{formatPrice(payableTotal)}</span>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#1a1a1a] shadow-sm rounded-sm">
-          <div className="px-6 py-4 border-b border-stone-50 dark:border-stone-800 flex items-center justify-between">
-            <span className="text-lg font-medium">Phương thức thanh toán</span>
-            <div className="flex gap-4">
+        <div className="rounded-sm bg-white shadow-sm dark:bg-[#1a1a1a]">
+          <div className="flex flex-col gap-4 border-b border-stone-50 px-6 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-stone-800">
+            <span className="text-lg font-medium">{t('checkout.paymentTitle')}</span>
+            <div className="flex flex-wrap gap-2 sm:gap-4">
               <button
+                type="button"
                 onClick={() => setPaymentMethod('cod')}
-                className={`px-4 py-2 border rounded-sm text-sm transition-all ${
-                  paymentMethod === 'cod' ? 'border-orange-600 text-orange-600' : 'border-stone-200 dark:border-stone-800 hover:border-orange-600'
+                className={`rounded-sm border px-4 py-2 text-sm transition-all ${
+                  paymentMethod === 'cod'
+                    ? 'border-orange-600 text-orange-600'
+                    : 'border-stone-200 hover:border-orange-600 dark:border-stone-800'
                 }`}
               >
-                Thanh toán khi nhận hàng
+                {t('checkout.payCod')}
               </button>
               <button
+                type="button"
                 onClick={() => setPaymentMethod('paypal')}
-                className={`px-4 py-2 border rounded-sm text-sm transition-all ${
-                  paymentMethod === 'paypal' ? 'border-orange-600 text-orange-600' : 'border-stone-200 dark:border-stone-800 hover:border-orange-600'
+                className={`rounded-sm border px-4 py-2 text-sm transition-all ${
+                  paymentMethod === 'paypal'
+                    ? 'border-orange-600 text-orange-600'
+                    : 'border-stone-200 hover:border-orange-600 dark:border-stone-800'
                 }`}
               >
-                PayPal
+                {t('checkout.payPaypal')}
               </button>
               <button
+                type="button"
                 onClick={() => setPaymentMethod('coffee_coin')}
-                className={`px-4 py-2 border rounded-sm text-sm transition-all ${
+                className={`rounded-sm border px-4 py-2 text-sm transition-all ${
                   paymentMethod === 'coffee_coin'
                     ? 'border-orange-600 text-orange-600'
-                    : 'border-stone-200 dark:border-stone-800 hover:border-orange-600'
+                    : 'border-stone-200 hover:border-orange-600 dark:border-stone-800'
                 }`}
               >
-                Coffee Coin
+                {t('checkout.payCoffeeCoin')}
               </button>
             </div>
           </div>
 
           {paymentMethod === 'coffee_coin' && (
-            <div className="px-6 py-3 border-b border-stone-50 dark:border-stone-800 text-sm">
-              <span className="text-stone-500">Số dư Coffee Coin: </span>
+            <div className="border-b border-stone-50 px-6 py-3 text-sm dark:border-stone-800">
+              <span className="text-stone-500 dark:text-stone-400">{t('checkout.walletLabel')} </span>
               <span className="font-semibold text-orange-600">
                 {walletLoading
-                  ? 'Đang tải...'
+                  ? t('checkout.walletLoading')
                   : `${Number(walletCoin ?? 0).toLocaleString('vi-VN')} Coin`}
               </span>
               {!walletLoading && walletCoin != null && walletCoin < grandTotal && (
-                <span className="ml-3 text-red-500">
-                  Số dư không đủ để thanh toán đơn này.
-                </span>
+                <span className="ml-3 text-red-500">{t('checkout.walletInsufficient')}</span>
               )}
             </div>
           )}
 
-          <div className="p-10 flex flex-col items-end space-y-3 bg-[#fffefb] dark:bg-[#1a1a1a]">
-            <div className="grid grid-cols-2 gap-x-20 gap-y-3 text-sm text-stone-500 text-right min-w-[300px]">
-              <span>Tổng tiền hàng</span>
+          <div className="flex flex-col items-end space-y-3 bg-[#fffefb] p-10 dark:bg-[#1a1a1a]">
+            <div className="grid min-w-[300px] grid-cols-2 gap-x-20 gap-y-3 text-right text-sm text-stone-500 dark:text-stone-400">
+              <span>{t('checkout.summarySubtotal')}</span>
               <span className="text-stone-900 dark:text-stone-100">{formatPrice(productsTotal)}</span>
-              <span>Phí vận chuyển</span>
+              <span>{t('checkout.summaryShipping')}</span>
               <span className="text-stone-900 dark:text-stone-100">{formatPrice(shippingFee)}</span>
               {voucher.discount != null && voucher.isSuccess && (
                 <>
-                  <span>Giảm giá voucher</span>
+                  <span>{t('checkout.summaryVoucher')}</span>
                   <span className="text-green-700 dark:text-green-400">- {formatPrice(Number(voucher.discount ?? 0))}</span>
                 </>
               )}
-              <span className="text-lg mt-2 font-medium">Tổng thanh toán:</span>
-              <span className="text-3xl font-bold text-orange-600 mt-2">{formatPrice(payableTotal)}</span>
+              <span className="mt-2 text-lg font-medium">{t('checkout.summaryTotal')}</span>
+              <span className="mt-2 text-3xl font-bold text-orange-600">{formatPrice(payableTotal)}</span>
             </div>
 
-            {error && <Alert type="error" showIcon message={error} className="w-full max-w-md mt-4" />}
+            {error ? <Alert type="error" showIcon message={error} className="mt-4 w-full max-w-md" /> : null}
 
-            <div className="pt-6 border-t border-stone-100 dark:border-stone-800 w-full flex flex-col items-end">
-              <p className="text-xs text-stone-400 mb-6">Nhấn "Đặt hàng" đồng nghĩa với việc bạn đồng ý tuân theo Điều khoản Phan Coffee</p>
+            <div className="flex w-full flex-col items-end border-t border-stone-100 pt-6 dark:border-stone-800">
+              <p className="mb-6 text-xs text-stone-400 dark:text-stone-500">{t('checkout.termsHint')}</p>
               {!showPaypal ? (
                 <Button
                   type="primary"
-                  className="bg-orange-600 hover:bg-orange-700 border-none h-12 px-14 font-bold text-lg rounded-sm"
+                  className="h-12 rounded-sm border-none bg-orange-600 px-14 text-lg font-bold hover:bg-orange-700"
                   loading={createOrder.isPending}
                   disabled={
                     paymentMethod === 'coffee_coin' &&
@@ -551,21 +594,21 @@ const OrderPage: React.FC = () => {
                   }
                   onClick={handlePlaceOrder}
                 >
-                  Đặt hàng
+                  {t('checkout.placeOrder')}
                 </Button>
               ) : (
                 <div className="w-full max-w-sm">
                   {loadingSdk && (
-                    <div className="text-center py-4">
+                    <div className="py-4 text-center">
                       <div className="inline-flex flex-col items-center gap-2">
                         <Spin />
-                        <span className="text-xs text-stone-500">Đang tải PayPal...</span>
+                        <span className="text-xs text-stone-500 dark:text-stone-400">{t('checkout.loadingPaypal')}</span>
                       </div>
                     </div>
                   )}
                   <div ref={paypalRef} />
                   <Button block className="mt-2" onClick={() => setShowPaypal(false)}>
-                    Quay lại
+                    {t('checkout.back')}
                   </Button>
                 </div>
               )}
@@ -577,28 +620,40 @@ const OrderPage: React.FC = () => {
       <Chatbox />
 
       <Modal
-        title="Thay Đổi Địa Chỉ Nhận Hàng"
+        title={t('checkout.modalTitle')}
         open={isModalOpen}
         onOk={() => {
-          form.validateFields().then((values) => {
+          void form.validateFields().then((values) => {
             setShipping(values);
             setIsModalOpen(false);
           });
         }}
         onCancel={() => setIsModalOpen(false)}
-        okText="Hoàn thành"
-        cancelText="Hủy"
+        okText={t('checkout.modalOk')}
+        cancelText={t('common.cancel')}
         okButtonProps={{ className: 'bg-orange-600 hover:bg-orange-700' }}
       >
         <Form form={form} layout="vertical" initialValues={shipping} className="pt-4">
-          <Form.Item name="fullName" label="Họ và Tên" rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}>
-            <Input placeholder="Nhập họ và tên" />
+          <Form.Item
+            name="fullName"
+            label={t('checkout.formName')}
+            rules={[{ required: true, message: t('checkout.formNameRequired') }]}
+          >
+            <Input placeholder={t('checkout.formNamePlaceholder')} />
           </Form.Item>
-          <Form.Item name="phone" label="Số Điện Thoại" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}>
-            <Input placeholder="Nhập số điện thoại" />
+          <Form.Item
+            name="phone"
+            label={t('checkout.formPhone')}
+            rules={[{ required: true, message: t('checkout.formPhoneRequired') }]}
+          >
+            <Input placeholder={t('checkout.formPhonePlaceholder')} />
           </Form.Item>
-          <Form.Item name="address" label="Địa Chỉ Chi Tiết" rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}>
-            <Input.TextArea rows={3} placeholder="Nhập địa chỉ nhận hàng" />
+          <Form.Item
+            name="address"
+            label={t('checkout.formAddress')}
+            rules={[{ required: true, message: t('checkout.formAddressRequired') }]}
+          >
+            <Input.TextArea rows={3} placeholder={t('checkout.formAddressPlaceholder')} />
           </Form.Item>
         </Form>
       </Modal>
@@ -607,4 +662,3 @@ const OrderPage: React.FC = () => {
 };
 
 export default OrderPage;
-

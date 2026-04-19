@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { toast } from 'react-toastify';
+import { i18nKeys } from '@/constants/i18nKeys';
+import { toastError, toastErrorWithFallback } from '@/lib/toast/i18nToast';
 import { useAuth } from '@/store/AuthContext';
 import { supportWidgetApi } from '../api/supportWidget.api';
 import { supportWidgetEvents } from '../socket/supportWidget.socket';
@@ -197,7 +198,7 @@ export const CustomerSupportWidget: React.FC = () => {
 
   const onSend = async (content: string) => {
     if (!enabled) {
-      toast.error('Please login to chat.');
+      toastError(i18nKeys.toast.support.loginToChat);
       return;
     }
 
@@ -342,7 +343,7 @@ export const CustomerSupportWidget: React.FC = () => {
         });
         if (!ack) throw new Error('Socket timeout');
         if (isNotParticipantError(ack)) {
-          toast.error('Unable to join current thread. Creating a new support conversation...');
+          toastError(i18nKeys.toast.support.joinThreadFailed);
         }
         if (isAckError(ack)) throw new Error(typeof ack?.error === 'string' ? ack.error : 'Socket send failed');
         const handled = handleAck(ack);
@@ -420,7 +421,10 @@ export const CustomerSupportWidget: React.FC = () => {
         markOptimisticSent(clientId);
       } catch (restErr: any) {
         markOptimisticFailed(clientId);
-        toast.error(restErr?.message ? String(restErr.message) : err?.message ? String(err.message) : 'Failed to send message');
+        toastErrorWithFallback(
+          i18nKeys.toast.support.sendFailed,
+          restErr?.message ? String(restErr.message) : err?.message ? String(err.message) : undefined,
+        );
       }
     } finally {
     }

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { i18nKeys } from '@/constants/i18nKeys';
+import { toastErrorWithFallback } from '@/lib/toast/i18nToast';
 import { supportChatApi } from '../api/supportChat.api';
 import { useSupportChatStore } from '../store/useSupportChatStore';
 
@@ -26,7 +27,10 @@ export const useSupportChatConversations = ({ enabled }: Options) => {
       })
       .catch((err) => {
         if (cancelled) return;
-        toast.error(err?.message ? String(err.message) : 'Failed to load conversations');
+        toastErrorWithFallback(
+          i18nKeys.toast.support.loadConversationsFailed,
+          err?.message ? String(err.message) : undefined,
+        );
       })
       .finally(() => {
         if (cancelled) return;

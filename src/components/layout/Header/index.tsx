@@ -18,6 +18,7 @@ import { changeLanguage } from '@/translates/i18n';
 import Logo from '@/components/common/Logo';
 import UserMenu from './UserMenu';
 import { getImageSrc } from '@/utils/image';
+import { translatedProductName } from '@/utils/productI18n';
 import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
 import type { IconButtonProps } from './header.types';
 
@@ -357,6 +358,10 @@ const HeaderPage: React.FC = () => {
                         {cartItems.map((item, idx) => {
                           const img = item?.products?.image;
                           const imageSrc = getImageSrc(img);
+                          const lineName = translatedProductName(t, {
+                            product_ID: Number(item.product_ID),
+                            name: String(item.products?.name ?? ''),
+                          });
                           const linePrice =
                             Number(item.quantity || 0) *
                             Number(item.products?.price ?? item.price ?? 0);
@@ -374,7 +379,7 @@ const HeaderPage: React.FC = () => {
                               <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-stone-100 dark:bg-black/20 flex-shrink-0">
                                 <img
                                   src={imageSrc}
-                                  alt={item.products?.name || "cart-product"}
+                                  alt={lineName}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
                                     (e.currentTarget as HTMLImageElement).src = "/no-image.png";
@@ -383,10 +388,11 @@ const HeaderPage: React.FC = () => {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="text-sm font-bold text-stone-800 dark:text-stone-100 truncate mb-1">
-                                  {item.products?.name || `Product #${item.product_ID}`}
+                                  {lineName}
                                 </div>
                                 <div className="text-xs font-medium text-stone-500 dark:text-stone-400">
-                                  Qty: <span className="text-stone-700 dark:text-stone-300">{item.quantity}</span>
+                                  {t('cart.qtyShort')}:{' '}
+                                  <span className="text-stone-700 dark:text-stone-300">{item.quantity}</span>
                                 </div>
                               </div>
                               <div className="text-sm font-black text-stone-900 dark:text-white whitespace-nowrap">
@@ -406,7 +412,7 @@ const HeaderPage: React.FC = () => {
                     >
                       <div className="w-full rounded-2xl bg-stone-50 dark:bg-white/5 p-4 flex items-center justify-between border border-stone-100 dark:border-white/5">
                         <span className="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400">
-                          Total
+                          {t('cart.totalShort')}
                         </span>
                         <span className="text-base font-black text-stone-900 dark:text-white mt-[2px]">
                           {cartTotal.toLocaleString()} ₫

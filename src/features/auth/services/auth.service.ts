@@ -140,6 +140,11 @@ export const authService = {
       throw new Error('INVALID_LOGIN_RESPONSE');
     }
 
+    // Only allow roleID=1 in this user-facing app.
+    if (String((user as any)?.roleID ?? '').trim() !== '1') {
+      throw new Error('ROLE_NOT_ALLOWED');
+    }
+
     return { accessToken, user };
   },
 

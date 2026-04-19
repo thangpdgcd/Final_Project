@@ -52,9 +52,14 @@ export interface RegisterResponse {
 export interface Product {
   product_ID: number;
   name: string;
+  /** Optional API locale fields — used when present before byName fallbacks. */
+  name_en?: string;
+  name_vi?: string;
   price: number;
   stock: number;
   description?: string;
+  description_en?: string;
+  description_vi?: string;
   image?: string;
   categories_ID: number;
   user_ID: number;
@@ -113,6 +118,8 @@ export interface Order {
   user_ID: number;
   total_Amount: number;
   status?: string;
+  /** Logistics / delivery phase from API (optional). */
+  shippingStatus?: string;
   shipping_Address?: string;
   paymentMethod?: string;
   paypalCaptureId?: string | null;

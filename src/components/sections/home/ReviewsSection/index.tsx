@@ -93,7 +93,7 @@ const ReviewsSection: React.FC = () => {
               
               <div className='customer-reviews__stars'>
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={14} fill="#dfa88b" stroke="#dfa88b" />
+                  <Star key={i} size={14} className="customer-reviews__star" fill="currentColor" stroke="currentColor" aria-hidden />
                 ))}
               </div>
 

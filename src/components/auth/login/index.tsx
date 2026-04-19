@@ -43,6 +43,16 @@ const LoginPage: React.FC = () => {
 
       if ((data as any)?.user) {
         const user: any = (data as any).user;
+        // Only allow roleID=1 to sign in to this user-facing app.
+        const roleIdRaw = String(user?.roleID ?? user?.roleId ?? user?.role ?? "").trim();
+        if (roleIdRaw !== "1") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("user");
+          localStorage.removeItem("user_ID");
+          message.error(t("auth.roleNotAllowed"));
+          return;
+        }
         localStorage.setItem("user", JSON.stringify(user));
 
         const userId =

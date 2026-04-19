@@ -28,12 +28,27 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const ME_ENDPOINT_DISABLED_KEY = 'auth:me_endpoint_disabled';
+  const ALLOWED_ROLE_ID = '1';
+
+  const clearAuthStorage = () => {
+    setAccessToken('');
+    localStorage.removeItem('token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('user_ID');
+    // keep ME_ENDPOINT_DISABLED_KEY as-is
+    void queryClient.removeQueries({ queryKey: CART_KEY });
+    window.dispatchEvent(new Event('auth:cleared'));
+  };
 
   const normalizeUser = (raw: unknown): AuthUser | null => {
     if (!raw || typeof raw !== 'object') return null;
     const u = raw as any;
     const user_ID = Number(u.user_ID ?? u.userId ?? u.id);
     if (!Number.isFinite(user_ID) || user_ID <= 0) return null;
+    const roleID = String(u.roleID ?? u.roleId ?? u.role ?? '').trim();
+    // Only allow roleID=1 to sign in to this app.
+    if (roleID !== ALLOWED_ROLE_ID) return null;
     return {
       user_ID,
       name: String(u.name ?? u.username ?? ''),
@@ -54,13 +69,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return null;
     }
   });
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('user'));
+  const [isAuthenticated, setIsAuthenticated] = useState(!!user);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
     if (storedToken) {
       setAccessToken(storedToken);
+    }
+    // If user payload is missing/invalid (including disallowed role), clear the session.
+    try {
+      const raw = localStorage.getItem('user');
+      const parsed = raw ? normalizeUser(JSON.parse(raw)) : null;
+      if (!parsed) {
+        clearAuthStorage();
+        setUser(null);
+        setIsAuthenticated(false);
+        setIsLoading(false);
+        return;
+      }
+    } catch {
+      clearAuthStorage();
+      setUser(null);
+      setIsAuthenticated(false);
+      setIsLoading(false);
+      return;
     }
     // Keep a dedicated user_ID for modules that rely on it (cart/orders).
     try {
@@ -144,7 +177,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('token', accessToken);
     }
-    const normalized = normalizeUser(newUser) ?? newUser;
+    const normalized = normalizeUser(newUser);
+    if (!normalized) {
+      clearAuthStorage();
+      setUser(null);
+      setIsAuthenticated(false);
+      return;
+    }
     void queryClient.removeQueries({ queryKey: CART_KEY });
     setUser(normalized);
     localStorage.setItem('user', JSON.stringify(normalized));

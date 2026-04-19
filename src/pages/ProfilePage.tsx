@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Loader2,
@@ -20,9 +20,15 @@ import { App, Modal, InputNumber, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/AuthContext';
 import * as profileApi from '@/api/profileApi';
-import { getImageSrc } from '@/utils/image';
+import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/image';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useOrders, ordersService, OrderItemCard, type OrderItemRowAction } from '@/features/orders';
+import {
+  normalizeOrderStatusForLogic,
+  translateOrderStatus,
+  translatePaymentMethod,
+  translateShippingStatus,
+} from '@/features/orders/lib/orderLabels';
 import { useAddToCart } from '@/features/cart';
 import { useProducts } from '@/features/products';
 import {
@@ -31,7 +37,6 @@ import {
   PROFILE_THEME_TOKENS,
 } from '@/features/users/utils/profileConstants';
 import type { Order, Product } from '@/types';
-import axios from 'axios';
 import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
 import { useVoucherVaultStore } from '@/features/voucher/store/useVoucherVaultStore';
 
@@ -350,31 +355,8 @@ const ProfilePage: React.FC = () => {
 
   type OrderTabKey = 'all' | 'Pending' | 'Shipping' | 'To Receive' | 'Completed' | 'Cancelled' | 'Refund';
 
-  const normalizeOrderStatus = (raw: unknown): string => {
-    const key = String(raw || '').trim().toLowerCase().replace(/[\s_-]+/g, '');
-    const map: Record<string, string> = {
-      paid: 'confirmed',
-      accepted: 'confirmed',
-      preparing: 'processing',
-      inprogress: 'processing',
-      delivering: 'shipped',
-      outfordelivery: 'shipped',
-      ontheway: 'shipped',
-      dangiao: 'shipped',
-      complete: 'completed',
-      done: 'completed',
-      refundrequested: 'refund_requested',
-      refundrequest: 'refund_requested',
-      canceled: 'cancelled',
-      refund: 'refunded',
-      returned: 'refunded',
-      return: 'refunded',
-    };
-    return map[key] ?? key;
-  };
-
   const matchesOrderTab = (rawStatus: unknown, tabKey: OrderTabKey): boolean => {
-    const status = normalizeOrderStatus(rawStatus);
+    const status = normalizeOrderStatusForLogic(rawStatus);
     switch (tabKey) {
       case 'all':
         return true;
@@ -396,35 +378,14 @@ const ProfilePage: React.FC = () => {
   };
 
   const canUserCancelOrder = (rawStatus: unknown): boolean => {
-    const status = normalizeOrderStatus(rawStatus);
+    const status = normalizeOrderStatusForLogic(rawStatus);
     return ['pending', 'confirmed', 'processing'].includes(status);
   };
 
   const canUserRequestRefund = (rawStatus: unknown): boolean => {
-    const status = normalizeOrderStatus(rawStatus);
+    const status = normalizeOrderStatusForLogic(rawStatus);
     return status === 'completed' || status === 'shipped' || status === 'sent';
   };
-
-  const getOrderStatusLabel = useCallback((normalizedStatus: string, raw: unknown) => {
-    if (normalizedStatus === 'refund_requested') return t('profile.orders.status.refund_requested');
-    if (normalizedStatus === 'refunded') return t('profile.orders.status.refunded');
-    if (normalizedStatus === 'completed') return t('profile.orders.status.completed');
-    const known = [
-      'pending',
-      'confirmed',
-      'processing',
-      'shipping',
-      'shipped',
-      'sent',
-      'cancelled',
-    ] as const;
-    if ((known as readonly string[]).includes(normalizedStatus)) {
-      return t(`profile.orders.status.${normalizedStatus}`);
-    }
-    const rawStr = String(raw ?? '').trim();
-    if (rawStr) return rawStr.toUpperCase();
-    return t('profile.orders.status.pending');
-  }, [t]);
 
   const walletDateLocale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
 
@@ -603,12 +564,8 @@ const ProfilePage: React.FC = () => {
       message.success(t('profile.orders.messages.cancelOrderSuccess'));
       await refetchOrders();
     } catch (err) {
-      const msg =
-        axios.isAxiosError(err) &&
-        typeof (err.response?.data as { message?: unknown } | undefined)?.message === 'string'
-          ? String((err.response?.data as { message: string }).message)
-          : t('profile.orders.messages.cancelOrderError');
-      message.error(msg);
+      if (import.meta.env.DEV) console.error('[cancelOrder]', err);
+      message.error(t('common.requestFailed'));
     }
   };
 
@@ -624,12 +581,8 @@ const ProfilePage: React.FC = () => {
       message.success(t('profile.orders.messages.refundSuccess'));
       await refetchOrders();
     } catch (err) {
-      const msg =
-        axios.isAxiosError(err) &&
-        typeof (err.response?.data as { message?: unknown } | undefined)?.message === 'string'
-          ? String((err.response?.data as { message: string }).message)
-          : t('profile.orders.messages.refundError');
-      message.error(msg);
+      if (import.meta.env.DEV) console.error('[requestRefund]', err);
+      message.error(t('common.requestFailed'));
     } finally {
       setRefundBusyOrderId(null);
     }
@@ -646,7 +599,7 @@ const ProfilePage: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!user) {
-      message.error(t('profile.avatarError') || 'Upload failed');
+      message.error(t('profile.avatarError'));
       e.target.value = '';
       return;
     }
@@ -688,7 +641,7 @@ const ProfilePage: React.FC = () => {
     } catch (error) {
       console.error('Avatar upload failed:', error);
       setPreviewAvatar(previousAvatar);
-      message.error(t('profile.avatarError') || 'Upload failed');
+      message.error(t('profile.avatarError'));
     } finally {
       setIsLoading(false);
       e.target.value = '';
@@ -715,7 +668,7 @@ const ProfilePage: React.FC = () => {
         });
       setIsEditing(false);
     } catch {
-      message.error(t('profile.updateError') || 'Update failed');
+      message.error(t('profile.updateError'));
     } finally {
       setIsLoading(false);
     }
@@ -988,9 +941,9 @@ const ProfilePage: React.FC = () => {
                 style={{ borderColor: T.gold }}
               >
                 <img
-                  src={getImageSrc(previewAvatar || user?.avatar)}
+                  src={getAvatarImageSrc(previewAvatar || user?.avatar)}
                   alt="avatar"
-                  className="w-full h-full object-cover"
+                  className={AVATAR_DISPLAY_IMG_CLASS}
                   onError={e => {
                     (e.currentTarget as HTMLImageElement).src =
                       'https://ui-avatars.com/api/?name=User&background=1c1b1b&color=e5c18b&size=128';
@@ -1646,11 +1599,11 @@ const ProfilePage: React.FC = () => {
                       const orderID = order.order_ID || (order as any).orderId;
                       const canCancel = canUserCancelOrder(order.status);
                       const canRefund = canUserRequestRefund(order.status);
-                      const normalizedStatus = normalizeOrderStatus(order.status);
+                      const normalizedStatus = normalizeOrderStatusForLogic(order.status);
                       const isCompleted = normalizedStatus === 'completed';
                       const isRefundFlow =
                         normalizedStatus === 'refund_requested' || normalizedStatus === 'refunded';
-                      const statusLabel = getOrderStatusLabel(normalizedStatus, order.status);
+                      const statusLabel = translateOrderStatus(t, order.status);
                       return (
                         <motion.div
                           key={orderID}
@@ -1778,7 +1731,7 @@ const ProfilePage: React.FC = () => {
                               </>
                             )}
                           </span>
-                          <div className="flex items-center gap-3">
+                          <div className="flex flex-wrap items-center gap-3">
                             {canCancel && (
                               <button
                                 type="button"
@@ -1797,6 +1750,24 @@ const ProfilePage: React.FC = () => {
                                 {t('profile.orders.cancelOrder')}
                               </button>
                             )}
+                            {order.paymentMethod ? (
+                              <span
+                                style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}
+                                className="max-w-[200px] truncate sm:max-w-none"
+                              >
+                                {t('profile.orders.paymentLabel')}:{' '}
+                                {translatePaymentMethod(t, order.paymentMethod)}
+                              </span>
+                            ) : null}
+                            {order.shippingStatus ? (
+                              <span
+                                style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}
+                                className="max-w-[220px] truncate sm:max-w-none"
+                              >
+                                {t('profile.orders.shippingStatusLabel')}:{' '}
+                                {translateShippingStatus(t, order.shippingStatus)}
+                              </span>
+                            ) : null}
                             <Wallet size={18} style={{ color: T.gold }} />
                             <span style={{ color: T.onSurfaceVariant, fontSize: '0.82rem' }}>
                               {t('profile.orders.subtotalLabel')}:

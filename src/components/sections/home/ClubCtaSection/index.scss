@@ -79,3 +79,41 @@
   }
 }
 
+.dark .club-cta {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, #5c2e28 88%, #1a1210) 0%,
+    color-mix(in srgb, #6b3d36 85%, #2a1814) 100%
+  );
+  color: #faf8f5;
+
+  .club-cta__subtitle {
+    color: rgba(250, 248, 245, 0.82);
+  }
+
+  .club-cta__input {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.22);
+    color: #fff;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    &:focus {
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  .club-cta__btn {
+    background: #faf8f5;
+    color: #4a2822;
+
+    &:hover {
+      background: #fff;
+      color: #3d1f1a;
+    }
+  }
+}
+

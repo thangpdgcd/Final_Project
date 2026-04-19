@@ -57,7 +57,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
       login(data.accessToken, data.user);
       messageApi.success(t('auth.loginSuccess'));
     },
-    onError: () => {
+    onError: (error: unknown) => {
+      if (error instanceof Error && error.message === 'ROLE_NOT_ALLOWED') {
+        messageApi.error(t('auth.roleNotAllowed'));
+        return;
+      }
       messageApi.error(t('auth.loginError'));
     },
   });

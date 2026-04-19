@@ -1,26 +1,32 @@
 import type { CartItem as CartItemType } from '@/types';
 import { getImageSrc } from '@/utils/image';
+import { translatedProductName } from '@/utils/productI18n';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 
-export function CartItemProductInfo({ item }: { item: CartItemType }) {
+export const CartItemProductInfo = ({ item }: { item: CartItemType }) => {
+  const { t } = useAppTranslation();
+  const displayName = translatedProductName(t, {
+    product_ID: item.product_ID,
+    name: item.products?.name ?? '',
+  });
   return (
-    <div className="flex flex-1 gap-4 min-w-0">
+    <div className="flex min-w-0 flex-1 gap-4">
       <img
         src={getImageSrc(item.products?.image)}
-        alt={item.products?.name || ''}
-        className="h-20 w-20 rounded-lg object-cover bg-stone-50 dark:bg-stone-800 border border-stone-100 dark:border-stone-800"
+        alt={displayName}
+        className="h-20 w-20 rounded-lg border border-stone-100 bg-stone-50 object-cover dark:border-stone-800 dark:bg-stone-800"
         onError={(e) => {
           (e.currentTarget as HTMLImageElement).src = '/no-image.png';
         }}
       />
-      <div className="flex flex-col flex-1 min-w-0 pr-4">
-        <h3 className="text-sm font-medium text-stone-900 dark:text-stone-100 line-clamp-2 leading-snug">
-          {item.products?.name || `Product #${item.product_ID}`}
+      <div className="flex min-w-0 flex-1 flex-col pr-4">
+        <h3 className="line-clamp-2 text-sm font-medium leading-snug text-stone-900 dark:text-stone-100">
+          {displayName}
         </h3>
-        <div className="mt-2 inline-flex items-center text-[10px] sm:text-xs text-orange-600 bg-orange-50 dark:bg-orange-900/20 px-1.5 py-0.5 rounded border border-orange-100 dark:border-orange-800 w-fit">
-          Miễn phí trả hàng 15 ngày
+        <div className="mt-2 inline-flex w-fit items-center rounded border border-orange-100 bg-orange-50 px-1.5 py-0.5 text-[10px] text-orange-600 sm:text-xs dark:border-orange-800 dark:bg-orange-900/20">
+          {t('customersCart.badges.freeReturns15')}
         </div>
       </div>
     </div>
   );
-}
-
+};

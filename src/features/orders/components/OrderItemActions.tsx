@@ -1,5 +1,6 @@
 import { Coffee, Eye, Loader2, MessageCircle, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
 
 export type OrderItemRowAction = {
   productId: number;
@@ -25,6 +26,7 @@ export function OrderItemActions({
   onContactSeller: () => void;
   args: OrderItemRowAction;
 }) {
+  const { t } = useAppTranslation();
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -46,7 +48,7 @@ export function OrderItemActions({
         ) : (
           <RotateCcw className="h-3.5 w-3.5 shrink-0" aria-hidden />
         )}
-        Mua lại
+        {t('order.buyAgain')}
       </motion.button>
       <motion.button
         type="button"
@@ -58,7 +60,7 @@ export function OrderItemActions({
         className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white/80 px-3 py-2 text-xs font-medium text-stone-700 backdrop-blur-sm transition-colors hover:border-[#ee4d2d]/40 hover:bg-stone-50 dark:border-stone-600 dark:bg-stone-900/50 dark:text-stone-200 dark:hover:border-orange-500/35 dark:hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
       >
         <Eye className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
-        Xem chi tiết
+        {t('order.viewDetails')}
       </motion.button>
       <motion.button
         type="button"
@@ -69,7 +71,7 @@ export function OrderItemActions({
         className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white/80 px-3 py-2 text-xs font-medium text-stone-700 backdrop-blur-sm transition-colors hover:border-[#ee4d2d]/40 hover:bg-stone-50 dark:border-stone-600 dark:bg-stone-900/50 dark:text-stone-200 dark:hover:border-orange-500/35 dark:hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 sm:text-sm"
       >
         <MessageCircle className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
-        Liên hệ người bán
+        {t('order.contactSeller')}
       </motion.button>
     </motion.div>
   );

@@ -67,6 +67,10 @@ const LoginPage: React.FC = () => {
       const fallbackMessage = t('auth.loginError');
       const invalidResponseMessage = t('common.error');
 
+      if (error instanceof Error && error.message === 'ROLE_NOT_ALLOWED') {
+        messageApi.error(t('auth.roleNotAllowed'));
+        return;
+      }
       if (error instanceof Error && error.message === 'INVALID_LOGIN_RESPONSE') {
         messageApi.error(invalidResponseMessage);
         return;

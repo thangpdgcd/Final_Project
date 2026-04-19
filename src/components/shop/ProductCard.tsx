@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import type { Product } from '@/components/shop/shop.types';
+import { translatedShopProductName } from '@/utils/productI18n';
 
 type RatingProps = {
   value: number;
@@ -33,6 +35,8 @@ type ProductCardProps = {
 
 const ProductCard = ({ product, onSelect, selected }: ProductCardProps) => {
   const { format } = useCurrency() as any;
+  const { t } = useTranslation();
+  const displayName = translatedShopProductName(t, product);
 
   return (
     <motion.button
@@ -51,7 +55,7 @@ const ProductCard = ({ product, onSelect, selected }: ProductCardProps) => {
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           src={product.image}
-          alt={product.name}
+          alt={displayName}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           loading="lazy"
         />
@@ -70,7 +74,7 @@ const ProductCard = ({ product, onSelect, selected }: ProductCardProps) => {
               className="line-clamp-1 text-sm font-medium text-[color:var(--hl-primary)]"
               style={{ fontFamily: 'var(--font-highland-display)' }}
             >
-              {product.name}
+              {displayName}
             </div>
             <div className="mt-1">
               <Rating value={product.rating} />

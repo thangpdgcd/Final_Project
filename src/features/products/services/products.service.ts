@@ -14,8 +14,12 @@ const mapProduct = (p: any): Product => ({
   categories_ID: toNumberOr(p?.categories_ID ?? p?.categoriesId ?? p?.category_ID ?? p?.categoryId, 0),
   user_ID: toNumberOr(p?.user_ID ?? p?.userId ?? p?.owner_ID ?? p?.ownerId, 0),
   name: String(p?.name ?? ''),
+  name_en: p?.name_en != null ? String(p.name_en) : undefined,
+  name_vi: p?.name_vi != null ? String(p.name_vi) : undefined,
   price: toNumberOr(p?.price, 0),
   stock: toNumberOr(p?.stock, 0),
+  description_en: p?.description_en != null ? String(p.description_en) : undefined,
+  description_vi: p?.description_vi != null ? String(p.description_vi) : undefined,
 });
 
 const pickProductPayload = (data: any) => data?.product ?? data?.data ?? data;

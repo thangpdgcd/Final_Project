@@ -1,8 +1,7 @@
 import React, { startTransition, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Typography, Alert, Skeleton, Checkbox } from 'antd';
+import { Typography, Alert, Skeleton, Checkbox } from 'antd';
 import { ShoppingOutlined, ShopOutlined, CreditCardOutlined, TagOutlined } from '@ant-design/icons';
-import { toast } from 'react-toastify';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/store/AuthContext';
 import { useCart, useRemoveCartItem, useUpdateCartItem, useAddToCart } from '../hooks/useCart';
@@ -18,6 +17,11 @@ import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
 import { VoucherInput } from '@/features/voucher/components/VoucherInput';
 import { VoucherSummary } from '@/features/voucher/components/VoucherSummary';
 import { useApplyVoucher } from '@/features/voucher/hooks/useApplyVoucher';
+import { useAppTranslation } from '@/hooks/useAppTranslation';
+import { i18nKeys } from '@/constants/i18nKeys';
+import { toastError, toastInfo, toastSuccess, toastWarning } from '@/lib/toast/i18nToast';
+import { CartPurchaseBar } from '@/components/ui/cart/CartPurchaseBar';
+import { translatedProductDescription, translatedProductName } from '@/utils/productI18n';
 
 const { Title } = Typography;
 
@@ -26,9 +30,10 @@ const formatPrice = (v: number) =>
 
 const CartPage: React.FC = () => {
   useDocumentTitle('pages.cart.documentTitle');
+  const { t } = useAppTranslation();
 
   const navigate = useNavigate();
-  useAuth(); // keep subscription; page behavior depends on auth state
+  useAuth();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const userId = useEffectiveUserId();
@@ -40,10 +45,10 @@ const CartPage: React.FC = () => {
   const handleRemove = (id: number) => {
     removeItem.mutate(id, {
       onSuccess: () => {
-        toast.success('Đã xóa sản phẩm khỏi giỏ hàng');
+        toastSuccess(i18nKeys.toast.cart.removeSuccess);
         setSelectedIds((prev) => prev.filter((sid) => sid !== id));
       },
-      onError: () => toast.error('Không thể xóa sản phẩm'),
+      onError: () => toastError(i18nKeys.toast.cart.removeError),
     });
   };
 
@@ -86,7 +91,6 @@ const CartPage: React.FC = () => {
   const payable = voucher.isSuccess && voucher.finalPrice != null ? voucher.finalPrice : totalAmount;
 
   useEffect(() => {
-    // Auto-fill voucher from vault "Use in cart" or direct URL `?voucher=CODE`
     try {
       const params = new URLSearchParams(window.location.search);
       const fromQuery = params.get('voucher')?.trim() ?? '';
@@ -102,7 +106,7 @@ const CartPage: React.FC = () => {
 
   const handleCheckout = () => {
     if (!selectedItems.length) {
-      toast.warning('Vui lòng chọn ít nhất một sản phẩm để thanh toán');
+      toastWarning(i18nKeys.toast.cart.checkoutNeedSelection);
       return;
     }
     startTransition(() => {
@@ -115,7 +119,7 @@ const CartPage: React.FC = () => {
 
   const handleAddToCart = (product: Product) => {
     if (!userId) {
-      toast.info('Vui lòng đăng nhập để thêm vào giỏ hàng');
+      toastInfo(i18nKeys.toast.cart.loginToAdd);
       navigate('/login');
       return;
     }
@@ -127,8 +131,9 @@ const CartPage: React.FC = () => {
         price: product.price,
       },
       {
-        onSuccess: () => toast.success(`Đã thêm ${product.name} vào giỏ hàng`),
-        onError: () => toast.error('Thêm vào giỏ hàng thất bại'),
+        onSuccess: () =>
+          toastSuccess(i18nKeys.toast.cart.addSuccess, { name: translatedProductName(t, product) }),
+        onError: () => toastError(i18nKeys.toast.cart.addError),
       },
     );
   };
@@ -136,6 +141,8 @@ const CartPage: React.FC = () => {
   const recommendedProducts = useMemo(() => {
     return [...allProducts].sort(() => 0.5 - Math.random()).slice(0, 12);
   }, [allProducts]);
+
+  const allSelected = selectedIds.length === cartItems.length && cartItems.length > 0;
 
   if (!userId) {
     return (
@@ -148,17 +155,17 @@ const CartPage: React.FC = () => {
             className="mt-6 text-2xl font-medium text-[color:var(--hl-primary)]"
             style={{ fontFamily: 'var(--font-highland-display)' }}
           >
-            Vui lòng đăng nhập
+            {t('customersCart.loginTitle')}
           </h2>
           <p className="hl-sans mt-2 text-sm text-[color:color-mix(in_srgb,var(--hl-on-surface)_70%,transparent)]">
-            Đăng nhập để xem và thanh toán giỏ hàng của bạn.
+            {t('customersCart.loginSubtitle')}
           </p>
           <button
             type="button"
             className="btn-highland-primary mt-8"
             onClick={() => navigate('/login', { state: { from: { pathname: '/cart' } } })}
           >
-            Đăng nhập ngay
+            {t('customersCart.loginCta')}
           </button>
         </div>
       </EditorialPageShell>
@@ -169,7 +176,7 @@ const CartPage: React.FC = () => {
     return (
       <EditorialPageShell innerClassName="px-5 py-12">
         <div className="mx-auto max-w-4xl">
-          <Alert type="error" message="Không thể tải giỏ hàng. Vui lòng thử lại sau." showIcon />
+          <Alert type="error" message={t('customersCart.loadErrorDetail')} showIcon />
         </div>
       </EditorialPageShell>
     );
@@ -178,14 +185,16 @@ const CartPage: React.FC = () => {
     <EditorialPageShell innerClassName="pb-32">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <p className="hl-sans text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--hl-secondary)]">Phan Coffee</p>
+          <p className="hl-sans text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--hl-secondary)]">
+            {t('customersCart.eyebrow')}
+          </p>
           <Title
             level={3}
             className="!m-0 !mt-2 flex items-center gap-2 !font-medium !text-[color:var(--hl-primary)]"
             style={{ fontFamily: 'var(--font-highland-display)' }}
           >
             <ShoppingOutlined className="text-[color:var(--hl-primary-container)]" />
-            Giỏ hàng
+            {t('customersCart.pageHeading')}
           </Title>
         </div>
 
@@ -194,36 +203,37 @@ const CartPage: React.FC = () => {
         ) : cartItems.length === 0 ? (
           <div className="contact-form-card rounded-md py-16 text-center shadow-sm">
             <ShoppingOutlined className="mb-4 text-6xl text-[color:color-mix(in_srgb,var(--hl-on-surface)_25%,transparent)]" />
-            <p className="hl-sans text-[color:color-mix(in_srgb,var(--hl-on-surface)_72%,transparent)]">Giỏ hàng của bạn còn trống</p>
+            <p className="hl-sans text-[color:color-mix(in_srgb,var(--hl-on-surface)_72%,transparent)]">
+              {t('customersCart.emptyTitle')}
+            </p>
             <button type="button" className="btn-highland-primary mt-6" onClick={() => navigate('/products')}>
-              Mua sắm ngay
+              {t('customersCart.emptyCta')}
             </button>
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="sticky top-20 z-10 flex items-center gap-4 rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] bg-[color:var(--hl-surface-lowest)] px-4 py-4 text-sm font-medium text-[color:color-mix(in_srgb,var(--hl-on-surface)_65%,transparent)] shadow-sm">
-              <div className="flex items-center justify-center w-8">
-                <Checkbox
-                  checked={selectedIds.length === cartItems.length && cartItems.length > 0}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                />
+            <div
+              style={{ background: 'var(--hl-surface-lowest)' }}
+              className="sticky top-20 z-10 flex items-center gap-4 rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] px-4 py-4 text-sm font-medium text-[color:color-mix(in_srgb,var(--hl-on-surface)_75%,transparent)] shadow-sm dark:text-stone-200"
+            >
+              <div className="flex w-8 items-center justify-center">
+                <Checkbox checked={allSelected} onChange={(e) => handleSelectAll(e.target.checked)} />
               </div>
-              <div className="flex-1 text-stone-800 dark:text-stone-200">Sản Phẩm</div>
-              <div className="hidden md:block w-24 text-center">Đơn Giá</div>
-              <div className="w-24 md:w-32 text-center">Số Lượng</div>
-              <div className="hidden sm:block w-28 text-center">Số Tiền</div>
-              <div className="w-16 text-center text-stone-800 dark:text-stone-200">Thao Tác</div>
+              <div className="flex-1 text-stone-800 dark:text-stone-100">{t('customersCart.columns.product')}</div>
+              <div className="hidden w-24 text-center md:block">{t('customersCart.columns.unitPrice')}</div>
+              <div className="w-24 text-center md:w-32">{t('customersCart.columns.quantity')}</div>
+              <div className="hidden w-28 text-center sm:block">{t('customersCart.columns.total')}</div>
+              <div className="w-16 text-center text-stone-800 dark:text-stone-100">{t('customersCart.columns.actions')}</div>
             </div>
 
             <div className="overflow-hidden rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] bg-[color:var(--hl-surface-lowest)] shadow-sm">
               <div className="flex items-center gap-2 border-b border-[color:color-mix(in_srgb,var(--hl-outline-variant)_18%,transparent)] px-4 py-3">
-                <Checkbox
-                  checked={selectedIds.length === cartItems.length && cartItems.length > 0}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                />
-                <span className="bg-orange-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded ml-2">Yêu thích</span>
-                <span className="text-sm font-bold ml-1 flex items-center gap-1 cursor-pointer hover:text-orange-600 text-stone-900 dark:text-stone-100">
-                  Phan Coffee Official <ShopOutlined />
+                <Checkbox checked={allSelected} onChange={(e) => handleSelectAll(e.target.checked)} />
+                <span className="ml-2 rounded bg-orange-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  {t('customersCart.sellerFavorite')}
+                </span>
+                <span className="ml-1 flex cursor-pointer items-center gap-1 text-sm font-bold text-stone-900 hover:text-orange-600 dark:text-stone-100">
+                  {t('customersCart.storeOfficial')} <ShopOutlined />
                 </span>
               </div>
 
@@ -242,12 +252,16 @@ const CartPage: React.FC = () => {
               </AnimatePresence>
 
               <div className="flex items-center gap-4 border-t border-dashed border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] px-4 py-4 text-xs">
-                <div className="flex items-center gap-1 text-[color:color-mix(in_srgb,var(--hl-on-surface)_65%,transparent)]">
+                <div className="flex items-center gap-1 text-[color:color-mix(in_srgb,var(--hl-on-surface)_70%,transparent)]">
                   <TagOutlined className="text-orange-600" />
-                  Voucher giảm đến 20k
+                  {t('customersCart.voucherBanner')}
                 </div>
-                <button className="text-blue-500 hover:underline" onClick={() => navigate('/vouchers')}>
-                  Xem thêm voucher
+                <button
+                  type="button"
+                  className="text-blue-500 hover:underline"
+                  onClick={() => navigate('/vouchers')}
+                >
+                  {t('customersCart.moreVouchers')}
                 </button>
               </div>
 
@@ -260,7 +274,7 @@ const CartPage: React.FC = () => {
                   }}
                   isApplying={voucher.isApplying}
                   errorMessage={voucher.errorMessage || undefined}
-                  helperText={selectedItems.length === 0 ? 'Chọn sản phẩm để áp dụng voucher.' : undefined}
+                  helperText={selectedItems.length === 0 ? t('customersCart.voucherHelperSelect') : undefined}
                 />
                 <VoucherSummary
                   discount={voucher.discount}
@@ -274,8 +288,10 @@ const CartPage: React.FC = () => {
 
               <div className="flex items-center gap-2 border-t border-[color:color-mix(in_srgb,var(--hl-outline-variant)_18%,transparent)] bg-[color:color-mix(in_srgb,#16a34a_08%,var(--hl-surface-low))] px-4 py-4 text-xs text-green-700 dark:text-green-400">
                 <CreditCardOutlined />
-                Giảm 15.000₫ phí vận chuyển đơn tối thiểu 0₫
-                <button className="text-blue-500 hover:underline ml-1">Tìm hiểu thêm</button>
+                {t('customersCart.shippingBanner')}
+                <button type="button" className="ml-1 text-blue-500 hover:underline">
+                  {t('customersCart.learnMore')}
+                </button>
               </div>
             </div>
           </div>
@@ -284,23 +300,24 @@ const CartPage: React.FC = () => {
         <div className="mt-12">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="hl-sans text-base font-semibold uppercase tracking-[0.14em] text-[color:var(--hl-secondary)]">
-              Có thể bạn cũng thích
+              {t('customersCart.recommendedHeading')}
             </h2>
             <button
-              className="text-orange-600 text-sm flex items-center gap-1 hover:underline"
+              type="button"
+              className="flex items-center gap-1 text-sm text-orange-600 hover:underline"
               onClick={() => navigate('/products')}
             >
-              Xem Tất Cả <span className="text-xs">&gt;</span>
+              {t('customersCart.recommendedViewAll')} <span className="text-xs">&gt;</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
             {recommendedProducts.map((product) => (
               <ProductCard
                 key={product.product_ID}
                 product={product}
-                title={product.name}
-                description={product.description || ''}
+                title={translatedProductName(t, product)}
+                description={translatedProductDescription(t, product, 'list')}
                 price={formatPrice(product.price)}
                 imageSrc={getImageSrc(product.image)}
                 onOpen={() => navigate(`/product-detail/${product.product_ID}`)}
@@ -312,49 +329,34 @@ const CartPage: React.FC = () => {
       </div>
 
       {!isLoading && cartItems.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[color:color-mix(in_srgb,var(--hl-outline-variant)_25%,transparent)] bg-[color:var(--hl-surface-lowest)] shadow-[0_-4px_24px_rgba(0,0,0,0.06)]">
-          <div className="max-w-7xl mx-auto px-4 py-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-6 text-sm text-stone-800 dark:text-stone-200">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    checked={selectedIds.length === cartItems.length && cartItems.length > 0}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                  />
-                  <span>Chọn Tất Cả ({cartItems.length})</span>
-                </div>
-                <button className="hover:text-orange-600 transition-colors" onClick={() => setSelectedIds([])}>
-                  Xóa
-                </button>
-                <button className="hidden sm:block text-orange-600 hover:text-orange-500 transition-colors">Lưu vào mục Đã thích</button>
-              </div>
-
-              <div className="flex items-center gap-6 justify-between md:justify-end">
-                <div className="flex flex-col items-end">
-                  <div className="flex items-center gap-2 text-stone-800 dark:text-stone-200">
-                    <span className="text-sm">Tổng cộng ({selectedIds.length} sản phẩm):</span>
-                    <span className="text-xl font-bold text-orange-600">{formatPrice(payable)}</span>
-                  </div>
-                  {voucher.isSuccess && voucher.discount != null ? (
-                    <span className="text-[10px] text-green-600">
-                      Giảm {formatPrice(voucher.discount)}
-                    </span>
-                  ) : (
-                    <span className="text-[10px] text-stone-500 dark:text-stone-400">Tiết kiệm {formatPrice(totalAmount * 0.1)}</span>
-                  )}
-                </div>
-                <Button
-                  type="primary"
-                  size="large"
-                  className="bg-orange-600 hover:bg-orange-700 border-none h-12 px-10 font-bold min-w-[200px]"
-                  onClick={handleCheckout}
-                >
-                  Mua Hàng
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CartPurchaseBar
+          cartCount={cartItems.length}
+          selectedCount={selectedIds.length}
+          allSelected={allSelected}
+          onSelectAll={handleSelectAll}
+          onClearSelection={() => setSelectedIds([])}
+          totalLabel={t('customersCart.purchaseBar.totalLabel', { count: selectedIds.length })}
+          formattedTotal={formatPrice(payable)}
+          discountLine={
+            voucher.isSuccess && voucher.discount != null ? (
+              <span className="text-[10px] text-emerald-200">
+                {t('customersCart.purchaseBar.discountApplied', { amount: formatPrice(voucher.discount) })}
+              </span>
+            ) : undefined
+          }
+          savingsLine={
+            !(voucher.isSuccess && voucher.discount != null) ? (
+              <span className="text-[10px] text-white/75">
+                {t('customersCart.purchaseBar.savingsEstimate', { amount: formatPrice(totalAmount * 0.1) })}
+              </span>
+            ) : undefined
+          }
+          checkoutLabel={t('customersCart.purchaseBar.checkout')}
+          onCheckout={handleCheckout}
+          selectAllLabel={t('customersCart.purchaseBar.selectAll', { count: cartItems.length })}
+          removeLabel={t('customersCart.purchaseBar.clearSelection')}
+          wishlistLabel={t('customersCart.purchaseBar.saveToWishlist')}
+        />
       )}
 
       <Chatbox />
@@ -363,4 +365,3 @@ const CartPage: React.FC = () => {
 };
 
 export default CartPage;
-

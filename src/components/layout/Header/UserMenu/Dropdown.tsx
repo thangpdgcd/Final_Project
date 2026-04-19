@@ -11,7 +11,7 @@ import {
   Settings,
   Heart
 } from 'lucide-react';
-import { getImageSrc } from '@/utils/image';
+import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/image';
 
 interface DropdownProps {
   isLoggedIn: boolean;
@@ -54,7 +54,11 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
               <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#FFD700] to-amber-200 p-0.5 shadow-lg shadow-[#FFD700]/10">
                 <div className="w-full h-full rounded-full bg-white dark:bg-[#1c1716] flex items-center justify-center overflow-hidden border-2 border-white dark:border-[#1c1716]">
                   {user?.avatar ? (
-                    <img src={getImageSrc(user.avatar)} alt="Avatar" className="w-full h-full object-cover" />
+                    <img
+                      src={getAvatarImageSrc(user.avatar)}
+                      alt="Avatar"
+                      className={AVATAR_DISPLAY_IMG_CLASS}
+                    />
                   ) : (
                     <span className="text-[#FFD700] font-black text-lg">
                       {user?.name?.charAt(0) || 'U'}

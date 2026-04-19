@@ -31,7 +31,8 @@ import { useTheme } from '@/store/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { getImageSrc } from '@/utils/image';
 import { translatedProductDescription, translatedProductName } from '@/utils/productI18n';
-import { toast } from 'react-toastify';
+import { i18nKeys } from '@/constants/i18nKeys';
+import { toastWarning } from '@/lib/toast/i18nToast';
 
 const formatPrice = (v: number) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v || 0);
@@ -188,7 +189,7 @@ const ProductDetailPage: React.FC = () => {
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleCTA = () => {
     if (!user?.user_ID) {
-      toast.warning('Vui lòng đăng nhập', { toastId: 'require-login' });
+      toastWarning(i18nKeys.toast.product.loginRequired, undefined, { toastId: 'require-login' });
       navigate('/login', { state: { from: { pathname: `/products/${id}` } } });
       return;
     }

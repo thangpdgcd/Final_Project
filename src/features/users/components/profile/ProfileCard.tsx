@@ -5,7 +5,7 @@ import AvatarSection from './AvatarSection';
 import ProfileInfo from './ProfileInfo';
 import ProfileActions from './ProfileActions';
 import ProfileSkeleton from './ProfileSkeleton';
-import { getImageSrc } from '@/utils/image';
+import { getAvatarImageSrc } from '@/utils/image';
 import type { AuthUser } from '@/types';
 
 export interface ProfileCardProps {
@@ -37,7 +37,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 }) => {
   const { dark } = useTheme();
   const showSkeleton = !user;
-  const avatarSrc = getImageSrc(previewAvatar || user?.avatar);
+  const avatarSrc = getAvatarImageSrc(previewAvatar || user?.avatar);
 
   return (
     <AnimatePresence mode="wait">

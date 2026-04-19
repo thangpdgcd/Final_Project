@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { i18nKeys } from '@/constants/i18nKeys';
+import { toastErrorWithFallback } from '@/lib/toast/i18nToast';
 import { supportWidgetApi } from '../api/supportWidget.api';
 import { useSupportWidgetStore } from '../store/useSupportWidgetStore';
 
@@ -39,7 +40,7 @@ export const useSupportWidgetMessages = ({ enabled, conversationId }: Options) =
       })
       .catch((err) => {
         if (cancelled) return;
-        toast.error(err?.message ? String(err.message) : 'Failed to load messages');
+        toastErrorWithFallback(i18nKeys.toast.support.loadMessagesFailed, err?.message ? String(err.message) : undefined);
         // Avoid an infinite skeleton if the endpoint rejects or is temporarily down.
         useSupportWidgetStore.getState().setLoadedConversationId(conversationId);
       })

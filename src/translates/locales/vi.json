@@ -17,7 +17,8 @@
     "lang": {
       "en": "EN",
       "vi": "VN"
-    }
+    },
+    "requestFailed": "Không thực hiện được thao tác. Vui lòng thử lại."
   },
   "header": {
     "breadcrumbBrand": "Phan Coffee"
@@ -48,7 +49,54 @@
     "completed": "Hoàn thành",
     "loadingItems": "Đang tải sản phẩm...",
     "itemsEmpty": "Đơn hàng này chưa có sản phẩm nào.",
-    "productFallback": "Sản phẩm #{{id}}"
+    "productFallback": "Sản phẩm #{{id}}",
+    "status": {
+      "pending": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "paid": "Đã thanh toán",
+      "processing": "Đang xử lý",
+      "shipping": "Đang giao",
+      "shipped": "Đang vận chuyển",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "refundRequested": "Yêu cầu hoàn tiền",
+      "refunded": "Đã hoàn tiền",
+      "sent": "Đã gửi",
+      "unknown": "Không xác định"
+    },
+    "payment": {
+      "cod": "Thanh toán khi nhận hàng",
+      "paypal": "PayPal",
+      "coffeeCoin": "Coffee Coin",
+      "momo": "MoMo",
+      "vnpay": "VNPay",
+      "bankTransfer": "Chuyển khoản",
+      "stripe": "Thẻ (Stripe)",
+      "card": "Thẻ",
+      "zalopay": "ZaloPay",
+      "applePay": "Apple Pay",
+      "googlePay": "Google Pay",
+      "other": "Khác"
+    },
+    "shipping": {
+      "standard": "Giao hàng tiêu chuẩn",
+      "express": "Giao hàng nhanh",
+      "pickup": "Nhận tại cửa hàng"
+    },
+    "shippingStatus": {
+      "pending": "Chờ gửi hàng",
+      "preparing": "Đang chuẩn bị",
+      "packed": "Đã đóng gói",
+      "picked": "Đã lấy hàng",
+      "shipped": "Đã gửi",
+      "inTransit": "Đang vận chuyển",
+      "outForDelivery": "Đang giao",
+      "delivered": "Đã giao",
+      "failed": "Giao thất bại",
+      "returned": "Hoàn trả",
+      "cancelled": "Đã hủy",
+      "unknown": "Không xác định"
+    }
   },
   "about": {
     "sectionLabel": "VỀ PHAN COFFEE",
@@ -273,7 +321,9 @@
     "viewFullBasket": "XEM GIỎ HÀNG",
     "emptyTitle": "Giỏ hàng trống",
     "emptyDesc": "Hành trình cà phê của bạn chưa bắt đầu. Hãy khám phá các loại cà phê của chúng tôi!",
-    "shopNow": "Mua sắm ngay"
+    "shopNow": "Mua sắm ngay",
+    "qtyShort": "SL",
+    "totalShort": "Tổng"
   },
   "products": {
     "title": "Sản phẩm",
@@ -335,6 +385,18 @@
       "peach_tea": {
         "name": "Trà đào",
         "description": "Trà đào kèm lát trái cây"
+      },
+      "phin_pha_ca_phe_inox": {
+        "name": "Phin pha cà phê inox",
+        "description": "Phin inox bền, pha đúng chuẩn cà phê Việt."
+      },
+      "ca_phe_robusta_honey": {
+        "name": "Cà phê Robusta Honey",
+        "description": "Robusta honey lên men ngọt dịu, thân đậm, hậu ngọt."
+      },
+      "ca_phe_arabica_mang_den": {
+        "name": "Cà phê Arabica Măng Đen nguyên chất",
+        "description": "Arabica Măng Đen một nguồn, thơm sạch, vị cân bằng."
       },
       "butter_croissant": {
         "name": "Bánh sừng bò bơ",
@@ -412,6 +474,7 @@
     "joinNow": "Tham gia ngay",
     "loginSuccess": "Đăng nhập thành công!",
     "loginError": "Email hoặc mật khẩu không chính xác!",
+    "roleNotAllowed": "Tài khoản này không được phép đăng nhập vào trang người dùng.",
     "registerTitle": "TẠO TÀI KHOẢN",
     "registerDivider": "Đăng ký bằng email",
     "loginEmailLabel": "Email",
@@ -506,12 +569,6 @@
     "historyOrdersSearchPlaceholder":
       "Bạn có thể tìm kiếm theo tên Shop, ID đơn hàng hoặc Tên Sản phẩm",
     "notFound": "Không tìm thấy người dùng",
-    "orders": {
-      "apiNotAvailableHint": "Backend chưa có API đơn hàng cho tài khoản này."
-    },
-    "wallet": {
-      "apiNotAvailableHint": "Backend chưa có API ví/Coffee Coin."
-    },
     "sidebar": {
       "account": "Tài Khoản Của Tôi",
       "orders": "Đơn Mua",
@@ -576,6 +633,7 @@
       "editProfileCaps": "CHỈNH SỬA"
     },
     "orders": {
+      "apiNotAvailableHint": "Backend chưa có API đơn hàng cho tài khoản này.",
       "productInfoPending": "Đang xử lý thông tin sản phẩm...",
       "reloginToBuyAgain": "Vui lòng đăng nhập lại để mua lại.",
       "addToCartSuccess": "Đã thêm vào giỏ hàng!",
@@ -614,6 +672,8 @@
       "requestRefundLoading": "Đang gửi yêu cầu...",
       "requestReturn": "Yêu cầu trả hàng",
       "cancelOrder": "Hủy đơn",
+      "paymentLabel": "Thanh toán",
+      "shippingStatusLabel": "Vận chuyển",
       "subtotalLabel": "Thành tiền",
       "messages": {
         "orderIdMissing": "Không xác định được mã đơn hàng.",
@@ -625,6 +685,7 @@
       }
     },
     "wallet": {
+      "apiNotAvailableHint": "Backend chưa có API ví/Coffee Coin.",
       "topup": "Nạp PayPal",
       "refund": "Hoàn tiền đơn hàng",
       "spend": "Thanh toán Coffee Coin",
@@ -822,6 +883,32 @@
     "selectedItems": "Đã chọn {{count}} sản phẩm",
     "totalLabel": "Tổng cộng:",
     "checkout": "Mua hàng",
+    "eyebrow": "Phan Coffee",
+    "pageHeading": "Giỏ hàng",
+    "loginTitle": "Vui lòng đăng nhập",
+    "loginSubtitle": "Đăng nhập để xem và thanh toán giỏ hàng của bạn.",
+    "loginCta": "Đăng nhập ngay",
+    "loadErrorDetail": "Không thể tải giỏ hàng. Vui lòng thử lại sau.",
+    "emptyTitle": "Giỏ hàng của bạn còn trống",
+    "emptyCta": "Mua sắm ngay",
+    "sellerFavorite": "Yêu thích",
+    "storeOfficial": "Phan Coffee Official",
+    "voucherBanner": "Voucher giảm đến 20k",
+    "moreVouchers": "Xem thêm voucher",
+    "shippingBanner": "Giảm 15.000₫ phí vận chuyển đơn tối thiểu 0₫",
+    "learnMore": "Tìm hiểu thêm",
+    "voucherHelperSelect": "Chọn sản phẩm để áp dụng voucher.",
+    "recommendedHeading": "Có thể bạn cũng thích",
+    "recommendedViewAll": "Xem tất cả",
+    "purchaseBar": {
+      "selectAll": "Chọn tất cả ({{count}})",
+      "clearSelection": "Xóa",
+      "saveToWishlist": "Lưu vào mục Đã thích",
+      "totalLabel": "Tổng cộng ({{count}} sản phẩm):",
+      "discountApplied": "Giảm {{amount}}",
+      "savingsEstimate": "Tiết kiệm {{amount}}",
+      "checkout": "Mua hàng"
+    },
     "columns": {
       "product": "Sản phẩm",
       "unitPrice": "Đơn giá",
@@ -830,13 +917,96 @@
       "actions": "Thao tác"
     },
     "actions": {
-      "remove": "Xóa"
+      "remove": "Xóa",
+      "similar": "Tìm sản phẩm tương tự"
+    },
+    "badges": {
+      "freeReturns15": "Miễn phí trả hàng 15 ngày"
     },
     "fallback": {
       "productAlt": "product",
       "noName": "Không có tên",
       "categoryLabel": "Phân loại: Mặc định"
     }
+  },
+  "toast": {
+    "cart": {
+      "removeSuccess": "Đã xóa sản phẩm khỏi giỏ hàng",
+      "removeError": "Không thể xóa sản phẩm",
+      "checkoutNeedSelection": "Vui lòng chọn ít nhất một sản phẩm để thanh toán",
+      "loginToAdd": "Vui lòng đăng nhập để thêm vào giỏ hàng",
+      "addSuccess": "Đã thêm {{name}} vào giỏ hàng",
+      "addError": "Thêm vào giỏ hàng thất bại"
+    },
+    "order": {
+      "created": "Đặt hàng thành công",
+      "voucherApplyFailed": "Không thể áp dụng voucher",
+      "saveFailed": "Không thể lưu đơn hàng"
+    },
+    "support": {
+      "loadMessagesFailed": "Không thể tải tin nhắn",
+      "loadConversationsFailed": "Không thể tải cuộc trò chuyện",
+      "loginToChat": "Vui lòng đăng nhập để trò chuyện.",
+      "joinThreadFailed": "Không thể tham gia cuộc trò chuyện này. Đang tạo cuộc mới…",
+      "sendFailed": "Gửi tin nhắn thất bại",
+      "chatError": "Lỗi chat"
+    },
+    "product": {
+      "loginRequired": "Vui lòng đăng nhập"
+    }
+  },
+  "checkout": {
+    "shippingTitle": "Địa chỉ nhận hàng",
+    "defaultBadge": "Mặc định",
+    "change": "Thay đổi",
+    "tableProduct": "Sản phẩm",
+    "tableUnit": "Đơn giá",
+    "tableQty": "Số lượng",
+    "tableLine": "Thành tiền",
+    "sellerFavorite": "Yêu thích",
+    "storeOfficial": "Phan Coffee Official",
+    "chatNow": "Chat ngay",
+    "categoryDefault": "Phân loại: Default",
+    "noteLabel": "Lời nhắn:",
+    "notePlaceholder": "Lưu ý cho người bán…",
+    "shopVoucher": "Voucher của Shop",
+    "voucherHelper": "Mẹo: chọn voucher trong Kho voucher — sẽ tự điền vào đây.",
+    "shippingCarrier": "Đơn vị vận chuyển: Vận Chuyển Nhanh",
+    "shippingEta": "Nhận hàng vào 29/03 – 03/04",
+    "inspection": "Được đồng kiểm",
+    "totalWithCount": "Tổng số tiền ({{count}} sản phẩm):",
+    "paymentTitle": "Phương thức thanh toán",
+    "payCod": "Thanh toán khi nhận hàng",
+    "payPaypal": "PayPal",
+    "payCoffeeCoin": "Coffee Coin",
+    "walletLabel": "Số dư Coffee Coin:",
+    "walletLoading": "Đang tải…",
+    "walletInsufficient": "Số dư không đủ để thanh toán đơn này.",
+    "summarySubtotal": "Tổng tiền hàng",
+    "summaryShipping": "Phí vận chuyển",
+    "summaryVoucher": "Giảm giá voucher",
+    "summaryTotal": "Tổng thanh toán:",
+    "termsHint": "Nhấn \"Đặt hàng\" đồng nghĩa với việc bạn đồng ý tuân theo Điều khoản Phan Coffee",
+    "placeOrder": "Đặt hàng",
+    "loadingPaypal": "Đang tải PayPal…",
+    "back": "Quay lại",
+    "modalTitle": "Thay đổi địa chỉ nhận hàng",
+    "modalOk": "Hoàn thành",
+    "modalCancel": "Hủy",
+    "formName": "Họ và tên",
+    "formPhone": "Số điện thoại",
+    "formAddress": "Địa chỉ chi tiết",
+    "formNameRequired": "Vui lòng nhập họ tên",
+    "formPhoneRequired": "Vui lòng nhập số điện thoại",
+    "formAddressRequired": "Vui lòng nhập địa chỉ",
+    "formNamePlaceholder": "Nhập họ và tên",
+    "formPhonePlaceholder": "Nhập số điện thoại",
+    "formAddressPlaceholder": "Nhập địa chỉ nhận hàng",
+    "redirecting": "Đang chuyển đến giỏ hàng…",
+    "paypalError": "PayPal lỗi",
+    "paypalSdkError": "Không thể tải PayPal SDK",
+    "paypalLoadError": "Lỗi tải PayPal",
+    "saveOrderError": "Lưu đơn hàng thất bại"
   },
   "chatbox": {
     "greeting": "Xin chào! Phan Coffee có thể giúp gì cho bạn hôm nay?",

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import { i18nKeys } from '@/constants/i18nKeys';
+import { toastErrorWithFallback } from '@/lib/toast/i18nToast';
 import type { ReceiveMessagePayload } from '../types';
 import { useSupportWidgetStore } from '../store/useSupportWidgetStore';
 import { connectSupportWidgetSocket, disconnectSupportWidgetSocket, supportWidgetEvents } from '../socket/supportWidget.socket';
@@ -236,7 +237,7 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
           : typeof payload === 'string'
             ? payload
             : 'Chat error';
-      toast.error(msg);
+      toastErrorWithFallback(i18nKeys.toast.support.chatError, msg);
     });
 
     return () => {

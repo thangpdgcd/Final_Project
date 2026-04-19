@@ -1,3 +1,27 @@
+/** Cloudinary delivery: brighten + contrast so faces read better in small UI crops. */
+const CLOUDINARY_AVATAR_ENHANCE = 'e_improve,e_brightness:12,e_contrast:10';
+
+/**
+ * Inserts avatar-friendly transforms into a Cloudinary image URL when missing.
+ * Skips if `e_improve` is already present.
+ */
+export function enhanceCloudinaryAvatarUrl(url: string): string {
+  const v = String(url).trim();
+  if (!v || /e_improve/i.test(v)) return v;
+  if (!/cloudinary\.com\//i.test(v) || !/\/image\/upload\//i.test(v)) return v;
+
+  if (/\/image\/upload\/v\d+\//.test(v)) {
+    return v.replace(/\/image\/upload\/(v\d+\/)/, `/image/upload/${CLOUDINARY_AVATAR_ENHANCE}/$1`);
+  }
+  if (/\/image\/upload\/[^/]+\/v\d+\//.test(v)) {
+    return v.replace(
+      /\/image\/upload\/([^/]+)\/(v\d+\/)/,
+      `/image/upload/$1,${CLOUDINARY_AVATAR_ENHANCE}/$2`,
+    );
+  }
+  return v;
+}
+
 export const getImageSrc = (img?: string | null): string => {
   if (!img) return '/no-image.png';
   const v = String(img).trim();
@@ -51,3 +75,15 @@ export const getImageSrc = (img?: string | null): string => {
   
   return `data:image/${mime};base64,${v}`;
 };
+
+/** Same as {@link getImageSrc}, plus Cloudinary avatar enhancement when applicable. */
+export const getAvatarImageSrc = (img?: string | null): string => {
+  const base = getImageSrc(img);
+  if (base === '/no-image.png' || /^data:image\//.test(base)) return base;
+  if (/cloudinary\.com/i.test(base)) return enhanceCloudinaryAvatarUrl(base);
+  return base;
+};
+
+/** Tailwind: bias crop toward upper face + mild lift for dark / contrasty photos */
+export const AVATAR_DISPLAY_IMG_CLASS =
+  'w-full h-full object-cover object-[center_24%] brightness-[1.06] contrast-[1.08] saturate-[1.04]';
