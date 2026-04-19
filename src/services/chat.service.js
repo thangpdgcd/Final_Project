@@ -1,6 +1,8 @@
 import { AppError } from "../utils/AppError.js";
 import models from "../models/index.js";
 import { presenceManager as presence } from "../infrastructure/chat/rooms/presence.manager.js";
+import { createNotificationService } from "./notification.service.js";
+import { emitNotificationsToUsers } from "../infrastructure/socket/notificationEmitter.js";
 
 const serializeMessageForApi = (msg, fallbackSenderRoleId) => {
   if (!msg) return null;
@@ -54,6 +56,7 @@ const pickPatch = (patch, allowedKeys) => {
 };
 
 export const createChatService = ({ chatRepository, userRepository, staffRepository }) => {
+  const notificationService = createNotificationService();
   const normalizePagination = ({ limit, offset }) => {
     const parsedLimit = Number(limit);
     const parsedOffset = Number(offset);
@@ -368,6 +371,23 @@ export const createChatService = ({ chatRepository, userRepository, staffReposit
       sender,
       input: messageInput,
     });
+
+    // Notify other participants (excluding sender) about new message
+    try {
+      const participants = await chatRepository.listParticipants({
+        conversationId: Number(conversationId),
+      });
+      const ids = (participants ?? [])
+        .map((p) => p?.userId)
+        .filter((id) => id != null && String(id) !== String(sender?.id));
+
+      const rows = await notificationService.createForUsers({
+        userIds: ids,
+        type: "chat",
+        message: "You have a new chat message",
+      });
+      emitNotificationsToUsers({ userIds: ids, notifications: rows });
+    } catch {}
 
     return { conversationId: Number(conversationId), message: saved };
   };

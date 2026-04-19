@@ -7,13 +7,13 @@ import initCategoriesRoutes from "./categoriesRoutes.js";
 import initOrdersRoutes from "./ordersRoutes.js";
 import initCartRoutes from "./cartsRoutes.js";
 import initAuthRoutes from "./authRoutes.js";
-import initNotfoundRoutes from "./notfoundRoutes.js";
 import initPaymentsRoutes from "./paymentsRoutes.js";
 import initChatRoutes from "./chatRoutes.js";
 import initPresenceRoutes from "./presenceRoutes.js";
 import initVoucherAdminRoutes from "./voucherAdminRoutes.js";
 import { initAdminVoucherRoutes } from "./adminVoucherRoutes.js";
 import { initVoucherRoutes } from "./voucherRoutes.js";
+import initNotificationsRoutes from "./notificationsRoutes.js";
 
 const router = express.Router();
 
@@ -65,10 +65,10 @@ const initRoutes = (app) => {
   initOrdersRoutes(app);
   initCartRoutes(app);
   initChatRoutes(app);
+  initNotificationsRoutes(app);
   initVoucherAdminRoutes(app);
   initAdminVoucherRoutes(app);
   initVoucherRoutes(app);
-  initNotfoundRoutes(app);
   initPaymentsRoutes(app);
 };
 

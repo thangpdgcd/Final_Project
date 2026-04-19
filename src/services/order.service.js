@@ -1,6 +1,8 @@
 import db from "../models/index.js";
 import { Op } from "sequelize";
 import { emitOrderNew, emitOrderUpdate } from "../infrastructure/socket/socketServer.js";
+import { createNotificationService } from "./notification.service.js";
+import { emitNotificationsToUsers } from "../infrastructure/socket/notificationEmitter.js";
 import { AppError } from "../utils/AppError.js";
 import {
   addWalletXu,
@@ -20,6 +22,8 @@ const {
   OrderMeta,
   OrderChatMessage,
 } = db;
+
+const notificationService = createNotificationService();
 
 const STATUS = {
   pending: "pending",
@@ -374,6 +378,23 @@ const createOrderFromCart = async ({ userId, note, paymentMethod, paypalCaptureI
       actor: { id: uid, role: "customer" },
     });
     emitOrderNew(order);
+
+    // Notify staff/admin about new order (per-user notifications, no broadcast)
+    try {
+      const staffAdmins = await Users.findAll({
+        where: { roleID: { [Op.in]: ["2", "3"] } },
+        attributes: ["userId"],
+        raw: true,
+      });
+      const ids = staffAdmins.map((u) => u.userId);
+      const rows = await notificationService.createForUsers({
+        userIds: ids,
+        type: "order",
+        message: `New order #${created.orderId} created`,
+      });
+      emitNotificationsToUsers({ userIds: ids, notifications: rows });
+    } catch {}
+
     return order;
   } catch (error) {
     try {

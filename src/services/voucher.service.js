@@ -1,7 +1,10 @@
 import models from "../models/index.js";
 import { AppError } from "../utils/AppError.js";
+import { createNotificationService } from "./notification.service.js";
+import { emitNotificationsToUsers } from "../infrastructure/socket/notificationEmitter.js";
 
 const { Vouchers, VoucherAuditLogs, Users } = models;
+const notificationService = createNotificationService();
 
 const toPositiveNumber = (raw) => {
   const n = Number(raw);
@@ -104,6 +107,22 @@ export const createVoucherService = () => {
           },
           { transaction: tx },
         );
+
+        // Notify staff/admin that a voucher was created (per-user notifications, no broadcast)
+        try {
+          const staffAdmins = await Users.findAll({
+            where: { roleID: { [models.Sequelize.Op.in]: ["2", "3"] } },
+            attributes: ["userId"],
+            raw: true,
+          });
+          const ids = staffAdmins.map((u) => u.userId);
+          const rows = await notificationService.createForUsers({
+            userIds: ids,
+            type: "voucher",
+            message: `Voucher created for user #${uid}`,
+          });
+          emitNotificationsToUsers({ userIds: ids, notifications: rows });
+        } catch {}
 
         return voucher;
       });

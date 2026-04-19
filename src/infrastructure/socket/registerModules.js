@@ -6,6 +6,7 @@ import { createUserRepository } from "../../services/user.repository.js";
 import { createStaffRepository } from "../../services/staff.repository.js";
 import { registerVoucherSocket } from "./voucher.socket.js";
 import { registerStaffInternalSocket } from "./staff.internal.socket.js";
+import { registerNotificationSocket } from "./notification.socket.js";
 
 export const registerSocketModules = ({ io, socket, rooms, events }) => {
   const chatRepository = createChatRepository();
@@ -16,5 +17,6 @@ export const registerSocketModules = ({ io, socket, rooms, events }) => {
   registerOrderSocket({ io, socket, rooms, events });
   registerVoucherSocket({ io, socket, rooms, events });
   registerStaffInternalSocket({ io, socket, rooms, events });
+  registerNotificationSocket({ io, socket, rooms, events });
 };
 
