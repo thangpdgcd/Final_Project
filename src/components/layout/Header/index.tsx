@@ -21,6 +21,7 @@ import { getImageSrc } from '@/utils/image';
 import { translatedProductName } from '@/utils/productI18n';
 import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
 import type { IconButtonProps } from './header.types';
+import { NotificationBell } from '@/features/notifications';
 
 // --- CONSTANTS ---
 const NAV_ITEMS = [
@@ -266,6 +267,7 @@ const HeaderPage: React.FC = () => {
             />
 
             {/* User Account - REFINED COMPONENT */}
+            <NotificationBell className="hidden sm:block" />
             <UserMenu
               onLoginClick={() =>
                 navigate('/login', { state: { from: location }, replace: false })
