@@ -147,8 +147,29 @@ export const ordersService = {
   },
 
   getById: async (id: number): Promise<Order> => {
-    const res = await axiosInstance.get<Order>(`/orders/${id}`);
-    return res.data;
+    const orderId = Number(id);
+    if (!Number.isFinite(orderId) || orderId <= 0) {
+      throw new Error('INVALID_ORDER_ID');
+    }
+    try {
+      const res = await axiosInstance.get<any>(`/orders/${orderId}`);
+      const payload = res.data?.data ?? res.data;
+      // Backend uses sendSuccess wrapper: { success, message, data }
+      const record = payload?.order ?? payload ?? res.data;
+      return normalizeOrderRow(record as any);
+    } catch (err) {
+      // If backend forbids direct GET /orders/:id for customers in some deployments,
+      // fall back to "my orders" and find it locally.
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        if (status === 403 || status === 404) {
+          const mine = await ordersService.getAll();
+          const found = mine.find((o) => Number(o.order_ID) === orderId || Number((o as any).orderId) === orderId);
+          if (found) return found;
+        }
+      }
+      throw err;
+    }
   },
 
   /**
