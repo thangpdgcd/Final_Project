@@ -1,5 +1,5 @@
-import { buildStaffRouter } from "../modules/admin/index.js";
-import { buildUserRouter } from "../modules/user/user.routes.js";
+import { buildStaffRouter } from "./staff.build.js";
+import { buildUserRouter } from "./user.build.js";
 
 const initUserRoutes = (app) => {
   app.use("/api", buildStaffRouter());

@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
-import { socketLogger } from "../../core/utils/socketLogger.js";
-import { joinDefaultRooms } from "../../modules/chat/rooms/room.manager.js";
+import { socketLogger } from "../../utils/socketLogger.js";
+import { joinDefaultRooms } from "../chat/rooms/room.manager.js";
 import { rooms } from "./rooms.js";
 import { events } from "./events.js";
 import { presence } from "./presence.js";

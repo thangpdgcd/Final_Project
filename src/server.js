@@ -3,10 +3,10 @@ import http from "http";
 import paypal from "paypal-rest-sdk";
 
 import { createApp } from "./app.js";
-import { loadEnv } from "./core/config/runtimeEnv.js";
-import { initSocket } from "./core/socket/socket.init.js";
+import { loadEnv } from "./config/runtimeEnv.js";
+import { attachSocketServer } from "./infrastructure/socket/socketServer.js";
 import { registerSocketModules } from "./infrastructure/socket/registerModules.js";
-import { seedChatOnStartup } from "./modules/chat/chat.seed.js";
+import { seedChatOnStartup } from "./seeders/chatOnStartup.js";
 
 loadEnv();
 
@@ -49,7 +49,7 @@ if (!process.env.PAYPAL_CLIENT_ID || !process.env.PAYPAL_CLIENT_SECRET) {
 }
 
 const httpServer = http.createServer(app);
-initSocket({ httpServer, registerModules: registerSocketModules });
+attachSocketServer(httpServer, { registerModules: registerSocketModules });
 
 const isBackendAlreadyRunning = async (port) => {
   const url = `http://127.0.0.1:${port}/api/health`;

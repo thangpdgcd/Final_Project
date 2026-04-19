@@ -1,4 +1,4 @@
-import { buildChatRouter } from "../modules/chat/chat.routes.js";
+import { buildChatRouter } from "./chat.build.js";
 
 const router = buildChatRouter();
 

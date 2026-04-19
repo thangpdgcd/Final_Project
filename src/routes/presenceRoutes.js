@@ -1,7 +1,7 @@
 import express from "express";
 import models from "../models/index.js";
 import { authenticate } from "../middlewares/authenticate.js";
-import { presenceManager as presence } from "../modules/chat/rooms/presence.manager.js";
+import { presenceManager as presence } from "../infrastructure/chat/rooms/presence.manager.js";
 import { sendSuccess, sendError } from "../utils/response.js";
 
 const MAX_BASIC_IDS = 100;

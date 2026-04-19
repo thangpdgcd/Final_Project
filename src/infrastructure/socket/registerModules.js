@@ -1,11 +1,11 @@
-import { createChatRepository } from "../../modules/chat/chat.repository.js";
-import { createChatService } from "../../modules/chat/chat.service.js";
-import { registerChatSocket } from "../../modules/chat/chat.socket.js";
-import { registerOrderSocket } from "../../modules/order/order.socket.js";
-import { createUserRepository } from "../../modules/user/user.repository.js";
-import { createStaffRepository } from "../../modules/staff/staff.repository.js";
-import { registerVoucherSocket } from "../../socket/voucher.socket.js";
-import { registerStaffInternalSocket } from "../../modules/staff/staff.internal.socket.js";
+import { createChatRepository } from "../../services/chat.repository.js";
+import { createChatService } from "../../services/chat.service.js";
+import { registerChatSocket } from "./chat.socket.js";
+import { registerOrderSocket } from "./order.socket.js";
+import { createUserRepository } from "../../services/user.repository.js";
+import { createStaffRepository } from "../../services/staff.repository.js";
+import { registerVoucherSocket } from "./voucher.socket.js";
+import { registerStaffInternalSocket } from "./staff.internal.socket.js";
 
 export const registerSocketModules = ({ io, socket, rooms, events }) => {
   const chatRepository = createChatRepository();

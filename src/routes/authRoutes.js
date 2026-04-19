@@ -1,4 +1,4 @@
-import { buildAuthRouter } from "../modules/auth/auth.routes.js";
+import { buildAuthRouter } from "./auth.build.js";
 
 const router = buildAuthRouter();
 

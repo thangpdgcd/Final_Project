@@ -1,5 +1,5 @@
 import express from "express";
-import orderController from "../modules/order/order.controller.js";
+import orderController from "../controllers/ordersController.js";
 import OrderItemsController from "../controllers/orderItemsController.js";
 import {
   isCustomer,

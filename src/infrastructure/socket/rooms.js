@@ -1,2 +1,2 @@
-export { roomManager as rooms, roomManager } from "../../modules/chat/rooms/room.manager.js";
+export { roomManager as rooms, roomManager } from "../chat/rooms/room.manager.js";
 

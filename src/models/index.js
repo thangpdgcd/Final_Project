@@ -37,7 +37,12 @@ const sequelize = new Sequelize(
 
 const files = fs
   .readdirSync(__dirname)
-  .filter((file) => file !== "index.js" && file.endsWith(".js"));
+  .filter(
+    (file) =>
+      file !== "index.js" &&
+      file !== "orderModels.js" &&
+      file.endsWith(".js"),
+  );
 
 for (const file of files) {
   const filePath = path.join(__dirname, file);
@@ -47,25 +52,6 @@ for (const file of files) {
   // Prefer Sequelize modelName (stable); avoid relying on class `name` alone.
   const registryKey = ModelClass.options?.modelName ?? ModelClass.name;
   db[registryKey] = ModelClass;
-}
-
-// Module-owned models (kept outside src/models/)
-const moduleModelDirs = [
-  path.resolve(__dirname, "../modules/chat/chat.models"),
-  path.resolve(__dirname, "../modules/order/order.models"),
-];
-
-for (const dir of moduleModelDirs) {
-  if (!fs.existsSync(dir)) continue;
-  const moduleFiles = fs.readdirSync(dir).filter((f) => f.endsWith(".js"));
-  for (const file of moduleFiles) {
-    const filePath = path.join(dir, file);
-    const fileUrl = pathToFileURL(filePath).href;
-    const modelImport = await import(fileUrl);
-    const ModelClass = modelImport.default(sequelize, DataTypes);
-    const registryKey = ModelClass.options?.modelName ?? ModelClass.name;
-    db[registryKey] = ModelClass;
-  }
 }
 
 Object.keys(db).forEach((modelName) => {

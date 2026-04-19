@@ -1,5 +1,5 @@
 import models from "../models/index.js";
-import { AppError } from "../core/utils/AppError.js";
+import { AppError } from "../utils/AppError.js";
 
 const { Vouchers, VoucherAuditLogs, Users } = models;
 

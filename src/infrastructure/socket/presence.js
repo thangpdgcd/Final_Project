@@ -1,4 +1,4 @@
-import { presenceManager } from "../../modules/chat/rooms/presence.manager.js";
+import { presenceManager } from "../chat/rooms/presence.manager.js";
 
 export const presence = presenceManager;
 
