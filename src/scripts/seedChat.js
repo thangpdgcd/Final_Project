@@ -14,9 +14,7 @@ const getUserByEmail = async (email) => {
   return Users.findOne({ where: { email: String(email).trim().toLowerCase() } });
 };
 
-export const seedChatOnStartup = async () => {
-  if (!asBool(process.env.SEED_ON_STARTUP)) return;
-
+const seedChatCore = async () => {
   const chatRepository = createChatRepository();
   const sequelize = models.sequelize;
 
@@ -145,5 +143,14 @@ export const seedChatOnStartup = async () => {
   });
 
   console.log("[chat-seed] Seeded chat conversations/messages (idempotent).");
+};
+
+export const seedChatOnStartup = async () => {
+  if (!asBool(process.env.SEED_ON_STARTUP)) return;
+  await seedChatCore();
+};
+
+export const seedChat = async () => {
+  await seedChatCore();
 };
 

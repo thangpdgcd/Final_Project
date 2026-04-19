@@ -9,6 +9,18 @@ export default (sequelize) => {
     }
   }
 
+  const normalizeRoleID = (value) => {
+    if (value == null) return value;
+    const v = String(value).trim().toLowerCase();
+    if (!v) return value;
+
+    if (v === "1" || v === "user" || v === "customer") return "1";
+    if (v === "2" || v === "admin") return "2";
+    if (v === "3" || v === "staff") return "3";
+
+    return value;
+  };
+
   Users.init(
     {
       userId: {
@@ -34,8 +46,11 @@ export default (sequelize) => {
         type: DataTypes.STRING,
       },
       roleID: {
-        type: DataTypes.STRING, 
+        type: DataTypes.STRING,
         allowNull: false,
+        set(value) {
+          this.setDataValue("roleID", normalizeRoleID(value));
+        },
       },
     },
     {

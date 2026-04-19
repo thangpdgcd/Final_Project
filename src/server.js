@@ -6,7 +6,7 @@ import { createApp } from "./app.js";
 import { loadEnv } from "./config/runtimeEnv.js";
 import { attachSocketServer } from "./infrastructure/socket/socketServer.js";
 import { registerSocketModules } from "./infrastructure/socket/registerModules.js";
-import { seedChatOnStartup } from "./seeders/chatOnStartup.js";
+import { seedChatOnStartup } from "./scripts/seedChat.js";
 
 loadEnv();
 
