@@ -1,6 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { App, Button, Skeleton, Alert, Radio, Select, Rate, Tag, Avatar, Carousel, InputNumber } from 'antd';
+import {
+  App,
+  Button,
+  Skeleton,
+  Alert,
+  Radio,
+  Select,
+  Rate,
+  Tag,
+  Avatar,
+  Carousel,
+  InputNumber,
+} from 'antd';
 import {
   ShoppingCart,
   ArrowLeft,
@@ -34,84 +46,180 @@ import { translatedProductDescription, translatedProductName } from '@/utils/pro
 import { i18nKeys } from '@/constants/i18nKeys';
 import { toastWarning } from '@/lib/toast/i18nToast';
 
-const formatPrice = (v: number) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v || 0);
+const formatPrice = (v: number, locale: string) =>
+  new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(v || 0);
 
 // ── Theme tokens (2 product types × 2 brightness modes = 4 variants) ─────────
 
 const COFFEE_LIGHT = {
-  pageBg:'#fdfbf8', navBg:'rgba(253,251,248,0.92)', navBorder:'rgba(111,78,55,0.10)',
-  cardBg:'#ffffff', storyBg:'#ffffff', storyBorder:'rgba(111,78,55,0.05)',
-  workshopBg:'#FFF9F3', workshopBorder:'rgba(111,78,55,0.05)',
-  featureCardBg:'#ffffff', reviewCardBg:'#ffffff', panelBg:'#ffffff',
-  accent:'#6f4e37', accentHover:'#4e3524', accentBorder:'rgba(111,78,55,0.12)',
-  bodyColor:'#1a0a00', subtleColor:'#5c3d2e',
-  tag:'bg-[#6f4e37] text-white', tagAlt:'bg-white/90 text-orange-600 border border-orange-100',
-  optionBox:'bg-[#FFF9F3]/60', badgeSub:'bg-[#6f4e37] text-white',
-  iconColor:'text-[#6f4e37]', priceColor:'text-[#6f4e37]', navText:'text-[#6f4e37]',
-  borderTop:'border-gray-100', stockBg:'bg-red-50/50 border-red-100',
-  stockIcon:'text-red-500', stockText:'text-red-800', stockPing:'bg-red-500',
-  rateClass:'text-[#6f4e37]', sectionLabel:'text-orange-600', dividerBar:'bg-orange-200',
-  cardFeatureIcon:'bg-amber-50', avatarBg:'bg-[#6f4e37]', avatarName:'text-orange-600',
-  reviewBadge:'success' as const, reviewAvatar:'bg-orange-100 text-orange-700',
-  panelShadow:'0 50px 100px -20px rgba(111,78,55,0.18)', stockIconBg:'#fee2e2',
+  pageBg: '#fdfbf8',
+  navBg: 'rgba(253,251,248,0.92)',
+  navBorder: 'rgba(111,78,55,0.10)',
+  cardBg: '#ffffff',
+  storyBg: '#ffffff',
+  storyBorder: 'rgba(111,78,55,0.05)',
+  workshopBg: '#FFF9F3',
+  workshopBorder: 'rgba(111,78,55,0.05)',
+  featureCardBg: '#ffffff',
+  reviewCardBg: '#ffffff',
+  panelBg: '#ffffff',
+  accent: '#6f4e37',
+  accentHover: '#4e3524',
+  accentBorder: 'rgba(111,78,55,0.12)',
+  bodyColor: '#1a0a00',
+  subtleColor: '#5c3d2e',
+  tag: 'bg-[#6f4e37] text-white',
+  tagAlt: 'bg-white/90 text-orange-600 border border-orange-100',
+  optionBox: 'bg-[#FFF9F3]/60',
+  badgeSub: 'bg-[#6f4e37] text-white',
+  iconColor: 'text-[#6f4e37]',
+  priceColor: 'text-[#6f4e37]',
+  navText: 'text-[#6f4e37]',
+  borderTop: 'border-gray-100',
+  stockBg: 'bg-red-50/50 border-red-100',
+  stockIcon: 'text-red-500',
+  stockText: 'text-red-800',
+  stockPing: 'bg-red-500',
+  rateClass: 'text-[#6f4e37]',
+  sectionLabel: 'text-orange-600',
+  dividerBar: 'bg-orange-200',
+  cardFeatureIcon: 'bg-amber-50',
+  avatarBg: 'bg-[#6f4e37]',
+  avatarName: 'text-orange-600',
+  reviewBadge: 'success' as const,
+  reviewAvatar: 'bg-orange-100 text-orange-700',
+  panelShadow: '0 50px 100px -20px rgba(111,78,55,0.18)',
+  stockIconBg: '#fee2e2',
 };
 
 const COFFEE_DARK = {
-  pageBg:'#130800', navBg:'rgba(19,8,0,0.96)', navBorder:'rgba(212,167,106,0.18)',
-  cardBg:'#2a1408', storyBg:'#2a1408', storyBorder:'rgba(212,167,106,0.08)',
-  workshopBg:'#3a1e0a', workshopBorder:'rgba(212,167,106,0.12)',
-  featureCardBg:'#2a1408', reviewCardBg:'#2a1408', panelBg:'#2a1408',
-  accent:'#d4a76a', accentHover:'#c4925a', accentBorder:'rgba(212,167,106,0.20)',
-  bodyColor:'#fde8c8', subtleColor:'#c9a882',
-  tag:'bg-[#d4a76a] text-[#130800]', tagAlt:'bg-[#3a1e0a]/90 text-[#d4a76a] border border-[#d4a76a]/30',
-  optionBox:'bg-[#3a1e0a]/60', badgeSub:'bg-[#d4a76a] text-[#130800]',
-  iconColor:'text-[#d4a76a]', priceColor:'text-[#d4a76a]', navText:'text-[#d4a76a]',
-  borderTop:'border-[#3a1e0a]', stockBg:'bg-[#3a1e0a]/60 border-[#d4a76a]/20',
-  stockIcon:'text-[#d4a76a]', stockText:'text-[#fde8c8]', stockPing:'bg-[#d4a76a]',
-  rateClass:'text-[#d4a76a]', sectionLabel:'text-[#d4a76a]', dividerBar:'bg-[#5c3d2e]',
-  cardFeatureIcon:'bg-[#3a1e0a]', avatarBg:'bg-[#d4a76a]', avatarName:'text-[#d4a76a]',
-  reviewBadge:'warning' as const, reviewAvatar:'bg-[#3a1e0a] text-[#d4a76a]',
-  panelShadow:'0 50px 100px -20px rgba(212,167,106,0.14)', stockIconBg:'#3a1e0a',
+  pageBg: '#130800',
+  navBg: 'rgba(19,8,0,0.96)',
+  navBorder: 'rgba(212,167,106,0.18)',
+  cardBg: '#2a1408',
+  storyBg: '#2a1408',
+  storyBorder: 'rgba(212,167,106,0.08)',
+  workshopBg: '#3a1e0a',
+  workshopBorder: 'rgba(212,167,106,0.12)',
+  featureCardBg: '#2a1408',
+  reviewCardBg: '#2a1408',
+  panelBg: '#2a1408',
+  accent: '#d4a76a',
+  accentHover: '#c4925a',
+  accentBorder: 'rgba(212,167,106,0.20)',
+  bodyColor: '#fde8c8',
+  subtleColor: '#c9a882',
+  tag: 'bg-[#d4a76a] text-[#130800]',
+  tagAlt: 'bg-[#3a1e0a]/90 text-[#d4a76a] border border-[#d4a76a]/30',
+  optionBox: 'bg-[#3a1e0a]/60',
+  badgeSub: 'bg-[#d4a76a] text-[#130800]',
+  iconColor: 'text-[#d4a76a]',
+  priceColor: 'text-[#d4a76a]',
+  navText: 'text-[#d4a76a]',
+  borderTop: 'border-[#3a1e0a]',
+  stockBg: 'bg-[#3a1e0a]/60 border-[#d4a76a]/20',
+  stockIcon: 'text-[#d4a76a]',
+  stockText: 'text-[#fde8c8]',
+  stockPing: 'bg-[#d4a76a]',
+  rateClass: 'text-[#d4a76a]',
+  sectionLabel: 'text-[#d4a76a]',
+  dividerBar: 'bg-[#5c3d2e]',
+  cardFeatureIcon: 'bg-[#3a1e0a]',
+  avatarBg: 'bg-[#d4a76a]',
+  avatarName: 'text-[#d4a76a]',
+  reviewBadge: 'warning' as const,
+  reviewAvatar: 'bg-[#3a1e0a] text-[#d4a76a]',
+  panelShadow: '0 50px 100px -20px rgba(212,167,106,0.14)',
+  stockIconBg: '#3a1e0a',
 };
 
 // Brew-light shares the same warm cream foundation as coffee-light.
 // Accent: charcoal-slate #374151 — premium "steel tool" feel, in-brand.
 const BREW_LIGHT = {
-  pageBg:'#faf8f5', navBg:'rgba(250,248,245,0.92)', navBorder:'rgba(55,65,81,0.10)',
-  cardBg:'#ffffff', storyBg:'#ffffff', storyBorder:'rgba(55,65,81,0.06)',
-  workshopBg:'#f3f2ef', workshopBorder:'rgba(55,65,81,0.08)',
-  featureCardBg:'#ffffff', reviewCardBg:'#ffffff', panelBg:'#ffffff',
-  accent:'#374151', accentHover:'#1f2937', accentBorder:'rgba(55,65,81,0.14)',
-  bodyColor:'#111827', subtleColor:'#4b5563',
-  tag:'bg-[#374151] text-white', tagAlt:'bg-white/90 text-gray-600 border border-gray-200',
-  optionBox:'bg-[#f3f2ef]/70', badgeSub:'bg-[#374151] text-white',
-  iconColor:'text-[#374151]', priceColor:'text-[#374151]', navText:'text-[#374151]',
-  borderTop:'border-gray-200', stockBg:'bg-gray-50 border-gray-200',
-  stockIcon:'text-gray-500', stockText:'text-gray-800', stockPing:'bg-gray-500',
-  rateClass:'text-[#374151]', sectionLabel:'text-gray-500', dividerBar:'bg-gray-300',
-  cardFeatureIcon:'bg-gray-100', avatarBg:'bg-[#374151]', avatarName:'text-gray-500',
-  reviewBadge:'default' as const, reviewAvatar:'bg-gray-100 text-gray-700',
-  panelShadow:'0 50px 100px -20px rgba(55,65,81,0.14)', stockIconBg:'#f3f4f6',
+  pageBg: '#faf8f5',
+  navBg: 'rgba(250,248,245,0.92)',
+  navBorder: 'rgba(55,65,81,0.10)',
+  cardBg: '#ffffff',
+  storyBg: '#ffffff',
+  storyBorder: 'rgba(55,65,81,0.06)',
+  workshopBg: '#f3f2ef',
+  workshopBorder: 'rgba(55,65,81,0.08)',
+  featureCardBg: '#ffffff',
+  reviewCardBg: '#ffffff',
+  panelBg: '#ffffff',
+  accent: '#374151',
+  accentHover: '#1f2937',
+  accentBorder: 'rgba(55,65,81,0.14)',
+  bodyColor: '#111827',
+  subtleColor: '#4b5563',
+  tag: 'bg-[#374151] text-white',
+  tagAlt: 'bg-white/90 text-gray-600 border border-gray-200',
+  optionBox: 'bg-[#f3f2ef]/70',
+  badgeSub: 'bg-[#374151] text-white',
+  iconColor: 'text-[#374151]',
+  priceColor: 'text-[#374151]',
+  navText: 'text-[#374151]',
+  borderTop: 'border-gray-200',
+  stockBg: 'bg-gray-50 border-gray-200',
+  stockIcon: 'text-gray-500',
+  stockText: 'text-gray-800',
+  stockPing: 'bg-gray-500',
+  rateClass: 'text-[#374151]',
+  sectionLabel: 'text-gray-500',
+  dividerBar: 'bg-gray-300',
+  cardFeatureIcon: 'bg-gray-100',
+  avatarBg: 'bg-[#374151]',
+  avatarName: 'text-gray-500',
+  reviewBadge: 'default' as const,
+  reviewAvatar: 'bg-gray-100 text-gray-700',
+  panelShadow: '0 50px 100px -20px rgba(55,65,81,0.14)',
+  stockIconBg: '#f3f4f6',
 };
 
 // Brew-dark: same deep-espresso canvas as coffee-dark, silver accent for "steel" feel.
 const BREW_DARK = {
-  pageBg:'#111118', navBg:'rgba(17,17,24,0.96)', navBorder:'rgba(209,213,219,0.12)',
-  cardBg:'#1c1c24', storyBg:'#1c1c24', storyBorder:'rgba(209,213,219,0.07)',
-  workshopBg:'#26262f', workshopBorder:'rgba(209,213,219,0.10)',
-  featureCardBg:'#1c1c24', reviewCardBg:'#1c1c24', panelBg:'#1c1c24',
-  accent:'#d1d5db', accentHover:'#9ca3af', accentBorder:'rgba(209,213,219,0.18)',
-  bodyColor:'#f3f4f6', subtleColor:'#9ca3af',
-  tag:'bg-[#d1d5db] text-[#111118]', tagAlt:'bg-[#26262f]/90 text-gray-300 border border-gray-700',
-  optionBox:'bg-[#26262f]/70', badgeSub:'bg-[#d1d5db] text-[#111118]',
-  iconColor:'text-[#d1d5db]', priceColor:'text-[#d1d5db]', navText:'text-[#d1d5db]',
-  borderTop:'border-gray-800', stockBg:'bg-gray-800/50 border-gray-700',
-  stockIcon:'text-gray-400', stockText:'text-gray-200', stockPing:'bg-gray-400',
-  rateClass:'text-[#d1d5db]', sectionLabel:'text-gray-400', dividerBar:'bg-gray-700',
-  cardFeatureIcon:'bg-gray-800', avatarBg:'bg-[#d1d5db]', avatarName:'text-gray-400',
-  reviewBadge:'default' as const, reviewAvatar:'bg-gray-800 text-gray-300',
-  panelShadow:'0 50px 100px -20px rgba(209,213,219,0.08)', stockIconBg:'#1f2937',
+  pageBg: '#111118',
+  navBg: 'rgba(17,17,24,0.96)',
+  navBorder: 'rgba(209,213,219,0.12)',
+  cardBg: '#1c1c24',
+  storyBg: '#1c1c24',
+  storyBorder: 'rgba(209,213,219,0.07)',
+  workshopBg: '#26262f',
+  workshopBorder: 'rgba(209,213,219,0.10)',
+  featureCardBg: '#1c1c24',
+  reviewCardBg: '#1c1c24',
+  panelBg: '#1c1c24',
+  accent: '#d1d5db',
+  accentHover: '#9ca3af',
+  accentBorder: 'rgba(209,213,219,0.18)',
+  bodyColor: '#f3f4f6',
+  subtleColor: '#9ca3af',
+  tag: 'bg-[#d1d5db] text-[#111118]',
+  tagAlt: 'bg-[#26262f]/90 text-gray-300 border border-gray-700',
+  optionBox: 'bg-[#26262f]/70',
+  badgeSub: 'bg-[#d1d5db] text-[#111118]',
+  iconColor: 'text-[#d1d5db]',
+  priceColor: 'text-[#d1d5db]',
+  navText: 'text-[#d1d5db]',
+  borderTop: 'border-gray-800',
+  stockBg: 'bg-gray-800/50 border-gray-700',
+  stockIcon: 'text-gray-400',
+  stockText: 'text-gray-200',
+  stockPing: 'bg-gray-400',
+  rateClass: 'text-[#d1d5db]',
+  sectionLabel: 'text-gray-400',
+  dividerBar: 'bg-gray-700',
+  cardFeatureIcon: 'bg-gray-800',
+  avatarBg: 'bg-[#d1d5db]',
+  avatarName: 'text-gray-400',
+  reviewBadge: 'default' as const,
+  reviewAvatar: 'bg-gray-800 text-gray-300',
+  panelShadow: '0 50px 100px -20px rgba(209,213,219,0.08)',
+  stockIconBg: '#1f2937',
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -127,6 +235,7 @@ const ProductDetailPage: React.FC = () => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { t, i18n } = useTranslation();
   const { dark, toggleDark } = useTheme();
+  const moneyLocale = i18n.language?.toLowerCase().startsWith('vi') ? 'vi-VN' : 'en-US';
 
   const [purchaseType, setPurchaseType] = useState<'once' | 'subscribe'>('once');
   const [grind, setGrind] = useState('Beans');
@@ -147,7 +256,13 @@ const ProductDetailPage: React.FC = () => {
   // Everything else (Accessories, Stationery, Electronics, Office Tools …) is
   // treated as a non-coffee product and gets the neutral steel theme.
   const COFFEE_CATEGORY_NAMES = new Set([
-    'robusta', 'arabica', 'blend', 'specialty', 'coffee', 'cà phê', 'ca phe',
+    'robusta',
+    'arabica',
+    'blend',
+    'specialty',
+    'coffee',
+    'cà phê',
+    'ca phe',
   ]);
 
   const isCoffeeProduct = useMemo(() => {
@@ -155,7 +270,9 @@ const ProductDetailPage: React.FC = () => {
     const catId = (product as any).categories_ID ?? (product as any).category_ID;
     if (catId && categories.length > 0) {
       const cat = categories.find((c: any) => c.category_ID === catId);
-      const catName = String(cat?.name ?? '').toLowerCase().trim();
+      const catName = String(cat?.name ?? '')
+        .toLowerCase()
+        .trim();
       // Match any of the known coffee category names
       if (COFFEE_CATEGORY_NAMES.has(catName)) return true;
       for (const key of COFFEE_CATEGORY_NAMES) {
@@ -170,9 +287,7 @@ const ProductDetailPage: React.FC = () => {
   }, [product, categories]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isBrewingTool = !isCoffeeProduct;
-  const T = isCoffeeProduct
-    ? (dark ? COFFEE_DARK : COFFEE_LIGHT)
-    : (dark ? BREW_DARK   : BREW_LIGHT);
+  const T = isCoffeeProduct ? (dark ? COFFEE_DARK : COFFEE_LIGHT) : dark ? BREW_DARK : BREW_LIGHT;
 
   // ── Document title ────────────────────────────────────────────────────────
   const productDisplayName = product ? translatedProductName(t, product) : '';
@@ -180,10 +295,16 @@ const ProductDetailPage: React.FC = () => {
 
   React.useEffect(() => {
     const prev = document.title;
-    if (isLoading) { document.title = t('pages.productDetail.loadingDocumentTitle'); }
-    else if (error || !product) { document.title = t('pages.productDetail.notFoundDocumentTitle'); }
-    else { document.title = t('pages.productDetail.documentTitle', { name: productDisplayName }); }
-    return () => { document.title = prev; };
+    if (isLoading) {
+      document.title = t('pages.productDetail.loadingDocumentTitle');
+    } else if (error || !product) {
+      document.title = t('pages.productDetail.notFoundDocumentTitle');
+    } else {
+      document.title = t('pages.productDetail.documentTitle', { name: productDisplayName });
+    }
+    return () => {
+      document.title = prev;
+    };
   }, [isLoading, error, product, t, i18n.language, productDisplayName]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
@@ -195,9 +316,17 @@ const ProductDetailPage: React.FC = () => {
     }
     if (!product) return;
     addToCart.mutate(
-      { user_ID: user.user_ID, product_ID: product.product_ID, quantity, price: finalPrice / quantity },
       {
-        onSuccess: () => { message.success(t('productDetail.purchaseOnceSuccess')); navigate('/cart'); },
+        user_ID: user.user_ID,
+        product_ID: product.product_ID,
+        quantity,
+        price: finalPrice / quantity,
+      },
+      {
+        onSuccess: () => {
+          message.success(t('productDetail.purchaseOnceSuccess'));
+          navigate('/cart');
+        },
         onError: () => message.error(t('productDetail.purchaseError')),
       },
     );
@@ -227,7 +356,9 @@ const ProductDetailPage: React.FC = () => {
       <div className="about-page min-h-screen bg-[color:var(--hl-surface)] text-[color:var(--hl-on-surface)]">
         <div className="relative z-[1] mx-auto max-w-7xl px-4 py-20">
           <Alert type="error" message={t('productDetail.notFoundMessage')} showIcon />
-          <Button className="mt-6" onClick={() => navigate('/products')}>{t('productDetail.backToStore')}</Button>
+          <Button className="mt-6" onClick={() => navigate('/products')}>
+            {t('productDetail.backToStore')}
+          </Button>
         </div>
       </div>
     );
@@ -238,24 +369,30 @@ const ProductDetailPage: React.FC = () => {
   return (
     <div
       className="min-h-screen pb-32 font-sans transition-all duration-500"
-      style={{ background: T.pageBg, color: T.bodyColor, transition: 'background 0.4s ease, color 0.4s ease' }}
+      style={{
+        background: T.pageBg,
+        color: T.bodyColor,
+        transition: 'background 0.4s ease, color 0.4s ease',
+      }}
     >
       {/* ── Identity banner ─────────────────────────────────────────────── */}
       <div
         className="w-full py-2 text-center text-[10px] font-black uppercase tracking-[0.35em]"
         style={{
           background: isBrewingTool
-            ? (dark
-                ? 'linear-gradient(90deg, #0a0a0f 0%, #111118 40%, #26262f 60%, #111118 80%, #0a0a0f 100%)'
-                : 'linear-gradient(90deg, #1f2937 0%, #374151 50%, #1f2937 100%)')
-            : (dark
-                ? 'linear-gradient(90deg, #080400 0%, #130800 40%, #2a1408 60%, #130800 80%, #080400 100%)'
-                : 'linear-gradient(90deg, #4e3524 0%, #6f4e37 50%, #4e3524 100%)'),
+            ? dark
+              ? 'linear-gradient(90deg, #0a0a0f 0%, #111118 40%, #26262f 60%, #111118 80%, #0a0a0f 100%)'
+              : 'linear-gradient(90deg, #1f2937 0%, #374151 50%, #1f2937 100%)'
+            : dark
+              ? 'linear-gradient(90deg, #080400 0%, #130800 40%, #2a1408 60%, #130800 80%, #080400 100%)'
+              : 'linear-gradient(90deg, #4e3524 0%, #6f4e37 50%, #4e3524 100%)',
           color: isBrewingTool ? '#e5e7eb' : '#fde8c8',
           letterSpacing: '0.3em',
         }}
       >
-        {isBrewingTool ? '⚙  DỤNG CỤ PHA CHẾ  —  BREWING EQUIPMENT' : '☕  CÀ PHÊ  —  PREMIUM COFFEE'}
+        {isBrewingTool
+          ? t('productDetail.banner.brewingEquipment')
+          : t('productDetail.banner.premiumCoffee')}
       </div>
 
       <div className="relative z-[1]">
@@ -275,8 +412,10 @@ const ProductDetailPage: React.FC = () => {
               <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
               {t('productDetail.store')}
             </button>
-            <div className={`text-[10px] font-black uppercase tracking-[0.4em] opacity-35 hidden md:block ${T.navText}`}>
-              {isBrewingTool ? 'PRECISION CRAFT' : t('productDetail.artOfCoffee')}
+            <div
+              className={`text-[10px] font-black uppercase tracking-[0.4em] opacity-35 hidden md:block ${T.navText}`}
+            >
+              {isBrewingTool ? t('productDetail.precisionCraft') : t('productDetail.artOfCoffee')}
             </div>
             <div className="flex items-center gap-2">
               {/* Dark / Light mode toggle */}
@@ -284,7 +423,7 @@ const ProductDetailPage: React.FC = () => {
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.92 }}
                 onClick={toggleDark}
-                title={dark ? 'Chuyển sang Light mode' : 'Chuyển sang Dark mode'}
+                title={dark ? t('productDetail.switchToLight') : t('productDetail.switchToDark')}
                 className="p-2 rounded-full transition-all"
                 style={{
                   background: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)',
@@ -318,17 +457,19 @@ const ProductDetailPage: React.FC = () => {
         </nav>
 
         <main className="max-w-7xl mx-auto px-4 md:px-8 py-12 grid grid-cols-1 lg:grid-cols-12 gap-16">
-
           {/* ── LEFT COLUMN ─────────────────────────────────────────────── */}
           <div className="lg:col-span-7 space-y-20">
-
             {/* Product image carousel */}
             <section className="relative group">
               <div className="absolute top-8 left-8 z-10 flex flex-col gap-3 pointer-events-none">
-                <span className={`px-5 py-2 text-[10px] font-black tracking-[0.2em] rounded-full shadow-xl ${T.tag}`}>
+                <span
+                  className={`px-5 py-2 text-[10px] font-black tracking-[0.2em] rounded-full shadow-xl ${T.tag}`}
+                >
                   {isBrewingTool ? 'CRAFTSMAN PICK' : t('productDetail.badgeBestSeller')}
                 </span>
-                <span className={`px-5 py-2 backdrop-blur text-[10px] font-black tracking-[0.2em] rounded-full shadow-lg ${T.tagAlt}`}>
+                <span
+                  className={`px-5 py-2 backdrop-blur text-[10px] font-black tracking-[0.2em] rounded-full shadow-lg ${T.tagAlt}`}
+                >
                   {isBrewingTool ? 'PROFESSIONAL GRADE' : t('productDetail.badgeLimitedEdition')}
                 </span>
               </div>
@@ -377,33 +518,47 @@ const ProductDetailPage: React.FC = () => {
                 {isBrewingTool ? (
                   /* ── Brewing tool story ─────────────────────────────── */
                   <>
-                    <h2 className={`text-[10px] font-black uppercase tracking-[0.5em] mb-8 flex items-center gap-4 ${T.sectionLabel}`}>
+                    <h2
+                      className={`text-[10px] font-black uppercase tracking-[0.5em] mb-8 flex items-center gap-4 ${T.sectionLabel}`}
+                    >
                       <div className={`w-8 h-px ${T.dividerBar}`} />
                       Craftsmanship &amp; Precision
                     </h2>
-                    <h3 className="text-4xl md:text-5xl font-black mb-8 leading-[1.1]" style={{ fontFamily: 'serif' }}>
+                    <h3
+                      className="text-4xl md:text-5xl font-black mb-8 leading-[1.1]"
+                      style={{ fontFamily: 'serif' }}
+                    >
                       Thiết kế cho những tay pha chế chuyên nghiệp
                     </h3>
                     <p className="text-gray-500 text-lg leading-relaxed mb-10 italic font-medium">
-                      "Mỗi chi tiết được gia công với độ chính xác cao — từ lỗ lọc đến van điều áp — để cho ra tách cà phê hoàn hảo."
+                      "Mỗi chi tiết được gia công với độ chính xác cao — từ lỗ lọc đến van điều áp —
+                      để cho ra tách cà phê hoàn hảo."
                     </p>
 
                     <div className="grid grid-cols-2 gap-8 mb-12">
                       <div className="flex items-center gap-5">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${T.cardFeatureIcon}`}>
+                        <div
+                          className={`w-14 h-14 rounded-2xl flex items-center justify-center ${T.cardFeatureIcon}`}
+                        >
                           <Layers className={`w-6 h-6 ${T.iconColor}`} />
                         </div>
                         <div>
-                          <div className="text-[10px] font-black text-gray-400 uppercase">Chất liệu</div>
+                          <div className="text-[10px] font-black text-gray-400 uppercase">
+                            Chất liệu
+                          </div>
                           <div className="font-bold">Thép không gỉ 304</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-5">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${T.cardFeatureIcon}`}>
+                        <div
+                          className={`w-14 h-14 rounded-2xl flex items-center justify-center ${T.cardFeatureIcon}`}
+                        >
                           <Thermometer className={`w-6 h-6 ${T.iconColor}`} />
                         </div>
                         <div>
-                          <div className="text-[10px] font-black text-gray-400 uppercase">Nhiệt độ</div>
+                          <div className="text-[10px] font-black text-gray-400 uppercase">
+                            Nhiệt độ
+                          </div>
                           <div className="font-bold">Chịu đến 200°C</div>
                         </div>
                       </div>
@@ -421,41 +576,58 @@ const ProductDetailPage: React.FC = () => {
                       </div>
                       <div>
                         <div className="font-bold text-lg">Phan Coffee Workshop</div>
-                        <div className={`text-xs font-bold uppercase tracking-widest ${T.avatarName}`}>Xưởng gia công thủ công</div>
+                        <div
+                          className={`text-xs font-bold uppercase tracking-widest ${T.avatarName}`}
+                        >
+                          Xưởng gia công thủ công
+                        </div>
                       </div>
                     </div>
                   </>
                 ) : (
                   /* ── Coffee story ─────────────────────────────────────── */
                   <>
-                    <h2 className={`text-[10px] font-black uppercase tracking-[0.5em] mb-8 flex items-center gap-4 ${T.sectionLabel}`}>
+                    <h2
+                      className={`text-[10px] font-black uppercase tracking-[0.5em] mb-8 flex items-center gap-4 ${T.sectionLabel}`}
+                    >
                       <div className={`w-8 h-px ${T.dividerBar}`} />
                       From Farm to Cup
                     </h2>
-                    <h3 className="text-4xl md:text-5xl font-black mb-8 leading-[1.1]" style={{ fontFamily: 'serif' }}>
-                      Hành trình từ cao nguyên Di Linh
+                    <h3
+                      className="text-4xl md:text-5xl font-black mb-8 leading-[1.1]"
+                      style={{ fontFamily: 'serif' }}
+                    >
+                      {t('productDetail.story.title')}
                     </h3>
                     <p className="text-gray-500 text-lg leading-relaxed mb-10 italic font-medium">
-                      "Mỗi hạt cà phê là lời kể của đất bazan và những giọt sương mai trên đỉnh núi cao 1,500m."
+                      {t('productDetail.story.quote')}
                     </p>
 
                     <div className="grid grid-cols-2 gap-8 mb-12">
                       <div className="flex items-center gap-5">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${T.cardFeatureIcon}`}>
+                        <div
+                          className={`w-14 h-14 rounded-2xl flex items-center justify-center ${T.cardFeatureIcon}`}
+                        >
                           <Globe className={`w-6 h-6 ${T.iconColor}`} />
                         </div>
                         <div>
-                          <div className="text-[10px] font-black text-gray-400 uppercase">Xuất xứ</div>
-                          <div className="font-bold">Lâm Đồng, VN</div>
+                          <div className="text-[10px] font-black text-gray-400 uppercase">
+                            {t('productDetail.story.originLabel')}
+                          </div>
+                          <div className="font-bold">{t('productDetail.story.originValue')}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-5">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${T.cardFeatureIcon}`}>
+                        <div
+                          className={`w-14 h-14 rounded-2xl flex items-center justify-center ${T.cardFeatureIcon}`}
+                        >
                           <Leaf className="text-green-600 w-6 h-6" />
                         </div>
                         <div>
-                          <div className="text-[10px] font-black text-gray-400 uppercase">Quy trình</div>
-                          <div className="font-bold">Sơ chế Ướt</div>
+                          <div className="text-[10px] font-black text-gray-400 uppercase">
+                            {t('productDetail.story.processLabel')}
+                          </div>
+                          <div className="font-bold">{t('productDetail.story.processValue')}</div>
                         </div>
                       </div>
                     </div>
@@ -464,10 +636,16 @@ const ProductDetailPage: React.FC = () => {
                       className="flex items-center gap-4 p-6 rounded-[30px]"
                       style={{ background: T.workshopBg, border: `1px solid ${T.workshopBorder}` }}
                     >
-                      <Avatar size={64} className={T.avatarBg}>P</Avatar>
+                      <Avatar size={64} className={T.avatarBg}>
+                        P
+                      </Avatar>
                       <div>
-                        <div className="font-bold text-lg">Nông dân Phan</div>
-                        <div className={`text-xs font-bold uppercase tracking-widest ${T.avatarName}`}>Hợp tác xã Cao Nguyên</div>
+                        <div className="font-bold text-lg">{t('productDetail.story.farmerName')}</div>
+                        <div
+                          className={`text-xs font-bold uppercase tracking-widest ${T.avatarName}`}
+                        >
+                          {t('productDetail.story.farmerOrg')}
+                        </div>
                       </div>
                     </div>
                   </>
@@ -504,20 +682,37 @@ const ProductDetailPage: React.FC = () => {
             {/* ── Reviews ───────────────────────────────────────────────── */}
             <section className="space-y-10">
               <div className="flex items-center justify-between px-4">
-                <h2 className="text-2xl font-black">Phản hồi khách hàng</h2>
+                <h2 className="text-2xl font-black">{t('productDetail.reviews.title')}</h2>
                 <span className={`text-sm font-bold flex items-center ${T.iconColor}`}>
-                  4.9/5 Average <ChevronRight size={16} />
+                  {t('productDetail.reviews.average', { score: '4.9/5' })}{' '}
+                  <ChevronRight size={16} />
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {(isBrewingTool
                   ? [
-                      { u: 'Minh Barista', c: 'Phin lọc rất chuẩn, cà phê nhỏ giọt đều và thơm hơn hẳn. Chất liệu thép dày dặn, bền lắm.', r: 5 },
-                      { u: 'Quang Roaster', c: 'Thiết kế tinh tế, không bị rỉ sét sau nhiều tháng sử dụng. Xứng đáng đầu tư cho dụng cụ pha chế.', r: 5 },
+                      {
+                        u: 'Minh Barista',
+                        c: 'Phin lọc rất chuẩn, cà phê nhỏ giọt đều và thơm hơn hẳn. Chất liệu thép dày dặn, bền lắm.',
+                        r: 5,
+                      },
+                      {
+                        u: 'Quang Roaster',
+                        c: 'Thiết kế tinh tế, không bị rỉ sét sau nhiều tháng sử dụng. Xứng đáng đầu tư cho dụng cụ pha chế.',
+                        r: 5,
+                      },
                     ]
                   : [
-                      { u: 'Tùng Nguyễn', c: 'Cà phê rất thơm, vị đậm đà đúng gu mình. Gói đăng ký định kỳ rất tiện lợi!', r: 5 },
-                      { u: 'Hạnh Lê', c: 'Bao bì xịn xò, quả thực là món quà tuyệt vời cho người yêu cà phê.', r: 5 },
+                      {
+                        u: 'Tùng Nguyễn',
+                        c: 'Cà phê rất thơm, vị đậm đà đúng gu mình. Gói đăng ký định kỳ rất tiện lợi!',
+                        r: 5,
+                      },
+                      {
+                        u: 'Hạnh Lê',
+                        c: 'Bao bì xịn xò, quả thực là món quà tuyệt vời cho người yêu cà phê.',
+                        r: 5,
+                      },
                     ]
                 ).map((rev, i) => (
                   <div
@@ -526,15 +721,22 @@ const ProductDetailPage: React.FC = () => {
                     style={{ background: T.reviewCardBg, border: `1px solid ${T.accentBorder}` }}
                   >
                     <div className="flex items-center gap-3 mb-6">
-                      <Avatar className={`font-bold ${T.reviewAvatar}`} size="large">{rev.u[0]}</Avatar>
+                      <Avatar className={`font-bold ${T.reviewAvatar}`} size="large">
+                        {rev.u[0]}
+                      </Avatar>
                       <div>
                         <div className="font-bold text-sm tracking-tight">{rev.u}</div>
-                        <Tag color={T.reviewBadge} className="text-[8px] font-black border-none rounded-full px-2">
-                          VERIFIED BUYER
+                        <Tag
+                          color={T.reviewBadge}
+                          className="text-[8px] font-black border-none rounded-full px-2"
+                        >
+                          {t('productDetail.reviews.verifiedBuyer')}
                         </Tag>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 leading-relaxed italic mb-6 flex-1">"{rev.c}"</p>
+                    <p className="text-sm text-gray-600 leading-relaxed italic mb-6 flex-1">
+                      "{rev.c}"
+                    </p>
                     <Rate disabled defaultValue={rev.r} className={`text-xs ${T.rateClass}`} />
                   </div>
                 ))}
@@ -564,7 +766,9 @@ const ProductDetailPage: React.FC = () => {
                   <div className="flex items-center justify-center gap-3 mt-3">
                     <Rate disabled defaultValue={5} className={`text-sm ${T.rateClass}`} />
                     <span className="text-[10px] font-black uppercase text-gray-300 tracking-[0.2em]">
-                      {isBrewingTool ? '3.8k+ Đã mua' : '1.2k+ Đã trải nghiệm'}
+                      {isBrewingTool
+                        ? t('productDetail.stats.purchased', { countText: '3.8k+' })
+                        : t('productDetail.stats.tried', { countText: '1.2k+' })}
                     </span>
                   </div>
                 </div>
@@ -575,7 +779,9 @@ const ProductDetailPage: React.FC = () => {
                     <div
                       onClick={() => setPurchaseType('subscribe')}
                       className={`p-6 rounded-[30px] border-2 transition-all cursor-pointer relative group ${
-                        purchaseType === 'subscribe' ? 'border-[#6f4e37] bg-amber-50/30' : 'border-gray-100 hover:border-amber-200'
+                        purchaseType === 'subscribe'
+                          ? 'border-[#6f4e37] bg-amber-50/30'
+                          : 'border-gray-100 hover:border-amber-200'
                       }`}
                     >
                       {purchaseType === 'subscribe' && (
@@ -586,7 +792,9 @@ const ProductDetailPage: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="font-black text-lg">Đăng ký Định kỳ</div>
-                          <div className="text-xs text-green-600 font-bold">Tiết kiệm 15% mỗi kỳ</div>
+                          <div className="text-xs text-green-600 font-bold">
+                            Tiết kiệm 15% mỗi kỳ
+                          </div>
                         </div>
                         <Radio checked={purchaseType === 'subscribe'} />
                       </div>
@@ -598,10 +806,12 @@ const ProductDetailPage: React.FC = () => {
                             className="mt-4 pt-4 border-t border-[#6f4e37]/10 text-[11px] space-y-2 font-medium overflow-hidden"
                           >
                             <div className="flex items-center gap-2 text-gray-600">
-                              <CheckCircle size={14} className="text-green-500" /> Miễn phí vận chuyển tận nhà
+                              <CheckCircle size={14} className="text-green-500" /> Miễn phí vận
+                              chuyển tận nhà
                             </div>
                             <div className="flex items-center gap-2 text-gray-600">
-                              <CheckCircle size={14} className="text-green-500" /> Nhận ưu đãi cho lô hàng mới nhất
+                              <CheckCircle size={14} className="text-green-500" /> Nhận ưu đãi cho
+                              lô hàng mới nhất
                             </div>
                           </motion.div>
                         )}
@@ -611,11 +821,13 @@ const ProductDetailPage: React.FC = () => {
                     <div
                       onClick={() => setPurchaseType('once')}
                       className={`p-6 rounded-[30px] border-2 transition-all cursor-pointer ${
-                        purchaseType === 'once' ? 'border-[#6f4e37] bg-amber-50/30' : 'border-gray-100 hover:border-amber-200'
+                        purchaseType === 'once'
+                          ? 'border-[#6f4e37] bg-amber-50/30'
+                          : 'border-gray-100 hover:border-amber-200'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="font-bold">Mua một lần</div>
+                        <div className="font-bold">{t('productDetail.purchase.once')}</div>
                         <Radio checked={purchaseType === 'once'} />
                       </div>
                     </div>
@@ -628,37 +840,56 @@ const ProductDetailPage: React.FC = () => {
                     {isBrewingTool ? (
                       <>
                         <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">Kích cỡ</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">
+                            {t('productDetail.options.size.label')}
+                          </label>
                           <Select value={size} onChange={setSize} className="w-full" size="large">
-                            <Select.Option value="Small">Nhỏ (1 ly)</Select.Option>
-                            <Select.Option value="Standard">Tiêu chuẩn (2 ly)</Select.Option>
-                            <Select.Option value="Large">Lớn (4 ly)</Select.Option>
+                            <Select.Option value="Small">{t('productDetail.options.size.small')}</Select.Option>
+                            <Select.Option value="Standard">{t('productDetail.options.size.standard')}</Select.Option>
+                            <Select.Option value="Large">{t('productDetail.options.size.large')}</Select.Option>
                           </Select>
                         </div>
                         <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">Chất liệu</label>
-                          <Select value={material} onChange={setMaterial} className="w-full" size="large">
-                            <Select.Option value="Stainless Steel">Thép 304</Select.Option>
-                            <Select.Option value="Aluminum">Nhôm</Select.Option>
-                            <Select.Option value="Titanium">Titanium</Select.Option>
+                          <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">
+                            {t('productDetail.options.material.label')}
+                          </label>
+                          <Select
+                            value={material}
+                            onChange={setMaterial}
+                            className="w-full"
+                            size="large"
+                          >
+                            <Select.Option value="Stainless Steel">
+                              {t('productDetail.options.material.stainless')}
+                            </Select.Option>
+                            <Select.Option value="Aluminum">
+                              {t('productDetail.options.material.aluminum')}
+                            </Select.Option>
+                            <Select.Option value="Titanium">
+                              {t('productDetail.options.material.titanium')}
+                            </Select.Option>
                           </Select>
                         </div>
                       </>
                     ) : (
                       <>
                         <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">Cách pha</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">
+                            {t('productDetail.options.grind.label')}
+                          </label>
                           <Select value={grind} onChange={setGrind} className="w-full" size="large">
-                            <Select.Option value="Beans">Nguyên hạt</Select.Option>
-                            <Select.Option value="Ground">Xay sẵn</Select.Option>
+                            <Select.Option value="Beans">{t('productDetail.options.grind.beans')}</Select.Option>
+                            <Select.Option value="Ground">{t('productDetail.options.grind.ground')}</Select.Option>
                           </Select>
                         </div>
                         <div>
-                          <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">Độ rang</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">
+                            {t('productDetail.options.roast.label')}
+                          </label>
                           <Select value={roast} onChange={setRoast} className="w-full" size="large">
-                            <Select.Option value="Light">Rang Sáng</Select.Option>
-                            <Select.Option value="Medium">Rang Vừa</Select.Option>
-                            <Select.Option value="Dark">Rang Đậm</Select.Option>
+                            <Select.Option value="Light">{t('productDetail.options.roast.light')}</Select.Option>
+                            <Select.Option value="Medium">{t('productDetail.options.roast.medium')}</Select.Option>
+                            <Select.Option value="Dark">{t('productDetail.options.roast.dark')}</Select.Option>
                           </Select>
                         </div>
                       </>
@@ -667,17 +898,32 @@ const ProductDetailPage: React.FC = () => {
 
                   {!isBrewingTool && purchaseType === 'subscribe' && (
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">Chu kỳ giao</label>
-                      <Select value={frequency} onChange={setFrequency} className="w-full" size="large">
-                        <Select.Option value="Every week">Hàng tuần</Select.Option>
-                        <Select.Option value="Every 2 weeks">Mỗi 2 tuần</Select.Option>
-                        <Select.Option value="Monthly">Hàng tháng</Select.Option>
+                      <label className="text-[10px] font-black uppercase tracking-widest mb-2 block opacity-40">
+                        {t('productDetail.options.frequency.label')}
+                      </label>
+                      <Select
+                        value={frequency}
+                        onChange={setFrequency}
+                        className="w-full"
+                        size="large"
+                      >
+                        <Select.Option value="Every week">
+                          {t('productDetail.options.frequency.weekly')}
+                        </Select.Option>
+                        <Select.Option value="Every 2 weeks">
+                          {t('productDetail.options.frequency.every2Weeks')}
+                        </Select.Option>
+                        <Select.Option value="Monthly">
+                          {t('productDetail.options.frequency.monthly')}
+                        </Select.Option>
                       </Select>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Số lượng</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest opacity-40">
+                      {t('productDetail.options.quantity')}
+                    </label>
                     <InputNumber
                       min={1}
                       value={quantity}
@@ -691,14 +937,18 @@ const ProductDetailPage: React.FC = () => {
                 {/* Price + CTA */}
                 <div className={`pt-8 border-t ${T.borderTop}`}>
                   <div className="flex items-end justify-between mb-8 px-2">
-                    <div className="text-gray-400 text-xs font-black uppercase tracking-widest">Tổng thanh toán</div>
+                    <div className="text-gray-400 text-xs font-black uppercase tracking-widest">
+                      {t('productDetail.totalPayable')}
+                    </div>
                     <div className="text-right">
                       {savings > 0 && (
                         <div className="text-xs text-green-600 font-black mb-1">
-                          Tiết kiệm {formatPrice(savings)}
+                          {t('productDetail.savings', { amount: formatPrice(savings, moneyLocale) })}
                         </div>
                       )}
-                      <div className={`text-4xl font-black ${T.priceColor}`}>{formatPrice(finalPrice)}</div>
+                      <div className={`text-4xl font-black ${T.priceColor}`}>
+                        {formatPrice(finalPrice, moneyLocale)}
+                      </div>
                     </div>
                   </div>
 
@@ -711,7 +961,7 @@ const ProductDetailPage: React.FC = () => {
                     icon={<ShoppingCart className="w-6 h-6 mr-2" />}
                     onClick={handleCTA}
                   >
-                    MUA NGAY
+                    {t('productDetail.buyNow')}
                   </Button>
                 </div>
               </div>
@@ -722,17 +972,19 @@ const ProductDetailPage: React.FC = () => {
                   className={`w-12 h-12 rounded-2xl flex items-center justify-center relative`}
                   style={{ background: T.stockIconBg }}
                 >
-                  {isBrewingTool
-                    ? <Star className={`w-6 h-6 ${T.stockIcon}`} />
-                    : <Package className={`w-6 h-6 ${T.stockIcon}`} />
-                  }
-                  <span className={`absolute top-0 right-0 w-3 h-3 rounded-full animate-ping ${T.stockPing}`} />
+                  {isBrewingTool ? (
+                    <Star className={`w-6 h-6 ${T.stockIcon}`} />
+                  ) : (
+                    <Package className={`w-6 h-6 ${T.stockIcon}`} />
+                  )}
+                  <span
+                    className={`absolute top-0 right-0 w-3 h-3 rounded-full animate-ping ${T.stockPing}`}
+                  />
                 </div>
                 <div className={`text-sm font-bold ${T.stockText}`}>
                   {isBrewingTool
-                    ? `Còn ${product.stock} sản phẩm trong kho — đặt ngay!`
-                    : `Cơ hội cuối! Chỉ còn ${product.stock} gói trong đợt rang này.`
-                  }
+                    ? t('productDetail.stock.tool', { count: product.stock })
+                    : t('productDetail.stock.coffee', { count: product.stock })}
                 </div>
               </div>
             </div>

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;600;700;800;900&display=swap');
 
 /* ===== DESIGN TOKENS (match design) ===== */
 $primary: #a0645a;
@@ -19,7 +19,13 @@ $text-light: #f8fafc;
    USER HEADER (match screenshot)
 ================================= */
 .user-header {
-  font-family: "Work Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family:
+    'Work Sans',
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    sans-serif;
   position: sticky;
   top: 0;
   z-index: 1001;
@@ -210,7 +216,9 @@ $text-light: #f8fafc;
   font-size: 13px;
   font-weight: 800;
   text-align: left;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 
   .anticon {
     font-size: 16px;
@@ -376,7 +384,9 @@ $text-light: #f8fafc;
   background: $primary;
   color: #fff;
   box-shadow: 0 16px 34px rgba(160, 100, 90, 0.22);
-  transition: transform 0.15s ease, background 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease;
 
   .anticon {
     font-size: 18px;
@@ -410,7 +420,7 @@ $text-light: #f8fafc;
     font-size: 18px;
   }
 
-   .user-header__inner {
+  .user-header__inner {
     grid-template-columns: auto minmax(260px, 1fr) auto;
     column-gap: 16px;
   }
@@ -491,4 +501,3 @@ html.dark {
     background: rgba(248, 250, 252, 0.12);
   }
 }
-

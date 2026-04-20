@@ -3,7 +3,11 @@ import { i18nKeys } from '@/constants/i18nKeys';
 import { toastErrorWithFallback } from '@/lib/toast/i18nToast';
 import type { ReceiveMessagePayload } from '../types';
 import { useSupportWidgetStore } from '../store/useSupportWidgetStore';
-import { connectSupportWidgetSocket, disconnectSupportWidgetSocket, supportWidgetEvents } from '../socket/supportWidget.socket';
+import {
+  connectSupportWidgetSocket,
+  disconnectSupportWidgetSocket,
+  supportWidgetEvents,
+} from '../socket/supportWidget.socket';
 
 type Options = {
   enabled: boolean;
@@ -71,7 +75,9 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
       raw?.staff?.username,
     );
 
-  const mapSender = (raw: any): { userId: number; name: string; avatarUrl?: string } | undefined => {
+  const mapSender = (
+    raw: any,
+  ): { userId: number; name: string; avatarUrl?: string } | undefined => {
     if (!raw || typeof raw !== 'object') return undefined;
     const userId = pickNumber(
       raw.userId,
@@ -97,7 +103,9 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
     return { userId, name, avatarUrl };
   };
 
-  const mapSenderFromFlatFields = (raw: any): { userId: number; name: string; avatarUrl?: string } | undefined => {
+  const mapSenderFromFlatFields = (
+    raw: any,
+  ): { userId: number; name: string; avatarUrl?: string } | undefined => {
     if (!raw || typeof raw !== 'object') return undefined;
     const userId = pickNumber(
       raw.senderUserId ??
@@ -126,7 +134,10 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
 
   const normalizeReceive = (raw: any): ReceiveMessagePayload | null => {
     if (!raw || typeof raw !== 'object') return null;
-    const message = (raw as any).message && typeof (raw as any).message === 'object' ? (raw as any).message : undefined;
+    const message =
+      (raw as any).message && typeof (raw as any).message === 'object'
+        ? (raw as any).message
+        : undefined;
     const conversationId = Number(
       (raw as any).conversationId ??
         (raw as any).conversation_ID ??
@@ -142,7 +153,8 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
     if (!Number.isFinite(conversationId) || conversationId <= 0) return null;
 
     // Some backends emit the saved message at top-level (no `message` field).
-    const topLevelLooksLikeMessage = (raw as any).type && ((raw as any).content || (raw as any).action || (raw as any).meta);
+    const topLevelLooksLikeMessage =
+      (raw as any).type && ((raw as any).content || (raw as any).action || (raw as any).meta);
     const candidate = message ?? (topLevelLooksLikeMessage ? raw : undefined);
     if (!candidate) return null;
 
@@ -169,11 +181,14 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
       id: (candidate as any).id ?? (candidate as any).messageId ?? `${conversationId}-${createdAt}`,
       createdAt,
       type: (candidate as any).type === 'action' ? 'action' : 'text',
-      sender: mapSender(senderRaw) ?? mapSenderFromFlatFields(candidate) ?? mapSenderFromFlatFields(raw),
+      sender:
+        mapSender(senderRaw) ?? mapSenderFromFlatFields(candidate) ?? mapSenderFromFlatFields(raw),
     };
 
     if (normalizedMessage.type === 'text') {
-      normalizedMessage.content = String((candidate as any).content ?? (candidate as any).text ?? (candidate as any).message ?? '');
+      normalizedMessage.content = String(
+        (candidate as any).content ?? (candidate as any).text ?? (candidate as any).message ?? '',
+      );
       if (!normalizedMessage.content.trim()) {
         // Ignore empty text payloads (typing/presence/noise events).
         return null;
@@ -187,7 +202,9 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
     if (!enabled) return;
 
     const socket = connectSupportWidgetSocket();
-    useSupportWidgetStore.getState().setConnectionStatus(socket.connected ? 'connected' : 'connecting');
+    useSupportWidgetStore
+      .getState()
+      .setConnectionStatus(socket.connected ? 'connected' : 'connecting');
 
     const onConnect = () => useSupportWidgetStore.getState().setConnectionStatus('connected');
     const onDisconnect = () => useSupportWidgetStore.getState().setConnectionStatus('disconnected');
@@ -256,4 +273,3 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
     useSupportWidgetStore.getState().setConnectionStatus('disconnected');
   }, [enabled]);
 };
-

@@ -1,7 +1,7 @@
 :root {
-  --coffee-brown: #4B3621;
-  --gold: #FFD700;
-  --cream: #FDF5E6;
+  --coffee-brown: #4b3621;
+  --gold: #ffd700;
+  --cream: #fdf5e6;
   --bg-main: #f7f4ef;
 }
 
@@ -11,13 +11,12 @@ html {
 
 body {
   margin: 0;
-  font-family: "Viaoda Libre", serif;
+  font-family: 'Viaoda Libre', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--bg-main);
 }
 
 code {
-  font-family:
-    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }

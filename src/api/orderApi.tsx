@@ -1,15 +1,5 @@
 // src/api/orderApi.ts
-import axios from "axios";
-
-/* --------- BASE URL (GIỮ NGUYÊN THEO BẠN) --------- */
-const apiBase = process.env.VITE_API_URL || "http://localhost:8080/";
-
-/* --------- helpers --------- */
-const joinUrl = (base: string, path: string) =>
-  `${String(base).replace(/\/+$/, "")}/${String(path).replace(/^\/+/, "")}`;
-
-// Vì BE mount: app.use("/api", router)
-const API = (path: string) => joinUrl(apiBase, `api/${path}`);
+import { http } from '@/services/api/http';
 
 /* --------- TYPES --------- */
 export interface Order {
@@ -56,34 +46,31 @@ DELETE /api/orders/:id
 */
 
 export async function getAllOrders(): Promise<Order[]> {
-  const res = await axios.get<Order[]>(API("orders"));
+  const res = await http.get<Order[]>(`/orders`);
   return res.data;
 }
 
 export async function getOrderById(id: number): Promise<Order> {
-  const res = await axios.get<Order>(API(`orders/${id}`));
+  const res = await http.get<Order>(`/orders/${id}`);
   return res.data;
 }
 
 export async function createOrder(payload: CreateOrderPayload): Promise<Order> {
-  const res = await axios.post<Order>(API("create-orders"), payload, {
-    headers: { "Content-Type": "application/json" },
+  const res = await http.post<Order>(`/create-orders`, payload, {
+    headers: { 'Content-Type': 'application/json' },
   });
   return res.data;
 }
 
-export async function updateOrder(
-  id: number,
-  payload: Partial<Order>
-): Promise<Order> {
-  const res = await axios.put<Order>(API(`orders/${id}`), payload, {
-    headers: { "Content-Type": "application/json" },
+export async function updateOrder(id: number, payload: Partial<Order>): Promise<Order> {
+  const res = await http.put<Order>(`/orders/${id}`, payload, {
+    headers: { 'Content-Type': 'application/json' },
   });
   return res.data;
 }
 
 export async function deleteOrder(id: number): Promise<{ message: string }> {
-  const res = await axios.delete<{ message: string }>(API(`orders/${id}`));
+  const res = await http.delete<{ message: string }>(`/orders/${id}`);
   return res.data;
 }
 
@@ -95,27 +82,19 @@ POST   /api/orderitems
 DELETE /api/orderitems/:orderitem_ID
 */
 
-export async function getOrderItemsByOrderId(
-  order_ID: number
-): Promise<OrderItem[]> {
-  const res = await axios.get<OrderItem[]>(API(`orders/${order_ID}/items`));
+export async function getOrderItemsByOrderId(order_ID: number): Promise<OrderItem[]> {
+  const res = await http.get<OrderItem[]>(`/orders/${order_ID}/items`);
   return res.data;
 }
 
-export async function createOrderItem(
-  payload: CreateOrderItemPayload
-): Promise<OrderItem> {
-  const res = await axios.post<OrderItem>(API("orderitems"), payload, {
-    headers: { "Content-Type": "application/json" },
+export async function createOrderItem(payload: CreateOrderItemPayload): Promise<OrderItem> {
+  const res = await http.post<OrderItem>(`/orderitems`, payload, {
+    headers: { 'Content-Type': 'application/json' },
   });
   return res.data;
 }
 
-export async function deleteOrderItem(
-  orderitem_ID: number
-): Promise<{ message: string }> {
-  const res = await axios.delete<{ message: string }>(
-    API(`orderitems/${orderitem_ID}`)
-  );
+export async function deleteOrderItem(orderitem_ID: number): Promise<{ message: string }> {
+  const res = await http.delete<{ message: string }>(`/orderitems/${orderitem_ID}`);
   return res.data;
 }

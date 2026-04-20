@@ -1,14 +1,13 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import en from "./locales/en.json";
-import vi from "./locales/vi.json";
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import en from './locales/en.json';
+import vi from './locales/vi.json';
 
-const DEFAULT_LANG = "vi";
-const STORAGE_KEY = "app_language";
+const DEFAULT_LANG = 'vi';
+const STORAGE_KEY = 'app_language';
 
 const savedLang =
-  (typeof window !== "undefined" && localStorage.getItem(STORAGE_KEY)) ||
-  DEFAULT_LANG;
+  (typeof window !== 'undefined' && localStorage.getItem(STORAGE_KEY)) || DEFAULT_LANG;
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -22,9 +21,9 @@ i18n.use(initReactI18next).init({
   },
 });
 
-export const changeLanguage = (lang: "en" | "vi") => {
+export const changeLanguage = (lang: 'en' | 'vi') => {
   i18n.changeLanguage(lang);
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     localStorage.setItem(STORAGE_KEY, lang);
   }
 };

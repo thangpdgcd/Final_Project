@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios from 'axios';
 
-const apiBase = process.env.VITE_API_URL || "http://localhost:8080/api";
+const apiBase = process.env.VITE_API_URL || 'http://localhost:8080/api';
 
 // -------- TYPES --------
 export interface User {
@@ -10,7 +10,7 @@ export interface User {
   roleID: number | string;
   phoneNumber?: string;
   address?: string;
-  status?: "active" | "inactive";
+  status?: 'active' | 'inactive';
   createdAt?: string;
   updatedAt?: string;
 }
@@ -34,7 +34,7 @@ export interface UpdateUserPayload {
 export async function getAllUsers(): Promise<User[]> {
   const res = await axios.get<User[]>(`${apiBase}/users`, {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
   });
   return res.data;
@@ -44,7 +44,7 @@ export async function getAllUsers(): Promise<User[]> {
 export async function getUserById(id: number): Promise<User> {
   const res = await axios.get<User>(`${apiBase}/users/${id}`, {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
   });
   return res.data;
@@ -54,22 +54,19 @@ export async function getUserById(id: number): Promise<User> {
 export async function createUser(payload: CreateUserPayload): Promise<User> {
   const res = await axios.post<User>(`${apiBase}/create-users`, payload, {
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
   });
   return res.data;
 }
 
 // ✅ Cập nhật thông tin người dùng
-export async function updateUser(
-  id: number,
-  payload: Partial<User>
-): Promise<User> {
+export async function updateUser(id: number, payload: Partial<User>): Promise<User> {
   const res = await axios.put<User>(`${apiBase}/users/${id}`, payload, {
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
   });
   return res.data;
@@ -77,13 +74,10 @@ export async function updateUser(
 
 // ✅ Xoá người dùng
 export async function deleteUser(id: number): Promise<{ message: string }> {
-  const res = await axios.delete<{ message: string }>(
-    `${apiBase}/users/${id}`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-  );
+  const res = await axios.delete<{ message: string }>(`${apiBase}/users/${id}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+  });
   return res.data;
 }

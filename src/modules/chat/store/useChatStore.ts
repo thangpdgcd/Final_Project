@@ -21,7 +21,10 @@ type ChatState = {
   upsertConversation: (conv: Conversation) => void;
   selectRoom: (roomId: string) => void;
   markJoined: (roomId: string) => void;
-  appendMessage: (payload: ReceiveMessagePayload, opts?: { incrementUnreadIfNotSelected?: boolean }) => void;
+  appendMessage: (
+    payload: ReceiveMessagePayload,
+    opts?: { incrementUnreadIfNotSelected?: boolean },
+  ) => void;
   setRoomLoading: (roomId: string, loading: boolean) => void;
   setRoomMessages: (roomId: string, messages: ChatMessage[]) => void;
   markRoomLoaded: (roomId: string) => void;
@@ -55,7 +58,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const selectedRoomId =
         state.selectedRoomId && conversations.some((c) => c.roomId === state.selectedRoomId)
           ? state.selectedRoomId
-          : conversations[0]?.roomId ?? null;
+          : (conversations[0]?.roomId ?? null);
       return { conversations, selectedRoomId };
     }),
 
@@ -131,4 +134,3 @@ export const useChatStore = create<ChatState>((set, get) => ({
       ),
     })),
 }));
-

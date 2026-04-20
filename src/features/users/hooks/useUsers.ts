@@ -28,7 +28,8 @@ export const useCreateUser = () => {
 export const useUpdateUser = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: UpdateUserPayload }) => usersService.update(id, payload),
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateUserPayload }) =>
+      usersService.update(id, payload),
     onSuccess: () => qc.invalidateQueries({ queryKey: USERS_KEY }),
   });
 };
@@ -40,4 +41,3 @@ export const useDeleteUser = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: USERS_KEY }),
   });
 };
-

@@ -16,7 +16,12 @@ const BlogPage: React.FC = () => {
   return (
     <EditorialPageShell>
       <PageContainer wide className="pt-8 pb-20 lg:pt-12 lg:pb-28">
-        <motion.div variants={fadeInUp} initial="hidden" animate="show" className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <motion.div
+          variants={fadeInUp}
+          initial="hidden"
+          animate="show"
+          className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"
+        >
           <div className="max-w-2xl">
             <p className="hl-sans mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--hl-secondary)] sm:text-sm">
               {t('blogPage.eyebrow')}
@@ -44,4 +49,3 @@ const BlogPage: React.FC = () => {
 };
 
 export default BlogPage;
-

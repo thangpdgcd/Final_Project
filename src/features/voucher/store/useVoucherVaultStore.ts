@@ -19,7 +19,9 @@ const readStorage = (): VaultVoucher[] => {
     return parsed
       .map((x) => ({
         id: String(x?.id ?? ''),
-        code: String(x?.code ?? '').trim().toUpperCase(),
+        code: String(x?.code ?? '')
+          .trim()
+          .toUpperCase(),
         message: x?.message != null ? String(x.message) : undefined,
         receivedAt: Number(x?.receivedAt ?? Date.now()),
       }))
@@ -63,7 +65,9 @@ export const useVoucherVaultStore = create<State>((set) => ({
   },
 
   add: ({ code, message }) => {
-    const normalized = String(code ?? '').trim().toUpperCase();
+    const normalized = String(code ?? '')
+      .trim()
+      .toUpperCase();
     if (!normalized) return;
 
     const next: VaultVoucher = {
@@ -94,4 +98,3 @@ export const useVoucherVaultStore = create<State>((set) => ({
     set({ vouchers: [] });
   },
 }));
-

@@ -3,7 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { CartItem } from '@/types';
 
 const formatPrice = (v: number) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v || 0);
+  new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(v || 0);
 
 interface Props {
   items: CartItem[];
@@ -12,12 +16,21 @@ interface Props {
 }
 
 const CartSummary: React.FC<Props> = ({ items, onCheckout, onContinueShopping }) => {
-  const total = useMemo(() => items.reduce((sum, item) => sum + (item.products?.price || item.price || 0) * item.quantity, 0), [items]);
+  const total = useMemo(
+    () =>
+      items.reduce(
+        (sum, item) => sum + (item.products?.price || item.price || 0) * item.quantity,
+        0,
+      ),
+    [items],
+  );
   const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
 
   return (
     <div className="sticky top-28 rounded-3xl border border-stone-200 bg-white p-6 shadow-xl dark:border-stone-800 dark:bg-[#1e1e1e]">
-      <h3 className="mb-6 text-xl font-black text-stone-900 uppercase tracking-wider dark:text-stone-100">Order Summary</h3>
+      <h3 className="mb-6 text-xl font-black text-stone-900 uppercase tracking-wider dark:text-stone-100">
+        Order Summary
+      </h3>
 
       <div className="space-y-4 text-sm">
         <div className="flex justify-between overflow-hidden text-stone-600 dark:text-stone-400">
@@ -75,4 +88,3 @@ const CartSummary: React.FC<Props> = ({ items, onCheckout, onContinueShopping })
 };
 
 export default CartSummary;
-

@@ -12,10 +12,7 @@ type WalletTransactionLabels = {
   fallback: string;
 };
 
-export const getWalletTransactionLabel = (
-  type: string,
-  labels: WalletTransactionLabels,
-) => {
+export const getWalletTransactionLabel = (type: string, labels: WalletTransactionLabels) => {
   const normalizedType = String(type || '').toUpperCase();
 
   if (normalizedType === 'TOPUP') return labels.topup;

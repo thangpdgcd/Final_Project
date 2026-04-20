@@ -17,7 +17,7 @@ let isRefreshing = false;
 let refreshQueue: Array<(token: string) => void> = [];
 
 const flushQueue = (token: string) => {
-  refreshQueue.forEach(cb => cb(token));
+  refreshQueue.forEach((cb) => cb(token));
   refreshQueue = [];
 };
 
@@ -45,7 +45,9 @@ httpClient.interceptors.request.use(
 httpClient.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error?.config as (RetriableRequestConfig & { url?: string; headers?: any }) | undefined;
+    const originalRequest = error?.config as
+      | (RetriableRequestConfig & { url?: string; headers?: any })
+      | undefined;
     const requestUrl = String(originalRequest?.url ?? '');
 
     if (!originalRequest) return Promise.reject(error);
@@ -58,7 +60,10 @@ httpClient.interceptors.response.use(
     if (isRefreshing) {
       return new Promise<any>((resolve, reject) => {
         refreshQueue.push((token) => {
-          if (!token) { reject(error); return; }
+          if (!token) {
+            reject(error);
+            return;
+          }
           originalRequest.headers = originalRequest.headers ?? {};
           originalRequest.headers.Authorization = `Bearer ${token}`;
           resolve(httpClient(originalRequest as any));
@@ -108,4 +113,3 @@ httpClient.interceptors.response.use(
     }
   },
 );
-

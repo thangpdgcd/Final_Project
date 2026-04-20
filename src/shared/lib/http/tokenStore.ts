@@ -52,4 +52,3 @@ export const clearAuthStorage = () => {
     window.dispatchEvent(new Event('auth:cleared'));
   }
 };
-

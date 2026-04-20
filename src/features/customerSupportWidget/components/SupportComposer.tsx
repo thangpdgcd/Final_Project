@@ -10,7 +10,10 @@ type Props = {
 export const SupportComposer: React.FC<Props> = ({ disabled, sending, onSend }) => {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const canSend = useMemo(() => !disabled && !sending && value.trim().length > 0, [disabled, sending, value]);
+  const canSend = useMemo(
+    () => !disabled && !sending && value.trim().length > 0,
+    [disabled, sending, value],
+  );
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -57,8 +60,9 @@ export const SupportComposer: React.FC<Props> = ({ disabled, sending, onSend }) 
           </button>
         </div>
       </div>
-      <div className="mt-2 px-1 text-[11px] text-zinc-500">Enter to send - Shift + Enter for new line</div>
+      <div className="mt-2 px-1 text-[11px] text-zinc-500">
+        Enter to send - Shift + Enter for new line
+      </div>
     </div>
   );
 };
-

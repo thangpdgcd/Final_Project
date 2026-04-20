@@ -63,7 +63,7 @@ const MenuCard: React.FC<MenuCardProps> = ({
       animate="animate"
       transition={{
         opacity: { duration: 0.4, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] },
-        y:       { duration: 0.4, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] },
+        y: { duration: 0.4, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] },
       }}
       // ── Hover / tap: use whileHover/whileTap so child variants fire ───────
       whileHover="hover"
@@ -88,7 +88,6 @@ const MenuCard: React.FC<MenuCardProps> = ({
     >
       {/* Inner padding wrapper — lets Framer scale without clipping */}
       <div className="flex items-center gap-4 p-4 sm:p-5">
-
         {/* Icon chip */}
         <motion.div
           variants={iconVariants}

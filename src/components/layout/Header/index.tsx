@@ -1,15 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
-import {
-  Search,
-  ShoppingCart,
-  Menu,
-  X,
-  Moon,
-  Sun,
-  ChevronRight,
-} from 'lucide-react';
+import { Search, ShoppingCart, Menu, X, Moon, Sun, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/store/ThemeContext';
 import { useAuth } from '@/store/AuthContext';
 import { useCart } from '@/features/cart';
@@ -20,7 +12,7 @@ import UserMenu from './UserMenu';
 import { getImageSrc } from '@/utils/image';
 import { translatedProductName } from '@/utils/productI18n';
 import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
-import type { IconButtonProps } from './header.types';
+import { IconButton } from '@/components/ui/IconButton';
 import { NotificationBell } from '@/features/notifications';
 
 // --- CONSTANTS ---
@@ -29,65 +21,12 @@ const NAV_ITEMS = [
   { label: 'nav.coffee', href: '/products' },
   { label: 'nav.about', href: '/about' },
   { label: 'nav.contact', href: '/contacts' },
-   { label: 'nav.blog', href: '/blog' },
+  { label: 'nav.blog', href: '/blog' },
 ];
 
 // --- COMPONENTS ---
 
-/**
- * IconButton: Reusable premium icon button with consistent styling and micro-interactions
- */
-const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
-  (
-    {
-      icon,
-      onClick,
-      badge,
-      className = '',
-      active = false,
-      cartTarget = false,
-      bounceBadge = false,
-    },
-    ref,
-  ) => {
-    const base =
-      'relative flex items-center justify-center w-10 h-10 rounded-full border-[2.5px] transition-all duration-300 group ' +
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 ' +
-      'focus-visible:ring-offset-white dark:focus-visible:ring-offset-stone-900';
-
-    const stateClass = active
-      ? 'bg-stone-800 dark:bg-stone-200 border-stone-800 dark:border-stone-200 text-white dark:text-stone-900'
-      : 'border-transparent bg-transparent text-stone-700 dark:text-stone-300 ' +
-        'hover:bg-stone-100 dark:hover:bg-stone-800/50 hover:text-orange-600 dark:hover:text-orange-400';
-
-    const buttonClass = [base, stateClass, className].filter(Boolean).join(' ');
-
-    return (
-      <motion.button
-        ref={ref}
-        type="button"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={onClick}
-        data-cart-target={cartTarget ? 'header' : undefined}
-        className={buttonClass}
-      >
-        {badge !== undefined && (
-          <motion.span
-            animate={bounceBadge ? { scale: [1, 1.26, 1] } : undefined}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--gold)] text-[10px] font-bold text-[var(--coffee-brown)] border-2 border-white dark:border-[#1c1716]"
-          >
-            {badge}
-          </motion.span>
-        )}
-        {icon}
-      </motion.button>
-    );
-  },
-);
-
-IconButton.displayName = 'IconButton';
+// IconButton moved to `src/components/ui/IconButton.tsx` for reuse.
 
 const HeaderPage: React.FC = () => {
   const navigate = useNavigate();
@@ -111,11 +50,11 @@ const HeaderPage: React.FC = () => {
   const productLastScrollTop = useRef(0);
   const isVisibleRef = useRef(isVisible);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const direction = latest > lastScrollY.current ? "down" : "up";
-    if (latest > 100 && direction === "down" && isVisible) {
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    const direction = latest > lastScrollY.current ? 'down' : 'up';
+    if (latest > 100 && direction === 'down' && isVisible) {
       setIsVisible(false);
-    } else if (direction === "up" && !isVisible) {
+    } else if (direction === 'up' && !isVisible) {
       setIsVisible(true);
     }
     setIsScrolled(latest > 20);
@@ -196,13 +135,15 @@ const HeaderPage: React.FC = () => {
       <motion.header
         initial={{ y: 0 }}
         animate={{ y: isVisible ? 0 : -100 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
         className={`fixed top-0 left-0 right-0 z-[50] transition-all duration-300 overflow-visible ${headerClass}`}
       >
         <div className="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
-
           {/* Logo + brand */}
-          <Link to="/" className="flex min-w-0 max-w-[min(100%,14rem)] flex-shrink-0 items-center gap-2.5 no-underline sm:max-w-[min(100%,22rem)] md:max-w-none md:gap-3">
+          <Link
+            to="/"
+            className="flex min-w-0 max-w-[min(100%,14rem)] flex-shrink-0 items-center gap-2.5 no-underline sm:max-w-[min(100%,22rem)] md:max-w-none md:gap-3"
+          >
             <Logo size={42} showText={false} className="shrink-0" />
             <div className="min-w-0 flex-1 text-left">
               <div className="flex min-w-0 items-center gap-1 text-[11px] font-black uppercase tracking-[0.12em] text-stone-800 dark:text-stone-100 sm:text-xs sm:tracking-[0.16em]">
@@ -233,7 +174,7 @@ const HeaderPage: React.FC = () => {
           </nav>
 
           {/* Right-side Icons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <IconButton
               icon={<Search size={18} />}
               onClick={() => navigate('/products')}
@@ -259,7 +200,7 @@ const HeaderPage: React.FC = () => {
             <IconButton
               icon={
                 <span className="text-[10px] font-bold">
-                  {i18n.language === "vi" ? t("common.lang.en") : t("common.lang.vi")}
+                  {i18n.language === 'vi' ? t('common.lang.en') : t('common.lang.vi')}
                 </span>
               }
               onClick={() => changeLanguage(i18n.language === 'vi' ? 'en' : 'vi')}
@@ -267,11 +208,9 @@ const HeaderPage: React.FC = () => {
             />
 
             {/* User Account - REFINED COMPONENT */}
-            <NotificationBell className="hidden sm:block" />
+            <NotificationBell />
             <UserMenu
-              onLoginClick={() =>
-                navigate('/login', { state: { from: location }, replace: false })
-              }
+              onLoginClick={() => navigate('/login', { state: { from: location }, replace: false })}
             />
 
             <IconButton
@@ -298,15 +237,26 @@ const HeaderPage: React.FC = () => {
                     to={item.href}
                     className="flex items-center justify-between p-4 rounded-2xl bg-stone-50 dark:bg-stone-800/50 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors group"
                   >
-                    <span className="font-bold text-stone-800 dark:text-stone-200 uppercase tracking-widest text-sm">{t(item.label)}</span>
-                    <ChevronRight size={18} className="text-orange-600 dark:text-orange-400 group-hover:translate-x-1 transition-transform" />
+                    <span className="font-bold text-stone-800 dark:text-stone-200 uppercase tracking-widest text-sm">
+                      {t(item.label)}
+                    </span>
+                    <ChevronRight
+                      size={18}
+                      className="text-orange-600 dark:text-orange-400 group-hover:translate-x-1 transition-transform"
+                    />
                   </Link>
                 ))}
                 <div className="grid grid-cols-2 gap-4 pt-4">
-                  <button onClick={() => setIsCartOpen(true)} className="flex items-center justify-center gap-2 p-4 rounded-2xl bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900 font-bold text-xs uppercase tracking-widest">
+                  <button
+                    onClick={() => setIsCartOpen(true)}
+                    className="flex items-center justify-center gap-2 p-4 rounded-2xl bg-stone-800 dark:bg-stone-200 text-white dark:text-stone-900 font-bold text-xs uppercase tracking-widest"
+                  >
                     <ShoppingCart size={16} /> {t('nav.cart')}
                   </button>
-                  <button onClick={toggleDark} className="flex items-center justify-center gap-2 p-4 rounded-2xl border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-200 font-bold text-xs uppercase tracking-widest hover:bg-stone-50 dark:hover:bg-stone-800">
+                  <button
+                    onClick={toggleDark}
+                    className="flex items-center justify-center gap-2 p-4 rounded-2xl border border-stone-300 dark:border-stone-700 text-stone-800 dark:text-stone-200 font-bold text-xs uppercase tracking-widest hover:bg-stone-50 dark:hover:bg-stone-800"
+                  >
                     {dark ? <Sun size={16} /> : <Moon size={16} />} {t('common.theme')}
                   </button>
                 </div>
@@ -339,21 +289,21 @@ const HeaderPage: React.FC = () => {
                 <h2 className="text-xl md:text-2xl font-black text-stone-900 dark:text-stone-100 tracking-tighter uppercase">
                   {t('cart.title')}
                 </h2>
-                <motion.button 
+                <motion.button
                   whileHover={{ rotate: 90, scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => setIsCartOpen(false)} 
+                  onClick={() => setIsCartOpen(false)}
                   className="p-2 rounded-full bg-stone-100 dark:bg-stone-800/50 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
                 >
                   <X size={20} className="text-stone-600 dark:text-stone-300" />
                 </motion.button>
               </div>
-              
+
               <div className="flex-1 overflow-y-auto p-6 md:p-8 flex flex-col pt-6">
                 {cartItems.length > 0 ? (
                   <div className="w-full h-full flex flex-col">
-                    <motion.div 
-                      layout 
+                    <motion.div
+                      layout
                       className="w-full overflow-y-auto space-y-4 pr-2 flex-1 scrollbar-hide"
                     >
                       <AnimatePresence initial={false}>
@@ -374,7 +324,12 @@ const HeaderPage: React.FC = () => {
                               initial={{ opacity: 0, x: 50, scale: 0.95 }}
                               animate={{ opacity: 1, x: 0, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                              transition={{ type: "spring", stiffness: 400, damping: 30, delay: idx * 0.05 }}
+                              transition={{
+                                type: 'spring',
+                                stiffness: 400,
+                                damping: 30,
+                                delay: idx * 0.05,
+                              }}
                               whileHover={{ y: -2, scale: 1.01 }}
                               className="w-full rounded-2xl border border-stone-100 dark:border-white/5 bg-white dark:bg-white/5 p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow"
                             >
@@ -384,7 +339,7 @@ const HeaderPage: React.FC = () => {
                                   alt={lineName}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
-                                    (e.currentTarget as HTMLImageElement).src = "/no-image.png";
+                                    (e.currentTarget as HTMLImageElement).src = '/no-image.png';
                                   }}
                                 />
                               </div>
@@ -394,7 +349,9 @@ const HeaderPage: React.FC = () => {
                                 </div>
                                 <div className="text-xs font-medium text-stone-500 dark:text-stone-400">
                                   {t('cart.qtyShort')}:{' '}
-                                  <span className="text-stone-700 dark:text-stone-300">{item.quantity}</span>
+                                  <span className="text-stone-700 dark:text-stone-300">
+                                    {item.quantity}
+                                  </span>
                                 </div>
                               </div>
                               <div className="text-sm font-black text-stone-900 dark:text-white whitespace-nowrap">
@@ -406,7 +363,7 @@ const HeaderPage: React.FC = () => {
                       </AnimatePresence>
                     </motion.div>
 
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
@@ -425,10 +382,16 @@ const HeaderPage: React.FC = () => {
                         <p className="text-stone-500 dark:text-stone-400 font-bold uppercase tracking-widest text-[10px] mb-4">
                           {t('cart.itemsCount', { count: cartCount })}
                         </p>
-                        <motion.button 
-                          whileHover={{ scale: 1.02, boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                        <motion.button
+                          whileHover={{
+                            scale: 1.02,
+                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                          }}
                           whileTap={{ scale: 0.98 }}
-                          onClick={() => { setIsCartOpen(false); navigate('/cart'); }} 
+                          onClick={() => {
+                            setIsCartOpen(false);
+                            navigate('/cart');
+                          }}
                           className="w-full py-4 rounded-xl bg-stone-900 dark:bg-stone-200 text-white dark:text-stone-900 font-black tracking-widest text-sm hover:opacity-90 transition-opacity shadow-lg"
                         >
                           {t('cart.viewFullBasket')}
@@ -437,14 +400,14 @@ const HeaderPage: React.FC = () => {
                     </motion.div>
                   </div>
                 ) : (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="flex-1 flex flex-col items-center justify-center space-y-6 text-center"
                   >
-                    <motion.div 
-                      animate={{ y: [0, -10, 0] }} 
-                      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    <motion.div
+                      animate={{ y: [0, -10, 0] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                       className="w-24 h-24 bg-stone-100 dark:bg-white/5 rounded-full flex items-center justify-center border border-stone-200 dark:border-white/10"
                     >
                       <ShoppingCart size={40} className="text-stone-300 dark:text-stone-600" />
@@ -457,10 +420,13 @@ const HeaderPage: React.FC = () => {
                         {t('cart.emptyDesc')}
                       </p>
                     </div>
-                    <motion.button 
+                    <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => { setIsCartOpen(false); navigate('/products'); }} 
+                      onClick={() => {
+                        setIsCartOpen(false);
+                        navigate('/products');
+                      }}
                       className="px-8 py-3 rounded-full border-2 border-stone-900 dark:border-stone-100 text-stone-900 dark:text-stone-100 font-black text-xs uppercase tracking-widest hover:bg-stone-900 dark:hover:bg-stone-100 hover:text-white dark:hover:text-stone-900 transition-colors mt-4"
                     >
                       {t('cart.shopNow')}
@@ -472,10 +438,8 @@ const HeaderPage: React.FC = () => {
           </>
         )}
       </AnimatePresence>
-
     </>
   );
 };
 
 export default HeaderPage;
-

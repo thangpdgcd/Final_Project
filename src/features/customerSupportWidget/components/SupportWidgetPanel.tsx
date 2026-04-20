@@ -12,9 +12,15 @@ type Props = {
   onSend: (content: string) => Promise<void>;
 };
 
-export const SupportWidgetPanel: React.FC<Props> = ({ onClose, statusText, loadingMessages, onSend }) => {
+export const SupportWidgetPanel: React.FC<Props> = ({
+  onClose,
+  statusText,
+  loadingMessages,
+  onSend,
+}) => {
   const { user } = useAuth();
-  const myUserId = Number((user as any)?.user_ID ?? (user as any)?.userId ?? (user as any)?.id ?? 0) || 0;
+  const myUserId =
+    Number((user as any)?.user_ID ?? (user as any)?.userId ?? (user as any)?.id ?? 0) || 0;
   const messages = useSupportWidgetStore((s) => s.messages);
   const lastKnownConversation = useSupportWidgetStore((s) => s.lastKnownConversation);
 
@@ -43,9 +49,7 @@ export const SupportWidgetPanel: React.FC<Props> = ({ onClose, statusText, loadi
       return conversationTitle;
     }
 
-    const anyStaffName = staffMessages
-      .map((m) => (m.sender?.name ?? '').trim())
-      .find((n) => !!n);
+    const anyStaffName = staffMessages.map((m) => (m.sender?.name ?? '').trim()).find((n) => !!n);
     if (anyStaffName) return anyStaffName;
 
     return 'Support';
@@ -66,9 +70,7 @@ export const SupportWidgetPanel: React.FC<Props> = ({ onClose, statusText, loadi
       <div
         className={[
           'pointer-events-auto flex max-h-[calc(100vh-16px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/95 backdrop-blur shadow-[0_16px_50px_rgba(0,0,0,0.5)]',
-          isMobile
-            ? 'mx-auto h-[min(72vh,560px)] w-full max-w-[390px]'
-            : 'h-[500px] w-[350px]',
+          isMobile ? 'mx-auto h-[min(72vh,560px)] w-full max-w-[390px]' : 'h-[500px] w-[350px]',
         ].join(' ')}
         role="dialog"
         aria-label="Customer support chat"
@@ -80,4 +82,3 @@ export const SupportWidgetPanel: React.FC<Props> = ({ onClose, statusText, loadi
     </div>
   );
 };
-

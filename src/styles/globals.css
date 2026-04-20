@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ─── Design Tokens ────────────────────────────────────────────────────────── */
@@ -46,7 +46,9 @@
 }
 
 /* ─── Base ─────────────────────────────────────────────────────────────────── */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -59,7 +61,9 @@ body {
   background-color: var(--bg-main, var(--color-cream));
   color: #1a0a00;
   line-height: 1.6;
-  transition: background-color var(--transition-base), color var(--transition-base);
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
 }
 
 .dark body {
@@ -68,13 +72,27 @@ body {
 }
 
 /* ─── Scrollbar ────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--color-primary); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-primary-dark); }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
 
 /* ─── Typography ───────────────────────────────────────────────────────────── */
-h1, h2, h3, h4, h5 {
+h1,
+h2,
+h3,
+h4,
+h5 {
   font-family: var(--font-display);
   line-height: 1.2;
 }
@@ -92,13 +110,23 @@ h1, h2, h3, h4, h5 {
 
 /* ─── Utility Animations ───────────────────────────────────────────────────── */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-fade-in {
@@ -110,7 +138,9 @@ h1, h2, h3, h4, h5 {
 }
 
 .header-nav-link {
-  transition: color 0.25s ease, transform 0.25s ease;
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
 }
 
 .header-nav-link:hover {
@@ -157,7 +187,9 @@ h1, h2, h3, h4, h5 {
   border-radius: 16px !important;
   overflow: hidden;
   box-shadow: var(--shadow-card) !important;
-  transition: transform var(--transition-card), box-shadow var(--transition-card) !important;
+  transition:
+    transform var(--transition-card),
+    box-shadow var(--transition-card) !important;
   cursor: pointer;
   border: none !important;
 }
@@ -247,7 +279,9 @@ h1, h2, h3, h4, h5 {
   align-items: center;
   justify-content: center;
   line-height: 1;
-  transition: background var(--transition-base), transform var(--transition-base);
+  transition:
+    background var(--transition-base),
+    transform var(--transition-base);
 }
 
 .product-card__add:hover {
@@ -266,46 +300,46 @@ h1, h2, h3, h4, h5 {
 /* ─── Highland Design Tokens ─────────────────────────────────────────────── */
 :root {
   /* Surface */
-  --hl-surface:            #fdfaf5;
-  --hl-surface-variant:    #f5ead0;
-  --hl-on-surface:         #1a0a00;
+  --hl-surface: #fdfaf5;
+  --hl-surface-variant: #f5ead0;
+  --hl-on-surface: #1a0a00;
   --hl-on-surface-variant: #5c3d2e;
 
   /* Brand colours */
-  --hl-primary:            #4b2e2b;
-  --hl-primary-light:      #7a4f3a;
-  --hl-secondary:          #8b6347;
-  --hl-tertiary:           #c69c6d;
+  --hl-primary: #4b2e2b;
+  --hl-primary-light: #7a4f3a;
+  --hl-secondary: #8b6347;
+  --hl-tertiary: #c69c6d;
 
   /* Borders */
-  --hl-outline:            rgba(75, 46, 43, 0.30);
-  --hl-outline-variant:    rgba(75, 46, 43, 0.14);
+  --hl-outline: rgba(75, 46, 43, 0.3);
+  --hl-outline-variant: rgba(75, 46, 43, 0.14);
 
   /* Typography */
   --font-highland-display: 'Playfair Display', Georgia, serif;
-  --font-highland-sans:    'Inter', system-ui, sans-serif;
+  --font-highland-sans: 'Inter', system-ui, sans-serif;
 
   /* Shadows */
-  --hl-shadow-card:        0 2px 24px rgba(75, 46, 43, 0.08), 0 1px 4px rgba(75, 46, 43, 0.06);
-  --hl-shadow-card-hover:  0 8px 40px rgba(75, 46, 43, 0.14), 0 2px 8px rgba(75, 46, 43, 0.08);
+  --hl-shadow-card: 0 2px 24px rgba(75, 46, 43, 0.08), 0 1px 4px rgba(75, 46, 43, 0.06);
+  --hl-shadow-card-hover: 0 8px 40px rgba(75, 46, 43, 0.14), 0 2px 8px rgba(75, 46, 43, 0.08);
 }
 
 .dark {
-  --hl-surface:            #18100a;
-  --hl-surface-variant:    #231608;
-  --hl-on-surface:         #f5ead0;
+  --hl-surface: #18100a;
+  --hl-surface-variant: #231608;
+  --hl-on-surface: #f5ead0;
   --hl-on-surface-variant: #c9a882;
 
-  --hl-primary:            #c69c6d;
-  --hl-primary-light:      #d4ab5a;
-  --hl-secondary:          #a07850;
-  --hl-tertiary:           #8b6347;
+  --hl-primary: #c69c6d;
+  --hl-primary-light: #d4ab5a;
+  --hl-secondary: #a07850;
+  --hl-tertiary: #8b6347;
 
-  --hl-outline:            rgba(220, 200, 170, 0.30);
-  --hl-outline-variant:    rgba(220, 200, 170, 0.12);
+  --hl-outline: rgba(220, 200, 170, 0.3);
+  --hl-outline-variant: rgba(220, 200, 170, 0.12);
 
-  --hl-shadow-card:        0 2px 24px rgba(0, 0, 0, 0.40), 0 1px 4px rgba(0, 0, 0, 0.30);
-  --hl-shadow-card-hover:  0 8px 40px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.40);
+  --hl-shadow-card: 0 2px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.3);
+  --hl-shadow-card-hover: 0 8px 40px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* ─── Typography helper ───────────────────────────────────────────────────── */
@@ -317,7 +351,7 @@ h1, h2, h3, h4, h5 {
 .hl-field-label {
   display: block;
   font-family: var(--font-highland-sans);
-  font-size: 0.6875rem;        /* 11px */
+  font-size: 0.6875rem; /* 11px */
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.13em;
@@ -340,7 +374,7 @@ h1, h2, h3, h4, h5 {
   color: var(--hl-on-surface);
   outline: none;
   transition: border-color 0.25s ease;
-  resize: none;                /* for textarea */
+  resize: none; /* for textarea */
 }
 
 .hl-input-underline::placeholder {
@@ -426,7 +460,11 @@ h1, h2, h3, h4, h5 {
   font-weight: 600;
   letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
   text-decoration: none;
 }
 
@@ -454,7 +492,10 @@ h1, h2, h3, h4, h5 {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   cursor: pointer;
-  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
   box-shadow: 0 4px 16px color-mix(in srgb, var(--hl-primary) 30%, transparent);
   text-decoration: none;
 }
@@ -483,8 +524,13 @@ h1, h2, h3, h4, h5 {
 
 /* Gentle floating animation for image cards */
 @keyframes ambientFloat {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 .about-ambient-float {

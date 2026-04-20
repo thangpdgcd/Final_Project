@@ -47,7 +47,9 @@ const ShippingMethod = () => {
                   </div>
                 </div>
               </div>
-              <div className="hl-sans text-sm font-semibold text-[color:var(--hl-primary)]">{costLabel}</div>
+              <div className="hl-sans text-sm font-semibold text-[color:var(--hl-primary)]">
+                {costLabel}
+              </div>
             </label>
           );
         })}

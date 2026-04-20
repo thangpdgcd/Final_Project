@@ -61,18 +61,23 @@ export type SendMessagePayload =
   | {
       conversationId: number;
       recipientUserId?: number;
-      message: { type: 'text'; content: string } | { type: 'action'; action: SupportChatActionName; meta: SupportChatActionMeta };
+      message:
+        | { type: 'text'; content: string }
+        | { type: 'action'; action: SupportChatActionName; meta: SupportChatActionMeta };
     }
   | {
       recipientUserId: number;
-      message: { type: 'text'; content: string } | { type: 'action'; action: SupportChatActionName; meta: SupportChatActionMeta };
+      message:
+        | { type: 'text'; content: string }
+        | { type: 'action'; action: SupportChatActionName; meta: SupportChatActionMeta };
     }
   | {
-      message: { type: 'text'; content: string } | { type: 'action'; action: SupportChatActionName; meta: SupportChatActionMeta };
+      message:
+        | { type: 'text'; content: string }
+        | { type: 'action'; action: SupportChatActionName; meta: SupportChatActionMeta };
     };
 
 export type ReceiveMessagePayload = {
   conversationId: number;
   message: SupportChatMessage;
 };
-

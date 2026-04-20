@@ -15,4 +15,3 @@ export const useEffectiveUserId = (): number | undefined => {
     return undefined;
   }, [user?.user_ID]);
 };
-

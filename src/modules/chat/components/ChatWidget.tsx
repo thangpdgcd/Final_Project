@@ -122,9 +122,12 @@ export const ChatWidget: React.FC = () => {
                     { roomId: selectedRoomId, message: { type: 'text', text } },
                     (ack: any) => {
                       // Prefer server-acknowledged saved message to avoid sender-side duplication.
-                      const saved = ack?.message && typeof ack.message === 'object' ? ack.message : ack;
+                      const saved =
+                        ack?.message && typeof ack.message === 'object' ? ack.message : ack;
                       if (!saved || typeof saved !== 'object') return;
-                      const roomId = String((saved as any).roomId ?? (saved as any).room_id ?? selectedRoomId);
+                      const roomId = String(
+                        (saved as any).roomId ?? (saved as any).room_id ?? selectedRoomId,
+                      );
                       const message: ChatMessage = {
                         id: String((saved as any).id ?? (saved as any)._id ?? createId()),
                         roomId,
@@ -151,4 +154,3 @@ export const ChatWidget: React.FC = () => {
     </div>
   );
 };
-

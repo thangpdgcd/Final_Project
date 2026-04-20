@@ -7,7 +7,9 @@ import { useSupportChatStore } from '../store/useSupportChatStore';
 type Options = { enabled: boolean; conversationId: number | null };
 
 export const useSupportChatMessages = ({ enabled, conversationId }: Options) => {
-  const loaded = useSupportChatStore((s) => (conversationId ? s.loadedConversations[conversationId] : undefined));
+  const loaded = useSupportChatStore((s) =>
+    conversationId ? s.loadedConversations[conversationId] : undefined,
+  );
   const setConversationLoading = useSupportChatStore((s) => s.setConversationLoading);
   const setConversationMessages = useSupportChatStore((s) => s.setConversationMessages);
   const markConversationLoaded = useSupportChatStore((s) => s.markConversationLoaded);
@@ -29,7 +31,10 @@ export const useSupportChatMessages = ({ enabled, conversationId }: Options) => 
       })
       .catch((err) => {
         if (cancelled) return;
-        toastErrorWithFallback(i18nKeys.toast.support.loadMessagesFailed, err?.message ? String(err.message) : undefined);
+        toastErrorWithFallback(
+          i18nKeys.toast.support.loadMessagesFailed,
+          err?.message ? String(err.message) : undefined,
+        );
       })
       .finally(() => {
         if (cancelled) return;
@@ -48,4 +53,3 @@ export const useSupportChatMessages = ({ enabled, conversationId }: Options) => 
     setConversationMessages,
   ]);
 };
-

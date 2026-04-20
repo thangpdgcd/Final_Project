@@ -79,10 +79,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
   }
 
   return (
-    <div 
-      className="relative flex items-center gap-1.5 z-50 w-fit" 
-      ref={menuRef}
-    >
+    <div className="relative flex items-center gap-1.5 z-50 w-fit" ref={menuRef}>
       {/* 1. Avatar Area */}
       <motion.button
         type="button"
@@ -105,7 +102,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
               {user.name.charAt(0)}
             </span>
           ) : (
-            <User size={20} className="text-stone-700 dark:text-white group-hover:text-[#FFD700] transition-colors" />
+            <User
+              size={20}
+              className="text-stone-700 dark:text-white group-hover:text-[#FFD700] transition-colors"
+            />
           )}
         </div>
       </motion.button>
@@ -120,9 +120,9 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
           ${isOpen ? 'text-[#FFD700] bg-stone-100 dark:bg-white/5' : 'text-stone-500 hover:text-stone-900 hover:bg-stone-100 dark:text-white/40 dark:hover:text-white dark:hover:bg-white/5'}
         `}
       >
-        <ChevronDown 
-          size={16} 
-          className={`transition-transform duration-300 pointer-events-none ${isOpen ? 'rotate-180' : ''}`} 
+        <ChevronDown
+          size={16}
+          className={`transition-transform duration-300 pointer-events-none ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -130,9 +130,9 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
       <AnimatePresence>
         {isOpen && (
           <div className="absolute top-full right-0 mt-3 z-[60]">
-            <Dropdown 
-              isLoggedIn={isAuthenticated} 
-              user={user} 
+            <Dropdown
+              isLoggedIn={isAuthenticated}
+              user={user}
               onLogout={handleLogout}
               onClose={() => setIsOpen(false)}
               onLoginClick={onLoginClick}

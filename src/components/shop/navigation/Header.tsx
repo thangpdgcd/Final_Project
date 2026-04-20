@@ -52,7 +52,10 @@ const Header = () => {
               <span className="text-sm font-semibold text-[color:var(--hl-primary)]">PC</span>
             </div>
             <div className="leading-tight">
-              <div className="font-semibold tracking-wide text-[color:var(--hl-on-surface)]" style={{ fontFamily: 'var(--font-highland-display)' }}>
+              <div
+                className="font-semibold tracking-wide text-[color:var(--hl-on-surface)]"
+                style={{ fontFamily: 'var(--font-highland-display)' }}
+              >
                 Phan Coffee
               </div>
               <div className="-mt-0.5 text-[11px] text-[color:color-mix(in_srgb,var(--hl-on-surface)_55%,transparent)]">

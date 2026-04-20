@@ -29,4 +29,3 @@ export function useCurrency() {
   if (!ctx) throw new Error('useCurrency must be used within CurrencyProvider');
   return ctx;
 }
-

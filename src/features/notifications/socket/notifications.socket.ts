@@ -24,4 +24,3 @@ export const joinNotificationsRoom = (userId: number) => {
 export const resetJoinedRoom = () => {
   joinedForUserId = null;
 };
-

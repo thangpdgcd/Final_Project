@@ -42,4 +42,3 @@ export const useDeleteProduct = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: PRODUCTS_KEY }),
   });
 };
-

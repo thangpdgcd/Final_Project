@@ -15,4 +15,3 @@ const PageSpinner: React.FC<Props> = ({ label = 'Loading...', className = '' }) 
 );
 
 export default PageSpinner;
-

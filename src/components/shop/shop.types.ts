@@ -10,4 +10,3 @@ export type Product = {
 };
 
 export type ViewMode = 'grid' | 'list';
-

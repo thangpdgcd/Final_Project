@@ -39,43 +39,46 @@ export const useApplyVoucher = (): UseApplyVoucherState => {
     setIsSuccess(false);
   }, []);
 
-  const applyVoucher = useCallback(async ({ orderValue, code: overrideCode }: { orderValue: number; code?: string }) => {
-    const nextCode = String(overrideCode ?? trimmedCode).trim();
-    if (!nextCode) {
-      setErrorMessage('Please enter a voucher code.');
+  const applyVoucher = useCallback(
+    async ({ orderValue, code: overrideCode }: { orderValue: number; code?: string }) => {
+      const nextCode = String(overrideCode ?? trimmedCode).trim();
+      if (!nextCode) {
+        setErrorMessage('Please enter a voucher code.');
+        setIsSuccess(false);
+        return null;
+      }
+
+      const ov = Number(orderValue ?? 0);
+      if (!Number.isFinite(ov) || ov < 0) {
+        setErrorMessage('Invalid order value. Please try again.');
+        setIsSuccess(false);
+        return null;
+      }
+
+      setIsApplying(true);
+      setErrorMessage('');
+      setMessage('');
       setIsSuccess(false);
-      return null;
-    }
 
-    const ov = Number(orderValue ?? 0);
-    if (!Number.isFinite(ov) || ov < 0) {
-      setErrorMessage('Invalid order value. Please try again.');
-      setIsSuccess(false);
-      return null;
-    }
+      try {
+        const res = await voucherService.apply({ code: nextCode, orderValue: ov });
 
-    setIsApplying(true);
-    setErrorMessage('');
-    setMessage('');
-    setIsSuccess(false);
+        setMessage(res.message || (res.success ? 'Voucher applied.' : 'Could not apply voucher.'));
+        setDiscount(res.discount);
+        setFinalPrice(res.finalPrice);
+        setIsSuccess(Boolean(res.success));
 
-    try {
-      const res = await voucherService.apply({ code: nextCode, orderValue: ov });
-
-      setMessage(res.message || (res.success ? 'Voucher applied.' : 'Could not apply voucher.'));
-      setDiscount(res.discount);
-      setFinalPrice(res.finalPrice);
-      setIsSuccess(Boolean(res.success));
-
-      return res;
-    } catch (err) {
-      setErrorMessage(voucherService.getErrorMessage(err));
-      setIsSuccess(false);
-      return null;
-    } finally {
-      setIsApplying(false);
-    }
-  }, [trimmedCode]);
+        return res;
+      } catch (err) {
+        setErrorMessage(voucherService.getErrorMessage(err));
+        setIsSuccess(false);
+        return null;
+      } finally {
+        setIsApplying(false);
+      }
+    },
+    [trimmedCode],
+  );
 
   return {
     code,
@@ -91,4 +94,3 @@ export const useApplyVoucher = (): UseApplyVoucherState => {
     reset,
   };
 };
-

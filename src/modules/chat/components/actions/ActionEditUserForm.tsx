@@ -27,7 +27,8 @@ export const ActionEditUserForm: React.FC<Props> = ({ targetUserId, initialValue
     return {
       name: typeof raw.name === 'string' ? raw.name : undefined,
       email: typeof raw.email === 'string' ? raw.email : undefined,
-      roleID: typeof raw.roleID === 'string' || typeof raw.roleID === 'number' ? raw.roleID : undefined,
+      roleID:
+        typeof raw.roleID === 'string' || typeof raw.roleID === 'number' ? raw.roleID : undefined,
       status: raw.status === 'inactive' ? 'inactive' : 'active',
     };
   }, [initialValues]);
@@ -68,12 +69,20 @@ export const ActionEditUserForm: React.FC<Props> = ({ targetUserId, initialValue
   };
 
   return (
-    <Form layout="vertical" initialValues={{ ...init, status: init.status === 'active' }} onFinish={onSubmit}>
+    <Form
+      layout="vertical"
+      initialValues={{ ...init, status: init.status === 'active' }}
+      onFinish={onSubmit}
+    >
       <Form.Item label="Name" name="name" rules={[{ required: true, message: 'Name is required' }]}>
         <Input placeholder="Full name" />
       </Form.Item>
 
-      <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Email is required' }]}>
+      <Form.Item
+        label="Email"
+        name="email"
+        rules={[{ required: true, message: 'Email is required' }]}
+      >
         <Input placeholder="Email" />
       </Form.Item>
 
@@ -99,4 +108,3 @@ export const ActionEditUserForm: React.FC<Props> = ({ targetUserId, initialValue
     </Form>
   );
 };
-

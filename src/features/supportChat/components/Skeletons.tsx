@@ -4,7 +4,10 @@ export const SidebarSkeleton: React.FC = () => {
   return (
     <div className="p-3 space-y-3">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
+        <div
+          key={i}
+          className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3"
+        >
           <div className="h-10 w-10 rounded-full bg-white/10 animate-pulse" />
           <div className="min-w-0 flex-1 space-y-2">
             <div className="h-3 w-32 bg-white/10 rounded animate-pulse" />
@@ -36,4 +39,3 @@ export const ThreadSkeleton: React.FC = () => {
     </div>
   );
 };
-

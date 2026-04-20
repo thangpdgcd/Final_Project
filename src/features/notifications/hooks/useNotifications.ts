@@ -1,11 +1,35 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import i18n from '@/translates/i18n';
 import type { AppNotification } from '../types';
 import { notificationsApi } from '../notifications.api';
 import { selectUnreadCount, useNotificationsStore } from '../notifications.store';
-import { ensureSocketConnected, joinNotificationsRoom, resetJoinedRoom } from '../socket/notifications.socket';
+import {
+  ensureSocketConnected,
+  joinNotificationsRoom,
+  resetJoinedRoom,
+} from '../socket/notifications.socket';
 
 type RawSocketNotification = any;
+
+const extractOrderIdFromMessage = (message: string): number | null => {
+  const m = /#\s*(\d+)/.exec(String(message ?? ''));
+  const id = m ? Number(m[1]) : NaN;
+  return Number.isFinite(id) && id > 0 ? id : null;
+};
+
+const displayNotificationMessage = (n: AppNotification): string => {
+  const orderId = Number((n.meta as any)?.orderId ?? 0);
+  if (n.type === 'order') {
+    return String(
+      i18n.t(
+        'notifications.templates.orderCreated',
+        Number.isFinite(orderId) && orderId > 0 ? { id: orderId } : undefined,
+      ),
+    );
+  }
+  return n.message;
+};
 
 const normalizeSocketNotification = (raw: RawSocketNotification): AppNotification | null => {
   if (!raw) return null;
@@ -18,18 +42,27 @@ const normalizeSocketNotification = (raw: RawSocketNotification): AppNotificatio
       read: false,
     };
   }
-  const id = String(raw.id ?? raw.notificationId ?? raw.notification_ID ?? raw._id ?? raw.uuid ?? '').trim();
+  const id = String(
+    raw.id ?? raw.notificationId ?? raw.notification_ID ?? raw._id ?? raw.uuid ?? '',
+  ).trim();
   const message = String(raw.message ?? raw.content ?? raw.title ?? raw.text ?? '').trim();
   if (!id || !message) return null;
-  const createdAt = String(raw.createdAt ?? raw.created_at ?? raw.time ?? raw.timestamp ?? new Date().toISOString());
+  const createdAt = String(
+    raw.createdAt ?? raw.created_at ?? raw.time ?? raw.timestamp ?? new Date().toISOString(),
+  );
   const type = String(raw.type ?? raw.kind ?? 'info').toLowerCase();
+  const meta = typeof raw.meta === 'object' && raw.meta ? raw.meta : undefined;
+  const orderId = String(type).includes('order') ? extractOrderIdFromMessage(message) : null;
   return {
     id,
     message,
     type: (type as any) || 'info',
     createdAt,
     read: Boolean(raw.read ?? raw.isRead ?? raw.seen ?? false),
-    meta: typeof raw.meta === 'object' && raw.meta ? raw.meta : undefined,
+    meta:
+      orderId && !(meta as any)?.orderId
+        ? { ...(meta ?? {}), orderId }
+        : meta,
   };
 };
 
@@ -99,7 +132,7 @@ export const useNotifications = (userId: number | null | undefined) => {
       const n = normalizeSocketNotification(raw);
       if (!n) return;
       addNotification({ ...n, read: false });
-      toast.info(n.message, { autoClose: 2500 });
+      toast.info(displayNotificationMessage(n), { autoClose: 2500 });
     };
 
     socket.off('receive_notification', handler);
@@ -143,4 +176,3 @@ export const useNotifications = (userId: number | null | undefined) => {
     api,
   };
 };
-

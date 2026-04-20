@@ -9,4 +9,3 @@ export type IconButtonProps = {
   cartTarget?: boolean;
   bounceBadge?: boolean;
 };
-

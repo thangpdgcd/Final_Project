@@ -11,23 +11,16 @@ import type { AuthView } from '../AuthModal';
 
 const buildForgotPasswordSchema = (t: (key: string) => string) =>
   z.object({
-    email: z
-      .string()
-      .min(1, t('auth.loginEmailRequired'))
-      .email(t('auth.loginEmailInvalid')),
+    email: z.string().min(1, t('auth.loginEmailRequired')).email(t('auth.loginEmailInvalid')),
   });
 
-type ForgotPasswordValues = z.infer<
-  ReturnType<typeof buildForgotPasswordSchema>
->;
+type ForgotPasswordValues = z.infer<ReturnType<typeof buildForgotPasswordSchema>>;
 
 type ForgotPasswordFormProps = {
   setView: React.Dispatch<React.SetStateAction<AuthView>>;
 };
 
-const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
-  setView,
-}) => {
+const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
   const { message: messageApi } = App.useApp();
   const { t } = useTranslation();
   const forgotPasswordSchema = buildForgotPasswordSchema(t);
@@ -56,10 +49,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
 
   return (
     <>
-      <motion.form
-        onSubmit={handleSubmit(onSubmit)}
-        className="w-full space-y-5"
-      >
+      <motion.form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-5">
         <div className="relative group">
           <Mail
             className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#4B3621] transition-colors"
@@ -104,4 +94,3 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
 };
 
 export default ForgotPasswordForm;
-

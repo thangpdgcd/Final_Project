@@ -24,7 +24,9 @@ const TotalCostCard = ({ productSubtotalUSD }: TotalCostCardProps) => {
       <div className="mt-3 space-y-2 text-sm">
         <div className="hl-sans flex items-center justify-between text-[color:color-mix(in_srgb,var(--hl-on-surface)_72%,transparent)]">
           <span>Products</span>
-          <span className="font-semibold text-[color:var(--hl-on-surface)]">{format(productSubtotalUSD)}</span>
+          <span className="font-semibold text-[color:var(--hl-on-surface)]">
+            {format(productSubtotalUSD)}
+          </span>
         </div>
         <div className="hl-sans flex items-center justify-between text-[color:color-mix(in_srgb,var(--hl-on-surface)_72%,transparent)]">
           <span>Shipping</span>
@@ -35,7 +37,9 @@ const TotalCostCard = ({ productSubtotalUSD }: TotalCostCardProps) => {
         <div className="my-2 h-px bg-[color:color-mix(in_srgb,var(--hl-outline-variant)_28%,transparent)]" />
         <div className="hl-sans flex items-center justify-between">
           <span className="font-medium text-[color:var(--hl-on-surface)]">Total</span>
-          <span className="text-lg font-bold text-[color:var(--hl-primary)]">{format(totalUSD)}</span>
+          <span className="text-lg font-bold text-[color:var(--hl-primary)]">
+            {format(totalUSD)}
+          </span>
         </div>
       </div>
     </div>

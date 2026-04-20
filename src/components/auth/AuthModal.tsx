@@ -1,4 +1,4 @@
-export type AuthView = "login" | "register" | "forgot";
+export type AuthView = 'login' | 'register' | 'forgot';
 
 /**
  * Minimal placeholder to satisfy type imports from auth form components.
@@ -6,5 +6,4 @@ export type AuthView = "login" | "register" | "forgot";
  */
 export const AuthModal = () => {
   return null;
-}
-
+};

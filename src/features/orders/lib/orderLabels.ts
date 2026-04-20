@@ -179,8 +179,10 @@ export const translateShippingStatus = (t: TFunction, raw: unknown): string => {
 };
 
 /** Fixed UI shipping method options (checkout) — already translated keys. */
-export const translateShippingLabel = (t: TFunction, key: 'standard' | 'express' | 'pickup'): string =>
-  t(`order.shipping.${key}`);
+export const translateShippingLabel = (
+  t: TFunction,
+  key: 'standard' | 'express' | 'pickup',
+): string => t(`order.shipping.${key}`);
 
 /** @deprecated Use mapOrderStatusToI18nKey — kept for any external imports. */
 export const orderStatusToKey = (raw: unknown): string => mapOrderStatusToI18nKey(raw);

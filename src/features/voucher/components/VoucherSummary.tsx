@@ -18,7 +18,10 @@ export const VoucherSummary: React.FC<VoucherSummaryProps> = ({
   formatPrice,
   onClear,
 }) => {
-  const hasData = useMemo(() => discount != null || finalPrice != null || Boolean(message), [discount, finalPrice, message]);
+  const hasData = useMemo(
+    () => discount != null || finalPrice != null || Boolean(message),
+    [discount, finalPrice, message],
+  );
   if (!hasData) return null;
 
   return (
@@ -36,7 +39,9 @@ export const VoucherSummary: React.FC<VoucherSummaryProps> = ({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className={`text-sm font-semibold ${isSuccess ? 'text-green-700 dark:text-green-400' : 'text-stone-800 dark:text-stone-100'}`}>
+              <span
+                className={`text-sm font-semibold ${isSuccess ? 'text-green-700 dark:text-green-400' : 'text-stone-800 dark:text-stone-100'}`}
+              >
                 {isSuccess ? 'Voucher applied' : 'Voucher result'}
               </span>
               {isSuccess && (
@@ -51,7 +56,9 @@ export const VoucherSummary: React.FC<VoucherSummaryProps> = ({
             </div>
 
             {message && (
-              <div className={`mt-1 text-xs ${isSuccess ? 'text-green-700/90 dark:text-green-300/90' : 'text-stone-600 dark:text-stone-400'}`}>
+              <div
+                className={`mt-1 text-xs ${isSuccess ? 'text-green-700/90 dark:text-green-300/90' : 'text-stone-600 dark:text-stone-400'}`}
+              >
                 {message}
               </div>
             )}
@@ -87,4 +94,3 @@ export const VoucherSummary: React.FC<VoucherSummaryProps> = ({
     </AnimatePresence>
   );
 };
-

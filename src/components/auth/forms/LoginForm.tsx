@@ -16,10 +16,7 @@ import type { AuthView } from '../AuthModal';
 
 const buildLoginSchema = (t: (key: string) => string) =>
   z.object({
-    email: z
-      .string()
-      .min(1, t('auth.loginEmailRequired'))
-      .email(t('auth.loginEmailInvalid')),
+    email: z.string().min(1, t('auth.loginEmailRequired')).email(t('auth.loginEmailInvalid')),
     password: z.string().min(1, t('auth.loginPasswordRequired')),
     remember: z.boolean().optional(),
   });
@@ -75,10 +72,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
 
   return (
     <>
-      <motion.form
-        onSubmit={handleSubmit(onSubmit)}
-        className="w-full space-y-5"
-      >
+      <motion.form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-5">
         <div className="space-y-4">
           <div className="relative group">
             <Mail
@@ -170,4 +164,3 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
 };
 
 export default LoginForm;
-

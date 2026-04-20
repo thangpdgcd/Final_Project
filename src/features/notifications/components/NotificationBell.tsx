@@ -3,19 +3,29 @@ import { Bell } from 'lucide-react';
 import { useAuth } from '@/store/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 import { useNotifications } from '../hooks/useNotifications';
+import { useTranslation } from 'react-i18next';
+import { i18nKeys } from '@/constants/i18nKeys';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
   className?: string;
 };
 
 const NotificationBell: React.FC<Props> = ({ className = '' }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const userId = isAuthenticated ? Number((user as any)?.user_ID ?? 0) : 0;
 
-  const { notifications, unreadCount, isOpen, toggle, close, api } = useNotifications(userId || null);
+  const { notifications, unreadCount, isOpen, toggle, close, api } = useNotifications(
+    userId || null,
+  );
   const [bounce, setBounce] = useState(false);
 
-  const badge = useMemo(() => (unreadCount > 99 ? '99+' : unreadCount ? String(unreadCount) : ''), [unreadCount]);
+  const badge = useMemo(
+    () => (unreadCount > 99 ? '99+' : unreadCount ? String(unreadCount) : ''),
+    [unreadCount],
+  );
 
   useEffect(() => {
     if (!unreadCount) return;
@@ -36,7 +46,7 @@ const NotificationBell: React.FC<Props> = ({ className = '' }) => {
           'border-transparent bg-transparent text-stone-700 dark:text-stone-300',
           'hover:bg-stone-100 dark:hover:bg-stone-800/50 hover:text-orange-600 dark:hover:text-orange-400',
         ].join(' ')}
-        aria-label="Notifications"
+        aria-label={t(i18nKeys.notifications.ui.ariaBell)}
       >
         <Bell size={18} />
         {badge && (
@@ -63,8 +73,13 @@ const NotificationBell: React.FC<Props> = ({ className = '' }) => {
           await api.markAllRead();
         }}
         onItemClick={async (id) => {
+          const n = notifications.find((x) => x.id === id);
+          const orderId = Number((n?.meta as any)?.orderId ?? 0);
           await api.markRead(id);
           close();
+          if (n?.type === 'order' && Number.isFinite(orderId) && orderId > 0) {
+            navigate(`/profile?tab=orders&orderId=${orderId}`);
+          }
         }}
       />
     </div>
@@ -72,4 +87,3 @@ const NotificationBell: React.FC<Props> = ({ className = '' }) => {
 };
 
 export default NotificationBell;
-

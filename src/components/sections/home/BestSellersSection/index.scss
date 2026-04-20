@@ -1,7 +1,13 @@
-@import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;600;700;800;900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;600;700;800;900&display=swap');
 
 .best-sellers {
-  font-family: "Work Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family:
+    'Work Sans',
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    sans-serif;
   background: #ffffff;
   padding: 64px 40px;
 }
@@ -117,7 +123,7 @@
 }
 
 .best-sellers__dot::after {
-  content: "";
+  content: '';
   width: 6px;
   height: 6px;
   border-radius: 999px;
@@ -152,7 +158,10 @@
   color: #ffffff;
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.15s ease, filter 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    filter 0.2s ease,
+    background 0.2s ease;
 }
 
 .best-sellers__cta:hover {
@@ -225,4 +234,3 @@ html.dark {
     }
   }
 }
-

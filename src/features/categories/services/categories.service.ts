@@ -74,13 +74,19 @@ export const categoriesService = {
     const urls = [
       { kind: 'api', url: `/categories/${safeId}` },
       { kind: 'api', url: `/category/${safeId}` },
-      ...(hostBase ? ([{ kind: 'host', url: `${hostBase}/categories/${safeId}` }, { kind: 'host', url: `${hostBase}/category/${safeId}` }] as const) : []),
+      ...(hostBase
+        ? ([
+            { kind: 'host', url: `${hostBase}/categories/${safeId}` },
+            { kind: 'host', url: `${hostBase}/category/${safeId}` },
+          ] as const)
+        : []),
     ] as const;
 
     let lastErr: unknown;
     for (const u of urls) {
       try {
-        const res = u.kind === 'api' ? await axiosInstance.get<any>(u.url) : await axios.get<any>(u.url);
+        const res =
+          u.kind === 'api' ? await axiosInstance.get<any>(u.url) : await axios.get<any>(u.url);
         return normalizeCategory((res.data as any)?.data ?? res.data);
       } catch (err) {
         lastErr = err;
@@ -108,4 +114,3 @@ export const categoriesService = {
     return res.data;
   },
 };
-

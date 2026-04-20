@@ -8,8 +8,9 @@ const formatPrice = (v: number) =>
 export function CartItemAmount({ amount }: { amount: number }) {
   return (
     <div className="hidden sm:block w-28 text-center">
-      <span className="text-sm font-bold text-orange-600 dark:text-orange-500">{formatPrice(amount)}</span>
+      <span className="text-sm font-bold text-orange-600 dark:text-orange-500">
+        {formatPrice(amount)}
+      </span>
     </div>
   );
 }
-

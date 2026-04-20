@@ -29,8 +29,18 @@ const mapUser = (raw: any): SupportChatUser | undefined => {
   return {
     userId,
     name: toString(raw.name ?? raw.username ?? raw.fullName, `User ${userId}`),
-    avatarUrl: typeof raw.avatarUrl === 'string' ? raw.avatarUrl : typeof raw.avatar === 'string' ? raw.avatar : undefined,
-    role: typeof raw.role === 'string' ? raw.role : typeof raw.roleName === 'string' ? raw.roleName : undefined,
+    avatarUrl:
+      typeof raw.avatarUrl === 'string'
+        ? raw.avatarUrl
+        : typeof raw.avatar === 'string'
+          ? raw.avatar
+          : undefined,
+    role:
+      typeof raw.role === 'string'
+        ? raw.role
+        : typeof raw.roleName === 'string'
+          ? raw.roleName
+          : undefined,
   };
 };
 
@@ -85,7 +95,10 @@ const mapConversation = (raw: any): SupportChatConversation | null => {
 };
 
 const mapMessage = (raw: any, conversationIdFallback?: number): SupportChatMessage | null => {
-  const conversationId = toNumber(raw.conversationId ?? raw.conversation_ID ?? raw.conversation ?? conversationIdFallback, 0);
+  const conversationId = toNumber(
+    raw.conversationId ?? raw.conversation_ID ?? raw.conversation ?? conversationIdFallback,
+    0,
+  );
   if (!conversationId) return null;
 
   const id = raw.id ?? raw.messageId ?? raw.message_ID ?? raw.message_id;
@@ -136,7 +149,10 @@ export const supportChatApi = {
     return list.map(mapConversation).filter(Boolean) as SupportChatConversation[];
   },
 
-  getMessages: async (conversationId: number, params?: { limit?: number; offset?: number }): Promise<SupportChatMessage[]> => {
+  getMessages: async (
+    conversationId: number,
+    params?: { limit?: number; offset?: number },
+  ): Promise<SupportChatMessage[]> => {
     if (!conversationId) return [];
     const limit = params?.limit ?? 50;
     const offset = params?.offset ?? 0;
@@ -156,4 +172,3 @@ export const supportChatApi = {
     return mapMessage(raw, body.conversationId);
   },
 };
-

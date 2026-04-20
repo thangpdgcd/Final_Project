@@ -11,7 +11,10 @@ const toNumberOr = (value: unknown, fallback = 0): number => {
 const mapProduct = (p: any): Product => ({
   ...p,
   product_ID: toNumberOr(p?.product_ID ?? p?.productId ?? p?.id ?? p?.ID, 0),
-  categories_ID: toNumberOr(p?.categories_ID ?? p?.categoriesId ?? p?.category_ID ?? p?.categoryId, 0),
+  categories_ID: toNumberOr(
+    p?.categories_ID ?? p?.categoriesId ?? p?.category_ID ?? p?.categoryId,
+    0,
+  ),
   user_ID: toNumberOr(p?.user_ID ?? p?.userId ?? p?.owner_ID ?? p?.ownerId, 0),
   name: String(p?.name ?? ''),
   name_en: p?.name_en != null ? String(p.name_en) : undefined,
@@ -68,7 +71,9 @@ export const productsService = {
         const res = u.kind === 'api' ? await axiosInstance.get(u.url) : await axios.get(u.url);
         const raw = extractProducts(res.data);
         const list = Array.isArray(raw) ? raw : [];
-        return list.map(mapProduct).filter((p) => Number.isFinite(p.product_ID) && p.product_ID > 0);
+        return list
+          .map(mapProduct)
+          .filter((p) => Number.isFinite(p.product_ID) && p.product_ID > 0);
       } catch (err) {
         lastErr = err;
         if (!axios.isAxiosError(err)) throw err;
@@ -87,13 +92,19 @@ export const productsService = {
     const urls = [
       { kind: 'api', url: `/products/${safeId}` },
       { kind: 'api', url: `/product/${safeId}` },
-      ...(hostBase ? ([{ kind: 'host', url: `${hostBase}/products/${safeId}` }, { kind: 'host', url: `${hostBase}/product/${safeId}` }] as const) : []),
+      ...(hostBase
+        ? ([
+            { kind: 'host', url: `${hostBase}/products/${safeId}` },
+            { kind: 'host', url: `${hostBase}/product/${safeId}` },
+          ] as const)
+        : []),
     ] as const;
 
     let lastErr: unknown;
     for (const u of urls) {
       try {
-        const res = u.kind === 'api' ? await axiosInstance.get<any>(u.url) : await axios.get<any>(u.url);
+        const res =
+          u.kind === 'api' ? await axiosInstance.get<any>(u.url) : await axios.get<any>(u.url);
         return mapProduct(pickProductPayload(res.data));
       } catch (err) {
         lastErr = err;
@@ -121,4 +132,3 @@ export const productsService = {
     return res.data;
   },
 };
-

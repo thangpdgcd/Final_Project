@@ -139,12 +139,28 @@ const mapConversation = (raw: any): SupportWidgetConversation | null => {
             ? raw.otherUser.avatar
             : undefined;
 
-  const participantsRaw = Array.isArray(raw.participants) ? raw.participants : Array.isArray(raw.members) ? raw.members : [];
+  const participantsRaw = Array.isArray(raw.participants)
+    ? raw.participants
+    : Array.isArray(raw.members)
+      ? raw.members
+      : [];
   const participants = participantsRaw
     .map((p: any) => ({
       userId: toNumber(p?.userId ?? p?.user_ID ?? p?.id, 0),
-      roleAtJoin: typeof p?.roleAtJoin === 'string' ? p.roleAtJoin : typeof p?.role === 'string' ? p.role : undefined,
-      name: pickString(p?.name, p?.displayName, p?.display_name, p?.username, p?.fullName, p?.full_name),
+      roleAtJoin:
+        typeof p?.roleAtJoin === 'string'
+          ? p.roleAtJoin
+          : typeof p?.role === 'string'
+            ? p.role
+            : undefined,
+      name: pickString(
+        p?.name,
+        p?.displayName,
+        p?.display_name,
+        p?.username,
+        p?.fullName,
+        p?.full_name,
+      ),
     }))
     .filter((p: any) => p.userId > 0);
 
@@ -152,7 +168,10 @@ const mapConversation = (raw: any): SupportWidgetConversation | null => {
 };
 
 const mapMessage = (raw: any, conversationIdFallback?: number): SupportWidgetMessage | null => {
-  const conversationId = toNumber(raw.conversationId ?? raw.conversation_ID ?? raw.conversation ?? conversationIdFallback, 0);
+  const conversationId = toNumber(
+    raw.conversationId ?? raw.conversation_ID ?? raw.conversation ?? conversationIdFallback,
+    0,
+  );
   if (!conversationId) return null;
 
   const id = raw.id ?? raw.messageId ?? raw.message_ID ?? raw.message_id;
@@ -223,7 +242,10 @@ export const supportWidgetApi = {
     return list.map(mapConversation).filter(Boolean) as SupportWidgetConversation[];
   },
 
-  getMessages: async (conversationId: number, params?: { limit?: number; offset?: number }): Promise<SupportWidgetMessage[]> => {
+  getMessages: async (
+    conversationId: number,
+    params?: { limit?: number; offset?: number },
+  ): Promise<SupportWidgetMessage[]> => {
     // Prevent accidental draft/invalid fetches (e.g. -1).
     if (!conversationId || conversationId <= 0) return [];
     const limit = params?.limit ?? 50;
@@ -241,8 +263,10 @@ export const supportWidgetApi = {
   }): Promise<SupportWidgetMessage | null> => {
     const res = await httpClient.post('/messages', body);
     const rawEnvelope = res.data?.message ?? res.data?.data ?? res.data;
-    const raw = rawEnvelope?.message && typeof rawEnvelope.message === 'object' ? rawEnvelope.message : rawEnvelope;
+    const raw =
+      rawEnvelope?.message && typeof rawEnvelope.message === 'object'
+        ? rawEnvelope.message
+        : rawEnvelope;
     return mapMessage(raw, body.conversationId);
   },
 };
-

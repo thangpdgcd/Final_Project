@@ -33,7 +33,12 @@ const containerVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20, scale: 0.96 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+  },
 };
 
 const ProductGrid: React.FC<ProductGridProps> = React.memo(
@@ -73,7 +78,11 @@ const ProductGrid: React.FC<ProductGridProps> = React.memo(
               </motion.div>
             ))
           ) : (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="col-span-full">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="col-span-full"
+            >
               <p className="rounded-2xl border border-dashed border-stone-300 px-6 py-14 text-center text-stone-500 dark:border-stone-700 dark:text-stone-400">
                 {emptyLabel}
               </p>
@@ -88,4 +97,3 @@ const ProductGrid: React.FC<ProductGridProps> = React.memo(
 ProductGrid.displayName = 'ProductGrid';
 
 export default ProductGrid;
-

@@ -19,7 +19,10 @@ const BlogNotFound: React.FC = () => {
     <EditorialPageShell>
       <PageContainer wide className="py-12 lg:py-16">
         <div className="contact-form-card max-w-xl rounded-md p-8">
-          <h2 className="text-xl font-medium text-[color:var(--hl-primary)]" style={{ fontFamily: 'var(--font-highland-display)' }}>
+          <h2
+            className="text-xl font-medium text-[color:var(--hl-primary)]"
+            style={{ fontFamily: 'var(--font-highland-display)' }}
+          >
             {t('blogDetail.notFoundTitle')}
           </h2>
           <p className="hl-sans mt-3 text-sm leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_72%,transparent)]">
@@ -89,7 +92,8 @@ const BlogDetailPage: React.FC = () => {
         </motion.h1>
 
         <div className="hl-sans mt-4 text-sm text-[color:color-mix(in_srgb,var(--hl-on-surface)_65%,transparent)]">
-          <span className="font-medium text-[color:var(--hl-on-surface)]">{post.author}</span> • <span>{dateLabel}</span>
+          <span className="font-medium text-[color:var(--hl-on-surface)]">{post.author}</span> •{' '}
+          <span>{dateLabel}</span>
         </div>
 
         <div className="mt-8 overflow-hidden rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_25%,transparent)]">
@@ -109,7 +113,10 @@ const BlogDetailPage: React.FC = () => {
                 key={`${s.title}-${idx}`}
                 className="rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] bg-[color:var(--hl-surface-lowest)] p-6 shadow-sm"
               >
-                <h2 className="text-lg font-medium text-[color:var(--hl-primary)]" style={{ fontFamily: 'var(--font-highland-display)' }}>
+                <h2
+                  className="text-lg font-medium text-[color:var(--hl-primary)]"
+                  style={{ fontFamily: 'var(--font-highland-display)' }}
+                >
                   {s.title}
                 </h2>
                 <ul className="hl-sans mt-4 list-disc space-y-2 pl-5 text-[color:color-mix(in_srgb,var(--hl-on-surface)_88%,transparent)]">
@@ -143,4 +150,3 @@ const BlogDetailPage: React.FC = () => {
 };
 
 export default BlogDetailPage;
-

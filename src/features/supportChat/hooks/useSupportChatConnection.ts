@@ -3,7 +3,11 @@ import { i18nKeys } from '@/constants/i18nKeys';
 import { toastErrorWithFallback } from '@/lib/toast/i18nToast';
 import type { ReceiveMessagePayload } from '../types';
 import { useSupportChatStore } from '../store/useSupportChatStore';
-import { connectSupportChatSocket, disconnectSupportChatSocket, supportChatEvents } from '../socket/supportChat.socket';
+import {
+  connectSupportChatSocket,
+  disconnectSupportChatSocket,
+  supportChatEvents,
+} from '../socket/supportChat.socket';
 
 type Options = {
   enabled: boolean;
@@ -64,7 +68,13 @@ export const useSupportChatConnection = ({ enabled }: Options) => {
       socket.off('disconnect', onDisconnect);
       socket.off('connect_error', onError);
     };
-  }, [appendIncoming, enabled, migrateConversation, reconcileOptimisticIfMatch, setConnectionStatus]);
+  }, [
+    appendIncoming,
+    enabled,
+    migrateConversation,
+    reconcileOptimisticIfMatch,
+    setConnectionStatus,
+  ]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -82,4 +92,3 @@ export const useSupportChatConnection = ({ enabled }: Options) => {
     setConnectionStatus('disconnected');
   }, [enabled, setConnectionStatus]);
 };
-

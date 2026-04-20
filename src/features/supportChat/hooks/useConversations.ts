@@ -42,4 +42,3 @@ export const useSupportChatConversations = ({ enabled }: Options) => {
     };
   }, [conversations.length, enabled, loading, setConversations, setLoading]);
 };
-

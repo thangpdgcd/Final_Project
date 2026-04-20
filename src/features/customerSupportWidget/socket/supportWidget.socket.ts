@@ -152,4 +152,3 @@ export const supportWidgetEvents = {
     return () => socket.off('error', handler);
   },
 };
-

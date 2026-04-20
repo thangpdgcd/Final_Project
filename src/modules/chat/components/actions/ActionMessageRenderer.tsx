@@ -72,4 +72,3 @@ export const ActionMessageRenderer: React.FC<Props> = ({ message }) => {
     </div>
   );
 };
-

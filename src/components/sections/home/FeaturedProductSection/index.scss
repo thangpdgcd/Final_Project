@@ -121,7 +121,10 @@
     background: #a0645a;
     color: #fff;
     font-weight: 900;
-    transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      transform 0.15s ease,
+      background 0.2s ease,
+      box-shadow 0.2s ease;
     box-shadow: 0 18px 40px rgba(160, 100, 90, 0.22);
 
     &:hover {
@@ -178,4 +181,3 @@ html.dark {
     }
   }
 }
-

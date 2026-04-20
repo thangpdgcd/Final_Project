@@ -29,5 +29,8 @@ export const toastErrorWithFallback = (
   options?: ToastOptions,
 ) => {
   const detail = serverMessage?.trim();
-  reactToastify.error(detail ? `${translate(fallbackKey)}: ${detail}` : translate(fallbackKey), options);
+  reactToastify.error(
+    detail ? `${translate(fallbackKey)}: ${detail}` : translate(fallbackKey),
+    options,
+  );
 };

@@ -22,7 +22,12 @@ import { useAuth } from '@/store/AuthContext';
 import * as profileApi from '@/api/profileApi';
 import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/image';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { useOrders, ordersService, OrderItemCard, type OrderItemRowAction } from '@/features/orders';
+import {
+  useOrders,
+  ordersService,
+  OrderItemCard,
+  type OrderItemRowAction,
+} from '@/features/orders';
 import {
   normalizeOrderStatusForLogic,
   translateOrderStatus,
@@ -134,8 +139,8 @@ const OrderItemsSummary: React.FC<{
           Number.isFinite(prev?.price) && Number(prev.price) > 0
             ? prev.price
             : Number.isFinite(price) && price >= 0
-            ? price
-            : prev?.price,
+              ? price
+              : prev?.price,
       });
     }
     return [...passthrough, ...Array.from(acc.values())];
@@ -218,16 +223,18 @@ const ProfilePage: React.FC = () => {
   const [refundBusyOrderId, setRefundBusyOrderId] = useState<number | null>(null);
   const [refundConfirmOrder, setRefundConfirmOrder] = useState<Order | null>(null);
   const [walletXu, setWalletXu] = useState<number>(0);
-  const [walletTransactions, setWalletTransactions] = useState<Array<{
-    id?: number;
-    type?: string;
-    amountXu?: number;
-    balanceAfter?: number;
-    source?: string;
-    referenceId?: string;
-    note?: string;
-    createdAt?: string;
-  }>>([]);
+  const [walletTransactions, setWalletTransactions] = useState<
+    Array<{
+      id?: number;
+      type?: string;
+      amountXu?: number;
+      balanceAfter?: number;
+      source?: string;
+      referenceId?: string;
+      note?: string;
+      createdAt?: string;
+    }>
+  >([]);
   const [walletLoading, setWalletLoading] = useState(false);
   const [topupModalOpen, setTopupModalOpen] = useState(false);
   const [topupXu, setTopupXu] = useState<number>(50000);
@@ -278,7 +285,9 @@ const ProfilePage: React.FC = () => {
   const isOrdersApiDisabled = (() => {
     try {
       const raw = localStorage.getItem('user');
-      const roleID = raw ? String((JSON.parse(raw) as any)?.roleID ?? (JSON.parse(raw) as any)?.role ?? '') : '';
+      const roleID = raw
+        ? String((JSON.parse(raw) as any)?.roleID ?? (JSON.parse(raw) as any)?.role ?? '')
+        : '';
       const normalized =
         roleID === '1' || roleID.toLowerCase() === 'customer' || roleID.toLowerCase() === 'user'
           ? '1'
@@ -287,14 +296,21 @@ const ProfilePage: React.FC = () => {
             : roleID === '3' || roleID.toLowerCase() === 'staff'
               ? '3'
               : 'unknown';
-      return typeof window !== 'undefined' && localStorage.getItem(`orders:list_disabled:${normalized}`) === '1';
+      return (
+        typeof window !== 'undefined' &&
+        localStorage.getItem(`orders:list_disabled:${normalized}`) === '1'
+      );
     } catch {
       return false;
     }
   })();
 
   // ── Orders ────────────────────────────────────────────────────────────────
-  const { data: allOrdersRaw, isLoading: ordersLoading, refetch: refetchOrders } = useOrders({
+  const {
+    data: allOrdersRaw,
+    isLoading: ordersLoading,
+    refetch: refetchOrders,
+  } = useOrders({
     // Avoid tight polling (my-orders + wallet) — refetch on focus / after mutations instead.
     refetchInterval: false,
   });
@@ -304,7 +320,9 @@ const ProfilePage: React.FC = () => {
       const user_ID = Number(r?.user_ID ?? r?.userId ?? r?.user_id ?? 0);
       const totalRaw = r?.total_Amount ?? r?.totalAmount ?? r?.total_amount ?? 0;
       const total_Amount =
-        typeof totalRaw === 'string' ? Number(String(totalRaw).replace(/[^0-9.-]/g, '')) : Number(totalRaw);
+        typeof totalRaw === 'string'
+          ? Number(String(totalRaw).replace(/[^0-9.-]/g, ''))
+          : Number(totalRaw);
       return {
         ...(r ?? {}),
         order_ID: Number.isFinite(order_ID) ? order_ID : 0,
@@ -338,13 +356,14 @@ const ProfilePage: React.FC = () => {
 
   const userOrders = useMemo<Order[]>(() => {
     const uid = Number(effectiveUserId);
-    const base = Number.isFinite(uid) && uid > 0
-      ? allOrders.filter((o: Order) => {
-          const orderUserId = o.user_ID || (o as any).UserID || (o as any).userId;
-          // Use effective user id (context may hydrate after orders fetch).
-          return Number(orderUserId) === uid;
-        })
-      : allOrders;
+    const base =
+      Number.isFinite(uid) && uid > 0
+        ? allOrders.filter((o: Order) => {
+            const orderUserId = o.user_ID || (o as any).UserID || (o as any).userId;
+            // Use effective user id (context may hydrate after orders fetch).
+            return Number(orderUserId) === uid;
+          })
+        : allOrders;
 
     return base.sort((a: Order, b: Order) => {
       const idA = a.order_ID || (a as any).orderId || 0;
@@ -353,7 +372,14 @@ const ProfilePage: React.FC = () => {
     });
   }, [allOrders, effectiveUserId]);
 
-  type OrderTabKey = 'all' | 'Pending' | 'Shipping' | 'To Receive' | 'Completed' | 'Cancelled' | 'Refund';
+  type OrderTabKey =
+    | 'all'
+    | 'Pending'
+    | 'Shipping'
+    | 'To Receive'
+    | 'Completed'
+    | 'Cancelled'
+    | 'Refund';
 
   const matchesOrderTab = (rawStatus: unknown, tabKey: OrderTabKey): boolean => {
     const status = normalizeOrderStatusForLogic(rawStatus);
@@ -403,11 +429,23 @@ const ProfilePage: React.FC = () => {
   );
 
   const activeOrderTab = (searchParams.get('status') || 'all') as OrderTabKey;
+  const focusOrderId = Number(searchParams.get('orderId') ?? 0);
+  const [highlightOrderId, setHighlightOrderId] = useState<number | null>(null);
   const filteredOrders = useMemo<Order[]>(() => {
     return userOrders.filter((o: Order) => matchesOrderTab(o.status, activeOrderTab));
   }, [userOrders, activeOrderTab]);
   const shouldScrollOrders =
     filteredOrders.length > 3 || activeOrderTab === 'Cancelled' || activeOrderTab === 'Refund';
+
+  useEffect(() => {
+    if (!focusOrderId || !Number.isFinite(focusOrderId)) return;
+    const el = document.getElementById(`order-${focusOrderId}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setHighlightOrderId(focusOrderId);
+    const timer = window.setTimeout(() => setHighlightOrderId(null), 2200);
+    return () => window.clearTimeout(timer);
+  }, [focusOrderId, filteredOrders.length]);
 
   const fetchWallet = async (opts?: { silent?: boolean }) => {
     if (!user?.user_ID) return;
@@ -420,7 +458,7 @@ const ProfilePage: React.FC = () => {
           (payload as any)?.data?.walletCoin ??
           (payload as any)?.data?.walletXu ??
           (payload as any)?.data?.result?.walletXu ??
-          0
+          0,
       );
       setWalletXu(Number.isFinite(walletValue) ? walletValue : 0);
       const txs =
@@ -457,7 +495,11 @@ const ProfilePage: React.FC = () => {
         if (!res.ok) continue;
         const data = (await res.json()) as any;
         const clientId =
-          data?.data?.clientId ?? data?.data?.clientID ?? data?.clientId ?? data?.clientID ?? data?.data;
+          data?.data?.clientId ??
+          data?.data?.clientID ??
+          data?.clientId ??
+          data?.clientID ??
+          data?.data;
         if (typeof clientId === 'string' && clientId.trim()) return clientId.trim();
       } catch {
         // try next candidate
@@ -522,8 +564,7 @@ const ProfilePage: React.FC = () => {
   // ── Handlers ──────────────────────────────────────────────────────────────
   const resolveUserIdForCart = () =>
     Number(
-      user?.user_ID ??
-        (typeof window !== 'undefined' ? localStorage.getItem('user_ID') : null)
+      user?.user_ID ?? (typeof window !== 'undefined' ? localStorage.getItem('user_ID') : null),
     );
 
   const handleBuyAgainOneItem = async (args: OrderItemRowAction) => {
@@ -577,7 +618,9 @@ const ProfilePage: React.FC = () => {
     }
     setRefundBusyOrderId(orderId);
     try {
-      await ordersService.requestRefund(orderId, { note: 'Customer requested refund from profile page' });
+      await ordersService.requestRefund(orderId, {
+        note: 'Customer requested refund from profile page',
+      });
       message.success(t('profile.orders.messages.refundSuccess'));
       await refetchOrders();
     } catch (err) {
@@ -592,7 +635,7 @@ const ProfilePage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -705,7 +748,9 @@ const ProfilePage: React.FC = () => {
       const buttons = w.paypal?.Buttons?.({
         style: { layout: 'vertical', label: 'paypal' },
         createOrder: (_d: any, actions: any) =>
-          actions.order.create({ purchase_units: [{ amount: { currency_code: 'USD', value: topupAmountUSD } }] }),
+          actions.order.create({
+            purchase_units: [{ amount: { currency_code: 'USD', value: topupAmountUSD } }],
+          }),
         onApprove: async (data: any, actions: any) => {
           try {
             setTopupBusy(true);
@@ -713,11 +758,15 @@ const ProfilePage: React.FC = () => {
             let captureId = '';
             try {
               const capture = await actions.order.capture();
-              captureId = String((capture as any)?.id ?? data?.orderID ?? data?.orderId ?? '').trim();
+              captureId = String(
+                (capture as any)?.id ?? data?.orderID ?? data?.orderId ?? '',
+              ).trim();
               paypalDebug('Capture success', captureId);
             } catch (captureError: any) {
               const captureMsg = String(captureError?.message || '');
-              const closedEarly = captureMsg.toLowerCase().includes('window closed before response');
+              const closedEarly = captureMsg
+                .toLowerCase()
+                .includes('window closed before response');
               const fallbackId = String(data?.orderID ?? data?.orderId ?? '').trim();
               if (closedEarly && fallbackId) {
                 // PayPal popup can close before capture response is returned.
@@ -738,11 +787,11 @@ const ProfilePage: React.FC = () => {
             });
             const nextWallet = Number(
               (topupRes as any)?.walletCoin ??
-              (topupRes as any)?.walletXu ??
-              (topupRes as any)?.data?.walletCoin ??
-              (topupRes as any)?.data?.walletXu ??
-              (topupRes as any)?.data?.result?.walletXu ??
-              0
+                (topupRes as any)?.walletXu ??
+                (topupRes as any)?.data?.walletCoin ??
+                (topupRes as any)?.data?.walletXu ??
+                (topupRes as any)?.data?.result?.walletXu ??
+                0,
             );
             if (Number.isFinite(nextWallet) && nextWallet >= 0) setWalletXu(nextWallet);
             else await fetchWallet();
@@ -813,7 +862,16 @@ const ProfilePage: React.FC = () => {
       void renderPaypalButtons();
     }, 250);
     return () => window.clearTimeout(tid);
-  }, [topupModalOpen, topupModalReady, topupSdkReady, topupAmountUSD, topupXu, message, topupRenderKey, t]);
+  }, [
+    topupModalOpen,
+    topupModalReady,
+    topupSdkReady,
+    topupAmountUSD,
+    topupXu,
+    message,
+    topupRenderKey,
+    t,
+  ]);
 
   // ── Menu grid items ───────────────────────────────────────────────────────
   const menuItems = useMemo(
@@ -911,7 +969,16 @@ const ProfilePage: React.FC = () => {
         icon: <Wallet size={16} />,
       },
     ],
-    [i18n.language, isOrdersApiDisabled, isWalletApiDisabled, t, userOrders.length, walletLoading, walletXu, voucherVault.length],
+    [
+      i18n.language,
+      isOrdersApiDisabled,
+      isWalletApiDisabled,
+      t,
+      userOrders.length,
+      walletLoading,
+      walletXu,
+      voucherVault.length,
+    ],
   );
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -924,7 +991,6 @@ const ProfilePage: React.FC = () => {
       className="min-h-screen pt-24 pb-20"
     >
       <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row gap-6">
-
         {/* ================================================================
             SIDEBAR
         ================================================================= */}
@@ -944,7 +1010,7 @@ const ProfilePage: React.FC = () => {
                   src={getAvatarImageSrc(previewAvatar || user?.avatar)}
                   alt="avatar"
                   className={AVATAR_DISPLAY_IMG_CLASS}
-                  onError={e => {
+                  onError={(e) => {
                     (e.currentTarget as HTMLImageElement).src =
                       'https://ui-avatars.com/api/?name=User&background=1c1b1b&color=e5c18b&size=128';
                   }}
@@ -993,7 +1059,7 @@ const ProfilePage: React.FC = () => {
 
           {/* Nav items */}
           <nav className="flex flex-col gap-1 p-3 flex-1">
-            {sideNavItems.map(item => {
+            {sideNavItems.map((item) => {
               const active = activeSideKey === item.key;
               return (
                 <motion.button
@@ -1022,14 +1088,12 @@ const ProfilePage: React.FC = () => {
               );
             })}
           </nav>
-
         </aside>
 
         {/* ================================================================
             MAIN PANEL
         ================================================================= */}
         <div className="flex-1 flex flex-col gap-5">
-
           {/* ── Hero card ─────────────────────────────────────────── */}
           <ProfileCard
             user={user}
@@ -1051,7 +1115,7 @@ const ProfilePage: React.FC = () => {
             transition={{ duration: 0.45, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
             className="grid grid-cols-2 md:grid-cols-3 gap-4"
           >
-            {profileStats.map(stat => (
+            {profileStats.map((stat) => (
               <div
                 key={stat.key}
                 style={{ background: T.surfaceLow }}
@@ -1134,7 +1198,8 @@ const ProfilePage: React.FC = () => {
                           {t('profile.sideNav.promotions')}
                         </h2>
                         <p className="mt-2 text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
-                          Voucher staff gửi cho bạn sẽ tự lưu ở đây. Bạn có thể copy hoặc dùng trực tiếp ở giỏ hàng.
+                          Voucher staff gửi cho bạn sẽ tự lưu ở đây. Bạn có thể copy hoặc dùng trực
+                          tiếp ở giỏ hàng.
                         </p>
                       </div>
 
@@ -1179,7 +1244,10 @@ const ProfilePage: React.FC = () => {
                     <div className="mt-5 space-y-3">
                       {voucherVault.length === 0 ? (
                         <div
-                          style={{ background: T.surfaceLowest, border: `1px solid ${T.onSurface}12` }}
+                          style={{
+                            background: T.surfaceLowest,
+                            border: `1px solid ${T.onSurface}12`,
+                          }}
                           className="rounded-2xl p-6 text-center"
                         >
                           <div className="text-sm font-semibold" style={{ color: T.onSurface }}>
@@ -1199,17 +1267,27 @@ const ProfilePage: React.FC = () => {
                             <div className="min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
                                 <code
-                                  style={{ border: `1px solid ${T.gold}50`, color: T.gold, background: `${T.gold}12` }}
+                                  style={{
+                                    border: `1px solid ${T.gold}50`,
+                                    color: T.gold,
+                                    background: `${T.gold}12`,
+                                  }}
                                   className="rounded-xl px-3 py-1 text-sm font-black"
                                 >
                                   {v.code}
                                 </code>
-                                <span className="text-xs" style={{ color: `${T.onSurfaceVariant}` }}>
+                                <span
+                                  className="text-xs"
+                                  style={{ color: `${T.onSurfaceVariant}` }}
+                                >
                                   Nhận lúc {formatVaultTime(v.receivedAt)}
                                 </span>
                               </div>
                               {v.message ? (
-                                <div className="mt-2 text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
+                                <div
+                                  className="mt-2 text-sm"
+                                  style={{ color: `${T.onSurfaceVariant}` }}
+                                >
                                   {v.message}
                                 </div>
                               ) : null}
@@ -1221,7 +1299,9 @@ const ProfilePage: React.FC = () => {
                                 onClick={() => {
                                   try {
                                     localStorage.setItem('checkout_voucher_code', v.code);
-                                  } catch {}
+                                  } catch {
+                                    // ignore
+                                  }
                                   navigate(`/cart?voucher=${encodeURIComponent(v.code)}`);
                                 }}
                                 style={{
@@ -1244,7 +1324,9 @@ const ProfilePage: React.FC = () => {
                                 onClick={async () => {
                                   try {
                                     await navigator.clipboard.writeText(v.code);
-                                  } catch {}
+                                  } catch {
+                                    // ignore
+                                  }
                                 }}
                                 style={{
                                   color: T.onSurfaceVariant,
@@ -1301,71 +1383,8 @@ const ProfilePage: React.FC = () => {
                       {t('profile.identity.sectionTitle')}
                     </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Read-only email / username */}
-                  <div className="flex flex-col gap-1.5">
-                    <label
-                      style={{
-                        color: T.onSurfaceVariant,
-                        fontSize: '0.7rem',
-                        fontFamily: "'Manrope', sans-serif",
-                        fontWeight: 600,
-                        letterSpacing: '0.07em',
-                      }}
-                    >
-                      {t('profile.identity.accountLabel')}
-                    </label>
-                    <div
-                      style={{
-                        background: T.surfaceLowest,
-                        color: `${T.onSurface}60`,
-                        borderRadius: '0.75rem',
-                        padding: '0.75rem 1rem',
-                        fontSize: '0.875rem',
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
-                      {user?.email?.split('@')[0]}
-                    </div>
-                  </div>
-
-                  {/* Email (read-only) */}
-                  <div className="flex flex-col gap-1.5">
-                    <label
-                      style={{
-                        color: T.onSurfaceVariant,
-                        fontSize: '0.7rem',
-                        fontFamily: "'Manrope', sans-serif",
-                        fontWeight: 600,
-                        letterSpacing: '0.07em',
-                      }}
-                    >
-                      {t('profile.identity.emailLabel')}
-                    </label>
-                    <div
-                      style={{
-                        background: T.surfaceLowest,
-                        color: `${T.onSurface}60`,
-                        borderRadius: '0.75rem',
-                        padding: '0.75rem 1rem',
-                        fontSize: '0.875rem',
-                        fontFamily: "'Inter', sans-serif",
-                      }}
-                    >
-                      {user?.email}
-                    </div>
-                  </div>
-
-                  {/* Editable fields */}
-                  {[
-                    { name: 'name', label: t('profile.identity.fieldName'), placeholder: t('profile.identity.placeholderName') },
-                    { name: 'phoneNumber', label: t('profile.identity.fieldPhone'), placeholder: t('profile.identity.placeholderPhone') },
-                    { name: 'address', label: t('profile.identity.fieldAddress'), placeholder: t('profile.identity.placeholderAddress') },
-                  ].map(field => (
-                    <div
-                      key={field.name}
-                      className={field.name === 'address' ? 'md:col-span-2' : ''}
-                    >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Read-only email / username */}
                       <div className="flex flex-col gap-1.5">
                         <label
                           style={{
@@ -1376,88 +1395,164 @@ const ProfilePage: React.FC = () => {
                             letterSpacing: '0.07em',
                           }}
                         >
-                          {field.label}
+                          {t('profile.identity.accountLabel')}
                         </label>
-                        <input
-                          name={field.name}
-                          disabled={!isEditing}
-                          value={(formData as any)[field.name]}
-                          onChange={handleInputChange}
-                          placeholder={field.placeholder}
+                        <div
                           style={{
                             background: T.surfaceLowest,
-                            color: isEditing ? T.onSurface : `${T.onSurface}70`,
-                            border: `1px solid ${isEditing ? T.gold + '50' : T.onSurface + '15'}`,
+                            color: `${T.onSurface}60`,
                             borderRadius: '0.75rem',
                             padding: '0.75rem 1rem',
                             fontSize: '0.875rem',
                             fontFamily: "'Inter', sans-serif",
-                            outline: 'none',
-                            transition: 'border-color 300ms ease-out',
-                            width: '100%',
                           }}
-                          onFocus={e => {
-                            if (isEditing) e.currentTarget.style.borderColor = T.gold;
-                          }}
-                          onBlur={e => {
-                            e.currentTarget.style.borderColor = isEditing
-                              ? `${T.gold}50`
-                              : `${T.onSurface}15`;
-                          }}
-                        />
+                        >
+                          {user?.email?.split('@')[0]}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
 
-                {/* Save / Edit button row */}
-                <div className="flex justify-end mt-6 gap-3">
-                  {isEditing && (
-                    <motion.button
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => setIsEditing(false)}
-                      style={{
-                        color: T.onSurfaceVariant,
-                        border: `1px solid ${T.onSurface}15`,
-                        fontFamily: "'Manrope', sans-serif",
-                        fontWeight: 600,
-                        fontSize: '0.75rem',
-                        letterSpacing: '0.06em',
-                        borderRadius: '0.75rem',
-                        background: 'transparent',
-                      }}
-                      className="px-5 py-2.5"
-                    >
-                      {t('profile.identity.cancelEdit')}
-                    </motion.button>
-                  )}
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    disabled={isLoading}
-                    onClick={() => (isEditing ? handleSaveProfile() : setIsEditing(true))}
-                    style={{
-                      background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
-                      color: T.surfaceLowest,
-                      fontFamily: "'Manrope', sans-serif",
-                      fontWeight: 800,
-                      fontSize: '0.75rem',
-                      letterSpacing: '0.08em',
-                      borderRadius: '0.75rem',
-                      boxShadow: `0 8px 32px -8px ${T.gold}50`,
-                      transition: 'all 300ms ease-out',
-                    }}
-                    className="px-8 py-2.5 inline-flex items-center gap-2 disabled:opacity-60"
-                  >
-                    {isLoading && <Loader2 size={14} className="animate-spin" />}
-                    {isEditing ? t('profile.identity.saveChangesCaps') : t('profile.identity.editProfileCaps')}
-                  </motion.button>
-                </div>
+                      {/* Email (read-only) */}
+                      <div className="flex flex-col gap-1.5">
+                        <label
+                          style={{
+                            color: T.onSurfaceVariant,
+                            fontSize: '0.7rem',
+                            fontFamily: "'Manrope', sans-serif",
+                            fontWeight: 600,
+                            letterSpacing: '0.07em',
+                          }}
+                        >
+                          {t('profile.identity.emailLabel')}
+                        </label>
+                        <div
+                          style={{
+                            background: T.surfaceLowest,
+                            color: `${T.onSurface}60`,
+                            borderRadius: '0.75rem',
+                            padding: '0.75rem 1rem',
+                            fontSize: '0.875rem',
+                            fontFamily: "'Inter', sans-serif",
+                          }}
+                        >
+                          {user?.email}
+                        </div>
+                      </div>
+
+                      {/* Editable fields */}
+                      {[
+                        {
+                          name: 'name',
+                          label: t('profile.identity.fieldName'),
+                          placeholder: t('profile.identity.placeholderName'),
+                        },
+                        {
+                          name: 'phoneNumber',
+                          label: t('profile.identity.fieldPhone'),
+                          placeholder: t('profile.identity.placeholderPhone'),
+                        },
+                        {
+                          name: 'address',
+                          label: t('profile.identity.fieldAddress'),
+                          placeholder: t('profile.identity.placeholderAddress'),
+                        },
+                      ].map((field) => (
+                        <div
+                          key={field.name}
+                          className={field.name === 'address' ? 'md:col-span-2' : ''}
+                        >
+                          <div className="flex flex-col gap-1.5">
+                            <label
+                              style={{
+                                color: T.onSurfaceVariant,
+                                fontSize: '0.7rem',
+                                fontFamily: "'Manrope', sans-serif",
+                                fontWeight: 600,
+                                letterSpacing: '0.07em',
+                              }}
+                            >
+                              {field.label}
+                            </label>
+                            <input
+                              name={field.name}
+                              disabled={!isEditing}
+                              value={(formData as any)[field.name]}
+                              onChange={handleInputChange}
+                              placeholder={field.placeholder}
+                              style={{
+                                background: T.surfaceLowest,
+                                color: isEditing ? T.onSurface : `${T.onSurface}70`,
+                                border: `1px solid ${isEditing ? T.gold + '50' : T.onSurface + '15'}`,
+                                borderRadius: '0.75rem',
+                                padding: '0.75rem 1rem',
+                                fontSize: '0.875rem',
+                                fontFamily: "'Inter', sans-serif",
+                                outline: 'none',
+                                transition: 'border-color 300ms ease-out',
+                                width: '100%',
+                              }}
+                              onFocus={(e) => {
+                                if (isEditing) e.currentTarget.style.borderColor = T.gold;
+                              }}
+                              onBlur={(e) => {
+                                e.currentTarget.style.borderColor = isEditing
+                                  ? `${T.gold}50`
+                                  : `${T.onSurface}15`;
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Save / Edit button row */}
+                    <div className="flex justify-end mt-6 gap-3">
+                      {isEditing && (
+                        <motion.button
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          whileTap={{ scale: 0.97 }}
+                          onClick={() => setIsEditing(false)}
+                          style={{
+                            color: T.onSurfaceVariant,
+                            border: `1px solid ${T.onSurface}15`,
+                            fontFamily: "'Manrope', sans-serif",
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            letterSpacing: '0.06em',
+                            borderRadius: '0.75rem',
+                            background: 'transparent',
+                          }}
+                          className="px-5 py-2.5"
+                        >
+                          {t('profile.identity.cancelEdit')}
+                        </motion.button>
+                      )}
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        disabled={isLoading}
+                        onClick={() => (isEditing ? handleSaveProfile() : setIsEditing(true))}
+                        style={{
+                          background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
+                          color: T.surfaceLowest,
+                          fontFamily: "'Manrope', sans-serif",
+                          fontWeight: 800,
+                          fontSize: '0.75rem',
+                          letterSpacing: '0.08em',
+                          borderRadius: '0.75rem',
+                          boxShadow: `0 8px 32px -8px ${T.gold}50`,
+                          transition: 'all 300ms ease-out',
+                        }}
+                        className="px-8 py-2.5 inline-flex items-center gap-2 disabled:opacity-60"
+                      >
+                        {isLoading && <Loader2 size={14} className="animate-spin" />}
+                        {isEditing
+                          ? t('profile.identity.saveChangesCaps')
+                          : t('profile.identity.editProfileCaps')}
+                      </motion.button>
+                    </div>
                   </>
                 )}
-
               </motion.div>
             )}
 
@@ -1474,12 +1569,9 @@ const ProfilePage: React.FC = () => {
                 className="space-y-4"
               >
                 {/* Order status tabs */}
-                <div
-                  style={{ background: T.surfaceLow }}
-                  className="rounded-2xl overflow-hidden"
-                >
+                <div style={{ background: T.surfaceLow }} className="rounded-2xl overflow-hidden">
                   <div className="flex overflow-x-auto scroller-hidden">
-                    {orderTabs.map(tab => {
+                    {orderTabs.map((tab) => {
                       const active = (searchParams.get('status') || 'all') === tab.key;
                       return (
                         <button
@@ -1505,291 +1597,320 @@ const ProfilePage: React.FC = () => {
 
                 {/* Order cards */}
                 <div className="min-h-[520px]">
-                {ordersLoading ? (
-                  <div
-                    style={{ background: T.surfaceLow }}
-                    className="p-12 text-center rounded-2xl flex flex-col items-center gap-4"
-                  >
-                    <Loader2
-                      className="animate-spin"
-                      size={28}
-                      style={{ color: T.gold }}
-                    />
-                    <p style={{ color: T.onSurfaceVariant, fontSize: '0.875rem' }}>
-                      {t('profile.orders.loadingOrders')}
-                    </p>
-                  </div>
-                ) : isOrdersApiDisabled ? (
-                  <div
-                    style={{ background: T.surfaceLow }}
-                    className="p-20 rounded-2xl flex flex-col items-center gap-4"
-                  >
+                  {ordersLoading ? (
                     <div
-                      style={{ background: T.surfaceLowest }}
-                      className="w-20 h-20 rounded-full flex items-center justify-center"
+                      style={{ background: T.surfaceLow }}
+                      className="p-12 text-center rounded-2xl flex flex-col items-center gap-4"
                     >
-                      <ShoppingBag size={40} style={{ color: T.onSurfaceVariant, opacity: 0.3 }} />
+                      <Loader2 className="animate-spin" size={28} style={{ color: T.gold }} />
+                      <p style={{ color: T.onSurfaceVariant, fontSize: '0.875rem' }}>
+                        {t('profile.orders.loadingOrders')}
+                      </p>
                     </div>
-                    <p
-                      style={{
-                        fontFamily: "'Manrope', sans-serif",
-                        color: T.onSurface,
-                        fontWeight: 700,
-                        fontSize: '1rem',
-                      }}
-                    >
-                      {t('common.notAvailable')}
-                    </p>
-                    <p style={{ color: T.onSurfaceVariant, fontSize: '0.82rem', opacity: 0.7 }}>
-                      {t('profile.orders.apiNotAvailableHint')}
-                    </p>
-                  </div>
-                ) : filteredOrders.length === 0 ? (
-                  <div
-                    style={{ background: T.surfaceLow }}
-                    className="p-20 rounded-2xl flex flex-col items-center gap-4"
-                  >
+                  ) : isOrdersApiDisabled ? (
                     <div
-                      style={{ background: T.surfaceLowest }}
-                      className="w-20 h-20 rounded-full flex items-center justify-center"
+                      style={{ background: T.surfaceLow }}
+                      className="p-20 rounded-2xl flex flex-col items-center gap-4"
                     >
-                      <ShoppingBag size={40} style={{ color: T.onSurfaceVariant, opacity: 0.3 }} />
+                      <div
+                        style={{ background: T.surfaceLowest }}
+                        className="w-20 h-20 rounded-full flex items-center justify-center"
+                      >
+                        <ShoppingBag
+                          size={40}
+                          style={{ color: T.onSurfaceVariant, opacity: 0.3 }}
+                        />
+                      </div>
+                      <p
+                        style={{
+                          fontFamily: "'Manrope', sans-serif",
+                          color: T.onSurface,
+                          fontWeight: 700,
+                          fontSize: '1rem',
+                        }}
+                      >
+                        {t('common.notAvailable')}
+                      </p>
+                      <p style={{ color: T.onSurfaceVariant, fontSize: '0.82rem', opacity: 0.7 }}>
+                        {t('profile.orders.apiNotAvailableHint')}
+                      </p>
                     </div>
-                    <p
+                  ) : filteredOrders.length === 0 ? (
+                    <div
+                      style={{ background: T.surfaceLow }}
+                      className="p-20 rounded-2xl flex flex-col items-center gap-4"
+                    >
+                      <div
+                        style={{ background: T.surfaceLowest }}
+                        className="w-20 h-20 rounded-full flex items-center justify-center"
+                      >
+                        <ShoppingBag
+                          size={40}
+                          style={{ color: T.onSurfaceVariant, opacity: 0.3 }}
+                        />
+                      </div>
+                      <p
+                        style={{
+                          fontFamily: "'Manrope', sans-serif",
+                          color: T.onSurface,
+                          fontWeight: 700,
+                          fontSize: '1rem',
+                        }}
+                      >
+                        {t('profile.orders.emptyTitle')}
+                      </p>
+                      <p style={{ color: T.onSurfaceVariant, fontSize: '0.82rem', opacity: 0.7 }}>
+                        {t('profile.orders.emptySubtitle')}
+                      </p>
+                      <Link
+                        to="/products"
+                        style={{
+                          background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
+                          color: T.surfaceLowest,
+                          fontFamily: "'Manrope', sans-serif",
+                          fontWeight: 700,
+                          fontSize: '0.78rem',
+                          letterSpacing: '0.06em',
+                          borderRadius: '0.75rem',
+                          padding: '0.625rem 1.5rem',
+                          marginTop: '0.5rem',
+                          display: 'inline-block',
+                        }}
+                      >
+                        {t('profile.orders.shopNow')}
+                      </Link>
+                    </div>
+                  ) : (
+                    <div
+                      className={`space-y-4 pr-1 ${
+                        shouldScrollOrders ? 'max-h-[760px] overflow-y-auto' : ''
+                      }`}
                       style={{
-                        fontFamily: "'Manrope', sans-serif",
-                        color: T.onSurface,
-                        fontWeight: 700,
-                        fontSize: '1rem',
+                        scrollbarGutter: 'stable',
                       }}
                     >
-                      {t('profile.orders.emptyTitle')}
-                    </p>
-                    <p style={{ color: T.onSurfaceVariant, fontSize: '0.82rem', opacity: 0.7 }}>
-                      {t('profile.orders.emptySubtitle')}
-                    </p>
-                    <Link
-                      to="/products"
-                      style={{
-                        background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
-                        color: T.surfaceLowest,
-                        fontFamily: "'Manrope', sans-serif",
-                        fontWeight: 700,
-                        fontSize: '0.78rem',
-                        letterSpacing: '0.06em',
-                        borderRadius: '0.75rem',
-                        padding: '0.625rem 1.5rem',
-                        marginTop: '0.5rem',
-                        display: 'inline-block',
-                      }}
-                    >
-                      {t('profile.orders.shopNow')}
-                    </Link>
-                  </div>
-                ) : (
-                  <div
-                    className={`space-y-4 pr-1 ${
-                      shouldScrollOrders ? 'max-h-[760px] overflow-y-auto' : ''
-                    }`}
-                    style={{
-                      scrollbarGutter: 'stable',
-                    }}
-                  >
-                    {filteredOrders.map((order: Order, orderIdx: number) => {
-                      const orderID = order.order_ID || (order as any).orderId;
-                      const canCancel = canUserCancelOrder(order.status);
-                      const canRefund = canUserRequestRefund(order.status);
-                      const normalizedStatus = normalizeOrderStatusForLogic(order.status);
-                      const isCompleted = normalizedStatus === 'completed';
-                      const isRefundFlow =
-                        normalizedStatus === 'refund_requested' || normalizedStatus === 'refunded';
-                      const statusLabel = translateOrderStatus(t, order.status);
-                      return (
-                        <motion.div
-                          key={orderID}
-                          layout
-                          initial={{ opacity: 0, y: 14 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{
-                            duration: 0.4,
-                            delay: orderIdx * 0.05,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                          style={{ background: T.surfaceLow }}
-                          className="rounded-2xl overflow-hidden"
-                        >
-                        {/* Order header */}
-                        <div
-                          style={{
-                            background: T.surfaceLowest,
-                            borderBottom: `1px solid ${T.onSurface}08`,
-                          }}
-                          className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span
-                              style={{
-                                background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
-                                color: T.surfaceLowest,
-                                fontFamily: "'Manrope', sans-serif",
-                                fontWeight: 800,
-                                fontSize: '0.6rem',
-                                letterSpacing: '0.12em',
-                                borderRadius: '4px',
-                                padding: '2px 6px',
-                              }}
-                            >
-                              {t('profile.orders.favoriteBadge')}
-                            </span>
-                            <span
-                              style={{
-                                color: T.onSurface,
-                                fontFamily: "'Manrope', sans-serif",
-                                fontWeight: 700,
-                                fontSize: '0.875rem',
-                              }}
-                            >
-                              {t('profile.orders.storeName')}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <span
-                              style={{
-                                color: isRefundFlow ? '#fb7185' : isCompleted ? '#4ade80' : T.gold,
-                                fontFamily: "'Manrope', sans-serif",
-                                fontWeight: 700,
-                                fontSize: '0.7rem',
-                                letterSpacing: '0.1em',
-                              }}
-                            >
-                              {statusLabel}
-                            </span>
-                            <span
-                              style={{
-                                color: T.onSurfaceVariant,
-                                fontSize: '0.75rem',
-                                opacity: 0.6,
-                              }}
-                            >
-                              #{orderID}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Order items */}
-                        <div className="px-6 py-5">
-                          <div
-                            style={{
-                              background: T.surfaceLowest,
-                              borderRadius: '0.75rem',
-                              padding: '0.75rem',
+                      {filteredOrders.map((order: Order, orderIdx: number) => {
+                        const orderID = order.order_ID || (order as any).orderId;
+                        const canCancel = canUserCancelOrder(order.status);
+                        const canRefund = canUserRequestRefund(order.status);
+                        const normalizedStatus = normalizeOrderStatusForLogic(order.status);
+                        const isCompleted = normalizedStatus === 'completed';
+                        const isRefundFlow =
+                          normalizedStatus === 'refund_requested' ||
+                          normalizedStatus === 'refunded';
+                        const statusLabel = translateOrderStatus(t, order.status);
+                        return (
+                          <motion.div
+                            key={orderID}
+                            id={`order-${orderID}`}
+                            layout
+                            initial={{ opacity: 0, y: 14 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              duration: 0.4,
+                              delay: orderIdx * 0.05,
+                              ease: [0.22, 1, 0.36, 1],
                             }}
+                            style={{ background: T.surfaceLow }}
+                            className={[
+                              'rounded-2xl overflow-hidden scroll-mt-28',
+                              highlightOrderId && Number(orderID) === highlightOrderId
+                                ? 'ring-2 ring-[var(--gold)]'
+                                : '',
+                            ]
+                              .filter(Boolean)
+                              .join(' ')}
                           >
-                            <OrderItemsSummary
-                              orderId={orderID}
-                              busyRowKey={buyAgainRowKey}
-                              onBuyAgainItem={a => void handleBuyAgainOneItem(a)}
-                              onViewProduct={pid => navigate(`/products/${pid}`)}
-                              onContactSeller={() => navigate('/contacts')}
-                            />
-                          </div>
-                        </div>
+                            {/* Order header */}
+                            <div
+                              style={{
+                                background: T.surfaceLowest,
+                                borderBottom: `1px solid ${T.onSurface}08`,
+                              }}
+                              className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span
+                                  style={{
+                                    background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
+                                    color: T.surfaceLowest,
+                                    fontFamily: "'Manrope', sans-serif",
+                                    fontWeight: 800,
+                                    fontSize: '0.6rem',
+                                    letterSpacing: '0.12em',
+                                    borderRadius: '4px',
+                                    padding: '2px 6px',
+                                  }}
+                                >
+                                  {t('profile.orders.favoriteBadge')}
+                                </span>
+                                <span
+                                  style={{
+                                    color: T.onSurface,
+                                    fontFamily: "'Manrope', sans-serif",
+                                    fontWeight: 700,
+                                    fontSize: '0.875rem',
+                                  }}
+                                >
+                                  {t('profile.orders.storeName')}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <span
+                                  style={{
+                                    color: isRefundFlow
+                                      ? '#fb7185'
+                                      : isCompleted
+                                        ? '#4ade80'
+                                        : T.gold,
+                                    fontFamily: "'Manrope', sans-serif",
+                                    fontWeight: 700,
+                                    fontSize: '0.7rem',
+                                    letterSpacing: '0.1em',
+                                  }}
+                                >
+                                  {statusLabel}
+                                </span>
+                                <span
+                                  style={{
+                                    color: T.onSurfaceVariant,
+                                    fontSize: '0.75rem',
+                                    opacity: 0.6,
+                                  }}
+                                >
+                                  #{orderID}
+                                </span>
+                              </div>
+                            </div>
 
-                        {/* Order footer */}
-                        <div
-                          style={{
-                            background: T.surfaceLowest,
-                            borderTop: `1px solid ${T.onSurface}08`,
-                          }}
-                          className="px-6 py-4 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-3"
-                        >
-                          <span style={{ color: T.onSurfaceVariant, fontSize: '0.75rem', opacity: 0.6 }}>
-                            {canCancel ? t('profile.orders.footerHintCancel') : t('profile.orders.footerHintRefund')}
-                            {!canCancel && (
-                              <>
-                                {' '}
-                                {canRefund ? (
+                            {/* Order items */}
+                            <div className="px-6 py-5">
+                              <div
+                                style={{
+                                  background: T.surfaceLowest,
+                                  borderRadius: '0.75rem',
+                                  padding: '0.75rem',
+                                }}
+                              >
+                                <OrderItemsSummary
+                                  orderId={orderID}
+                                  busyRowKey={buyAgainRowKey}
+                                  onBuyAgainItem={(a) => void handleBuyAgainOneItem(a)}
+                                  onViewProduct={(pid) => navigate(`/products/${pid}`)}
+                                  onContactSeller={() => navigate('/contacts')}
+                                />
+                              </div>
+                            </div>
+
+                            {/* Order footer */}
+                            <div
+                              style={{
+                                background: T.surfaceLowest,
+                                borderTop: `1px solid ${T.onSurface}08`,
+                              }}
+                              className="px-6 py-4 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-3"
+                            >
+                              <span
+                                style={{
+                                  color: T.onSurfaceVariant,
+                                  fontSize: '0.75rem',
+                                  opacity: 0.6,
+                                }}
+                              >
+                                {canCancel
+                                  ? t('profile.orders.footerHintCancel')
+                                  : t('profile.orders.footerHintRefund')}
+                                {!canCancel && (
+                                  <>
+                                    {' '}
+                                    {canRefund ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => void handleRequestRefund(order)}
+                                        disabled={refundBusyOrderId === Number(orderID)}
+                                        style={{
+                                          color:
+                                            refundBusyOrderId === Number(orderID)
+                                              ? T.onSurfaceVariant
+                                              : T.gold,
+                                          opacity: refundBusyOrderId === Number(orderID) ? 0.75 : 1,
+                                        }}
+                                        className="hover:underline cursor-pointer font-medium disabled:cursor-not-allowed"
+                                      >
+                                        {refundBusyOrderId === Number(orderID)
+                                          ? t('profile.orders.requestRefundLoading')
+                                          : t('profile.orders.requestRefund')}
+                                      </button>
+                                    ) : (
+                                      <button
+                                        style={{ color: T.gold }}
+                                        className="hover:underline font-medium"
+                                      >
+                                        {t('profile.orders.requestReturn')}
+                                      </button>
+                                    )}
+                                  </>
+                                )}
+                              </span>
+                              <div className="flex flex-wrap items-center gap-3">
+                                {canCancel && (
                                   <button
                                     type="button"
-                                    onClick={() => void handleRequestRefund(order)}
-                                    disabled={refundBusyOrderId === Number(orderID)}
+                                    onClick={() => void handleCancelOrder(order)}
                                     style={{
-                                      color: refundBusyOrderId === Number(orderID) ? T.onSurfaceVariant : T.gold,
-                                      opacity: refundBusyOrderId === Number(orderID) ? 0.75 : 1,
+                                      border: `1px solid ${T.onSurface}20`,
+                                      color: '#ef4444',
+                                      background: 'transparent',
+                                      borderRadius: '0.6rem',
+                                      padding: '0.4rem 0.75rem',
+                                      fontSize: '0.75rem',
+                                      fontWeight: 600,
                                     }}
-                                    className="hover:underline cursor-pointer font-medium disabled:cursor-not-allowed"
+                                    className="hover:opacity-80 transition-opacity"
                                   >
-                                    {refundBusyOrderId === Number(orderID)
-                                      ? t('profile.orders.requestRefundLoading')
-                                      : t('profile.orders.requestRefund')}
-                                  </button>
-                                ) : (
-                                  <button style={{ color: T.gold }} className="hover:underline font-medium">
-                                    {t('profile.orders.requestReturn')}
+                                    {t('profile.orders.cancelOrder')}
                                   </button>
                                 )}
-                              </>
-                            )}
-                          </span>
-                          <div className="flex flex-wrap items-center gap-3">
-                            {canCancel && (
-                              <button
-                                type="button"
-                                onClick={() => void handleCancelOrder(order)}
-                                style={{
-                                  border: `1px solid ${T.onSurface}20`,
-                                  color: '#ef4444',
-                                  background: 'transparent',
-                                  borderRadius: '0.6rem',
-                                  padding: '0.4rem 0.75rem',
-                                  fontSize: '0.75rem',
-                                  fontWeight: 600,
-                                }}
-                                className="hover:opacity-80 transition-opacity"
-                              >
-                                {t('profile.orders.cancelOrder')}
-                              </button>
-                            )}
-                            {order.paymentMethod ? (
-                              <span
-                                style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}
-                                className="max-w-[200px] truncate sm:max-w-none"
-                              >
-                                {t('profile.orders.paymentLabel')}:{' '}
-                                {translatePaymentMethod(t, order.paymentMethod)}
-                              </span>
-                            ) : null}
-                            {order.shippingStatus ? (
-                              <span
-                                style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}
-                                className="max-w-[220px] truncate sm:max-w-none"
-                              >
-                                {t('profile.orders.shippingStatusLabel')}:{' '}
-                                {translateShippingStatus(t, order.shippingStatus)}
-                              </span>
-                            ) : null}
-                            <Wallet size={18} style={{ color: T.gold }} />
-                            <span style={{ color: T.onSurfaceVariant, fontSize: '0.82rem' }}>
-                              {t('profile.orders.subtotalLabel')}:
-                            </span>
-                            <span
-                              style={{
-                                fontFamily: "'Manrope', sans-serif",
-                                color: T.gold,
-                                fontWeight: 800,
-                                fontSize: '1.25rem',
-                                letterSpacing: '-0.02em',
-                              }}
-                            >
-                              {formatPrice(Number(order.total_Amount))}
-                            </span>
-                          </div>
-                        </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                )}
+                                {order.paymentMethod ? (
+                                  <span
+                                    style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}
+                                    className="max-w-[200px] truncate sm:max-w-none"
+                                  >
+                                    {t('profile.orders.paymentLabel')}:{' '}
+                                    {translatePaymentMethod(t, order.paymentMethod)}
+                                  </span>
+                                ) : null}
+                                {order.shippingStatus ? (
+                                  <span
+                                    style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}
+                                    className="max-w-[220px] truncate sm:max-w-none"
+                                  >
+                                    {t('profile.orders.shippingStatusLabel')}:{' '}
+                                    {translateShippingStatus(t, order.shippingStatus)}
+                                  </span>
+                                ) : null}
+                                <Wallet size={18} style={{ color: T.gold }} />
+                                <span style={{ color: T.onSurfaceVariant, fontSize: '0.82rem' }}>
+                                  {t('profile.orders.subtotalLabel')}:
+                                </span>
+                                <span
+                                  style={{
+                                    fontFamily: "'Manrope', sans-serif",
+                                    color: T.gold,
+                                    fontWeight: 800,
+                                    fontSize: '1.25rem',
+                                    letterSpacing: '-0.02em',
+                                  }}
+                                >
+                                  {formatPrice(Number(order.total_Amount))}
+                                </span>
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -1822,7 +1943,9 @@ const ProfilePage: React.FC = () => {
               </div>
               {walletTransactions.length === 0 ? (
                 <p style={{ color: T.onSurfaceVariant, fontSize: '0.8rem', opacity: 0.8 }}>
-                  {isWalletApiDisabled ? t('profile.wallet.apiNotAvailableHint') : t('profile.wallet.noTransactions')}
+                  {isWalletApiDisabled
+                    ? t('profile.wallet.apiNotAvailableHint')
+                    : t('profile.wallet.noTransactions')}
                 </p>
               ) : (
                 <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
@@ -1840,24 +1963,33 @@ const ProfilePage: React.FC = () => {
                           )}
                         </p>
                         <p style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}>
-                          {tx.createdAt ? new Date(tx.createdAt).toLocaleString(walletDateLocale) : ''}
+                          {tx.createdAt
+                            ? new Date(tx.createdAt).toLocaleString(walletDateLocale)
+                            : ''}
                         </p>
                       </div>
                       <div className="text-right">
                         <p
                           style={{
-                            color: String(tx.type || '').toUpperCase() === 'SPEND' ? '#ef4444' : '#22c55e',
+                            color:
+                              String(tx.type || '').toUpperCase() === 'SPEND'
+                                ? '#ef4444'
+                                : '#22c55e',
                             fontWeight: 700,
                             fontSize: '0.8rem',
                           }}
                         >
                           {String(tx.type || '').toUpperCase() === 'SPEND' ? '-' : '+'}
-                          {Number(((tx as any).amountCoin ?? tx.amountXu) || 0).toLocaleString(walletDateLocale)}{' '}
+                          {Number(((tx as any).amountCoin ?? tx.amountXu) || 0).toLocaleString(
+                            walletDateLocale,
+                          )}{' '}
                           {t('profile.wallet.coinSuffix')}
                         </p>
                         <p style={{ color: T.onSurfaceVariant, fontSize: '0.72rem' }}>
                           {t('profile.wallet.balanceLabel')}{' '}
-                          {Number(((tx as any).balanceCoin ?? tx.balanceAfter) || 0).toLocaleString(walletDateLocale)}{' '}
+                          {Number(((tx as any).balanceCoin ?? tx.balanceAfter) || 0).toLocaleString(
+                            walletDateLocale,
+                          )}{' '}
                           {t('profile.wallet.coinSuffix')}
                         </p>
                       </div>

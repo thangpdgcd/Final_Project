@@ -7,7 +7,11 @@ import { useAppTranslation } from '@/hooks/useAppTranslation';
 import { OrderItemActions, OrderItemImage, type OrderItemRowAction } from './OrderItemActions';
 
 const formatPrice = (v: number) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v || 0);
+  new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(v || 0);
 
 export type OrderItemCardProps = {
   raw: any;
@@ -25,10 +29,13 @@ export const OrderItemCard = forwardRef<HTMLDivElement, OrderItemCardProps>(func
   ref,
 ) {
   const { t } = useAppTranslation();
-  const productId = Number(raw?.product_ID ?? raw?.productId ?? raw?.products?.product_ID ?? raw?.products?.id);
+  const productId = Number(
+    raw?.product_ID ?? raw?.productId ?? raw?.products?.product_ID ?? raw?.products?.id,
+  );
   const quantity = Number(raw?.quantity ?? 0);
   const unitPrice = Number(raw?.price ?? 0);
-  const fallbackProduct = Number.isFinite(productId) && productId > 0 ? productMap.get(productId) : undefined;
+  const fallbackProduct =
+    Number.isFinite(productId) && productId > 0 ? productMap.get(productId) : undefined;
 
   const apiName = String(raw?.products?.name ?? fallbackProduct?.name ?? '');
   const name =
@@ -37,9 +44,7 @@ export const OrderItemCard = forwardRef<HTMLDivElement, OrderItemCardProps>(func
       : t('order.productFallback', { id: '—' });
 
   const image =
-    raw?.products?.image ??
-    (fallbackProduct as any)?.image ??
-    (fallbackProduct as any)?.imageUrl;
+    raw?.products?.image ?? (fallbackProduct as any)?.image ?? (fallbackProduct as any)?.imageUrl;
 
   const rowKey = String(raw?.orderitem_ID ?? `${orderId}-${productId}-${idx}`);
   const qtySafe = Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
@@ -80,13 +85,17 @@ export const OrderItemCard = forwardRef<HTMLDivElement, OrderItemCardProps>(func
             <p className="truncate text-sm font-medium text-stone-800 transition-colors group-hover:text-stone-900 dark:text-stone-100 dark:group-hover:text-white">
               {name}
             </p>
-            <p className="flex-shrink-0 text-sm font-semibold text-[#ee4d2d]">{formatPrice(unitPrice)}</p>
+            <p className="flex-shrink-0 text-sm font-semibold text-[#ee4d2d]">
+              {formatPrice(unitPrice)}
+            </p>
           </div>
           <div className="mt-1 flex items-center justify-between text-xs text-stone-500 dark:text-stone-400">
             <span className="inline-flex items-center rounded-md bg-stone-100 px-2 py-0.5 font-medium tabular-nums dark:bg-stone-800/80">
               ×{qtySafe}
             </span>
-            <span className="font-semibold text-stone-700 dark:text-stone-200">{formatPrice(unitPrice * qtySafe)}</span>
+            <span className="font-semibold text-stone-700 dark:text-stone-200">
+              {formatPrice(unitPrice * qtySafe)}
+            </span>
           </div>
         </div>
       </div>
@@ -104,4 +113,3 @@ export const OrderItemCard = forwardRef<HTMLDivElement, OrderItemCardProps>(func
 });
 
 OrderItemCard.displayName = 'OrderItemCard';
-

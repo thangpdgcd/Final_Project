@@ -19,4 +19,3 @@ export const WidgetThreadSkeleton: React.FC = () => {
     </div>
   );
 };
-

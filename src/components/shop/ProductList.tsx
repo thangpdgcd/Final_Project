@@ -45,43 +45,52 @@ const ProductList = ({ products, viewMode, selectedId, onSelect }: ProductListPr
         {products.map((p) => {
           const displayName = translatedShopProductName(t, p);
           return (
-          <motion.button
-            key={p.id}
-            type="button"
-            onClick={() => onSelect?.(p)}
-            whileHover={{ y: -1 }}
-            className={[
-              'overflow-hidden rounded-md border text-left',
-              'border-[color:color-mix(in_srgb,var(--hl-outline-variant)_25%,transparent)] bg-[color:var(--hl-surface-lowest)]',
-              'shadow-[var(--hl-ambient-shadow)] transition-shadow hover:shadow-[var(--hl-ambient-shadow-hover)]',
-              selectedId === p.id ? 'ring-2 ring-[color:color-mix(in_srgb,var(--hl-primary)_45%,transparent)]' : '',
-            ].join(' ')}
-          >
-            <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[160px_1fr]">
-              <img src={p.image} alt={displayName} className="h-full w-full object-cover" loading="lazy" />
-              <div className="flex items-start justify-between gap-4 p-3 sm:p-4">
-                <div>
-                  <div
-                    className="text-sm font-medium text-[color:var(--hl-primary)]"
-                    style={{ fontFamily: 'var(--font-highland-display)' }}
-                  >
-                    {displayName}
-                  </div>
-                  <div className="mt-1">
-                    <Rating value={p.rating} />
-                  </div>
-                  {typeof p.discount === 'number' && (
-                    <div className="mt-2 inline-flex items-center rounded-full bg-[color:var(--hl-primary)] px-3 py-1 text-xs font-semibold text-[color:var(--hl-on-primary)]">
-                      -{p.discount}%
+            <motion.button
+              key={p.id}
+              type="button"
+              onClick={() => onSelect?.(p)}
+              whileHover={{ y: -1 }}
+              className={[
+                'overflow-hidden rounded-md border text-left',
+                'border-[color:color-mix(in_srgb,var(--hl-outline-variant)_25%,transparent)] bg-[color:var(--hl-surface-lowest)]',
+                'shadow-[var(--hl-ambient-shadow)] transition-shadow hover:shadow-[var(--hl-ambient-shadow-hover)]',
+                selectedId === p.id
+                  ? 'ring-2 ring-[color:color-mix(in_srgb,var(--hl-primary)_45%,transparent)]'
+                  : '',
+              ].join(' ')}
+            >
+              <div className="grid grid-cols-[120px_1fr] sm:grid-cols-[160px_1fr]">
+                <img
+                  src={p.image}
+                  alt={displayName}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+                <div className="flex items-start justify-between gap-4 p-3 sm:p-4">
+                  <div>
+                    <div
+                      className="text-sm font-medium text-[color:var(--hl-primary)]"
+                      style={{ fontFamily: 'var(--font-highland-display)' }}
+                    >
+                      {displayName}
                     </div>
-                  )}
-                </div>
-                <div className="text-right">
-                  <div className="hl-sans text-sm font-semibold text-[color:var(--hl-primary)]">{format(p.priceUSD)}</div>
+                    <div className="mt-1">
+                      <Rating value={p.rating} />
+                    </div>
+                    {typeof p.discount === 'number' && (
+                      <div className="mt-2 inline-flex items-center rounded-full bg-[color:var(--hl-primary)] px-3 py-1 text-xs font-semibold text-[color:var(--hl-on-primary)]">
+                        -{p.discount}%
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <div className="hl-sans text-sm font-semibold text-[color:var(--hl-primary)]">
+                      {format(p.priceUSD)}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.button>
+            </motion.button>
           );
         })}
       </div>

@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     tailwindcss(),
@@ -17,10 +17,21 @@ export default defineConfig({
   server: {
     port: 5173,
     open: true,
+    headers: {
+      // Needed for Google Sign-In popup communication in some browsers.
+      // Avoids `Cross-Origin-Opener-Policy policy would block window.postMessage`.
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    },
+  },
+  preview: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    },
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    // Sourcemaps are helpful in dev but add weight/leakage in production.
+    sourcemap: mode === 'development',
     rollupOptions: {
       output: {
         manualChunks: {
@@ -31,4 +42,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

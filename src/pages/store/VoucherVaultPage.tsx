@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { Copy, ShoppingCart, TicketPercent, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useVoucherVaultStore } from '@/features/voucher/store/useVoucherVaultStore';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/store/ThemeContext';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 const formatTime = (ms: number) => {
   try {
@@ -14,6 +17,9 @@ const formatTime = (ms: number) => {
 
 const VoucherVaultPage = () => {
   const navigate = useNavigate();
+  useDocumentTitle('pages.vouchers.documentTitle');
+  const { t } = useTranslation();
+  const { dark } = useTheme();
   const vouchers = useVoucherVaultStore((s) => s.vouchers);
   const hydrate = useVoucherVaultStore((s) => s.hydrate);
   const remove = useVoucherVaultStore((s) => s.remove);
@@ -24,7 +30,14 @@ const VoucherVaultPage = () => {
   }, [hydrate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+    <div
+      className={[
+        'min-h-screen',
+        dark
+          ? 'bg-gradient-to-br from-[#0b0b10] via-[#101018] to-[#140b05] text-white'
+          : 'bg-gradient-to-br from-orange-50 via-white to-amber-50 text-slate-900',
+      ].join(' ')}
+    >
       <div className="mx-auto max-w-5xl px-4 py-10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
@@ -33,9 +46,11 @@ const VoucherVaultPage = () => {
                 <TicketPercent className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-2xl font-black tracking-tight text-slate-900">Kho Voucher</h1>
-                <p className="mt-1 text-sm text-slate-500">
-                  Voucher nhận từ tin nhắn nhân viên sẽ tự lưu ở đây. Bạn có thể copy để áp dụng khi thanh toán.
+                <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                  {t('profile.sidebar.vouchers')}
+                </h1>
+                <p className="mt-1 text-sm text-slate-500 dark:text-white/65">
+                  {t('vouchers.subtitle')}
                 </p>
               </div>
             </div>
@@ -47,24 +62,26 @@ const VoucherVaultPage = () => {
               onClick={() => navigate('/cart')}
               className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-700"
             >
-              Đi tới giỏ hàng
+              {t('vouchers.goToCart')}
             </button>
             <button
               type="button"
               onClick={clear}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-orange-200 hover:text-orange-700"
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-orange-200 hover:text-orange-700 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:hover:border-white/20"
             >
-              Xóa tất cả
+              {t('vouchers.clearAll')}
             </button>
           </div>
         </div>
 
         <div className="mt-8">
           {vouchers.length === 0 ? (
-            <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-              <p className="text-sm font-semibold text-slate-700">Chưa có voucher nào</p>
-              <p className="mt-2 text-xs text-slate-400">
-                Khi nhân viên gửi voucher qua chat, mã sẽ tự động lưu tại đây.
+            <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm dark:border-white/10 dark:bg-white/5">
+              <p className="text-sm font-semibold text-slate-700 dark:text-white/85">
+                {t('vouchers.emptyTitle')}
+              </p>
+              <p className="mt-2 text-xs text-slate-400 dark:text-white/50">
+                {t('vouchers.emptySubtitle')}
               </p>
             </div>
           ) : (
@@ -74,14 +91,16 @@ const VoucherVaultPage = () => {
                   key={v.id}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-col gap-3 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:border-white/10 dark:bg-white/5"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <code className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-black text-amber-700">
                         {v.code}
                       </code>
-                      <span className="text-xs text-slate-400">Nhận lúc {formatTime(v.receivedAt)}</span>
+                      <span className="text-xs text-slate-400">
+                        {t('vouchers.receivedAt', { time: formatTime(v.receivedAt) })}
+                      </span>
                     </div>
                     {v.message && <div className="mt-2 text-sm text-slate-600">{v.message}</div>}
                   </div>
@@ -100,7 +119,7 @@ const VoucherVaultPage = () => {
                       className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-3 py-2 text-sm font-bold text-white shadow-md shadow-orange-500/20 hover:bg-orange-700"
                     >
                       <ShoppingCart className="h-4 w-4" />
-                      Dùng ở giỏ
+                      {t('vouchers.useInCart')}
                     </button>
                     <button
                       type="button"
@@ -111,7 +130,7 @@ const VoucherVaultPage = () => {
                           // ignore
                         }
                       }}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-orange-200 hover:text-orange-700"
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-orange-200 hover:text-orange-700 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:hover:border-white/20"
                     >
                       <Copy className="h-4 w-4" />
                       Copy
@@ -119,10 +138,10 @@ const VoucherVaultPage = () => {
                     <button
                       type="button"
                       onClick={() => remove(v.id)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-red-200 hover:text-red-700"
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-red-200 hover:text-red-700 dark:border-white/10 dark:bg-white/5 dark:text-white/80 dark:hover:border-red-500/40"
                     >
                       <Trash2 className="h-4 w-4" />
-                      Xóa
+                      {t('common.delete')}
                     </button>
                   </div>
                 </motion.div>
@@ -136,4 +155,3 @@ const VoucherVaultPage = () => {
 };
 
 export default VoucherVaultPage;
-

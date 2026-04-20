@@ -26,4 +26,3 @@ export const SupportWidgetButton: React.FC<Props> = ({ unreadCount, onClick }) =
     </button>
   );
 };
-

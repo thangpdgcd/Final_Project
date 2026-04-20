@@ -165,7 +165,11 @@ export const blogs: BlogPost[] = [
       sections: [
         {
           title: 'Profile vị thường gặp',
-          bullets: ['Cacao, hạt dẻ, caramel', 'Body tròn, hậu vị sạch', 'Rất hợp phin, espresso blend và cold brew'],
+          bullets: [
+            'Cacao, hạt dẻ, caramel',
+            'Body tròn, hậu vị sạch',
+            'Rất hợp phin, espresso blend và cold brew',
+          ],
         },
         {
           title: 'Yếu tố tạo nên khác biệt',
@@ -209,4 +213,3 @@ export const blogs: BlogPost[] = [
       'https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1400&q=80',
   },
 ];
-

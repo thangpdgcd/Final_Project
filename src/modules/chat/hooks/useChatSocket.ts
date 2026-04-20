@@ -124,7 +124,9 @@ export const useChatSocket = ({ enabled, myRef }: Options) => {
         sender: { id: 'system', name: 'System', role: 'admin' },
         createdAt: Date.now(),
       };
-      useChatStore.getState().appendMessage({ roomId, message: sysMessage }, { incrementUnreadIfNotSelected: true });
+      useChatStore
+        .getState()
+        .appendMessage({ roomId, message: sysMessage }, { incrementUnreadIfNotSelected: true });
     };
 
     socket.on('action_event', onActionResult);
@@ -157,4 +159,3 @@ export const useChatSocket = ({ enabled, myRef }: Options) => {
     useChatStore.getState().setConnectionStatus('disconnected');
   }, [enabled]);
 };
-

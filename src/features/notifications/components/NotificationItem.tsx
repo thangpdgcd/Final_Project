@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle2, Info, AlertTriangle, XCircle, ShoppingBag, Sparkles } from 'lucide-react';
 import type { AppNotification } from '../types';
 import { formatTimeAgo } from '../lib/time';
+import { useTranslation } from 'react-i18next';
 
 const typeIcon = (type: AppNotification['type']) => {
   switch (type) {
@@ -28,6 +29,15 @@ type Props = {
 };
 
 const NotificationItem: React.FC<Props> = ({ item, onClick }) => {
+  const { t } = useTranslation();
+  const orderId = Number((item.meta as any)?.orderId ?? 0);
+  const message =
+    item.type === 'order'
+      ? t(
+          'notifications.templates.orderCreated',
+          Number.isFinite(orderId) && orderId > 0 ? { id: orderId } : undefined,
+        )
+      : item.message;
   return (
     <button
       type="button"
@@ -44,11 +54,13 @@ const NotificationItem: React.FC<Props> = ({ item, onClick }) => {
           <p
             className={[
               'text-sm leading-snug',
-              item.read ? 'text-stone-600 dark:text-white/65' : 'text-stone-900 dark:text-white font-semibold',
+              item.read
+                ? 'text-stone-600 dark:text-white/65'
+                : 'text-stone-900 dark:text-white font-semibold',
               'break-words',
             ].join(' ')}
           >
-            {item.message}
+            {message}
           </p>
           {!item.read && (
             <span className="mt-1 h-2 w-2 rounded-full bg-[var(--gold)] flex-shrink-0" />
@@ -63,4 +75,3 @@ const NotificationItem: React.FC<Props> = ({ item, onClick }) => {
 };
 
 export default NotificationItem;
-

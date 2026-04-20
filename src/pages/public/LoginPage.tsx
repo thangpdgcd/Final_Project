@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,6 +10,10 @@ import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/AuthContext';
 import { authService } from '@/features/auth';
+import { authService as googleAuthService } from '@/services/authService';
+import { GoogleButton } from '@/components/GoogleButton';
+import api, { setAccessToken } from '@/api/axiosInstance';
+import axios, { type AxiosResponse } from 'axios';
 import Logo from '@/components/common/Logo';
 import EditorialPageShell from '@/components/layout/EditorialPageShell';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
@@ -21,10 +25,7 @@ const IMG_AUTH_PANEL = cloudinaryImg('v1775892150/99e2e916-6c84-475a-b4e9-418ff6
 
 const createLoginSchema = (t: (key: string) => string) =>
   z.object({
-    email: z
-      .string()
-      .min(1, t('auth.loginEmailRequired'))
-      .email(t('auth.loginEmailInvalid')),
+    email: z.string().min(1, t('auth.loginEmailRequired')).email(t('auth.loginEmailInvalid')),
     password: z.string().min(1, t('auth.loginPasswordRequired')),
     remember: z.boolean().optional(),
   });
@@ -35,6 +36,7 @@ const LoginPage: React.FC = () => {
   const { t } = useTranslation();
   const { login, isAuthenticated } = useAuth();
   const didRedirectRef = useRef(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   useDocumentTitle('pages.login.documentTitle');
 
@@ -76,20 +78,20 @@ const LoginPage: React.FC = () => {
         return;
       }
 
-      const directErrorMessage = error instanceof Error ? error.message : '';
-      const respData = (error as any)?.response?.data;
-      const responseMessage =
-        typeof respData === 'string'
-          ? respData
-          : typeof respData?.message === 'string'
-            ? respData.message
-            : typeof respData?.error === 'string'
-              ? respData.error
-              : '';
+      let msg = fallbackMessage;
+      if (axios.isAxiosError(error)) {
+        const data = error.response?.data as unknown;
+        if (typeof data === 'string') msg = data;
+        if (data && typeof data === 'object') {
+          const obj = data as Record<string, unknown>;
+          if (typeof obj.message === 'string') msg = obj.message;
+          else if (typeof obj.error === 'string') msg = obj.error;
+        }
+      } else if (error instanceof Error && error.message) {
+        msg = error.message;
+      }
 
-      const errorMessage = String(responseMessage || directErrorMessage || fallbackMessage).trim();
-
-      messageApi.error(errorMessage);
+      messageApi.error(String(msg).trim());
     },
   });
 
@@ -108,6 +110,88 @@ const LoginPage: React.FC = () => {
     loginMutation.mutate({ email: values.email, password: values.password });
   };
 
+  const handleGoogleToken = async (token: string | null) => {
+    if (!token) {
+      messageApi.error(t('auth.loginError'));
+      return;
+    }
+    try {
+      setGoogleLoading(true);
+      const { accessToken, user } = await googleAuthService.googleLogin(token);
+      if (!accessToken) {
+        messageApi.error(t('auth.loginError'));
+        return;
+      }
+
+      // Ensure our axios client has the token, so /me can be fetched immediately.
+      setAccessToken(accessToken);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('token', accessToken);
+
+      let finalUser: unknown = user ?? null;
+      if (!finalUser) {
+        const pickUserFromResponse = (res: AxiosResponse<unknown> | null): unknown => {
+          const data = res?.data;
+          if (!data || typeof data !== 'object') return null;
+          const root = data as Record<string, unknown>;
+          const directUser = root.user;
+          if (directUser) return directUser;
+          const nested = root.data;
+          if (nested && typeof nested === 'object') {
+            const nestedObj = nested as Record<string, unknown>;
+            return nestedObj.user ?? nestedObj ?? null;
+          }
+          return null;
+        };
+
+        // Backend might return JWT only → fetch the current user.
+        const candidates = ['/users/me', '/me'];
+        let res: AxiosResponse<unknown> | null = null;
+        for (const url of candidates) {
+          try {
+            res = (await api.get(url)) as AxiosResponse<unknown>;
+            break;
+          } catch (err) {
+            if (axios.isAxiosError(err)) {
+              const status = err.response?.status;
+              if (status === 404) continue;
+            }
+            throw err;
+          }
+        }
+        finalUser = pickUserFromResponse(res);
+      }
+
+      // Enforce the app rule: only roleID=1 can sign in.
+      const u = finalUser && typeof finalUser === 'object' ? (finalUser as Record<string, unknown>) : null;
+      const roleID = String((u?.roleID ?? u?.roleId ?? u?.role ?? '') as unknown).trim();
+      if (!roleID || roleID !== '1') {
+        messageApi.error(t('auth.roleNotAllowed'));
+        return;
+      }
+
+      login(accessToken, finalUser as AuthUser);
+      messageApi.success(t('auth.loginSuccess'));
+      navigate('/', { replace: true });
+    } catch (e: unknown) {
+      let msg = t('auth.loginError');
+      if (axios.isAxiosError(e)) {
+        const data = e.response?.data as unknown;
+        if (typeof data === 'string') msg = data;
+        if (data && typeof data === 'object') {
+          const obj = data as Record<string, unknown>;
+          if (typeof obj.message === 'string') msg = obj.message;
+          else if (typeof obj.error === 'string') msg = obj.error;
+        }
+      } else if (e instanceof Error && e.message) {
+        msg = e.message;
+      }
+      messageApi.error(String(msg));
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   return (
     <EditorialPageShell innerClassName="min-h-[calc(100vh-6rem)]">
       <div className="grid min-h-[inherit] grid-cols-1 lg:grid-cols-2">
@@ -119,7 +203,11 @@ const LoginPage: React.FC = () => {
         >
           <div className="contact-form-card mx-auto w-full max-w-md rounded-md p-8 sm:p-10">
             <div className="mb-8 flex items-center gap-3 lg:hidden">
-              <Logo size={40} showText={false} className="rounded-full ring-1 ring-[color:color-mix(in_srgb,var(--hl-outline-variant)_40%,transparent)]" />
+              <Logo
+                size={40}
+                showText={false}
+                className="rounded-full ring-1 ring-[color:color-mix(in_srgb,var(--hl-outline-variant)_40%,transparent)]"
+              />
               <span className="hl-sans text-sm font-semibold uppercase tracking-[0.18em] text-[color:var(--hl-secondary)]">
                 {t('common.brandName')}
               </span>
@@ -175,15 +263,26 @@ const LoginPage: React.FC = () => {
 
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <label className="hl-sans flex cursor-pointer items-center gap-2 text-sm text-[color:color-mix(in_srgb,var(--hl-on-surface)_75%,transparent)]">
-                  <input {...register('remember')} type="checkbox" className="h-4 w-4 accent-[color:var(--hl-primary)]" />
+                  <input
+                    {...register('remember')}
+                    type="checkbox"
+                    className="h-4 w-4 accent-[color:var(--hl-primary)]"
+                  />
                   {t('auth.rememberMe')}
                 </label>
-                <button type="button" className="hl-sans text-sm font-semibold text-[color:var(--hl-primary)] hover:underline underline-offset-4">
+                <button
+                  type="button"
+                  className="hl-sans text-sm font-semibold text-[color:var(--hl-primary)] hover:underline underline-offset-4"
+                >
                   {t('auth.forgotPassword')}
                 </button>
               </div>
 
-              <button type="submit" disabled={loginMutation.isPending} className="btn-highland-primary w-full disabled:opacity-50">
+              <button
+                type="submit"
+                disabled={loginMutation.isPending}
+                className="btn-highland-primary w-full disabled:opacity-50"
+              >
                 {loginMutation.isPending ? t('auth.authenticating') : t('auth.exploreTaste')}
               </button>
             </form>
@@ -201,17 +300,44 @@ const LoginPage: React.FC = () => {
                   { icon: <Facebook size={20} />, titleKey: 'auth.loginSocialFacebook' },
                   { icon: <Chrome size={20} />, titleKey: 'auth.loginSocialGoogle' },
                   { icon: <Instagram size={20} />, titleKey: 'auth.loginSocialInstagram' },
-                ].map((social, i) => (
-                  <button key={i} type="button" title={t(social.titleKey)} className="contact-social-btn flex h-14 items-center justify-center">
-                    {social.icon}
-                  </button>
-                ))}
+                ].map((social, i) => {
+                  if (social.titleKey === 'auth.loginSocialGoogle') {
+                    return (
+                      <div
+                        key={i}
+                        title={t(social.titleKey)}
+                        className="contact-social-btn flex h-14 items-center justify-center p-0"
+                      >
+                        <GoogleButton
+                          onToken={handleGoogleToken}
+                          loading={googleLoading}
+                          disabled={googleLoading || loginMutation.isPending}
+                          className="scale-[0.92] origin-center"
+                        />
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      title={t(social.titleKey)}
+                      className="contact-social-btn flex h-14 items-center justify-center"
+                    >
+                      {social.icon}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             <p className="hl-sans mt-10 text-center text-sm text-[color:color-mix(in_srgb,var(--hl-on-surface)_65%,transparent)]">
               {t('auth.noAccount')}{' '}
-              <Link to="/register" className="font-semibold text-[color:var(--hl-primary)] hover:underline underline-offset-4">
+              <Link
+                to="/register"
+                className="font-semibold text-[color:var(--hl-primary)] hover:underline underline-offset-4"
+              >
                 {t('auth.joinNow')}
               </Link>
             </p>
@@ -244,7 +370,9 @@ const LoginPage: React.FC = () => {
                 style={{ fontFamily: 'var(--font-highland-display)' }}
               >
                 {t('auth.loginBannerTitlePrefix')}{' '}
-                <span className="text-[color:var(--hl-secondary)]">{t('auth.loginBannerTitleHighlight')}</span>
+                <span className="text-[color:var(--hl-secondary)]">
+                  {t('auth.loginBannerTitleHighlight')}
+                </span>
               </p>
               <p className="hl-sans mt-4 text-sm leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_75%,transparent)]">
                 {t('auth.loginBannerQuote')}
@@ -258,4 +386,3 @@ const LoginPage: React.FC = () => {
 };
 
 export default LoginPage;
-

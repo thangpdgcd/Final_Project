@@ -1,36 +1,32 @@
-import axios from "axios";
+import axios from 'axios';
 
 function normalizeApiBaseUrl(raw: string): string {
   let v = raw.trim();
-  v = v.replace(/\/+$/, "");
+  v = v.replace(/\/+$/, '');
   if (!/^https?:\/\//i.test(v)) v = `https://${v}`;
   return v;
 }
 
-const apiHost =
-  (import.meta.env.VITE_API_URL as string | undefined) || process.env.VITE_API_URL;
+const apiHost = (import.meta.env.VITE_API_URL as string | undefined) || process.env.VITE_API_URL;
 
 const apiBase = (() => {
-  const fallback = "http://localhost:8080/api";
+  const fallback = 'http://localhost:8080/api';
   const host = apiHost ? normalizeApiBaseUrl(apiHost) : fallback;
-  const trimmed = String(host).replace(/\/+$/, "");
-  return trimmed.endsWith("/api") ? trimmed : `${trimmed}/api`;
+  const trimmed = String(host).replace(/\/+$/, '');
+  return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
 })();
 
-const postWithFallback = async <T,>(
-  paths: string[],
-  payload: unknown,
-): Promise<T> => {
+const postWithFallback = async <T,>(paths: string[], payload: unknown): Promise<T> => {
   const looksLikeMissingRoute = (raw: unknown) => {
-    const text = typeof raw === "string" ? raw : (raw as any)?.message;
-    if (typeof text !== "string") return false;
+    const text = typeof raw === 'string' ? raw : (raw as any)?.message;
+    if (typeof text !== 'string') return false;
     const t = text.toLowerCase().trim();
     return (
-      t.includes("cannot post") ||
-      t.includes("cannot get") ||
-      t.includes("route") ||
-      t.includes("endpoint") ||
-      t.includes("no route")
+      t.includes('cannot post') ||
+      t.includes('cannot get') ||
+      t.includes('route') ||
+      t.includes('endpoint') ||
+      t.includes('no route')
     );
   };
   let lastErr: unknown;
@@ -43,26 +39,26 @@ const postWithFallback = async <T,>(
       const status = (err as any)?.response?.status;
       const data = (err as any)?.response?.data;
       const msg =
-        (typeof data === "string" ? data : null) ??
+        (typeof data === 'string' ? data : null) ??
         data?.message ??
         data?.error ??
         data?.data?.message ??
         data?.result?.message ??
-        "";
-      const msgLower = String(msg || "").toLowerCase();
+        '';
+      const msgLower = String(msg || '').toLowerCase();
 
       // Try next endpoint only when it looks like a missing/blocked route.
       if (status === 404 && looksLikeMissingRoute(data)) continue;
-      if ((status === 401 || status === 403) && msgLower.includes("not authorized")) continue;
+      if ((status === 401 || status === 403) && msgLower.includes('not authorized')) continue;
       throw err;
     }
   }
-  throw lastErr ?? new Error("AUTH_ENDPOINT_NOT_FOUND");
+  throw lastErr ?? new Error('AUTH_ENDPOINT_NOT_FOUND');
 };
 
 const axiosWithCreds = axios.create({
   withCredentials: true,
-  headers: { "Content-Type": "application/json" },
+  headers: { 'Content-Type': 'application/json' },
 });
 
 export interface LoginPayload {
@@ -92,17 +88,9 @@ export interface RegisterResponse {
 
 export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
   // withCredentials is required so browser can store HttpOnly refresh cookies cross-site
-  return await postWithFallback<LoginResponse>(
-    ["/login"],
-    payload,
-  );
+  return await postWithFallback<LoginResponse>(['/login'], payload);
 };
 
-export const register = async (
-  payload: RegisterPayload
-): Promise<RegisterResponse> => {
-  return await postWithFallback<RegisterResponse>(
-    ["/register"],
-    payload,
-  );
+export const register = async (payload: RegisterPayload): Promise<RegisterResponse> => {
+  return await postWithFallback<RegisterResponse>(['/register'], payload);
 };

@@ -23,4 +23,3 @@ const Badge: React.FC<BadgeProps> = React.memo(({ label, variant = 'bestSeller' 
 Badge.displayName = 'Badge';
 
 export default Badge;
-

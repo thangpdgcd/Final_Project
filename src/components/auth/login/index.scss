@@ -1,8 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap');
 
 .login-layout {
   min-height: 100vh;
-  --font-brand: "Viaoda Libre", serif;
+  --font-brand: 'Viaoda Libre', serif;
 
   /* ================= HEADER ================= */
   .pc-header.pc-header--clean {
@@ -39,7 +39,7 @@
 
   /* ================= CARD ================= */
   .login-card {
-  height: 560px;
+    height: 560px;
     width: 1080px;
     margin: auto;
 
@@ -240,7 +240,7 @@
     background-repeat: no-repeat;
 
     &::before {
-      content: "";
+      content: '';
       position: absolute;
       inset: 0;
       background: linear-gradient(

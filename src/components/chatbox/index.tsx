@@ -7,18 +7,12 @@ import { useTheme } from '@/store/ThemeContext';
 type AnyUser = Record<string, any> | null | undefined;
 
 const safeUserFields = (user: AnyUser) => {
-  const id =
-    user?.id ??
-    user?.user_ID ??
-    user?.userId ??
-    user?.userid ??
-    user?.email ??
-    'user';
+  const id = user?.id ?? user?.user_ID ?? user?.userId ?? user?.userid ?? user?.email ?? 'user';
   const name = user?.name ?? user?.fullName ?? user?.username ?? user?.email ?? 'User';
   const email = user?.email ?? '';
   const photoUrl = user?.avatar ?? user?.photoUrl ?? user?.image ?? undefined;
   return { id: String(id), name: String(name), email: String(email), photoUrl };
-}
+};
 
 interface ChatboxProps {
   loggedInUser?: AnyUser;
@@ -111,9 +105,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ loggedInUser = null }) => {
       .catch(() => {
         if (!mounted) return;
         setIsInitLoading(false);
-        setInitError(
-          'TalkJS failed to load. Please verify App ID and allow network access.',
-        );
+        setInitError('TalkJS failed to load. Please verify App ID and allow network access.');
         // Intentionally not logging to console to keep UX clean.
       });
 
@@ -121,13 +113,17 @@ const Chatbox: React.FC<ChatboxProps> = ({ loggedInUser = null }) => {
       mounted = false;
       try {
         chatboxRef.current?.destroy?.();
-      } catch { }
+      } catch {
+        // ignore
+      }
       chatboxRef.current = null;
       setChatboxReady(false);
 
       try {
         sessionRef.current?.destroy?.();
-      } catch { }
+      } catch {
+        // ignore
+      }
       sessionRef.current = null;
       setIsInitLoading(false);
     };
@@ -140,7 +136,9 @@ const Chatbox: React.FC<ChatboxProps> = ({ loggedInUser = null }) => {
     if (!containerRef.current) return;
     try {
       chatbox.mount(containerRef.current);
-    } catch { }
+    } catch {
+      // ignore
+    }
   }, [isOpen, chatboxReady]);
 
   if (!appId || !loggedInUser) return null;

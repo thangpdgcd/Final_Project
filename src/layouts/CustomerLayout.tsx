@@ -13,11 +13,7 @@ const CustomerLayout: React.FC = () => {
     <Layout className="min-h-screen">
       <HeaderPage />
       <Content className="pt-24">
-        <Suspense
-          fallback={
-            <PageSpinner />
-          }
-        >
+        <Suspense fallback={<PageSpinner />}>
           <AnimatedOutlet />
         </Suspense>
       </Content>

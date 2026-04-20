@@ -15,7 +15,7 @@ export const useOnlineStaff = ({ enabled, pollMs = 15_000 }: Options) => {
     if (!enabled) return;
 
     let cancelled = false;
-    let timer: any = null;
+    let timer: ReturnType<typeof setInterval> | null = null;
 
     const load = async () => {
       setLoading(true);
@@ -26,8 +26,7 @@ export const useOnlineStaff = ({ enabled, pollMs = 15_000 }: Options) => {
       } catch {
         // silent: avoid spamming users if staff endpoint fails intermittently
       } finally {
-        if (cancelled) return;
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
@@ -44,4 +43,3 @@ export const useOnlineStaff = ({ enabled, pollMs = 15_000 }: Options) => {
 
   return { staff, loading };
 };
-

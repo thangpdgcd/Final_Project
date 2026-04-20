@@ -25,7 +25,7 @@ export function enhanceCloudinaryAvatarUrl(url: string): string {
 export const getImageSrc = (img?: string | null): string => {
   if (!img) return '/no-image.png';
   const v = String(img).trim();
-  
+
   // If it's already a URL or a full data-URI, return it as-is
   if (/^https?:\/\//i.test(v) || v.startsWith('data:image/')) {
     // If the site is https, upgrade http image URLs to https to avoid mixed-content blocks.
@@ -52,12 +52,9 @@ export const getImageSrc = (img?: string | null): string => {
 
   // Allow app-relative/static paths
   if (v.startsWith('/')) return v;
-  
+
   // Only treat as base64 when it clearly looks like one.
-  const looksLikeBase64 =
-    v.length >= 80 &&
-    /^[A-Za-z0-9+/=\s]+$/.test(v) &&
-    !/\s{2,}/.test(v);
+  const looksLikeBase64 = v.length >= 80 && /^[A-Za-z0-9+/=\s]+$/.test(v) && !/\s{2,}/.test(v);
   if (!looksLikeBase64) return '/no-image.png';
 
   // Basic heuristic to detect MIME type from base64 start
@@ -67,12 +64,12 @@ export const getImageSrc = (img?: string | null): string => {
   // GIF: R0lGOD (starts with R0l)
   const head = v.slice(0, 15);
   let mime = 'jpeg'; // Changed to jpeg as default fallback
-  
+
   if (head.includes('iVBOR')) mime = 'png';
   else if (head.includes('/9j/')) mime = 'jpeg';
   else if (head.includes('UklG')) mime = 'webp';
   else if (head.includes('R0lG')) mime = 'gif';
-  
+
   return `data:image/${mime};base64,${v}`;
 };
 

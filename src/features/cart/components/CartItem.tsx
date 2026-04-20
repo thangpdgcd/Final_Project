@@ -42,7 +42,10 @@ const CartItem = React.forwardRef<HTMLDivElement, Props>(
 
           <CartItemAmount amount={linePrice} />
 
-          <CartItemActions onRemove={() => onRemove(item.cartitem_ID)} removeDisabled={isRemoving} />
+          <CartItemActions
+            onRemove={() => onRemove(item.cartitem_ID)}
+            removeDisabled={isRemoving}
+          />
         </div>
       </motion.div>
     );
@@ -52,4 +55,3 @@ const CartItem = React.forwardRef<HTMLDivElement, Props>(
 CartItem.displayName = 'CartItem';
 
 export default CartItem;
-

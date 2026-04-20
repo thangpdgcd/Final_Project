@@ -47,4 +47,3 @@ export const MessageInput: React.FC<Props> = ({ disabled, onSend }) => {
     </div>
   );
 };
-

@@ -132,8 +132,16 @@ export interface CreateOrderPayload {
   total_Amount?: number;
   status?: string;
   shipping_Address?: string;
+  shippingMethod?: 'standard' | 'express' | string;
   paymentMethod?: string;
   paypalCaptureId?: string | null;
+  note?: string;
+  items?: Array<{
+    product_ID?: number;
+    productId?: number;
+    quantity: number;
+    price: number;
+  }>;
 }
 
 export interface OrderItem {

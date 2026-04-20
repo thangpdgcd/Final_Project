@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  type ReactNode,
+} from 'react';
 import type { AuthUser } from '@/types';
 import api, { setAccessToken } from '@/api/axiosInstance';
 import axios from 'axios';
@@ -11,7 +19,6 @@ interface AuthContextType {
   isLoading: boolean;
   login: (accessToken: string, user: AuthUser) => void;
   logout: () => Promise<void>;
-
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -210,8 +217,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-
-
   const value = useMemo<AuthContextType>(
     () => ({
       user,
@@ -219,9 +224,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isLoading,
       login,
       logout,
-
     }),
-    [user, isAuthenticated, isLoading, login, logout,]
+    [user, isAuthenticated, isLoading, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

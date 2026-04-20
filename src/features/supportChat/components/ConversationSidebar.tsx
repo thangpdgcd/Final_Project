@@ -28,7 +28,9 @@ export const ConversationSidebar: React.FC<Props> = ({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return conversations;
-    return conversations.filter((c) => c.title.toLowerCase().includes(q) || String(c.conversationId).includes(q));
+    return conversations.filter(
+      (c) => c.title.toLowerCase().includes(q) || String(c.conversationId).includes(q),
+    );
   }, [conversations, query]);
 
   return (
@@ -88,7 +90,9 @@ export const ConversationSidebar: React.FC<Props> = ({
                   <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-green-500 ring-2 ring-black/60" />
                 </div>
               ))}
-              {staff.length > 8 ? <div className="text-[11px] text-zinc-400 self-center">+{staff.length - 8}</div> : null}
+              {staff.length > 8 ? (
+                <div className="text-[11px] text-zinc-400 self-center">+{staff.length - 8}</div>
+              ) : null}
             </div>
           )}
         </div>
@@ -115,4 +119,3 @@ export const ConversationSidebar: React.FC<Props> = ({
     </div>
   );
 };
-

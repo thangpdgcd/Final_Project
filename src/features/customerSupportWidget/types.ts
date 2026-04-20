@@ -49,18 +49,23 @@ export type SendMessagePayload =
   | {
       conversationId: number;
       recipientUserId?: number;
-      message: { type: 'text'; content: string } | { type: 'action'; action: string; meta?: unknown };
+      message:
+        | { type: 'text'; content: string }
+        | { type: 'action'; action: string; meta?: unknown };
     }
   | {
       recipientUserId: number;
-      message: { type: 'text'; content: string } | { type: 'action'; action: string; meta?: unknown };
+      message:
+        | { type: 'text'; content: string }
+        | { type: 'action'; action: string; meta?: unknown };
     }
   | {
-      message: { type: 'text'; content: string } | { type: 'action'; action: string; meta?: unknown };
+      message:
+        | { type: 'text'; content: string }
+        | { type: 'action'; action: string; meta?: unknown };
     };
 
 export type ReceiveMessagePayload = {
   conversationId: number;
   message: SupportWidgetMessage;
 };
-

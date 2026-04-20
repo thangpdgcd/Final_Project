@@ -95,10 +95,12 @@ export function OrderItemImage({ imageUrl, name }: { imageUrl: string | null; na
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center">
-          <Coffee className="text-stone-300 transition-transform duration-300 group-hover:scale-110 dark:text-stone-600" size={22} />
+          <Coffee
+            className="text-stone-300 transition-transform duration-300 group-hover:scale-110 dark:text-stone-600"
+            size={22}
+          />
         </div>
       )}
     </motion.div>
   );
 }
-

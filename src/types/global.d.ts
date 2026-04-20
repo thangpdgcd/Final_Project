@@ -1,1 +1,1 @@
-declare module "aria-query";
+declare module 'aria-query';

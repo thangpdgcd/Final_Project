@@ -20,4 +20,3 @@ const SkeletonCard: React.FC = React.memo(() => {
 SkeletonCard.displayName = 'SkeletonCard';
 
 export default SkeletonCard;
-

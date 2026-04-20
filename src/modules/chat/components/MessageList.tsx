@@ -27,4 +27,3 @@ export const MessageList: React.FC<Props> = ({ messages, myUserId }) => {
     </div>
   );
 };
-

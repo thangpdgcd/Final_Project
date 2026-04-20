@@ -1,9 +1,8 @@
-
-@import url("https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Viaoda+Libre&display=swap');
 
 .register-layout {
   min-height: 100vh;
-  --font-brand: "Viaoda Libre", serif;
+  --font-brand: 'Viaoda Libre', serif;
 
   /* ===== HEADER: match Login/Home ===== */
   .pc-header.pc-header--clean {
@@ -175,7 +174,7 @@
       system-ui,
       -apple-system,
       BlinkMacSystemFont,
-      "Segoe UI",
+      'Segoe UI',
       sans-serif;
 
     .ant-form-item {
@@ -361,4 +360,3 @@
     }
   }
 }
-

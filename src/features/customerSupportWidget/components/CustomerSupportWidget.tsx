@@ -14,7 +14,8 @@ const FALLBACK_DRAFT_ID = -1;
 
 export const CustomerSupportWidget: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
-  const myUserId = Number((user as any)?.user_ID ?? (user as any)?.userId ?? (user as any)?.id ?? 0) || 0;
+  const myUserId =
+    Number((user as any)?.user_ID ?? (user as any)?.userId ?? (user as any)?.id ?? 0) || 0;
   const enabled = Boolean(isAuthenticated && myUserId);
   const hasHydrated = useSupportWidgetStore((s) => s.hasHydrated);
 
@@ -127,7 +128,7 @@ export const CustomerSupportWidget: React.FC = () => {
     setJoiningConversationId,
   ]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (!enabled) return;
     if (!isOpen) return;
     if (fetchedConversationsRef.current) return;
@@ -194,7 +195,16 @@ export const CustomerSupportWidget: React.FC = () => {
     supportWidgetEvents.joinRoom({});
     setJoiningConversationId(FALLBACK_DRAFT_ID);
     setConversationId(FALLBACK_DRAFT_ID);
-  }, [connected, conversationId, enabled, hasAutoAssigned, isOpen, setConversationId, setHasAutoAssigned, setJoiningConversationId]);
+  }, [
+    connected,
+    conversationId,
+    enabled,
+    hasAutoAssigned,
+    isOpen,
+    setConversationId,
+    setHasAutoAssigned,
+    setJoiningConversationId,
+  ]);
 
   const onSend = async (content: string) => {
     if (!enabled) {
@@ -243,7 +253,8 @@ export const CustomerSupportWidget: React.FC = () => {
         if (!payload) return false;
         if (payload?.ok === false) return true;
         if (typeof payload?.error === 'string' && payload.error.trim().length > 0) return true;
-        if (typeof payload?.message === 'string' && /error|failed/i.test(payload.message)) return true;
+        if (typeof payload?.message === 'string' && /error|failed/i.test(payload.message))
+          return true;
         return false;
       };
 
@@ -261,8 +272,8 @@ export const CustomerSupportWidget: React.FC = () => {
           supportWidgetEvents.joinRoom({ conversationId: targetConversationId }, (ack: any) => {
             const hasError = Boolean(
               ack?.error ||
-                ack?.ok === false ||
-                (typeof ack?.message === 'string' && /not a participant/i.test(ack.message)),
+              ack?.ok === false ||
+              (typeof ack?.message === 'string' && /not a participant/i.test(ack.message)),
             );
             done(!hasError);
           });
@@ -280,9 +291,7 @@ export const CustomerSupportWidget: React.FC = () => {
                 ? raw.payload
                 : raw;
         const saved =
-          envelope?.message && typeof envelope.message === 'object'
-            ? envelope.message
-            : envelope;
+          envelope?.message && typeof envelope.message === 'object' ? envelope.message : envelope;
         const conversationIdFromAck =
           Number(
             raw?.conversationId ??
@@ -306,14 +315,34 @@ export const CustomerSupportWidget: React.FC = () => {
               ? Date.parse(String(saved.createdAt)) || Date.now()
               : Date.now();
 
-        const senderRaw = saved?.sender ?? saved?.fromUser ?? saved?.user ?? raw?.sender ?? raw?.fromUser ?? raw?.user ?? raw?.staff;
+        const senderRaw =
+          saved?.sender ??
+          saved?.fromUser ??
+          saved?.user ??
+          raw?.sender ??
+          raw?.fromUser ??
+          raw?.user ??
+          raw?.staff;
 
         const sender =
           senderRaw && typeof senderRaw === 'object'
             ? {
-                userId: Number(senderRaw.userId ?? senderRaw.user_ID ?? senderRaw.id ?? senderRaw.senderUserId ?? senderRaw.fromUserId ?? 0) || myUserId,
+                userId:
+                  Number(
+                    senderRaw.userId ??
+                      senderRaw.user_ID ??
+                      senderRaw.id ??
+                      senderRaw.senderUserId ??
+                      senderRaw.fromUserId ??
+                      0,
+                  ) || myUserId,
                 name: typeof senderRaw.name === 'string' ? senderRaw.name : 'You',
-                avatarUrl: typeof senderRaw.avatarUrl === 'string' ? senderRaw.avatarUrl : typeof senderRaw.avatar === 'string' ? senderRaw.avatar : undefined,
+                avatarUrl:
+                  typeof senderRaw.avatarUrl === 'string'
+                    ? senderRaw.avatarUrl
+                    : typeof senderRaw.avatar === 'string'
+                      ? senderRaw.avatar
+                      : undefined,
               }
             : { userId: myUserId, name: 'You' };
 
@@ -345,7 +374,8 @@ export const CustomerSupportWidget: React.FC = () => {
         if (isNotParticipantError(ack)) {
           toastError(i18nKeys.toast.support.joinThreadFailed);
         }
-        if (isAckError(ack)) throw new Error(typeof ack?.error === 'string' ? ack.error : 'Socket send failed');
+        if (isAckError(ack))
+          throw new Error(typeof ack?.error === 'string' ? ack.error : 'Socket send failed');
         const handled = handleAck(ack);
         if (!handled) throw new Error('Socket ack missing message payload');
       } else {
@@ -358,7 +388,10 @@ export const CustomerSupportWidget: React.FC = () => {
             message: { type: 'text', content },
           });
           if (!fallbackAck) throw new Error('Socket timeout');
-          if (isAckError(fallbackAck)) throw new Error(typeof fallbackAck?.error === 'string' ? fallbackAck.error : 'Socket send failed');
+          if (isAckError(fallbackAck))
+            throw new Error(
+              typeof fallbackAck?.error === 'string' ? fallbackAck.error : 'Socket send failed',
+            );
           const handledFallback = handleAck(fallbackAck);
           if (!handledFallback) throw new Error('Socket ack missing message payload');
           return;
@@ -377,29 +410,34 @@ export const CustomerSupportWidget: React.FC = () => {
             message: { type: 'text', content },
           });
           if (!fallbackAck) throw new Error('Socket timeout');
-          if (isAckError(fallbackAck)) throw new Error(typeof fallbackAck?.error === 'string' ? fallbackAck.error : 'Socket send failed');
+          if (isAckError(fallbackAck))
+            throw new Error(
+              typeof fallbackAck?.error === 'string' ? fallbackAck.error : 'Socket send failed',
+            );
           const handledFallback = handleAck(fallbackAck);
           if (!handledFallback) throw new Error('Socket ack missing message payload');
           return;
         }
-        if (isAckError(ack)) throw new Error(typeof ack?.error === 'string' ? ack.error : 'Socket send failed');
+        if (isAckError(ack))
+          throw new Error(typeof ack?.error === 'string' ? ack.error : 'Socket send failed');
         const handled = handleAck(ack);
         if (!handled) throw new Error('Socket ack missing message payload');
       }
     } catch (err: any) {
       try {
-        const saved = !conversationId || conversationId === FALLBACK_DRAFT_ID
-          ? await supportWidgetApi.postMessage({
-              ...(staffUserId && staffUserId > 0 ? { recipientUserId: staffUserId } : {}),
-              type: 'text',
-              content,
-            })
-          : await supportWidgetApi.postMessage({
-              conversationId,
-              ...(staffUserId && staffUserId > 0 ? { recipientUserId: staffUserId } : {}),
-              type: 'text',
-              content,
-            });
+        const saved =
+          !conversationId || conversationId === FALLBACK_DRAFT_ID
+            ? await supportWidgetApi.postMessage({
+                ...(staffUserId && staffUserId > 0 ? { recipientUserId: staffUserId } : {}),
+                type: 'text',
+                content,
+              })
+            : await supportWidgetApi.postMessage({
+                conversationId,
+                ...(staffUserId && staffUserId > 0 ? { recipientUserId: staffUserId } : {}),
+                type: 'text',
+                content,
+              });
         if (saved) {
           const normalizedSaved: any = {
             ...saved,
@@ -413,7 +451,10 @@ export const CustomerSupportWidget: React.FC = () => {
             normalizedSaved.content = String((saved as any).content ?? '').trim() || content;
           }
           reconcileOptimisticIfMatch(normalizedSaved);
-          appendIncoming({ conversationId: normalizedSaved.conversationId, message: normalizedSaved });
+          appendIncoming({
+            conversationId: normalizedSaved.conversationId,
+            message: normalizedSaved,
+          });
           setConversationId(normalizedSaved.conversationId ?? conversationId ?? null);
           markOptimisticSent(clientId);
           return;
@@ -423,10 +464,15 @@ export const CustomerSupportWidget: React.FC = () => {
         markOptimisticFailed(clientId);
         toastErrorWithFallback(
           i18nKeys.toast.support.sendFailed,
-          restErr?.message ? String(restErr.message) : err?.message ? String(err.message) : undefined,
+          restErr?.message
+            ? String(restErr.message)
+            : err?.message
+              ? String(err.message)
+              : undefined,
         );
       }
     } finally {
+      // no-op
     }
   };
 
@@ -454,4 +500,3 @@ export const CustomerSupportWidget: React.FC = () => {
     </>
   );
 };
-

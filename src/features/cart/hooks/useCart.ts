@@ -38,7 +38,8 @@ export const useAddToCart = () => {
 export const useUpdateCartItem = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, quantity }: { id: number; quantity: number }) => cartService.updateItem(id, quantity),
+    mutationFn: ({ id, quantity }: { id: number; quantity: number }) =>
+      cartService.updateItem(id, quantity),
     onSuccess: () => qc.invalidateQueries({ queryKey: CART_KEY }),
   });
 };
@@ -50,4 +51,3 @@ export const useRemoveCartItem = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: CART_KEY }),
   });
 };
-

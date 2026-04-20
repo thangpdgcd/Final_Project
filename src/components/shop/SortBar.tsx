@@ -50,7 +50,9 @@ const SortBar = ({
           />
         </div>
         <div className="hl-sans text-sm text-[color:color-mix(in_srgb,var(--hl-on-surface)_65%,transparent)]">
-          Showing <span className="font-semibold text-[color:var(--hl-on-surface)]">{resultsCount}</span> results
+          Showing{' '}
+          <span className="font-semibold text-[color:var(--hl-on-surface)]">{resultsCount}</span>{' '}
+          results
         </div>
       </div>
 

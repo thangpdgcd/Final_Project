@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { useTranslation } from "react-i18next";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   onScrollNext?: () => void;
@@ -11,9 +11,9 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [imageFits, setImageFits] = useState<Record<number, "cover" | "contain">>({});
+  const [imageFits, setImageFits] = useState<Record<number, 'cover' | 'contain'>>({});
 
-  const slides = t("home.hero", { returnObjects: true }) as Array<{
+  const slides = t('home.hero', { returnObjects: true }) as Array<{
     title: string;
     subtitle: string;
     image: string;
@@ -28,17 +28,17 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
 
   const slideVariants: any = {
     initial: { opacity: 0, scale: 1.1 },
-    animate: { opacity: 1, scale: 1, transition: { duration: 1.5, ease: "easeOut" } },
+    animate: { opacity: 1, scale: 1, transition: { duration: 1.5, ease: 'easeOut' } },
     exit: { opacity: 0, transition: { duration: 1 } },
   };
 
   const textVariants: any = {
-    hidden: { opacity: 0, y: 30, filter: "blur(10px)" },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
-      filter: "blur(0px)",
-      transition: { duration: 0.8, ease: "easeOut" } 
+    hidden: { opacity: 0, y: 30, filter: 'blur(10px)' },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: { duration: 0.8, ease: 'easeOut' },
     },
   };
 
@@ -50,7 +50,7 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
     // If the image is close to square/portrait, `cover` crops too aggressively on wide hero.
     // Use `contain` to keep the whole subject visible.
     const ratio = naturalWidth / naturalHeight;
-    const fit: "cover" | "contain" = ratio < 1.35 ? "contain" : "cover";
+    const fit: 'cover' | 'contain' = ratio < 1.35 ? 'contain' : 'cover';
 
     setImageFits((prev) => (prev[index] === fit ? prev : { ...prev, [index]: fit }));
   };
@@ -74,9 +74,9 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
             alt="Hero Background"
             onLoad={handleImageLoad(currentSlide)}
             className={[
-              "w-full h-full",
-              imageFits[currentSlide] === "contain" ? "object-contain bg-black" : "object-cover",
-            ].join(" ")}
+              'w-full h-full',
+              imageFits[currentSlide] === 'contain' ? 'object-contain bg-black' : 'object-cover',
+            ].join(' ')}
           />
         </motion.div>
       </AnimatePresence>
@@ -95,16 +95,16 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
               variants={textVariants}
               className="px-6 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md text-[10px] sm:text-xs font-black uppercase tracking-[0.4em] text-amber-400 mb-8"
             >
-              {t("home.heroBadge")}
+              {t('home.heroBadge')}
             </motion.span>
-            
+
             <motion.h1
               variants={textVariants}
               transition={{ delay: 0.2 }}
               className="text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tighter leading-[0.9] uppercase"
               dangerouslySetInnerHTML={{ __html: slides[currentSlide].title }}
             />
-            
+
             <motion.p
               variants={textVariants}
               transition={{ delay: 0.4 }}
@@ -119,8 +119,8 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
               className="flex flex-wrap items-center justify-center gap-6"
             >
               <button
-                onClick={() => navigate("/products")}
-              className="
+                onClick={() => navigate('/products')}
+                className="
 px-10 py-5
 bg-gradient-to-r from-[#FFD700] via-[#f5c542] to-[#4B3621]
 bg-[length:200%_auto]
@@ -145,20 +145,18 @@ hover:brightness-110
 active:scale-95
 "
               >
-                {t("home.heroBtnPrimary")}
+                {t('home.heroBtnPrimary')}
               </button>
               <button
-                onClick={() => navigate("/about")}
+                onClick={() => navigate('/about')}
                 className="px-10 cursor-pointer py-5 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white border border-white/20 font-black uppercase tracking-[0.2em] text-sm rounded-2xl hover:scale-105 active:scale-95 transition-all"
               >
-                {t("home.heroBtnGhost")}
+                {t('home.heroBtnGhost')}
               </button>
             </motion.div>
           </motion.div>
         </AnimatePresence>
       </div>
-
-     
 
       {/* Slider Controls */}
       <div className="absolute right-10 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-4">
@@ -167,7 +165,7 @@ active:scale-95
             key={i}
             onClick={() => setCurrentSlide(i)}
             className={`w-1.5 h-12 rounded-full transition-all duration-500 ${
-              currentSlide === i ? "bg-[#FFD700] h-20" : "bg-white/20 hover:bg-white/40"
+              currentSlide === i ? 'bg-[#FFD700] h-20' : 'bg-white/20 hover:bg-white/40'
             }`}
           />
         ))}
@@ -181,9 +179,7 @@ active:scale-95
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2 }}
-      >
-       
-      </motion.button>
+      ></motion.button>
     </section>
   );
 };

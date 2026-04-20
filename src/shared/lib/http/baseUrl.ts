@@ -16,4 +16,3 @@ export const getApiBaseUrl = (): string => {
   // Default to local backend in dev to avoid accidentally calling the FE dev server.
   return apiUrlEnv ? normalizeApiBaseUrl(apiUrlEnv) : 'http://localhost:8080/api';
 };
-

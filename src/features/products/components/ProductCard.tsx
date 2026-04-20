@@ -97,4 +97,3 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(
 ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;
-

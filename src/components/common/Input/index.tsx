@@ -8,7 +8,9 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
 const Input: React.FC<InputProps> = ({ label, error, className = '', id, ...props }) => {
   return (
     <label className="block space-y-1.5">
-      {label ? <span className="text-sm font-medium text-stone-700 dark:text-stone-200">{label}</span> : null}
+      {label ? (
+        <span className="text-sm font-medium text-stone-700 dark:text-stone-200">{label}</span>
+      ) : null}
       <input
         id={id}
         className={`h-11 w-full rounded-2xl border bg-white px-3 text-sm outline-none transition-all duration-300 dark:bg-[#1e1e1e] ${

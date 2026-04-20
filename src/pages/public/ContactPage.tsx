@@ -34,7 +34,9 @@ const ContactPage: React.FC = () => {
   const email = t('footer.contact.email');
   const directionsHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(MAP_DIRECTIONS_DEST)}`;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -213,10 +215,7 @@ const ContactPage: React.FC = () => {
                 </div>
               </motion.div>
 
-              <motion.div
-                className="relative w-full max-w-md lg:max-w-none mt-4"
-                {...motionFade}
-              >
+              <motion.div className="relative w-full max-w-md lg:max-w-none mt-4" {...motionFade}>
                 <div className="relative w-full min-h-[min(52vh,440px)] lg:min-h-[min(64vh,560px)] rounded-md overflow-hidden about-ambient-float">
                   <img
                     src={IMG_CONTACT}
@@ -360,7 +359,10 @@ const ContactPage: React.FC = () => {
         </section>
 
         {/* Map */}
-        <section className="relative w-full min-h-[min(52vh,520px)] lg:min-h-[480px]" aria-labelledby="contact-map-heading">
+        <section
+          className="relative w-full min-h-[min(52vh,520px)] lg:min-h-[480px]"
+          aria-labelledby="contact-map-heading"
+        >
           <div className="absolute inset-0 grayscale contrast-[0.92]">
             <iframe
               title={t('contact.mapTitle')}
@@ -371,7 +373,10 @@ const ContactPage: React.FC = () => {
               referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
-          <div className="pointer-events-none absolute inset-0 bg-[color-mix(in_srgb,var(--hl-surface)_8%,transparent)]" aria-hidden />
+          <div
+            className="pointer-events-none absolute inset-0 bg-[color-mix(in_srgb,var(--hl-surface)_8%,transparent)]"
+            aria-hidden
+          />
 
           <div className="relative z-[1] max-w-[1400px] mx-auto px-5 sm:px-8 lg:px-12 py-12 lg:py-16 min-h-[inherit] flex items-center">
             <a

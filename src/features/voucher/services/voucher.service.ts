@@ -56,4 +56,3 @@ export const voucherService = {
     return String(msg ?? 'Could not apply voucher. Please try again.').trim();
   },
 };
-

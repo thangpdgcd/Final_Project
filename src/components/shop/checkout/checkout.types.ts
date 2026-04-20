@@ -23,4 +23,3 @@ export type ShippingCtx = {
 export type TotalCostCardProps = {
   productSubtotalUSD: number;
 };
-

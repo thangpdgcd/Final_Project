@@ -24,4 +24,3 @@ const AnimatedOutlet: React.FC<Props> = ({ className = '' }) => {
 };
 
 export default AnimatedOutlet;
-

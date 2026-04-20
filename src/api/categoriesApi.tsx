@@ -1,4 +1,4 @@
-import axios from "axios";
+import { http } from '@/services/api/http';
 
 /**
  * Cấu hình base URL cho API categories
@@ -9,14 +9,6 @@ import axios from "axios";
  *
  * Nếu biến môi trường đã chứa "/api" thì KHÔNG cộng thêm lần nữa.
  */
-const RAW_API_HOST =
-  (import.meta as any).env?.VITE_API_URL ||
-  process.env.REACT_APP_API_URL ||
-  "http://localhost:8080/api";
-
-const _host = String(RAW_API_HOST).replace(/\/+$/, "");
-const apiBase = _host.endsWith("/api") ? _host : `${_host}/api`;
-
 /* --------- TYPES --------- */
 export interface Category {
   category_ID: number;
@@ -75,7 +67,7 @@ export interface UpdateCategoryPayload {
 
 // Lấy tất cả categories
 export async function getAllCategories(): Promise<Category[]> {
-  const res = await axios.get(`${apiBase}/categories`, {
+  const res = await http.get(`/categories`, {
     params: { page: 1, limit: 1000 },
   });
   const raw = extractCategoryList(res.data);
@@ -86,33 +78,28 @@ export async function getAllCategories(): Promise<Category[]> {
 
 // Lấy category theo ID
 export async function getCategoryById(id: number): Promise<any> {
-  const res = await axios.get(`${apiBase}/categories/${id}`);
+  const res = await http.get(`/categories/${id}`);
   return res.data;
 }
 
 // Tạo mới category
-export async function createCategory(
-  payload: CreateCategoryPayload
-): Promise<any> {
-  const res = await axios.post(`${apiBase}/create-categories`, payload, {
-    headers: { "Content-Type": "application/json" },
+export async function createCategory(payload: CreateCategoryPayload): Promise<any> {
+  const res = await http.post(`/create-categories`, payload, {
+    headers: { 'Content-Type': 'application/json' },
   });
   return res.data;
 }
 
 // Cập nhật category
-export async function updateCategory(
-  id: number,
-  payload: UpdateCategoryPayload
-): Promise<any> {
-  const res = await axios.put(`${apiBase}/categories/${id}`, payload, {
-    headers: { "Content-Type": "application/json" },
+export async function updateCategory(id: number, payload: UpdateCategoryPayload): Promise<any> {
+  const res = await http.put(`/categories/${id}`, payload, {
+    headers: { 'Content-Type': 'application/json' },
   });
   return res.data;
 }
 
 // Xoá category
 export async function deleteCategory(id: number): Promise<any> {
-  const res = await axios.delete(`${apiBase}/categories/${id}`);
+  const res = await http.delete(`/categories/${id}`);
   return res.data;
 }

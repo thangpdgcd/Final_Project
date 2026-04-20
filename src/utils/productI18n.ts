@@ -15,7 +15,10 @@ type ProductDescFields = Pick<Product, 'product_ID' | 'name' | 'description'> & 
   description_vi?: string;
 };
 
-const langIsVi = () => String(i18n.language || '').toLowerCase().startsWith('vi');
+const langIsVi = () =>
+  String(i18n.language || '')
+    .toLowerCase()
+    .startsWith('vi');
 
 const pickLocalizedName = (product: ProductNameFields): string => {
   if (langIsVi() && product.name_vi?.trim()) return product.name_vi.trim();
@@ -75,7 +78,10 @@ export const translatedShopProductName = (
   t: TFunction,
   product: { id: string | number; name: string; name_en?: string; name_vi?: string },
 ): string => {
-  const pid = typeof product.id === 'number' && Number.isFinite(product.id) && product.id > 0 ? product.id : 0;
+  const pid =
+    typeof product.id === 'number' && Number.isFinite(product.id) && product.id > 0
+      ? product.id
+      : 0;
   return translatedProductName(t, {
     product_ID: pid,
     name: product.name,

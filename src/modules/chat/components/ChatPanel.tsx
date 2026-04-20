@@ -29,10 +29,7 @@ export const ChatPanel: React.FC<Props> = ({
           <div className="text-sm font-bold text-zinc-100 truncate">{title}</div>
           <div className="text-[11px] text-zinc-400">{subtitle}</div>
         </div>
-        <Badge
-          color={connected ? 'green' : 'red'}
-          text={connected ? 'live' : 'down'}
-        />
+        <Badge color={connected ? 'green' : 'red'} text={connected ? 'live' : 'down'} />
       </div>
 
       {conversation ? (
@@ -48,4 +45,3 @@ export const ChatPanel: React.FC<Props> = ({
     </div>
   );
 };
-

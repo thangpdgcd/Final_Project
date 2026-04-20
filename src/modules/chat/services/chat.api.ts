@@ -25,13 +25,14 @@ const pickArray = (data: any): any[] => {
 const mapConversation = (raw: any): Conversation => {
   const roomId = toStringOr(raw?.roomId ?? raw?.room_id ?? raw?.room ?? raw?.id, '');
   const title = toStringOr(raw?.title ?? raw?.name ?? raw?.subject ?? roomId, roomId);
-  const lastMessagePreview = typeof raw?.lastMessagePreview === 'string'
-    ? raw.lastMessagePreview
-    : typeof raw?.last_message_preview === 'string'
-      ? raw.last_message_preview
-      : typeof raw?.lastMessage === 'string'
-        ? raw.lastMessage
-        : undefined;
+  const lastMessagePreview =
+    typeof raw?.lastMessagePreview === 'string'
+      ? raw.lastMessagePreview
+      : typeof raw?.last_message_preview === 'string'
+        ? raw.last_message_preview
+        : typeof raw?.lastMessage === 'string'
+          ? raw.lastMessage
+          : undefined;
   const unreadCountRaw = raw?.unreadCount ?? raw?.unread_count ?? raw?.unread ?? 0;
   const unreadCount = toNumberOr(unreadCountRaw, 0);
 
@@ -48,8 +49,14 @@ const mapMessage = (raw: any, roomIdFallback?: string): ChatMessage | null => {
   const id = toStringOr(raw?.id ?? raw?.messageId ?? raw?.message_id, '');
   const createdAt = toNumberOr(raw?.createdAt ?? raw?.created_at ?? raw?.timestamp, Date.now());
 
-  const senderId = toStringOr(raw?.sender?.id ?? raw?.senderId ?? raw?.sender_id ?? raw?.from ?? 'unknown', 'unknown');
-  const senderName = toStringOr(raw?.sender?.name ?? raw?.senderName ?? raw?.sender_name ?? 'Unknown', 'Unknown');
+  const senderId = toStringOr(
+    raw?.sender?.id ?? raw?.senderId ?? raw?.sender_id ?? raw?.from ?? 'unknown',
+    'unknown',
+  );
+  const senderName = toStringOr(
+    raw?.sender?.name ?? raw?.senderName ?? raw?.sender_name ?? 'Unknown',
+    'Unknown',
+  );
   const senderRole = (raw?.sender?.role ?? raw?.senderRole ?? raw?.sender_role ?? 'user') as any;
 
   const type = raw?.type === 'action' ? 'action' : 'text';
@@ -102,4 +109,3 @@ export const chatApi = {
     }
   },
 };
-

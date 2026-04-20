@@ -9,7 +9,10 @@ type Props = {
 
 export const MessageComposer: React.FC<Props> = ({ disabled, sending, onSend }) => {
   const [value, setValue] = useState('');
-  const canSend = useMemo(() => !disabled && !sending && value.trim().length > 0, [disabled, sending, value]);
+  const canSend = useMemo(
+    () => !disabled && !sending && value.trim().length > 0,
+    [disabled, sending, value],
+  );
 
   const doSend = async () => {
     const text = value.trim();
@@ -74,4 +77,3 @@ export const MessageComposer: React.FC<Props> = ({ disabled, sending, onSend }) 
     </div>
   );
 };
-

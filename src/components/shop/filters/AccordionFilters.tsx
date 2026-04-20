@@ -15,7 +15,9 @@ const Section = ({ title, open, onToggle, children }: SectionProps) => {
         onClick={onToggle}
         className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
       >
-        <span className="hl-sans text-sm font-medium text-[color:var(--hl-secondary)]">{title}</span>
+        <span className="hl-sans text-sm font-medium text-[color:var(--hl-secondary)]">
+          {title}
+        </span>
         <ChevronDown
           size={18}
           className={[
@@ -134,8 +136,7 @@ const AccordionFilters = () => {
     [],
   );
 
-  const toggle = (key: keyof typeof open) =>
-    setOpen((o) => ({ ...o, [key]: !o[key] }));
+  const toggle = (key: keyof typeof open) => setOpen((o) => ({ ...o, [key]: !o[key] }));
 
   const clearAll = () => {
     setAvailability({ inStock: false, outOfStock: false });
@@ -210,11 +211,7 @@ const AccordionFilters = () => {
         />
       </Section>
 
-      <Section
-        title="Product Type"
-        open={open.productType}
-        onToggle={() => toggle('productType')}
-      >
+      <Section title="Product Type" open={open.productType} onToggle={() => toggle('productType')}>
         <CheckboxItem
           label="Beans"
           checked={productType.beans}
@@ -256,19 +253,13 @@ const AccordionFilters = () => {
       </Section>
 
       <Section title="Color" open={open.color} onToggle={() => toggle('color')}>
-        <div className="hl-sans text-xs text-[color:color-mix(in_srgb,var(--hl-on-surface)_55%,transparent)]">Pick one or more</div>
-        <ColorSwatches
-          options={colorOptions}
-          value={colors}
-          onChange={setColors}
-        />
+        <div className="hl-sans text-xs text-[color:color-mix(in_srgb,var(--hl-on-surface)_55%,transparent)]">
+          Pick one or more
+        </div>
+        <ColorSwatches options={colorOptions} value={colors} onChange={setColors} />
       </Section>
 
-      <Section
-        title="Material"
-        open={open.material}
-        onToggle={() => toggle('material')}
-      >
+      <Section title="Material" open={open.material} onToggle={() => toggle('material')}>
         <CheckboxItem
           label="Paper"
           checked={material.paper}

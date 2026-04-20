@@ -82,4 +82,3 @@ REST:
 - **Scroll behavior**
   - Scroll up in a long thread; new incoming messages should not yank your scroll
   - Scroll near bottom; new incoming messages should auto-stick
-

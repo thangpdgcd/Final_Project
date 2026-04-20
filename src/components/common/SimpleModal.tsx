@@ -15,13 +15,13 @@ interface SimpleModalProps {
  * Production-ready SimpleModal component
  * Features: Framer motion animations, body scroll lock, ESC to close, click outside to close
  */
-const SimpleModal: React.FC<SimpleModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  children, 
+const SimpleModal: React.FC<SimpleModalProps> = ({
+  isOpen,
+  onClose,
+  children,
   title,
-  maxWidth = "max-w-sm",
-  showCloseButton = true
+  maxWidth = 'max-w-sm',
+  showCloseButton = true,
 }) => {
   // --- LOGIC: Body Scroll Lock ---
   useEffect(() => {
@@ -38,10 +38,10 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   // --- LOGIC: ESC Key Closing ---
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    if (isOpen) window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    if (isOpen) window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
   }, [isOpen, onClose]);
 
   return (
@@ -62,7 +62,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={`relative w-[90%] ${maxWidth} bg-white dark:bg-[#1a1615] rounded-3xl shadow-2xl z-50 overflow-hidden`}
             onClick={(e) => e.stopPropagation()}
           >
@@ -73,8 +73,10 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
                   <h3 className="text-xl font-black text-[#4B3621] dark:text-amber-100 tracking-tight leading-none">
                     {title}
                   </h3>
-                ) : <div />}
-                
+                ) : (
+                  <div />
+                )}
+
                 {showCloseButton && (
                   <button
                     onClick={onClose}
@@ -87,9 +89,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
             )}
 
             {/* Body content */}
-            <div className="p-6 sm:p-8">
-              {children}
-            </div>
+            <div className="p-6 sm:p-8">{children}</div>
           </motion.div>
         </div>
       )}

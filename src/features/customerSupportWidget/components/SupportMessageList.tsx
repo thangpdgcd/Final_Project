@@ -90,7 +90,8 @@ export const SupportMessageList: React.FC<Props> = ({ myUserId, messages, loadin
           const avatarText = (senderName?.trim()?.[0] ?? 'S').toUpperCase();
           const text = m.type === 'text' ? m.content : `Action: ${m.action}`;
 
-          const bubbleBase = 'max-w-[80%] rounded-2xl px-3 py-2 text-[15px] leading-relaxed whitespace-pre-wrap break-words';
+          const bubbleBase =
+            'max-w-[80%] rounded-2xl px-3 py-2 text-[15px] leading-relaxed whitespace-pre-wrap break-words';
           const mineBubble = startsGroup
             ? endsGroup
               ? 'rounded-br-md'
@@ -130,11 +131,19 @@ export const SupportMessageList: React.FC<Props> = ({ myUserId, messages, loadin
 
               <div className={mine ? 'items-end flex flex-col' : 'items-start flex flex-col'}>
                 {!mine && startsGroup && senderName ? (
-                  <div className="mb-1 ml-1 text-[12px] font-medium text-zinc-300">{senderName}</div>
+                  <div className="mb-1 ml-1 text-[12px] font-medium text-zinc-300">
+                    {senderName}
+                  </div>
                 ) : null}
                 <div className={bubble}>{text}</div>
                 {endsGroup ? (
-                  <div className={mine ? 'mt-1 text-[10px] text-right text-zinc-500' : 'mt-1 text-[10px] text-zinc-500'}>
+                  <div
+                    className={
+                      mine
+                        ? 'mt-1 text-[10px] text-right text-zinc-500'
+                        : 'mt-1 text-[10px] text-zinc-500'
+                    }
+                  >
                     {formatTime(m.createdAt)}
                     {m.optimistic?.status === 'sending' ? ' · Sending…' : null}
                     {m.optimistic?.status === 'failed' ? ' · Failed' : null}
@@ -149,4 +158,3 @@ export const SupportMessageList: React.FC<Props> = ({ myUserId, messages, loadin
     </div>
   );
 };
-

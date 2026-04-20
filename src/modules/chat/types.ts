@@ -110,4 +110,3 @@ export type ActionEventResultPayload = {
   error?: string;
   data?: unknown;
 };
-

@@ -26,7 +26,9 @@ export const ConversationList: React.FC<Props> = ({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return conversations;
-    return conversations.filter((c) => c.title.toLowerCase().includes(q) || c.roomId.toLowerCase().includes(q));
+    return conversations.filter(
+      (c) => c.title.toLowerCase().includes(q) || c.roomId.toLowerCase().includes(q),
+    );
   }, [conversations, query]);
 
   return (
@@ -97,4 +99,3 @@ export const ConversationList: React.FC<Props> = ({
     </div>
   );
 };
-

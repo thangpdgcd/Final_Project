@@ -1,4 +1,4 @@
-import axios from "axios";
+import { http } from '@/services/api/http';
 
 /**
  * Base URL cho API giỏ hàng
@@ -11,14 +11,6 @@ import axios from "axios";
  *   VITE_API_URL=http://localhost:8080
  *   hoặc REACT_APP_API_URL=http://localhost:8080
  */
-const RAW_API_HOST =
-  (import.meta as any).env?.VITE_API_URL ||
-  process.env.REACT_APP_API_URL ||
-  "http://localhost:8080/api";
-
-const _host = String(RAW_API_HOST).replace(/\/+$/, "");
-const apiBase = _host.endsWith("/api") ? _host : `${_host}/api`;
-
 export interface CartProduct {
   name: string;
   price: number;
@@ -53,26 +45,18 @@ function unwrapList(resData: any): CartItem[] {
   return [];
 }
 
-function authHeaders() {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 export async function getCartByUserId(user_ID: number): Promise<CartItem[]> {
   const uid = Number(user_ID);
   if (!Number.isFinite(uid) || uid <= 0) return [];
 
-  const res = await axios.get(`${apiBase}/carts`, {
+  const res = await http.get(`/carts`, {
     params: { user_ID: uid },
-    headers: { ...authHeaders() },
   });
 
   return unwrapList(res.data);
 }
 
-export async function addToCart(
-  payload: AddToCartPayload
-): Promise<AddToCartResponse> {
+export async function addToCart(payload: AddToCartPayload): Promise<AddToCartResponse> {
   const safePayload: AddToCartPayload = {
     user_ID: Number(payload.user_ID),
     product_ID: Number(payload.product_ID),
@@ -80,8 +64,8 @@ export async function addToCart(
     price: Number(payload.price),
   };
 
-  const res = await axios.post(`${apiBase}/add-to-cart`, safePayload, {
-    headers: { "Content-Type": "application/json", ...authHeaders() },
+  const res = await http.post(`/add-to-cart`, safePayload, {
+    headers: { 'Content-Type': 'application/json' },
   });
 
   return res.data as AddToCartResponse;
@@ -89,30 +73,26 @@ export async function addToCart(
 
 export async function updateCartItem(
   cartItemId: number,
-  payload: { quantity: number }
+  payload: { quantity: number },
 ): Promise<CartItem> {
   const id = Number(cartItemId);
   const qty = Number(payload?.quantity);
 
-  const res = await axios.put(
-    `${apiBase}/cart-items/${id}`,
+  const res = await http.put(
+    `/cart-items/${id}`,
     { quantity: qty },
     {
-      headers: { "Content-Type": "application/json", ...authHeaders() },
-    }
+      headers: { 'Content-Type': 'application/json' },
+    },
   );
 
   return res.data as CartItem;
 }
 
-export async function removeCartItem(
-  cartItemId: number
-): Promise<{ message?: string }> {
+export async function removeCartItem(cartItemId: number): Promise<{ message?: string }> {
   const id = Number(cartItemId);
 
-  const res = await axios.delete(`${apiBase}/cart-items/${id}`, {
-    headers: { ...authHeaders() },
-  });
+  const res = await http.delete(`/cart-items/${id}`);
 
   return res.data as { message?: string };
 }

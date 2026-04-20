@@ -75,7 +75,9 @@ export const CartPurchaseBar: React.FC<CartPurchaseBarProps> = ({
             <div className="flex flex-col items-end gap-1 text-right">
               <div className="flex flex-wrap items-baseline justify-end gap-2">
                 <span className="text-sm text-white/90">{totalLabel}</span>
-                <span className="text-xl font-bold text-white drop-shadow-sm">{formattedTotal}</span>
+                <span className="text-xl font-bold text-white drop-shadow-sm">
+                  {formattedTotal}
+                </span>
               </div>
               {discountLine}
               {savingsLine}

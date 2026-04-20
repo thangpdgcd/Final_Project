@@ -22,11 +22,17 @@ import { i18nKeys } from '@/constants/i18nKeys';
 import { toastError, toastInfo, toastSuccess, toastWarning } from '@/lib/toast/i18nToast';
 import { CartPurchaseBar } from '@/components/ui/cart/CartPurchaseBar';
 import { translatedProductDescription, translatedProductName } from '@/utils/productI18n';
+import { calcShippingFeeVnd } from '@/utils/shippingFee';
+import { useShipping } from '@/contexts/ShippingContext';
 
 const { Title } = Typography;
 
 const formatPrice = (v: number) =>
-  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v || 0);
+  new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    maximumFractionDigits: 0,
+  }).format(v || 0);
 
 const CartPage: React.FC = () => {
   useDocumentTitle('pages.cart.documentTitle');
@@ -83,12 +89,22 @@ const CartPage: React.FC = () => {
   );
 
   const totalAmount = useMemo(
-    () => selectedItems.reduce((sum, item) => sum + (item.products?.price || item.price || 0) * item.quantity, 0),
+    () =>
+      selectedItems.reduce(
+        (sum, item) => sum + (item.products?.price || item.price || 0) * item.quantity,
+        0,
+      ),
     [selectedItems],
   );
 
   const voucher = useApplyVoucher();
-  const payable = voucher.isSuccess && voucher.finalPrice != null ? voucher.finalPrice : totalAmount;
+  const shippingCtx = useShipping();
+  const shippingFee = useMemo(
+    () => calcShippingFeeVnd(totalAmount, shippingCtx.shippingMethod),
+    [totalAmount, shippingCtx.shippingMethod],
+  );
+  const orderValue = totalAmount + shippingFee;
+  const payable = voucher.isSuccess && voucher.finalPrice != null ? voucher.finalPrice : orderValue;
 
   useEffect(() => {
     try {
@@ -206,7 +222,11 @@ const CartPage: React.FC = () => {
             <p className="hl-sans text-[color:color-mix(in_srgb,var(--hl-on-surface)_72%,transparent)]">
               {t('customersCart.emptyTitle')}
             </p>
-            <button type="button" className="btn-highland-primary mt-6" onClick={() => navigate('/products')}>
+            <button
+              type="button"
+              className="btn-highland-primary mt-6"
+              onClick={() => navigate('/products')}
+            >
               {t('customersCart.emptyCta')}
             </button>
           </div>
@@ -217,18 +237,32 @@ const CartPage: React.FC = () => {
               className="sticky top-20 z-10 flex items-center gap-4 rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] px-4 py-4 text-sm font-medium text-[color:color-mix(in_srgb,var(--hl-on-surface)_75%,transparent)] shadow-sm dark:text-stone-200"
             >
               <div className="flex w-8 items-center justify-center">
-                <Checkbox checked={allSelected} onChange={(e) => handleSelectAll(e.target.checked)} />
+                <Checkbox
+                  checked={allSelected}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                />
               </div>
-              <div className="flex-1 text-stone-800 dark:text-stone-100">{t('customersCart.columns.product')}</div>
-              <div className="hidden w-24 text-center md:block">{t('customersCart.columns.unitPrice')}</div>
+              <div className="flex-1 text-stone-800 dark:text-stone-100">
+                {t('customersCart.columns.product')}
+              </div>
+              <div className="hidden w-24 text-center md:block">
+                {t('customersCart.columns.unitPrice')}
+              </div>
               <div className="w-24 text-center md:w-32">{t('customersCart.columns.quantity')}</div>
-              <div className="hidden w-28 text-center sm:block">{t('customersCart.columns.total')}</div>
-              <div className="w-16 text-center text-stone-800 dark:text-stone-100">{t('customersCart.columns.actions')}</div>
+              <div className="hidden w-28 text-center sm:block">
+                {t('customersCart.columns.total')}
+              </div>
+              <div className="w-16 text-center text-stone-800 dark:text-stone-100">
+                {t('customersCart.columns.actions')}
+              </div>
             </div>
 
             <div className="overflow-hidden rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] bg-[color:var(--hl-surface-lowest)] shadow-sm">
               <div className="flex items-center gap-2 border-b border-[color:color-mix(in_srgb,var(--hl-outline-variant)_18%,transparent)] px-4 py-3">
-                <Checkbox checked={allSelected} onChange={(e) => handleSelectAll(e.target.checked)} />
+                <Checkbox
+                  checked={allSelected}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                />
                 <span className="ml-2 rounded bg-orange-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
                   {t('customersCart.sellerFavorite')}
                 </span>
@@ -270,11 +304,13 @@ const CartPage: React.FC = () => {
                   code={voucher.code}
                   onCodeChange={(v) => voucher.setCode(v)}
                   onApply={(trimmedCode) => {
-                    void voucher.applyVoucher({ orderValue: totalAmount, code: trimmedCode });
+                    void voucher.applyVoucher({ orderValue, code: trimmedCode });
                   }}
                   isApplying={voucher.isApplying}
                   errorMessage={voucher.errorMessage || undefined}
-                  helperText={selectedItems.length === 0 ? t('customersCart.voucherHelperSelect') : undefined}
+                  helperText={
+                    selectedItems.length === 0 ? t('customersCart.voucherHelperSelect') : undefined
+                  }
                 />
                 <VoucherSummary
                   discount={voucher.discount}
@@ -289,6 +325,19 @@ const CartPage: React.FC = () => {
               <div className="flex items-center gap-2 border-t border-[color:color-mix(in_srgb,var(--hl-outline-variant)_18%,transparent)] bg-[color:color-mix(in_srgb,#16a34a_08%,var(--hl-surface-low))] px-4 py-4 text-xs text-green-700 dark:text-green-400">
                 <CreditCardOutlined />
                 {t('customersCart.shippingBanner')}
+                <button
+                  type="button"
+                  className="ml-2 rounded-md bg-white/70 px-2 py-0.5 text-[10px] font-semibold text-stone-700 shadow-sm transition hover:bg-white dark:bg-white/10 dark:text-white/75"
+                  onClick={() =>
+                    shippingCtx.setShippingMethod(
+                      shippingCtx.shippingMethod === 'express' ? 'standard' : 'express',
+                    )
+                  }
+                >
+                  {shippingCtx.shippingMethod === 'express'
+                    ? t('checkout.shippingExpress')
+                    : t('checkout.shippingStandard')}
+                </button>
                 <button type="button" className="ml-1 text-blue-500 hover:underline">
                   {t('customersCart.learnMore')}
                 </button>
@@ -340,14 +389,18 @@ const CartPage: React.FC = () => {
           discountLine={
             voucher.isSuccess && voucher.discount != null ? (
               <span className="text-[10px] text-emerald-200">
-                {t('customersCart.purchaseBar.discountApplied', { amount: formatPrice(voucher.discount) })}
+                {t('customersCart.purchaseBar.discountApplied', {
+                  amount: formatPrice(voucher.discount),
+                })}
               </span>
             ) : undefined
           }
           savingsLine={
             !(voucher.isSuccess && voucher.discount != null) ? (
               <span className="text-[10px] text-white/75">
-                {t('customersCart.purchaseBar.savingsEstimate', { amount: formatPrice(totalAmount * 0.1) })}
+                {t('customersCart.purchaseBar.savingsEstimate', {
+                  amount: formatPrice(totalAmount * 0.1),
+                })}
               </span>
             ) : undefined
           }

@@ -51,4 +51,3 @@ export const SupportWidgetHeader: React.FC<Props> = ({ name, statusText, onClose
     </div>
   );
 };
-

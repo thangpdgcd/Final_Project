@@ -1,6 +1,6 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { getImageSrc } from "@/utils/image";
+import React from 'react';
+import { motion } from 'framer-motion';
+import { getImageSrc } from '@/utils/image';
 
 interface LogoProps {
   size?: number | string;
@@ -9,23 +9,18 @@ interface LogoProps {
   goldBorder?: boolean;
 }
 
-const Logo: React.FC<LogoProps> = ({
-  size = 48,
-  className = "",
-  showText = true,
-}) => {
+const Logo: React.FC<LogoProps> = ({ size = 48, className = '', showText = true }) => {
   // `public/` assets must be referenced by URL (not imported as modules).
   // Use BASE_URL so the component works even if the app is hosted under a subpath.
-  const baseUrl = import.meta.env.BASE_URL ?? "/";
+  const baseUrl = import.meta.env.BASE_URL ?? '/';
   const logoUrl =
-    "https://res.cloudinary.com/dfjecxrnl/image/upload/v1773308731/199bea82-b758-411d-863a-1b7be6ecc8b4.png";
+    'https://res.cloudinary.com/dfjecxrnl/image/upload/v1773308731/199bea82-b758-411d-863a-1b7be6ecc8b4.png';
   /** Local asset in `public/` — used if Cloudinary fails to load */
   const fallbackUrl = `${baseUrl}assets/img/logo_headermg.png`;
 
   // Determine container dimensions based on size prop
-  const sizeClass = typeof size === "number" ? "" : size;
-  const inlineStyle =
-    typeof size === "number" ? { width: size, height: size } : {};
+  const sizeClass = typeof size === 'number' ? '' : size;
+  const inlineStyle = typeof size === 'number' ? { width: size, height: size } : {};
 
   return (
     <motion.div

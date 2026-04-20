@@ -51,4 +51,3 @@ Optional env:
 - **Back to Browser A**
   - Close the widget; verify unread badge increments on incoming messages
   - Re-open; unread clears and the new message is visible
-

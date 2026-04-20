@@ -106,7 +106,8 @@ export const cartService = {
         lastErr = err;
         if (!axios.isAxiosError(err)) throw err;
         const status = err.response?.status;
-        if (status === 404 || status === 400 || status === 405 || status === 415 || status === 500) continue;
+        if (status === 404 || status === 400 || status === 405 || status === 415 || status === 500)
+          continue;
         throw err;
       }
     }
@@ -166,7 +167,12 @@ export async function syncCartToSelectionForCheckout(
 
   const selectedPids = new Set(
     selected
-      .map((i) => Number((i as CartItem & { productId?: number }).product_ID ?? (i as CartItem & { productId?: number }).productId))
+      .map((i) =>
+        Number(
+          (i as CartItem & { productId?: number }).product_ID ??
+            (i as CartItem & { productId?: number }).productId,
+        ),
+      )
       .filter((n) => Number.isFinite(n) && n > 0),
   );
   if (selectedPids.size === 0) throw new Error('EMPTY_CHECKOUT_SELECTION');
@@ -174,9 +180,13 @@ export async function syncCartToSelectionForCheckout(
   const serverCart = await cartService.getByUserId(uid);
 
   for (const row of serverCart) {
-    const pid = Number((row as CartItem).product_ID ?? (row as CartItem & { productId?: number }).productId);
+    const pid = Number(
+      (row as CartItem).product_ID ?? (row as CartItem & { productId?: number }).productId,
+    );
     if (!selectedPids.has(pid)) {
-      const cid = Number((row as CartItem).cartitem_ID ?? (row as CartItem & { cartItemId?: number }).cartItemId);
+      const cid = Number(
+        (row as CartItem).cartitem_ID ?? (row as CartItem & { cartItemId?: number }).cartItemId,
+      );
       if (Number.isFinite(cid) && cid > 0) await cartService.removeItem(cid);
     }
   }
@@ -184,12 +194,16 @@ export async function syncCartToSelectionForCheckout(
   const fresh = await cartService.getByUserId(uid);
 
   for (const sel of selected) {
-    const pid = Number((sel as CartItem).product_ID ?? (sel as CartItem & { productId?: number }).productId);
+    const pid = Number(
+      (sel as CartItem).product_ID ?? (sel as CartItem & { productId?: number }).productId,
+    );
     if (!Number.isFinite(pid) || pid <= 0) continue;
     const wantQty = Number(sel.quantity) || 1;
     const price = Number(sel.products?.price ?? sel.price ?? 0);
     const serverRow = fresh.find(
-      (r) => Number((r as CartItem).product_ID ?? (r as CartItem & { productId?: number }).productId) === pid,
+      (r) =>
+        Number((r as CartItem).product_ID ?? (r as CartItem & { productId?: number }).productId) ===
+        pid,
     );
     if (!serverRow) {
       await cartService.addToCart({
@@ -200,11 +214,13 @@ export async function syncCartToSelectionForCheckout(
       });
     } else {
       const curQty = Number(serverRow.quantity) || 0;
-      const cid = Number((serverRow as CartItem).cartitem_ID ?? (serverRow as CartItem & { cartItemId?: number }).cartItemId);
+      const cid = Number(
+        (serverRow as CartItem).cartitem_ID ??
+          (serverRow as CartItem & { cartItemId?: number }).cartItemId,
+      );
       if (Number.isFinite(cid) && cid > 0 && curQty !== wantQty) {
         await cartService.updateItem(cid, wantQty);
       }
     }
   }
 }
-

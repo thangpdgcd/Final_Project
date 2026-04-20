@@ -16,4 +16,3 @@ export type BlogPost = {
 export type BlogCardProps = {
   post: BlogPost;
 };
-

@@ -566,8 +566,7 @@
     "loadErrorFallback": "Không thể tải hồ sơ",
     "missingUserId": "Thiếu user id",
     "noName": "Không có tên",
-    "historyOrdersSearchPlaceholder":
-      "Bạn có thể tìm kiếm theo tên Shop, ID đơn hàng hoặc Tên Sản phẩm",
+    "historyOrdersSearchPlaceholder": "Bạn có thể tìm kiếm theo tên Shop, ID đơn hàng hoặc Tên Sản phẩm",
     "notFound": "Không tìm thấy người dùng",
     "sidebar": {
       "account": "Tài Khoản Của Tôi",
@@ -604,11 +603,23 @@
       "promotions": "KHUYẾN MÃI"
     },
     "menu": {
-      "myAccount": { "title": "Tài khoản của tôi", "description": "Thông tin cá nhân, bảo mật và thanh toán" },
-      "vouchers": { "title": "Kho Voucher", "description": "Lưu trữ các mã ưu đãi đặc quyền của bạn" },
+      "myAccount": {
+        "title": "Tài khoản của tôi",
+        "description": "Thông tin cá nhân, bảo mật và thanh toán"
+      },
+      "vouchers": {
+        "title": "Kho Voucher",
+        "description": "Lưu trữ các mã ưu đãi đặc quyền của bạn"
+      },
       "orders": { "title": "Đơn mua", "description": "Theo dõi đơn hàng đang giao và lịch sử" },
-      "settings": { "title": "Cài đặt hệ thống", "description": "Ngôn ngữ, chế độ hiển thị và quyền riêng tư" },
-      "notifications": { "title": "Thông báo", "description": "Cập nhật về bộ sưu tập và đơn hàng" },
+      "settings": {
+        "title": "Cài đặt hệ thống",
+        "description": "Ngôn ngữ, chế độ hiển thị và quyền riêng tư"
+      },
+      "notifications": {
+        "title": "Thông báo",
+        "description": "Cập nhật về bộ sưu tập và đơn hàng"
+      },
       "help": { "title": "Trung tâm trợ giúp", "description": "Liên hệ đội ngũ hỗ trợ 24/7" }
     },
     "stats": {
@@ -793,6 +804,9 @@
     "wishlist": {
       "documentTitle": "Yêu thích — Phan Coffee"
     },
+    "vouchers": {
+      "documentTitle": "Kho Voucher — Phan Coffee"
+    },
     "shop": {
       "documentTitle": "Cửa hàng — Phan Coffee"
     },
@@ -833,6 +847,8 @@
     "bestSeller": "Bán chạy",
     "premiumPrice": "Giá Premium",
     "toast": {
+      "alreadyAdded": "Sản phẩm đã có trong danh sách yêu thích!",
+      "added": "Đã thêm vào danh sách yêu thích!",
       "addToCartSuccess": "✅ Đã thêm vào giỏ hàng",
       "addToCartError": "❌ Không thể thêm vào giỏ",
       "removeSuccess": "Đã xóa khỏi danh sách yêu thích"
@@ -850,6 +866,15 @@
     "browseHeritage": "Khám phá di sản",
     "discoveryNew": "Khám phá mới"
   },
+  "vouchers": {
+    "subtitle": "Voucher nhận từ tin nhắn nhân viên sẽ tự lưu ở đây. Bạn có thể copy để áp dụng khi thanh toán.",
+    "goToCart": "Đi tới giỏ hàng",
+    "clearAll": "Xóa tất cả",
+    "emptyTitle": "Chưa có voucher nào",
+    "emptySubtitle": "Khi nhân viên gửi voucher qua chat, mã sẽ tự động lưu tại đây.",
+    "receivedAt": "Nhận lúc {{time}}",
+    "useInCart": "Dùng ở giỏ"
+  },
   "productDetail": {
     "purchaseSubscribeSuccess": "✅ Đã đăng ký gói thành công!",
     "purchaseOnceSuccess": "✅ Đã thêm vào giỏ hàng!",
@@ -860,7 +885,75 @@
     "badgeBestSeller": "BEST SELLER",
     "badgeLimitedEdition": "LIMITED EDITION",
     "store": "Cửa hàng",
-    "artOfCoffee": "The Art of Coffee"
+    "artOfCoffee": "The Art of Coffee",
+    "buyNow": "Mua ngay",
+    "story": {
+      "title": "Hành trình từ cao nguyên Di Linh",
+      "quote": "\"Mỗi hạt cà phê là lời kể của đất bazan và những giọt sương mai trên đỉnh núi cao 1,500m.\"",
+      "originLabel": "Xuất xứ",
+      "originValue": "Lâm Đồng, VN",
+      "processLabel": "Quy trình",
+      "processValue": "Sơ chế Ướt",
+      "farmerName": "Nông dân Phan",
+      "farmerOrg": "Hợp tác xã Cao Nguyên"
+    },
+    "reviews": {
+      "title": "Phản hồi khách hàng",
+      "average": "{{score}} trung bình",
+      "verifiedBuyer": "KHÁCH ĐÃ MUA"
+    },
+    "stats": {
+      "purchased": "{{countText}} Đã mua",
+      "tried": "{{countText}} Đã trải nghiệm"
+    },
+    "stock": {
+      "tool": "Còn {{count}} sản phẩm trong kho — đặt ngay!",
+      "coffee": "Cơ hội cuối! Chỉ còn {{count}} gói trong đợt rang này."
+    },
+    "banner": {
+      "brewingEquipment": "⚙  DỤNG CỤ PHA CHẾ  —  BREWING EQUIPMENT",
+      "premiumCoffee": "☕  CÀ PHÊ  —  PREMIUM COFFEE"
+    },
+    "precisionCraft": "PRECISION CRAFT",
+    "switchToLight": "Chuyển sang Light mode",
+    "switchToDark": "Chuyển sang Dark mode",
+    "purchase": {
+      "once": "Mua một lần"
+    },
+    "options": {
+      "size": {
+        "label": "Kích cỡ",
+        "small": "Nhỏ (1 ly)",
+        "standard": "Tiêu chuẩn (2 ly)",
+        "large": "Lớn (4 ly)"
+      },
+      "material": {
+        "label": "Chất liệu",
+        "stainless": "Thép 304",
+        "aluminum": "Nhôm",
+        "titanium": "Titanium"
+      },
+      "grind": {
+        "label": "Cách pha",
+        "beans": "Nguyên hạt",
+        "ground": "Xay sẵn"
+      },
+      "roast": {
+        "label": "Độ rang",
+        "light": "Rang Sáng",
+        "medium": "Rang Vừa",
+        "dark": "Rang Đậm"
+      },
+      "frequency": {
+        "label": "Chu kỳ giao",
+        "weekly": "Hàng tuần",
+        "every2Weeks": "Mỗi 2 tuần",
+        "monthly": "Hàng tháng"
+      },
+      "quantity": "Số lượng"
+    },
+    "totalPayable": "Tổng thanh toán",
+    "savings": "Tiết kiệm {{amount}}"
   },
   "coffeePackageDetail": {
     "purchaseSubscribeSuccess": "Đăng ký thành công!",
@@ -955,6 +1048,19 @@
       "loginRequired": "Vui lòng đăng nhập"
     }
   },
+  "notifications": {
+    "ui": {
+      "title": "Thông báo",
+      "close": "Đóng",
+      "markAllRead": "Đánh dấu đã đọc",
+      "emptyTitle": "Chưa có thông báo",
+      "emptyDesc": "Bạn đã xem hết thông báo.",
+      "ariaBell": "Mở thông báo"
+    },
+    "templates": {
+      "orderCreated": "Đơn hàng đã được tạo thành công"
+    }
+  },
   "checkout": {
     "shippingTitle": "Địa chỉ nhận hàng",
     "defaultBadge": "Mặc định",
@@ -971,8 +1077,8 @@
     "notePlaceholder": "Lưu ý cho người bán…",
     "shopVoucher": "Voucher của Shop",
     "voucherHelper": "Mẹo: chọn voucher trong Kho voucher — sẽ tự điền vào đây.",
-    "shippingCarrier": "Đơn vị vận chuyển: Vận Chuyển Nhanh",
-    "shippingEta": "Nhận hàng vào 29/03 – 03/04",
+    "shippingCarrier": "Đơn vị vận chuyển",
+    "shippingEta": "Nhận hàng vào",
     "inspection": "Được đồng kiểm",
     "totalWithCount": "Tổng số tiền ({{count}} sản phẩm):",
     "paymentTitle": "Phương thức thanh toán",
@@ -986,6 +1092,10 @@
     "summaryShipping": "Phí vận chuyển",
     "summaryVoucher": "Giảm giá voucher",
     "summaryTotal": "Tổng thanh toán:",
+    "shippingMethodTitle": "Chọn phương thức vận chuyển",
+    "shippingStandard": "Vận chuyển tiêu chuẩn",
+    "shippingExpress": "Vận chuyển nhanh",
+    "shippingDays": "ngày",
     "termsHint": "Nhấn \"Đặt hàng\" đồng nghĩa với việc bạn đồng ý tuân theo Điều khoản Phan Coffee",
     "placeOrder": "Đặt hàng",
     "loadingPaypal": "Đang tải PayPal…",
@@ -1079,8 +1189,7 @@
   "payment": {
     "cartEmpty": "Giỏ hàng trống!",
     "amountPlaceholder": "10.00",
-    "orderPaymentSuccess":
-      "Thanh toán thành công ✅ Đang chuyển đến sản phẩm bạn đã đặt..."
+    "orderPaymentSuccess": "Thanh toán thành công ✅ Đang chuyển đến sản phẩm bạn đã đặt..."
   },
   "paymentId": "Mã thanh toán"
 }

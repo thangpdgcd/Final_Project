@@ -42,4 +42,3 @@ export const StaffJoinById: React.FC<Props> = ({ disabled, onJoin }) => {
     </div>
   );
 };
-

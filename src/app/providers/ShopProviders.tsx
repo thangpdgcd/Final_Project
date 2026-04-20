@@ -13,4 +13,3 @@ const ShopProviders: React.FC<ShopProvidersProps> = ({ children }) => (
 );
 
 export default ShopProviders;
-

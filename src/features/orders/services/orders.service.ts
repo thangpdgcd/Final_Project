@@ -41,7 +41,9 @@ const getNormalizedRoleID = (): '1' | '2' | '3' | null => {
     const raw = localStorage.getItem(STORAGE_KEYS.user);
     if (!raw) return null;
     const u = JSON.parse(raw) as any;
-    const v = String(u?.roleID ?? u?.roleId ?? u?.role ?? '').trim().toLowerCase();
+    const v = String(u?.roleID ?? u?.roleId ?? u?.role ?? '')
+      .trim()
+      .toLowerCase();
     if (!v) return null;
     if (v === '1' || v === 'customer' || v === 'user') return '1';
     if (v === '2' || v === 'admin') return '2';
@@ -85,7 +87,14 @@ export const ordersService = {
     const candidates =
       roleID === '1'
         ? ['/my-orders', '/orders/my', '/orders/me', ...byUserCandidates]
-        : ['/my-orders', '/orders/my', '/orders/me', ...byUserCandidates, '/staff/orders', '/orders'];
+        : [
+            '/my-orders',
+            '/orders/my',
+            '/orders/me',
+            ...byUserCandidates,
+            '/staff/orders',
+            '/orders',
+          ];
 
     const extractList = (payload: any): unknown[] | null => {
       if (!payload) return null;
@@ -164,7 +173,9 @@ export const ordersService = {
         const status = err.response?.status;
         if (status === 403 || status === 404) {
           const mine = await ordersService.getAll();
-          const found = mine.find((o) => Number(o.order_ID) === orderId || Number((o as any).orderId) === orderId);
+          const found = mine.find(
+            (o) => Number(o.order_ID) === orderId || Number((o as any).orderId) === orderId,
+          );
           if (found) return found;
         }
       }
@@ -194,11 +205,22 @@ export const ordersService = {
       body.total_Amount = totalAmount;
       body.totalAmount = totalAmount;
     }
-    if (payload.paypalCaptureId) body.paypalCaptureId = payload.paypalCaptureId;
+    if (payload.paypalCaptureId != null) body.paypalCaptureId = payload.paypalCaptureId;
+    if ((payload as any).shippingMethod) {
+      body.shippingMethod = (payload as any).shippingMethod;
+      body.shipping_method = (payload as any).shippingMethod;
+    }
+    if ((payload as any).items) {
+      body.items = (payload as any).items;
+      body.cartItems = (payload as any).items;
+      body.orderItems = (payload as any).items;
+    }
+    if ((payload as any).note) {
+      body.note = String((payload as any).note);
+    }
     if (payload.shipping_Address) {
       body.shipping_Address = payload.shipping_Address;
       body.shippingAddress = payload.shipping_Address;
-      body.note = payload.shipping_Address;
     }
     const res = await axiosInstance.post<any>('/create-orders', body);
     const data = res.data;
@@ -225,12 +247,7 @@ export const ordersService = {
     const res = await axiosInstance.patch<any>(`/orders/${id}/cancel`, payload ?? {});
     const data = res.data;
     const order =
-      data?.order ??
-      data?.data?.order ??
-      data?.data ??
-      data?.result?.order ??
-      data?.result ??
-      data;
+      data?.order ?? data?.data?.order ?? data?.data ?? data?.result?.order ?? data?.result ?? data;
     return order as Order;
   },
 
@@ -238,12 +255,7 @@ export const ordersService = {
     const res = await axiosInstance.patch<any>(`/orders/${id}/refund-request`, payload ?? {});
     const data = res.data;
     const order =
-      data?.order ??
-      data?.data?.order ??
-      data?.data ??
-      data?.result?.order ??
-      data?.result ??
-      data;
+      data?.order ?? data?.data?.order ?? data?.data ?? data?.result?.order ?? data?.result ?? data;
     return order as Order;
   },
 
@@ -269,10 +281,9 @@ export const ordersService = {
 
         const res = await axiosInstance.get<any>(url);
         const data = res.data;
-        const list =
-          Array.isArray(data)
-            ? data
-            : (data?.items ?? data?.orderItems ?? data?.orderitems ?? data?.data ?? data?.rows ?? []);
+        const list = Array.isArray(data)
+          ? data
+          : (data?.items ?? data?.orderItems ?? data?.orderitems ?? data?.data ?? data?.rows ?? []);
         return (Array.isArray(list) ? list : []) as OrderItem[];
       } catch (err) {
         if (axios.isAxiosError(err) && err.response?.status === 404) {
@@ -283,7 +294,10 @@ export const ordersService = {
       }
     }
 
-    const candidates: Array<{ key: 'orders_items' | 'orderitems_query' | 'orderitems_nested' | 'orderitems_id'; url: string }> = [
+    const candidates: Array<{
+      key: 'orders_items' | 'orderitems_query' | 'orderitems_nested' | 'orderitems_id';
+      url: string;
+    }> = [
       { key: 'orders_items', url: `/orders/${order_ID}/items` },
       { key: 'orderitems_query', url: `/orderitems?order_ID=${order_ID}` },
       { key: 'orderitems_nested', url: `/orderitems/order/${order_ID}` },
@@ -294,10 +308,9 @@ export const ordersService = {
       try {
         const res = await axiosInstance.get<any>(url.url);
         const data = res.data;
-        const list =
-          Array.isArray(data)
-            ? data
-            : (data?.items ?? data?.orderItems ?? data?.orderitems ?? data?.data ?? data?.rows ?? []);
+        const list = Array.isArray(data)
+          ? data
+          : (data?.items ?? data?.orderItems ?? data?.orderitems ?? data?.data ?? data?.rows ?? []);
         orderItemsGetRoute = url.key;
         return (Array.isArray(list) ? list : []) as OrderItem[];
       } catch (err) {
@@ -364,4 +377,3 @@ export const ordersService = {
     return res.data;
   },
 };
-

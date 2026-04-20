@@ -53,4 +53,17 @@ export const i18nKeys = {
     shippingStatusFromApi: (raw: unknown) =>
       `order.shippingStatus.${mapShippingStatusToI18nKey(raw)}` as const,
   },
+  notifications: {
+    ui: {
+      title: 'notifications.ui.title',
+      close: 'notifications.ui.close',
+      markAllRead: 'notifications.ui.markAllRead',
+      emptyTitle: 'notifications.ui.emptyTitle',
+      emptyDesc: 'notifications.ui.emptyDesc',
+      ariaBell: 'notifications.ui.ariaBell',
+    },
+    templates: {
+      orderCreated: 'notifications.templates.orderCreated',
+    },
+  },
 } as const;

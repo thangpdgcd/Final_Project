@@ -4,4 +4,3 @@ export const STORAGE_KEYS = {
   user: 'user',
   userId: 'user_ID',
 } as const;
-

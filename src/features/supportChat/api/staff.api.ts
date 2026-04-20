@@ -29,7 +29,12 @@ const mapStaffUser = (raw: any): OnlineStaffUser | null => {
   return {
     userId,
     name: toString(raw?.name ?? raw?.username ?? raw?.fullName, `Staff ${userId}`),
-    avatarUrl: typeof raw?.avatarUrl === 'string' ? raw.avatarUrl : typeof raw?.avatar === 'string' ? raw.avatar : undefined,
+    avatarUrl:
+      typeof raw?.avatarUrl === 'string'
+        ? raw.avatarUrl
+        : typeof raw?.avatar === 'string'
+          ? raw.avatar
+          : undefined,
     role: 'staff',
   };
 };
@@ -42,11 +47,13 @@ export const staffApi = {
       return list.map(mapStaffUser).filter(Boolean) as OnlineStaffUser[];
     } catch (err) {
       // Customers may not have permission for staff presence; treat as "no staff online".
-      if (axios.isAxiosError(err) && (err.response?.status === 401 || err.response?.status === 403)) {
+      if (
+        axios.isAxiosError(err) &&
+        (err.response?.status === 401 || err.response?.status === 403)
+      ) {
         return [];
       }
       return [];
     }
   },
 };
-

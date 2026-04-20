@@ -84,7 +84,11 @@ const RegisterPage: React.FC = () => {
         >
           <div className="contact-form-card mx-auto w-full max-w-md rounded-md p-8 sm:p-10">
             <div className="mb-8 flex items-center gap-3 lg:hidden">
-              <Logo size={40} showText={false} className="rounded-full ring-1 ring-[color:color-mix(in_srgb,var(--hl-outline-variant)_40%,transparent)]" />
+              <Logo
+                size={40}
+                showText={false}
+                className="rounded-full ring-1 ring-[color:color-mix(in_srgb,var(--hl-outline-variant)_40%,transparent)]"
+              />
               <span className="hl-sans text-sm font-semibold uppercase tracking-[0.18em] text-[color:var(--hl-secondary)]">
                 {t('common.brandName')}
               </span>
@@ -115,7 +119,9 @@ const RegisterPage: React.FC = () => {
                   placeholder={t('auth.registerFullNamePlaceholder')}
                   className={`hl-input-underline ${errors.name ? 'border-b-red-500' : ''}`}
                 />
-                {errors.name && <p className="hl-sans mt-2 text-xs text-red-600">{errors.name.message}</p>}
+                {errors.name && (
+                  <p className="hl-sans mt-2 text-xs text-red-600">{errors.name.message}</p>
+                )}
               </div>
 
               <div>
@@ -130,7 +136,9 @@ const RegisterPage: React.FC = () => {
                   placeholder={t('auth.loginEmailPlaceholder')}
                   className={`hl-input-underline ${errors.email ? 'border-b-red-500' : ''}`}
                 />
-                {errors.email && <p className="hl-sans mt-2 text-xs text-red-600">{errors.email.message}</p>}
+                {errors.email && (
+                  <p className="hl-sans mt-2 text-xs text-red-600">{errors.email.message}</p>
+                )}
               </div>
 
               <div>
@@ -145,7 +153,9 @@ const RegisterPage: React.FC = () => {
                   placeholder={t('auth.loginPasswordPlaceholder')}
                   className={`hl-input-underline ${errors.password ? 'border-b-red-500' : ''}`}
                 />
-                {errors.password && <p className="hl-sans mt-2 text-xs text-red-600">{errors.password.message}</p>}
+                {errors.password && (
+                  <p className="hl-sans mt-2 text-xs text-red-600">{errors.password.message}</p>
+                )}
               </div>
 
               <div>
@@ -161,7 +171,9 @@ const RegisterPage: React.FC = () => {
                   className={`hl-input-underline ${errors.confirmPassword ? 'border-b-red-500' : ''}`}
                 />
                 {errors.confirmPassword && (
-                  <p className="hl-sans mt-2 text-xs text-red-600">{errors.confirmPassword.message}</p>
+                  <p className="hl-sans mt-2 text-xs text-red-600">
+                    {errors.confirmPassword.message}
+                  </p>
                 )}
               </div>
 
@@ -170,7 +182,9 @@ const RegisterPage: React.FC = () => {
                 disabled={registerMutation.isPending}
                 className="btn-highland-primary mt-2 flex w-full items-center justify-center gap-2 disabled:opacity-50"
               >
-                {registerMutation.isPending ? t('auth.registerProcessing') : t('auth.registerSubmit')}
+                {registerMutation.isPending
+                  ? t('auth.registerProcessing')
+                  : t('auth.registerSubmit')}
                 {!registerMutation.isPending && <ArrowRight size={18} aria-hidden />}
               </button>
             </form>
@@ -178,7 +192,10 @@ const RegisterPage: React.FC = () => {
             <div className="mt-10 flex flex-col gap-4 border-t border-[color:color-mix(in_srgb,var(--hl-outline-variant)_35%,transparent)] pt-8 sm:flex-row sm:items-center sm:justify-between">
               <p className="hl-sans text-sm text-[color:color-mix(in_srgb,var(--hl-on-surface)_65%,transparent)]">
                 {t('auth.registerAlreadyHaveAccount')}{' '}
-                <Link to="/login" className="font-semibold text-[color:var(--hl-primary)] hover:underline underline-offset-4">
+                <Link
+                  to="/login"
+                  className="font-semibold text-[color:var(--hl-primary)] hover:underline underline-offset-4"
+                >
                   {t('auth.registerGotoLogin')}
                 </Link>
               </p>
@@ -216,7 +233,9 @@ const RegisterPage: React.FC = () => {
                 style={{ fontFamily: 'var(--font-highland-display)' }}
               >
                 {t('auth.registerBannerTitlePrefix')}{' '}
-                <span className="text-[color:var(--hl-secondary)]">{t('auth.registerBannerTitleHighlight')}</span>
+                <span className="text-[color:var(--hl-secondary)]">
+                  {t('auth.registerBannerTitleHighlight')}
+                </span>
               </p>
               <p className="hl-sans mt-4 text-sm leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_75%,transparent)]">
                 {t('auth.registerBannerQuote')}
@@ -230,4 +249,3 @@ const RegisterPage: React.FC = () => {
 };
 
 export default RegisterPage;
-

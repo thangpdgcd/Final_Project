@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { App } from 'antd';
 import type { Product } from '@/types';
+import { useTranslation } from 'react-i18next';
 
 export const useWishlist = () => {
   const { message } = App.useApp();
+  const { t } = useTranslation();
   const [wishlist, setWishlist] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -20,12 +22,12 @@ export const useWishlist = () => {
   const addToWishlist = (product: Product) => {
     setWishlist((prev) => {
       if (prev.find((p) => p.product_ID === product.product_ID)) {
-        message.info('Sản phẩm đã có trong danh sách yêu thích!');
+        message.info(t('wishlist.toast.alreadyAdded'));
         return prev;
       }
       const updated = [...prev, product];
       localStorage.setItem('coffephan_wishlist', JSON.stringify(updated));
-      message.success('Đã thêm vào danh sách yêu thích!');
+      message.success(t('wishlist.toast.added'));
       return updated;
     });
   };

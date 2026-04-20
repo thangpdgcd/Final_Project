@@ -81,7 +81,9 @@ const ProductCard = ({ product, onSelect, selected }: ProductCardProps) => {
             </div>
           </div>
           <div className="text-right">
-            <div className="hl-sans text-sm font-semibold text-[color:var(--hl-primary)]">{format(product.priceUSD)}</div>
+            <div className="hl-sans text-sm font-semibold text-[color:var(--hl-primary)]">
+              {format(product.priceUSD)}
+            </div>
             {typeof product.discount === 'number' && (
               <div className="hl-sans text-xs text-[color:color-mix(in_srgb,var(--hl-on-surface)_50%,transparent)]">
                 <span className="line-through">

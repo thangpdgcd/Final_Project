@@ -77,9 +77,7 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
         onClick={isEditing ? onSave : onEdit}
         style={{
           ...btnBase,
-          background: isEditing
-            ? 'linear-gradient(135deg, #e5c18b, #c5a370)'
-            : 'transparent',
+          background: isEditing ? 'linear-gradient(135deg, #e5c18b, #c5a370)' : 'transparent',
           color: isEditing ? '#0e0e0e' : '#e5c18b',
           border: isEditing ? 'none' : '1px solid rgba(229,193,139,0.22)',
           opacity: isLoading ? 0.6 : 1,

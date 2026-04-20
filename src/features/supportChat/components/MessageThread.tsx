@@ -57,7 +57,10 @@ export const MessageThread: React.FC<Props> = ({ myUserId, messages, loading }) 
             ? `${bubbleBase} bg-[#0866ff] text-white border-white/10 rounded-br-md`
             : `${bubbleBase} bg-[rgba(255,255,255,0.08)] text-zinc-100 border-white/10 rounded-bl-md`;
 
-          const metaText = m.type === 'text' ? m.content : `Action: ${m.action}\n${JSON.stringify(m.meta, null, 2)}`;
+          const metaText =
+            m.type === 'text'
+              ? m.content
+              : `Action: ${m.action}\n${JSON.stringify(m.meta, null, 2)}`;
 
           return (
             <div
@@ -66,7 +69,13 @@ export const MessageThread: React.FC<Props> = ({ myUserId, messages, loading }) 
             >
               <div>
                 <div className={bubble}>{metaText}</div>
-                <div className={mine ? 'mt-1 text-[10px] text-right text-zinc-500' : 'mt-1 text-[10px] text-zinc-500'}>
+                <div
+                  className={
+                    mine
+                      ? 'mt-1 text-[10px] text-right text-zinc-500'
+                      : 'mt-1 text-[10px] text-zinc-500'
+                  }
+                >
                   {formatTime(m.createdAt)}
                   {m.optimistic?.status === 'sending' ? ' · Sending…' : null}
                   {m.optimistic?.status === 'failed' ? ' · Failed' : null}
@@ -80,4 +89,3 @@ export const MessageThread: React.FC<Props> = ({ myUserId, messages, loading }) 
     </div>
   );
 };
-

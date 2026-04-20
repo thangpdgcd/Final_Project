@@ -551,8 +551,7 @@
     "membership": "Membership",
     "joinedSince": "Joined Since",
     "accountStatus": "Account Status",
-    "points": "Coffee Points"
-    ,
+    "points": "Coffee Points",
     "accountBadge": "Account",
     "alertTitle": "Profile",
     "back": "Back",
@@ -568,8 +567,7 @@
     "loadErrorFallback": "Failed to load profile.",
     "missingUserId": "Missing user id",
     "noName": "No name",
-    "historyOrdersSearchPlaceholder":
-      "You can search by shop name, order ID, or product name",
+    "historyOrdersSearchPlaceholder": "You can search by shop name, order ID, or product name",
     "notFound": "User not found",
     "sidebar": {
       "account": "My Account",
@@ -606,11 +604,17 @@
       "promotions": "PROMOTIONS"
     },
     "menu": {
-      "myAccount": { "title": "My account", "description": "Personal info, security, and payments" },
+      "myAccount": {
+        "title": "My account",
+        "description": "Personal info, security, and payments"
+      },
       "vouchers": { "title": "Vouchers", "description": "Your exclusive promo codes" },
       "orders": { "title": "Orders", "description": "Track deliveries and order history" },
       "settings": { "title": "Settings", "description": "Language, display, and privacy" },
-      "notifications": { "title": "Notifications", "description": "Updates on collections and orders" },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Updates on collections and orders"
+      },
       "help": { "title": "Help center", "description": "Contact our 24/7 support team" }
     },
     "stats": {
@@ -795,6 +799,9 @@
     "wishlist": {
       "documentTitle": "Wishlist — Phan Coffee"
     },
+    "vouchers": {
+      "documentTitle": "Vouchers — Phan Coffee"
+    },
     "shop": {
       "documentTitle": "Shop — Phan Coffee"
     },
@@ -835,6 +842,8 @@
     "bestSeller": "Best Seller",
     "premiumPrice": "Premium Price",
     "toast": {
+      "alreadyAdded": "Product is already in your wishlist!",
+      "added": "Added to wishlist!",
       "addToCartSuccess": "✅ Added to cart",
       "addToCartError": "❌ Unable to add to cart",
       "removeSuccess": "Removed from wishlist"
@@ -852,6 +861,15 @@
     "browseHeritage": "Browse Our Heritage",
     "discoveryNew": "Discovery New"
   },
+  "vouchers": {
+    "subtitle": "Vouchers received from staff messages will be saved here automatically. Copy a code and apply it at checkout.",
+    "goToCart": "Go to cart",
+    "clearAll": "Clear all",
+    "emptyTitle": "No vouchers yet",
+    "emptySubtitle": "When staff sends a voucher via chat, it will be saved here.",
+    "receivedAt": "Received at {{time}}",
+    "useInCart": "Use in cart"
+  },
   "productDetail": {
     "purchaseSubscribeSuccess": "✅ Package subscription successful!",
     "purchaseOnceSuccess": "✅ Added to cart!",
@@ -862,7 +880,75 @@
     "badgeBestSeller": "BEST SELLER",
     "badgeLimitedEdition": "LIMITED EDITION",
     "store": "Shop",
-    "artOfCoffee": "The Art of Coffee"
+    "artOfCoffee": "The Art of Coffee",
+    "buyNow": "Buy now",
+    "story": {
+      "title": "A journey from the Di Linh highlands",
+      "quote": "\"Each coffee bean tells a story of basalt soil and morning dew on a 1,500m peak.\"",
+      "originLabel": "Origin",
+      "originValue": "Lam Dong, VN",
+      "processLabel": "Process",
+      "processValue": "Washed",
+      "farmerName": "Farmer Phan",
+      "farmerOrg": "Highland Cooperative"
+    },
+    "reviews": {
+      "title": "Customer reviews",
+      "average": "{{score}} average",
+      "verifiedBuyer": "VERIFIED BUYER"
+    },
+    "stats": {
+      "purchased": "{{countText}} purchased",
+      "tried": "{{countText}} tried"
+    },
+    "stock": {
+      "tool": "{{count}} items left in stock — order now!",
+      "coffee": "Last chance! Only {{count}} packs left in this roast batch."
+    },
+    "banner": {
+      "brewingEquipment": "⚙  BREWING EQUIPMENT",
+      "premiumCoffee": "☕  PREMIUM COFFEE"
+    },
+    "precisionCraft": "PRECISION CRAFT",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode",
+    "purchase": {
+      "once": "One-time purchase"
+    },
+    "options": {
+      "size": {
+        "label": "Size",
+        "small": "Small (1 cup)",
+        "standard": "Standard (2 cups)",
+        "large": "Large (4 cups)"
+      },
+      "material": {
+        "label": "Material",
+        "stainless": "Stainless Steel (304)",
+        "aluminum": "Aluminum",
+        "titanium": "Titanium"
+      },
+      "grind": {
+        "label": "Grind",
+        "beans": "Whole beans",
+        "ground": "Ground"
+      },
+      "roast": {
+        "label": "Roast",
+        "light": "Light roast",
+        "medium": "Medium roast",
+        "dark": "Dark roast"
+      },
+      "frequency": {
+        "label": "Delivery cycle",
+        "weekly": "Weekly",
+        "every2Weeks": "Every 2 weeks",
+        "monthly": "Monthly"
+      },
+      "quantity": "Quantity"
+    },
+    "totalPayable": "Total payable",
+    "savings": "Save {{amount}}"
   },
   "coffeePackageDetail": {
     "purchaseSubscribeSuccess": "Subscribed successfully!",
@@ -957,6 +1043,19 @@
       "loginRequired": "Please log in"
     }
   },
+  "notifications": {
+    "ui": {
+      "title": "Notifications",
+      "close": "Close",
+      "markAllRead": "Mark all read",
+      "emptyTitle": "No notifications",
+      "emptyDesc": "You're all caught up.",
+      "ariaBell": "Open notifications"
+    },
+    "templates": {
+      "orderCreated": "Order was created successfully"
+    }
+  },
   "checkout": {
     "shippingTitle": "Shipping address",
     "defaultBadge": "Default",
@@ -973,8 +1072,8 @@
     "notePlaceholder": "Note for seller…",
     "shopVoucher": "Shop voucher",
     "voucherHelper": "Tip: pick a voucher from Voucher Vault and it will auto-fill here.",
-    "shippingCarrier": "Carrier: Express",
-    "shippingEta": "Estimated delivery Mar 29 – Apr 3",
+    "shippingCarrier": "Shipping carrier",
+    "shippingEta": "Estimated delivery",
     "inspection": "Inspection on delivery",
     "totalWithCount": "Total ({{count}} items):",
     "paymentTitle": "Payment method",
@@ -988,6 +1087,10 @@
     "summaryShipping": "Shipping fee",
     "summaryVoucher": "Voucher discount",
     "summaryTotal": "Total due:",
+    "shippingMethodTitle": "Choose shipping method",
+    "shippingStandard": "Standard shipping",
+    "shippingExpress": "Express shipping",
+    "shippingDays": "days",
     "termsHint": "By placing an order you agree to Phan Coffee terms.",
     "placeOrder": "Place order",
     "loadingPaypal": "Loading PayPal…",
@@ -1081,8 +1184,7 @@
   "payment": {
     "cartEmpty": "Cart is empty!",
     "amountPlaceholder": "10.00",
-    "orderPaymentSuccess":
-      "Payment success ✅ Redirecting to your ordered products..."
+    "orderPaymentSuccess": "Payment success ✅ Redirecting to your ordered products..."
   },
   "paymentId": "Payment ID"
 }

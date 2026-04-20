@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import React, { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 
 type ModalProps = {
   open: boolean;
@@ -15,33 +15,33 @@ type ModalProps = {
  * Common Modal component: Production-level quality with Tailwind CSS
  * Features: Centered, backdrop blur, z-index management, scroll lock, ESC & click outside to close
  */
-const Modal: React.FC<ModalProps> = ({ 
-  open, 
-  onClose, 
-  title, 
+const Modal: React.FC<ModalProps> = ({
+  open,
+  onClose,
+  title,
   children,
-  maxWidth = "max-w-sm",
-  showCloseButton = true
+  maxWidth = 'max-w-sm',
+  showCloseButton = true,
 }) => {
   // --- LOGIC: Body Scroll Lock ---
   useEffect(() => {
     if (open) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     }
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     };
   }, [open]);
 
   // --- LOGIC: ESC Key Closing ---
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    if (open) window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    if (open) window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
   }, [open, onClose]);
 
   return (
@@ -62,7 +62,7 @@ const Modal: React.FC<ModalProps> = ({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={`relative w-full ${maxWidth} bg-white dark:bg-[#1c1716] rounded-2xl shadow-2xl p-5 sm:p-6 z-50 overflow-hidden`}
             onClick={(e) => e.stopPropagation()}
           >
@@ -86,9 +86,7 @@ const Modal: React.FC<ModalProps> = ({
             )}
 
             {/* Body */}
-            <div className="modal-body">
-              {children}
-            </div>
+            <div className="modal-body">{children}</div>
           </motion.div>
         </div>
       )}
@@ -97,5 +95,3 @@ const Modal: React.FC<ModalProps> = ({
 };
 
 export default Modal;
-
-

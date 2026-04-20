@@ -1,8 +1,7 @@
-import React from "react";
+import React from 'react';
 
 const Loader: React.FC = () => {
-  return <div className='common-loader'>Loading...</div>;
+  return <div className="common-loader">Loading...</div>;
 };
 
 export default Loader;
-

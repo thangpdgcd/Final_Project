@@ -17,7 +17,10 @@ const buildRegisterSchema = (t: (key: string) => string) =>
   z
     .object({
       name: z.string().min(2, t('auth.registerFullNameRequired')),
-      email: z.string().min(1, t('auth.registerEmailRequired')).email(t('auth.registerEmailInvalid')),
+      email: z
+        .string()
+        .min(1, t('auth.registerEmailRequired'))
+        .email(t('auth.registerEmailInvalid')),
       password: z.string().min(6, t('auth.registerPasswordRequired')),
       confirmPassword: z.string().min(1, t('auth.registerConfirmPasswordRequired')),
     })
@@ -67,10 +70,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ setView }) => {
 
   return (
     <>
-      <motion.form
-        onSubmit={handleSubmit(onSubmit)}
-        className="w-full space-y-5"
-      >
+      <motion.form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-5">
         <div className="space-y-4">
           <div className="relative group">
             <User
@@ -180,4 +180,3 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ setView }) => {
 };
 
 export default RegisterForm;
-

@@ -124,7 +124,9 @@ export const authService = {
     if (!res) throw lastErr ?? new Error('LOGIN_NOT_AVAILABLE');
 
     const raw: any = res.data;
-    const payloadData: RawLoginResponse = (raw && typeof raw === 'object' && 'data' in raw ? raw.data : raw) as any;
+    const payloadData: RawLoginResponse = (
+      raw && typeof raw === 'object' && 'data' in raw ? raw.data : raw
+    ) as any;
 
     const accessToken =
       payloadData?.accessToken ??
@@ -178,4 +180,3 @@ export const authService = {
     throw lastErr ?? new Error('REGISTER_NOT_AVAILABLE');
   },
 };
-

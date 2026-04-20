@@ -8,11 +8,7 @@ const ShopLayout: React.FC = () => (
   <ShopProviders>
     <div className="about-page about-page--bg-animate min-h-screen bg-[color:var(--hl-surface)] text-[color:var(--hl-on-surface)]">
       <Header />
-      <Suspense
-        fallback={
-          <PageSpinner />
-        }
-      >
+      <Suspense fallback={<PageSpinner />}>
         <div className="relative z-[1]">
           <AnimatedOutlet />
         </div>
@@ -22,4 +18,3 @@ const ShopLayout: React.FC = () => (
 );
 
 export default ShopLayout;
-

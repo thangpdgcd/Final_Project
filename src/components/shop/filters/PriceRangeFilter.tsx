@@ -11,12 +11,7 @@ const percent = (value: number, min: number, max: number) => {
   return ((value - min) / (max - min)) * 100;
 };
 
-const PriceRangeFilter = ({
-  min,
-  max,
-  priceRange,
-  setPriceRange,
-}: PriceRangeFilterProps) => {
+const PriceRangeFilter = ({ min, max, priceRange, setPriceRange }: PriceRangeFilterProps) => {
   const { format } = useCurrency() as any;
 
   const [minVal, maxVal] = priceRange;

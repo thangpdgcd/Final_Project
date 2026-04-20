@@ -18,7 +18,7 @@ const ROLE_MAP: Record<string, string> = {
 
 const useIsDesktop = () => {
   const [isDesktop, setIsDesktop] = useState(() =>
-    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true
+    typeof window !== 'undefined' ? window.innerWidth >= 1024 : true,
   );
   useEffect(() => {
     const handler = () => setIsDesktop(window.innerWidth >= 1024);
@@ -28,19 +28,11 @@ const useIsDesktop = () => {
   return isDesktop;
 };
 
-const ProfileInfo: React.FC<ProfileInfoProps> = ({
-  name,
-  email,
-  roleID,
-  ordersCount,
-  bio,
-}) => {
+const ProfileInfo: React.FC<ProfileInfoProps> = ({ name, email, roleID, ordersCount, bio }) => {
   const isDesktop = useIsDesktop();
   const roleLabel = ROLE_MAP[String(roleID)] ?? 'Thành viên';
 
-  const slideInitial = isDesktop
-    ? { opacity: 0, x: 30, y: 0 }
-    : { opacity: 0, x: 0, y: 20 };
+  const slideInitial = isDesktop ? { opacity: 0, x: 30, y: 0 } : { opacity: 0, x: 0, y: 20 };
 
   const stats = [
     { label: 'ĐƠN HÀNG', value: ordersCount, icon: <ShoppingBag size={14} /> },
@@ -120,11 +112,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
       <div className="flex items-center justify-center lg:justify-start gap-6 pt-1">
         {stats.map((stat, i) => (
           <React.Fragment key={stat.label}>
-            {i > 0 && (
-              <div
-                style={{ width: 1, height: 28, background: '#e5e2e115' }}
-              />
-            )}
+            {i > 0 && <div style={{ width: 1, height: 28, background: '#e5e2e115' }} />}
             <div className="flex flex-col items-center lg:items-start gap-0.5">
               <span
                 style={{

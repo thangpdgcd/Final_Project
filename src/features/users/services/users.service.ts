@@ -27,4 +27,3 @@ export const usersService = {
     return res.data;
   },
 };
-

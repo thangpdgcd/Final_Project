@@ -27,7 +27,9 @@ export const VoucherInput: React.FC<VoucherInputProps> = ({
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="text-sm font-medium text-stone-900 dark:text-stone-100">Voucher code</div>
-          <div className="text-xs text-stone-500 dark:text-stone-400">Apply a voucher to save on this order.</div>
+          <div className="text-xs text-stone-500 dark:text-stone-400">
+            Apply a voucher to save on this order.
+          </div>
         </div>
       </div>
 
@@ -50,7 +52,9 @@ export const VoucherInput: React.FC<VoucherInputProps> = ({
             }`}
           />
           {(errorMessage || helperText) && (
-            <div className={`mt-1 text-xs ${errorMessage ? 'text-red-600' : 'text-stone-500 dark:text-stone-400'}`}>
+            <div
+              className={`mt-1 text-xs ${errorMessage ? 'text-red-600' : 'text-stone-500 dark:text-stone-400'}`}
+            >
               {errorMessage || helperText}
             </div>
           )}
@@ -72,4 +76,3 @@ export const VoucherInput: React.FC<VoucherInputProps> = ({
     </div>
   );
 };
-

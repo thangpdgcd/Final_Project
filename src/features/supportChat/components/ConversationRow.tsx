@@ -32,7 +32,9 @@ export const ConversationRow: React.FC<Props> = ({ conversation, selected, onCli
       onClick={onClick}
       className={[
         'w-full text-left rounded-2xl px-3 py-2 transition border',
-        selected ? 'bg-white/10 border-white/15' : 'border-transparent hover:bg-white/5 hover:border-white/10',
+        selected
+          ? 'bg-white/10 border-white/15'
+          : 'border-transparent hover:bg-white/5 hover:border-white/10',
       ].join(' ')}
     >
       <div className="flex items-center gap-3">
@@ -53,10 +55,16 @@ export const ConversationRow: React.FC<Props> = ({ conversation, selected, onCli
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <div className="text-sm font-semibold text-zinc-100 truncate">{conversation.title}</div>
-              <div className="text-[11px] text-zinc-400 truncate">{conversation.lastMessagePreview ?? 'No messages yet'}</div>
+              <div className="text-sm font-semibold text-zinc-100 truncate">
+                {conversation.title}
+              </div>
+              <div className="text-[11px] text-zinc-400 truncate">
+                {conversation.lastMessagePreview ?? 'No messages yet'}
+              </div>
             </div>
-            <div className="shrink-0 text-[10px] text-zinc-400 mt-0.5">{formatTime(conversation.lastMessageAt)}</div>
+            <div className="shrink-0 text-[10px] text-zinc-400 mt-0.5">
+              {formatTime(conversation.lastMessageAt)}
+            </div>
           </div>
         </div>
 
@@ -69,4 +77,3 @@ export const ConversationRow: React.FC<Props> = ({ conversation, selected, onCli
     </button>
   );
 };
-

@@ -29,4 +29,3 @@ export type PriceRangeFilterProps = {
   priceRange: readonly [number, number];
   setPriceRange: (range: [number, number]) => void;
 };
-

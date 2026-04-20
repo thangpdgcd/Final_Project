@@ -42,8 +42,6 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const setDark = (value: boolean) => setDarkState(value);
 
   return (
-    <ThemeContext.Provider value={{ dark, toggleDark, setDark }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={{ dark, toggleDark, setDark }}>{children}</ThemeContext.Provider>
   );
 };

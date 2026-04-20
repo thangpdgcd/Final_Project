@@ -64,11 +64,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           */}
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-center lg:items-start">
             {/* Avatar */}
-            <AvatarSection
-              src={avatarSrc}
-              onClick={onAvatarClick}
-              size="lg"
-            />
+            <AvatarSection src={avatarSrc} onClick={onAvatarClick} size="lg" />
 
             {/* Info + Actions */}
             <div className="flex flex-col gap-5 text-center lg:text-left w-full min-w-0">

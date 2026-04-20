@@ -51,4 +51,3 @@ export const useRoomMessages = ({ enabled }: Options) => {
     setRoomMessages,
   ]);
 };
-

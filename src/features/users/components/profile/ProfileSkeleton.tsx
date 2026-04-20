@@ -23,8 +23,7 @@ const ShimmerBlock: React.FC<{ className?: string; style?: React.CSSProperties }
     transition={shimmerTransition}
     className={`rounded-xl ${className}`}
     style={{
-      backgroundImage:
-        'linear-gradient(90deg, #1c1b1b 0px, #2a2a2a 40%, #1c1b1b 80%)',
+      backgroundImage: 'linear-gradient(90deg, #1c1b1b 0px, #2a2a2a 40%, #1c1b1b 80%)',
       backgroundSize: '800px 100%',
       ...style,
     }}
@@ -56,17 +55,20 @@ const ProfileSkeleton: React.FC = () => {
         {/* Info placeholder */}
         <div className="flex flex-col gap-4 w-full">
           {/* Badge */}
-          <ShimmerBlock style={{ width: 80, height: 18, borderRadius: 999, alignSelf: 'center' }}
+          <ShimmerBlock
+            style={{ width: 80, height: 18, borderRadius: 999, alignSelf: 'center' }}
             className="lg:self-start"
           />
 
           {/* Name */}
-          <ShimmerBlock style={{ width: '55%', height: 32, alignSelf: 'center' }}
+          <ShimmerBlock
+            style={{ width: '55%', height: 32, alignSelf: 'center' }}
             className="lg:self-start"
           />
 
           {/* Email */}
-          <ShimmerBlock style={{ width: '38%', height: 16, alignSelf: 'center' }}
+          <ShimmerBlock
+            style={{ width: '38%', height: 16, alignSelf: 'center' }}
             className="lg:self-start"
           />
 

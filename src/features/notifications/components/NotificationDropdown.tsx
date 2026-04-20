@@ -2,6 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import NotificationItem from './NotificationItem';
 import type { AppNotification } from '../types';
+import { useTranslation } from 'react-i18next';
+import { i18nKeys } from '@/constants/i18nKeys';
+import { dropdownPop } from '@/utils/motion';
 
 type Props = {
   open: boolean;
@@ -20,6 +23,7 @@ const NotificationDropdown: React.FC<Props> = ({
   unreadCount,
   onMarkAllRead,
 }) => {
+  const { t } = useTranslation();
   const panelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -37,10 +41,10 @@ const NotificationDropdown: React.FC<Props> = ({
     <AnimatePresence>
       {open && (
         <motion.div
-          initial={{ opacity: 0, y: 8, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 8, scale: 0.98 }}
-          transition={{ duration: 0.18, ease: 'easeOut' }}
+          variants={dropdownPop}
+          initial="initial"
+          animate="animate"
+          exit="exit"
           className="absolute right-0 top-12 z-[80] w-[min(92vw,420px)]"
         >
           <div
@@ -49,7 +53,7 @@ const NotificationDropdown: React.FC<Props> = ({
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100 dark:border-white/10">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-stone-700 dark:text-white/80">
-                Notifications
+                {t(i18nKeys.notifications.ui.title)}
               </p>
               <div className="flex items-center gap-3">
                 {unreadCount > 0 && (
@@ -58,7 +62,7 @@ const NotificationDropdown: React.FC<Props> = ({
                     onClick={onMarkAllRead}
                     className="text-[11px] font-bold text-stone-700 hover:text-stone-900 dark:text-white/60 dark:hover:text-white"
                   >
-                    Mark all read
+                    {t(i18nKeys.notifications.ui.markAllRead)}
                   </button>
                 )}
                 <button
@@ -66,7 +70,7 @@ const NotificationDropdown: React.FC<Props> = ({
                   onClick={onClose}
                   className="text-[11px] font-bold text-stone-500 hover:text-stone-900 dark:text-white/45 dark:hover:text-white/80"
                 >
-                  Close
+                  {t(i18nKeys.notifications.ui.close)}
                 </button>
               </div>
             </div>
@@ -74,9 +78,11 @@ const NotificationDropdown: React.FC<Props> = ({
             <div className="max-h-[60vh] overflow-y-auto p-2">
               {items.length === 0 ? (
                 <div className="p-6 text-center">
-                  <p className="text-sm font-semibold text-stone-700 dark:text-white/75">No notifications</p>
+                  <p className="text-sm font-semibold text-stone-700 dark:text-white/75">
+                    {t(i18nKeys.notifications.ui.emptyTitle)}
+                  </p>
                   <p className="mt-1 text-xs text-stone-500 dark:text-white/45">
-                    You&apos;re all caught up.
+                    {t(i18nKeys.notifications.ui.emptyDesc)}
                   </p>
                 </div>
               ) : (
@@ -95,4 +101,3 @@ const NotificationDropdown: React.FC<Props> = ({
 };
 
 export default NotificationDropdown;
-

@@ -1,15 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   UserCircle,
-  ShoppingBag, 
-  LogOut, 
+  ShoppingBag,
+  LogOut,
   ChevronRight,
   ArrowRight,
   User,
   Settings,
-  Heart
+  Heart,
 } from 'lucide-react';
 import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/image';
 
@@ -21,7 +21,13 @@ interface DropdownProps {
   onLoginClick: () => void;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose, onLoginClick }) => {
+const Dropdown: React.FC<DropdownProps> = ({
+  isLoggedIn,
+  user,
+  onLogout,
+  onClose,
+  onLoginClick,
+}) => {
   const navigate = useNavigate();
 
   const handleAction = (path: string) => {
@@ -76,7 +82,7 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
               </div>
             </div>
           </div>
- 
+
           {/* B. Main Actions Layer */}
           <div className="p-2 space-y-1">
             {menuItems.map((item) => (
@@ -88,18 +94,22 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
                   dark:text-white/70 dark:hover:text-white dark:hover:bg-white/5`}
               >
                 <div className="flex items-center gap-4 group-hover:translate-x-1 transition-transform">
-                  <div className={`w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center text-[#b88900] group-hover:bg-[#FFD700] group-hover:text-[#1c1716] transition-all
+                  <div
+                    className={`w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center text-[#b88900] group-hover:bg-[#FFD700] group-hover:text-[#1c1716] transition-all
                     dark:bg-white/5 dark:text-[#FFD700]`}
                   >
                     {item.icon}
                   </div>
                   <span className="font-bold text-sm tracking-tight">{item.label}</span>
                 </div>
-                <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-[#FFD700]" />
+                <ChevronRight
+                  size={14}
+                  className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-[#FFD700]"
+                />
               </button>
             ))}
           </div>
- 
+
           {/* C. Footer Layer */}
           <div className="mt-auto border-t border-stone-100 p-2 bg-stone-50/40 dark:border-white/5 dark:bg-black/10">
             <button
@@ -117,10 +127,14 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
         <div className="flex flex-col">
           {/* Guest Header */}
           <div className="p-6 border-b border-stone-100 bg-stone-50/50 dark:border-white/5 dark:bg-white/[0.02]">
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FFD700] mb-1">Account</p>
-            <h3 className="text-stone-900 dark:text-white font-black text-xl tracking-tight uppercase">Guest User</h3>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FFD700] mb-1">
+              Account
+            </p>
+            <h3 className="text-stone-900 dark:text-white font-black text-xl tracking-tight uppercase">
+              Guest User
+            </h3>
           </div>
- 
+
           {/* Guest Content */}
           <div className="p-6">
             <div className="w-16 h-16 rounded-2xl bg-stone-100 dark:bg-white/5 flex items-center justify-center text-stone-400 dark:text-white/20 mb-6 mx-auto border border-stone-200 dark:border-white/10 rotate-3 transition-transform">
@@ -139,10 +153,12 @@ const Dropdown: React.FC<DropdownProps> = ({ isLoggedIn, user, onLogout, onClose
               Login Now <ArrowRight size={14} />
             </button>
           </div>
- 
+
           {/* Guest Footer Tagline */}
           <div className="border-t border-stone-100 p-4 bg-stone-50/40 flex items-center justify-center dark:border-white/5 dark:bg-black/5">
-            <span className="text-[10px] font-bold text-stone-400/60 dark:text-white/10 uppercase tracking-widest">Phan Coffee • Est 1995</span>
+            <span className="text-[10px] font-bold text-stone-400/60 dark:text-white/10 uppercase tracking-widest">
+              Phan Coffee • Est 1995
+            </span>
           </div>
         </div>
       )}

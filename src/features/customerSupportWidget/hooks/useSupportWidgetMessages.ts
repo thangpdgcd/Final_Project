@@ -33,14 +33,19 @@ export const useSupportWidgetMessages = ({ enabled, conversationId }: Options) =
         const byId = new Map<string, any>();
         for (const m of existing) byId.set(String(m.id), m);
         for (const m of messages) byId.set(String(m.id), m);
-        const merged = Array.from(byId.values()).sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+        const merged = Array.from(byId.values()).sort(
+          (a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0),
+        );
 
         s.setMessages(merged);
         s.setLoadedConversationId(conversationId);
       })
       .catch((err) => {
         if (cancelled) return;
-        toastErrorWithFallback(i18nKeys.toast.support.loadMessagesFailed, err?.message ? String(err.message) : undefined);
+        toastErrorWithFallback(
+          i18nKeys.toast.support.loadMessagesFailed,
+          err?.message ? String(err.message) : undefined,
+        );
         // Avoid an infinite skeleton if the endpoint rejects or is temporarily down.
         useSupportWidgetStore.getState().setLoadedConversationId(conversationId);
       })
@@ -54,4 +59,3 @@ export const useSupportWidgetMessages = ({ enabled, conversationId }: Options) =
     };
   }, [conversationId, enabled]);
 };
-

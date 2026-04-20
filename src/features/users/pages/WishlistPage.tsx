@@ -1,7 +1,16 @@
 import React from 'react';
 import { App } from 'antd';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, ChevronRight, Coffee, Heart, Package, ShoppingCart, Star, Trash2 } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronRight,
+  Coffee,
+  Heart,
+  Package,
+  ShoppingCart,
+  Star,
+  Trash2,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import EditorialPageShell from '@/components/layout/EditorialPageShell';
@@ -12,8 +21,8 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { getImageSrc } from '@/utils/image';
 import { translatedProductName } from '@/utils/productI18n';
 
-const formatPrice = (value: number) =>
-  new Intl.NumberFormat('vi-VN', {
+const formatPrice = (value: number, locale: string) =>
+  new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'VND',
     maximumFractionDigits: 0,
@@ -27,7 +36,8 @@ type WishlistItemProps = {
 
 const WishlistItem: React.FC<WishlistItemProps> = ({ product, onRemove, onAdd }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const moneyLocale = i18n.language?.toLowerCase().startsWith('vi') ? 'vi-VN' : 'en-US';
   const displayName = translatedProductName(t, {
     product_ID: Number(product.product_ID),
     name: String(product.name ?? ''),
@@ -66,7 +76,9 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ product, onRemove, onAdd })
               <Star key={i} size={10} fill="currentColor" />
             ))}
           </div>
-          <p className="mt-1 text-[8px] font-black uppercase tracking-[0.2em] text-white">{t('wishlist.premiumGrade')}</p>
+          <p className="mt-1 text-[8px] font-black uppercase tracking-[0.2em] text-white">
+            {t('wishlist.premiumGrade')}
+          </p>
         </div>
       </div>
 
@@ -94,7 +106,7 @@ const WishlistItem: React.FC<WishlistItemProps> = ({ product, onRemove, onAdd })
               {t('wishlist.premiumPrice')}
             </span>
             <span className="text-2xl font-black leading-none tracking-tighter text-[#4B3621] dark:text-[#FFD700]">
-              {formatPrice(Number(product.price))}
+              {formatPrice(Number(product.price), moneyLocale)}
             </span>
           </div>
 
@@ -160,14 +172,18 @@ const WishlistPage: React.FC = () => {
                 {t('wishlist.breadcrumb.origins')}
               </Link>
               <ChevronRight size={14} aria-hidden />
-              <span className="text-[color:var(--hl-primary)]">{t('wishlist.breadcrumb.treasures')}</span>
+              <span className="text-[color:var(--hl-primary)]">
+                {t('wishlist.breadcrumb.treasures')}
+              </span>
             </div>
             <h1
               className="mt-3 text-4xl font-medium leading-[1.1] tracking-tight text-[color:var(--hl-primary)] sm:text-5xl lg:text-[3.25rem]"
               style={{ fontFamily: 'var(--font-highland-display)' }}
             >
               {t('wishlist.savedTitlePrefix')}{' '}
-              <span className="text-[color:var(--hl-primary-container)]">{t('wishlist.savedTitleHighlight')}</span>
+              <span className="text-[color:var(--hl-primary-container)]">
+                {t('wishlist.savedTitleHighlight')}
+              </span>
             </h1>
             <p className="hl-sans mt-4 max-w-md text-sm leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_72%,transparent)]">
               {t('wishlist.yourSelects')}
@@ -182,7 +198,9 @@ const WishlistPage: React.FC = () => {
               <p className="hl-sans text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--hl-secondary)]">
                 {t('wishlist.collectionSize')}
               </p>
-              <p className="hl-sans text-sm font-medium text-[color:var(--hl-on-surface)]">{t('wishlist.yourSelects')}</p>
+              <p className="hl-sans text-sm font-medium text-[color:var(--hl-on-surface)]">
+                {t('wishlist.yourSelects')}
+              </p>
             </div>
           </div>
         </div>
@@ -226,9 +244,17 @@ const WishlistPage: React.FC = () => {
               </motion.button>
             </motion.div>
           ) : (
-            <motion.div layout className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <motion.div
+              layout
+              className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            >
               {wishlist.map((product) => (
-                <WishlistItem key={product.product_ID} product={product} onRemove={handleRemove} onAdd={handleQuickAdd} />
+                <WishlistItem
+                  key={product.product_ID}
+                  product={product}
+                  onRemove={handleRemove}
+                  onAdd={handleQuickAdd}
+                />
               ))}
 
               <motion.button
@@ -268,14 +294,18 @@ const WishlistPage: React.FC = () => {
                   Heritage in every <br /> <span className="text-[#FFD700]">Selection.</span>
                 </h3>
                 <p className="mb-12 max-w-md text-xl font-bold leading-relaxed text-amber-100/40">
-                  “Every bean in your wishlist tells a story of high-altitude harvesting and artisanal roasting from the
-                  soul of Kon Tum.”
+                  “Every bean in your wishlist tells a story of high-altitude harvesting and
+                  artisanal roasting from the soul of Kon Tum.”
                 </p>
                 <button
                   onClick={() => navigate('/products')}
                   className="group flex items-center gap-3 rounded-2xl bg-[#FFD700] px-10 py-5 text-xs font-black uppercase tracking-widest text-[#4B3621] transition-all hover:shadow-[0_20px_40px_rgba(255,215,0,0.3)]"
                 >
-                  Keep Exploring <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                  Keep Exploring{' '}
+                  <ArrowRight
+                    size={16}
+                    className="transition-transform group-hover:translate-x-1"
+                  />
                 </button>
               </div>
 
@@ -290,7 +320,9 @@ const WishlistPage: React.FC = () => {
                   </div>
                   <div className="absolute -bottom-10 -left-10 flex h-40 w-40 animate-pulse items-center justify-center rounded-full bg-[#FFD700] text-[#4B3621] shadow-2xl">
                     <div className="text-center">
-                      <p className="text-[10px] font-black uppercase tracking-widest leading-none">Organic</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest leading-none">
+                        Organic
+                      </p>
                       <p className="text-xs font-black uppercase leading-none">Highland</p>
                     </div>
                   </div>
@@ -305,4 +337,3 @@ const WishlistPage: React.FC = () => {
 };
 
 export default WishlistPage;
-
