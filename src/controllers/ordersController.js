@@ -4,7 +4,7 @@ import { orderService } from "../services/order.service.js";
 
 const actorFromReq = (req) => ({
   id: req.user?.id ?? req.user?.userId,
-  role: req.user?.role,
+  role: req.user?.role ?? req.user?.roleID ?? req.user?.roleId,
 });
 
 const getAllOrders = asyncHandler(async (req, res) => {

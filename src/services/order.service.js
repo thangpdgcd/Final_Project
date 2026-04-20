@@ -57,10 +57,12 @@ const STATUS_TRANSITIONS = {
 let ensureTablesPromise = null;
 
 const normalizeRole = (raw) => {
-  const role = String(raw ?? "")
-    .trim()
-    .toLowerCase();
-  if (role === "user") return "customer";
+  const role = String(raw ?? "").trim().toLowerCase();
+  if (!role) return null;
+  // Accept both string roles and numeric ids from DB/JWT payloads.
+  if (role === "user" || role === "customer" || role === "1") return "customer";
+  if (role === "admin" || role === "2") return "admin";
+  if (role === "staff" || role === "3") return "staff";
   return role;
 };
 
