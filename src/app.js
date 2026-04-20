@@ -21,6 +21,11 @@ export const createApp = () => {
     }),
   );
 
+  app.use((req, res, next) => {
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+    next();
+  });
+
   // Express 5 router may not reach later `(err, req, res, next)` handlers for JSON parse
   // failures from `express.json()`. Wrap the parser so invalid JSON always returns JSON 400.
   const jsonParser = express.json({ limit: "50mb" });
