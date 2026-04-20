@@ -61,6 +61,7 @@ const createOrder = asyncHandler(async (req, res) => {
     shippingAddress:
       req.body?.shipping_Address ?? req.body?.shippingAddress ?? req.body?.shipping_address,
     shippingMethod: req.body?.shippingMethod ?? req.body?.shipping_method ?? req.body?.shipping,
+    items: req.body?.items ?? req.body?.orderItems ?? req.body?.cartItems,
   });
   return sendSuccess(res, 201, { order: data }, "Order created successfully");
 });

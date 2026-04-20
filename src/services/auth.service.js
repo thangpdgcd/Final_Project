@@ -80,6 +80,66 @@ export const createAuthService = ({ authRepository }) => {
     };
   };
 
+  const boolFromEnv = (key, fallback = false) => {
+    const raw = process.env[key];
+    if (raw == null || String(raw).trim() === "") return fallback;
+    const v = String(raw).trim().toLowerCase();
+    return v === "1" || v === "true" || v === "yes" || v === "y";
+  };
+
+  const shouldAutoSeedDefaultAccounts = () => {
+    // Many hosted environments don't run sequelize seeders automatically.
+    // Enable an idempotent auto-seed for ONLY known default accounts.
+    // Can be disabled by setting AUTO_SEED_DEFAULT_ACCOUNTS=false.
+    return boolFromEnv("AUTO_SEED_DEFAULT_ACCOUNTS", true);
+  };
+
+  const defaultAccounts = () => {
+    // Allow overrides via env (recommended on production).
+    return [
+      {
+        email: String(process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com").trim().toLowerCase(),
+        name: String(process.env.DEFAULT_ADMIN_NAME || "Admin Account"),
+        roleID: "2",
+        password: String(process.env.DEFAULT_ADMIN_PASSWORD || "123456"),
+        phoneNumber: String(process.env.DEFAULT_ADMIN_PHONE || "0900000001"),
+        address: String(process.env.DEFAULT_ADMIN_ADDRESS || "District 1, Ho Chi Minh City"),
+      },
+      {
+        email: String(process.env.DEFAULT_STAFF_EMAIL || "staff@example.com").trim().toLowerCase(),
+        name: String(process.env.DEFAULT_STAFF_NAME || "Staff Account"),
+        roleID: "3",
+        password: String(process.env.DEFAULT_STAFF_PASSWORD || "123456"),
+        phoneNumber: String(process.env.DEFAULT_STAFF_PHONE || "0900000002"),
+        address: String(process.env.DEFAULT_STAFF_ADDRESS || "Thu Duc, Ho Chi Minh City"),
+      },
+    ];
+  };
+
+  const ensureDefaultAccountIfMissing = async (emailNorm) => {
+    if (!shouldAutoSeedDefaultAccounts()) return;
+    const acct = defaultAccounts().find((a) => a.email === emailNorm);
+    if (!acct) return;
+
+    const exists = await authRepository.existsByEmail(acct.email);
+    if (exists) return;
+
+    // Create idempotently; in rare races the UNIQUE index will win.
+    const passwordHash = await bcrypt.hash(acct.password, 10);
+    try {
+      await authRepository.createUser({
+        name: acct.name,
+        email: acct.email,
+        address: acct.address,
+        phoneNumber: acct.phoneNumber,
+        passwordHash,
+        roleID: acct.roleID,
+      });
+    } catch {
+      // Ignore if another process created it concurrently.
+    }
+  };
+
   const login = async (email, password) => {
     const emailNorm = typeof email === "string" ? email.trim().toLowerCase() : "";
     if (!emailNorm || !password) {
@@ -88,6 +148,9 @@ export const createAuthService = ({ authRepository }) => {
     if (!emailRegex.test(emailNorm)) {
       throw new AppError(400, "Invalid email address.");
     }
+
+    // Hosted DB may not have seeders executed. Auto-seed known default accounts if missing.
+    await ensureDefaultAccountIfMissing(emailNorm);
 
     const user = await authRepository.findByEmail(emailNorm);
     if (!user) {

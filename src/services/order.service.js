@@ -308,6 +308,7 @@ const createOrderFromCart = async ({
   paypalCaptureId,
   shippingAddress,
   shippingMethod,
+  items,
 }) => {
   const uid = toInt(userId);
   if (!uid || uid <= 0) throw new AppError("Missing userId", 400);
@@ -326,15 +327,22 @@ const createOrderFromCart = async ({
       lock: tx.LOCK.UPDATE,
     });
 
-    if (!cart) throw new AppError("Cart not found", 400);
-    if (!Array.isArray(cart.cart_Items) || cart.cart_Items.length === 0) {
+    // If cart is missing/empty, fall back to request items (compat for frontend selection sync issues).
+    const fallbackItems = Array.isArray(items) ? items : [];
+    if (!cart && fallbackItems.length === 0) throw new AppError("Cart not found", 400);
+    const lineItems =
+      cart && Array.isArray(cart.cart_Items) && cart.cart_Items.length > 0
+        ? cart.cart_Items
+        : fallbackItems;
+    if (!Array.isArray(lineItems) || lineItems.length === 0) {
       throw new AppError("Cart is empty", 400);
     }
 
-    const totalAmount = cart.cart_Items.reduce(
-      (sum, item) => sum + Number(item.price) * Number(item.quantity),
-      0,
-    );
+    const totalAmount = lineItems.reduce((sum, item) => {
+      const price = Number(item.price ?? item?.products?.price ?? 0);
+      const quantity = Number(item.quantity ?? 0);
+      return sum + Math.max(0, price) * Math.max(0, quantity);
+    }, 0);
 
     // Shipping fee rule (by total).
     // Configurable via env:
@@ -363,19 +371,23 @@ const createOrderFromCart = async ({
       { transaction: tx },
     );
 
-    for (const item of cart.cart_Items) {
+    for (const item of lineItems) {
+      const pid = toInt(item.productId ?? item.product_ID ?? item.productID ?? item?.products?.productId);
+      if (!pid) continue;
       await Order_Items.create(
         {
           orderId: created.orderId,
-          productId: item.productId,
-          quantity: item.quantity,
-          price: item.price,
+          productId: pid,
+          quantity: Math.max(1, Math.trunc(Number(item.quantity ?? 1))),
+          price: Math.max(0, Math.trunc(Number(item.price ?? item?.products?.price ?? 0))),
         },
         { transaction: tx },
       );
     }
 
-    await Cart_Items.destroy({ where: { cartId: cart.cartId }, transaction: tx });
+    if (cart) {
+      await Cart_Items.destroy({ where: { cartId: cart.cartId }, transaction: tx });
+    }
 
     if (normalizedPaymentMethod === "coffee_coin") {
       const amountCoin = Math.max(0, Math.trunc(Number(grandTotal) || 0));
