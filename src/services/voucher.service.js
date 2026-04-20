@@ -149,6 +149,51 @@ export const createVoucherService = () => {
     return Vouchers.findOne({ where: { code: String(code), userId: Number(userId) } });
   };
 
+  const attachVoucherToUserByCode = async ({ code, userId, staffId, message }) => {
+    const normalizedCode = String(code ?? "").trim();
+    if (!normalizedCode) throw new AppError("code is required", 400);
+
+    const uid = Number(userId);
+    if (!Number.isInteger(uid) || uid <= 0) throw new AppError("Invalid userId", 400);
+
+    const sid = Number(staffId);
+    if (!Number.isInteger(sid) || sid <= 0) throw new AppError("Invalid staffId", 401);
+
+    const now = new Date();
+    const voucher = await Vouchers.findOne({ where: { code: normalizedCode } });
+    if (!voucher) return null; // likely a promo code; caller can still audit/send message
+
+    // If this voucher is already assigned to a different user, prevent leaking it.
+    if (voucher.userId != null && Number(voucher.userId) !== uid) {
+      throw new AppError("Voucher does not belong to this user", 403);
+    }
+
+    if (voucher.deletedAt) throw new AppError("Voucher is no longer available", 400);
+    if (voucher.expiresAt && new Date(voucher.expiresAt).getTime() <= now.getTime()) {
+      throw new AppError("Voucher is expired", 400);
+    }
+
+    // Attach to user if not yet attached; ensure it's usable.
+    const shouldUpdate =
+      voucher.userId == null || String(voucher.status ?? "").toLowerCase() !== "active";
+
+    if (shouldUpdate) {
+      voucher.userId = uid;
+      voucher.status = "active";
+      await voucher.save();
+    }
+
+    await auditSendVoucher({
+      voucherId: voucher.id,
+      staffId: sid,
+      userId: uid,
+      code: normalizedCode,
+      message,
+    });
+
+    return voucher;
+  };
+
   const listActiveVouchersForUser = async ({ userId }) => {
     const uid = Number(userId);
     if (!Number.isInteger(uid) || uid <= 0) throw new AppError("Invalid userId", 400);
@@ -183,6 +228,7 @@ export const createVoucherService = () => {
     createManualVoucher,
     auditSendVoucher,
     findVoucherByCodeForUser,
+    attachVoucherToUserByCode,
     listActiveVouchersForUser,
   };
 };

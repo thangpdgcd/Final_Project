@@ -58,26 +58,31 @@ export const registerVoucherSocket = ({ io, socket, rooms }) => {
     }
 
     try {
-      // Voucher may belong to different sources (e.g. promo voucher codes).
-      // We still audit the send event even if it doesn't exist in `vouchers`.
-      let voucher = null;
-      try {
-        voucher = await voucherService.findVoucherByCodeForUser({ code, userId });
-      } catch {
-        voucher = null;
-      }
-      await voucherService.auditSendVoucher({
-        voucherId: voucher?.id ?? null,
-        staffId: actor?.id,
-        userId,
+      // If this is a manual voucher code in DB, attach/activate it for the user so
+      // `/api/vouchers/me` will show it. If it's a promo code, this returns null
+      // and we still allow sending as a message.
+      const attached = await voucherService.attachVoucherToUserByCode({
         code,
+        userId,
+        staffId: actor?.id,
         message,
       });
+
+      if (!attached) {
+        await voucherService.auditSendVoucher({
+          voucherId: null,
+          staffId: actor?.id,
+          userId,
+          code,
+          message,
+        });
+      }
     } catch (e) {
       socketLogger.warn("voucher_audit_failed", "Voucher audit failed", {
         socketId: socket.id,
         message: e?.message || "Error",
       });
+      return reply({ ok: false, message: e?.message || "Voucher send failed" });
     }
 
     io.to(rooms.user(userId)).emit("send_voucher", {
