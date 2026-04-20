@@ -48,7 +48,13 @@ export const createAuthController = ({ authService }) => {
       const { accessToken, refreshToken, user } = result;
 
       res.cookie("refresh_token", refreshToken, cookieSecureOptions(req));
-      return sendSuccess(res, 200, { accessToken, user }, "Login successful");
+      // `token` alias: some clients expect `data.token` instead of `data.accessToken`
+      return sendSuccess(
+        res,
+        200,
+        { accessToken, token: accessToken, user },
+        "Login successful",
+      );
     } catch (error) {
       const msg = error?.message || "Login failed.";
       const isDb =
