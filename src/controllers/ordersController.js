@@ -8,7 +8,8 @@ const actorFromReq = (req) => ({
 });
 
 const getAllOrders = asyncHandler(async (req, res) => {
-  const data = await orderService.listAllOrders();
+  const lite = String(req.query?.lite ?? "").trim().toLowerCase() === "true";
+  const data = await orderService.listAllOrders({ lite });
   return sendSuccess(res, 200, data, "OK");
 });
 
@@ -21,26 +22,32 @@ const getOrderById = asyncHandler(async (req, res) => {
 });
 
 const getMyOrders = asyncHandler(async (req, res) => {
+  const lite = String(req.query?.lite ?? "").trim().toLowerCase() === "true";
   const data = await orderService.listUserOrders({
     userId: req.user?.id ?? req.user?.userId,
     status: req.query?.status,
+    lite,
   });
   return sendSuccess(res, 200, data, "OK");
 });
 
 const getUserOrders = asyncHandler(async (req, res) => {
+  const lite = String(req.query?.lite ?? "").trim().toLowerCase() === "true";
   const data = await orderService.listUserOrders({
     userId: req.params.userId,
     status: req.query?.status,
+    lite,
   });
   return sendSuccess(res, 200, data, "OK");
 });
 
 const getStaffOrders = asyncHandler(async (req, res) => {
+  const lite = String(req.query?.lite ?? "").trim().toLowerCase() === "true";
   const data = await orderService.listStaffOrders({
     staffId: req.user?.id ?? req.user?.userId,
     status: req.query?.status,
     assigned: req.query?.assigned,
+    lite,
   });
   return sendSuccess(res, 200, data, "OK");
 });
@@ -51,6 +58,9 @@ const createOrder = asyncHandler(async (req, res) => {
     note: req.body?.note,
     paymentMethod: req.body?.paymentMethod,
     paypalCaptureId: req.body?.paypalCaptureId,
+    shippingAddress:
+      req.body?.shipping_Address ?? req.body?.shippingAddress ?? req.body?.shipping_address,
+    shippingMethod: req.body?.shippingMethod ?? req.body?.shipping_method ?? req.body?.shipping,
   });
   return sendSuccess(res, 201, { order: data }, "Order created successfully");
 });
@@ -137,6 +147,14 @@ const approveOrder = asyncHandler(async (req, res) => {
   return sendSuccess(res, 200, { order: data }, "Order confirmed");
 });
 
+const deleteOrder = asyncHandler(async (req, res) => {
+  const data = await orderService.deleteOrderByActor({
+    orderId: req.params.id,
+    actor: actorFromReq(req),
+  });
+  return sendSuccess(res, 200, data, "Order deleted");
+});
+
 export default {
   getAllOrders,
   getOrderById,
@@ -155,4 +173,5 @@ export default {
   getOrderMessages,
   createOrderMessage,
   approveOrder,
+  deleteOrder,
 };

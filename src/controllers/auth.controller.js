@@ -89,7 +89,11 @@ export const createAuthController = ({ authService }) => {
   };
 
   const logout = (req, res) => {
-    res.clearCookie("refresh_token", { path: "/" });
+    // Must match cookie options used when setting the cookie, otherwise the browser may keep it.
+    const opts = cookieSecureOptions(req);
+    res.clearCookie("refresh_token", opts);
+    // Extra safety: overwrite cookie with immediate expiry.
+    res.cookie("refresh_token", "", { ...opts, maxAge: 0 });
     if (req.session) {
       req.session.destroy();
     }

@@ -3,6 +3,7 @@ import orderController from "../controllers/ordersController.js";
 import OrderItemsController from "../controllers/orderItemsController.js";
 import {
   isCustomer,
+  isStaff,
   isStaffOrAdmin,
   verifyToken,
 } from "../middlewares/authMiddleware.js";
@@ -34,19 +35,20 @@ router.get(
   orderController.getUserOrders,
 );
 router.get("/orders/:id", verifyToken, orderController.getOrderById);
+router.delete("/orders/:id", verifyToken, isStaff, orderController.deleteOrder);
 router.get("/staff/orders", verifyToken, isStaffOrAdmin, orderController.getStaffOrders);
 
 // Role-based status flow
 router.patch(
   "/orders/:id/status",
   verifyToken,
-  isStaffOrAdmin,
+  isStaff,
   orderController.patchOrderStatus,
 );
 router.patch(
   "/orders/:id/assign",
   verifyToken,
-  isStaffOrAdmin,
+  isStaff,
   orderController.assignOrder,
 );
 router.patch(
@@ -64,18 +66,18 @@ router.patch(
 router.patch(
   "/orders/:id/refund",
   verifyToken,
-  isStaffOrAdmin,
+  isStaff,
   orderController.resolveRefund,
 );
 
 // Backward-compatible update endpoint (used by old clients)
-router.put("/orders/:id", verifyToken, orderController.updateOrder);
+router.put("/orders/:id", verifyToken, isStaff, orderController.updateOrder);
 
 // Backward-compatible approval endpoint
 router.post(
   "/orders/approve/:id",
   verifyToken,
-  isStaffOrAdmin,
+  isStaff,
   orderController.approveOrder,
 );
 

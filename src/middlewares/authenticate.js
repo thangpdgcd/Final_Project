@@ -37,14 +37,23 @@ const getRoleFromDecoded = (decoded) => {
 
 const extractAccessToken = (req) => {
   const header = req.headers.authorization;
-  const bearerMatch = typeof header === "string" ? BEARER.exec(header.trim()) : null;
-  if (bearerMatch) return bearerMatch[1];
-  return (
-    req.cookies?.accessToken ||
-    req.cookies?.access_token ||
-    req.session?.token ||
-    null
-  );
+  if (typeof header === "string" && header.trim()) {
+    const trimmed = header.trim();
+    const bearerMatch = BEARER.exec(trimmed);
+    if (bearerMatch) return bearerMatch[1];
+    // Some clients send the raw token in Authorization without "Bearer"
+    if (!/\s/.test(trimmed)) return trimmed;
+  }
+
+  // Common alternative headers used by different clients/proxies
+  const xAccessToken = req.headers["x-access-token"];
+  if (typeof xAccessToken === "string" && xAccessToken.trim()) return xAccessToken.trim();
+  const xAuthToken = req.headers["x-auth-token"];
+  if (typeof xAuthToken === "string" && xAuthToken.trim()) return xAuthToken.trim();
+  const tokenHeader = req.headers["token"];
+  if (typeof tokenHeader === "string" && tokenHeader.trim()) return tokenHeader.trim();
+
+  return req.cookies?.accessToken || req.cookies?.access_token || req.session?.token || null;
 };
 
 const buildUserContext = async (decoded) => {

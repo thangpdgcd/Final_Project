@@ -33,5 +33,6 @@ export const checkRole = (allowedRoles = []) =>
   authorizeRoles(...(Array.isArray(allowedRoles) ? allowedRoles : []));
 
 export const isAdmin = authorizeRoles("admin");
+export const isStaff = authorizeRoles("staff");
 export const isStaffOrAdmin = authorizeRoles("staff", "admin");
 export const isCustomer = authorizeRoles("customer");

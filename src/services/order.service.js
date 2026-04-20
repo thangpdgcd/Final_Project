@@ -91,6 +91,15 @@ const toInt = (raw) => {
 
 const ensureOrderTables = async () => {
   if (!OrderMeta || !OrderChatMessage) return;
+  // Avoid doing `sync()` inside request handlers in production: it can be very slow
+  // (especially on remote DB like TiDB Cloud) and will make the UI "load forever".
+  // Migrations should create these tables. In development, allow opt-in sync.
+  const allowSync =
+    process.env.DB_SYNC_ON_REQUEST === "true" ||
+    (process.env.NODE_ENV !== "production" && process.env.DB_SYNC_ON_REQUEST !== "false");
+
+  if (!allowSync) return;
+
   if (!ensureTablesPromise) {
     ensureTablesPromise = Promise.all([OrderMeta.sync(), OrderChatMessage.sync()]);
   }
@@ -116,21 +125,63 @@ const ORDER_INCLUDE = [
   },
 ];
 
+const ORDER_INCLUDE_LITE = [
+  {
+    model: Users,
+    as: "users",
+    attributes: ["userId", "name", "email", "phoneNumber", "roleID"],
+  },
+];
+
+const serializeOrderRow = (row) => {
+  if (!row) return row;
+  const data = typeof row.toJSON === "function" ? row.toJSON() : { ...row };
+
+  // Normalize legacy shapes for frontend clients.
+  // - Sequelize association uses alias `users`, but many clients expect `user`.
+  if (!data.user && data.users && typeof data.users === "object") {
+    data.user = data.users;
+  }
+  // - Orders model stores `total_Amount`, but some clients expect different keys.
+  if (data.total_Amount != null) {
+    const n = Number(data.total_Amount);
+    if (Number.isFinite(n)) {
+      data.totalAmount = n;
+      data.total_amount = n;
+      data.totalOrderPrice = n;
+      data.totalPrice = n;
+    }
+  }
+  if (data.orderId != null && data.id == null) {
+    data.id = data.orderId;
+    data.order_ID = data.orderId;
+  }
+
+  return data;
+};
+
 const attachOrderMeta = async (rows) => {
+  // Ensure tables only when explicitly allowed; otherwise just skip if missing.
   await ensureOrderTables();
   const list = Array.isArray(rows) ? rows : [rows];
+  const base = list.map(serializeOrderRow);
   const ids = list
     .map((row) => row?.orderId)
     .filter((id) => Number.isFinite(Number(id)))
     .map((id) => Number(id));
-  if (ids.length === 0 || !OrderMeta) return list;
+  if (ids.length === 0 || !OrderMeta) return base;
 
-  const metas = await OrderMeta.findAll({ where: { orderId: ids } });
+  let metas = [];
+  try {
+    metas = await OrderMeta.findAll({ where: { orderId: ids } });
+  } catch {
+    // If the meta table isn't present (or DB is restricted), keep the response usable.
+    return base;
+  }
   const map = new Map(metas.map((m) => [Number(m.orderId), m]));
-  return list.map((row) => {
-    if (!row) return row;
-    const data = typeof row.toJSON === "function" ? row.toJSON() : { ...row };
-    const meta = map.get(Number(data.orderId));
+  return base.map((data) => {
+    if (!data) return data;
+    const meta = map.get(Number(data.orderId ?? data.id));
     if (meta) {
       data.staffId = meta.staffId ?? null;
       data.note = meta.note ?? null;
@@ -201,30 +252,30 @@ const getOrderByIdForActor = async ({ orderId, actor }) => {
   return serialized;
 };
 
-const listAllOrders = async () => {
+const listAllOrders = async ({ lite = false } = {}) => {
   // Do not include customer-cancelled orders in staff queue.
   const rows = await Orders.findAll({
     where: { status: { [Op.ne]: STATUS.cancelled } },
-    include: ORDER_INCLUDE,
+    include: lite ? ORDER_INCLUDE_LITE : ORDER_INCLUDE,
     order: [["createdAt", "DESC"]],
   });
   return attachOrderMeta(rows);
 };
 
-const listUserOrders = async ({ userId, status }) => {
+const listUserOrders = async ({ userId, status, lite = false }) => {
   const id = toInt(userId);
   if (!id || id <= 0) throw new AppError("Invalid userId", 400);
   const where = { userId: id };
   if (status) where.status = normalizeStatus(status);
   const rows = await Orders.findAll({
     where,
-    include: ORDER_INCLUDE,
+    include: lite ? ORDER_INCLUDE_LITE : ORDER_INCLUDE,
     order: [["createdAt", "DESC"]],
   });
   return attachOrderMeta(rows);
 };
 
-const listStaffOrders = async ({ staffId, status, assigned }) => {
+const listStaffOrders = async ({ staffId, status, assigned, lite = false }) => {
   await ensureOrderTables();
   const where = {};
   if (status) {
@@ -236,7 +287,7 @@ const listStaffOrders = async ({ staffId, status, assigned }) => {
   }
   const rows = await Orders.findAll({
     where,
-    include: ORDER_INCLUDE,
+    include: lite ? ORDER_INCLUDE_LITE : ORDER_INCLUDE,
     order: [["createdAt", "DESC"]],
   });
   const withMeta = await attachOrderMeta(rows);
@@ -250,7 +301,14 @@ const listStaffOrders = async ({ staffId, status, assigned }) => {
   return withMeta;
 };
 
-const createOrderFromCart = async ({ userId, note, paymentMethod, paypalCaptureId }) => {
+const createOrderFromCart = async ({
+  userId,
+  note,
+  paymentMethod,
+  paypalCaptureId,
+  shippingAddress,
+  shippingMethod,
+}) => {
   const uid = toInt(userId);
   if (!uid || uid <= 0) throw new AppError("Missing userId", 400);
   await ensureOrderTables();
@@ -278,12 +336,29 @@ const createOrderFromCart = async ({ userId, note, paymentMethod, paypalCaptureI
       0,
     );
 
+    // Shipping fee rule (by total).
+    // Configurable via env:
+    // - SHIPPING_FREE_THRESHOLD_VND (default 200000)
+    // - SHIPPING_FEE_VND (default 17000)
+    const freeThreshold = Math.max(
+      0,
+      Math.trunc(Number(process.env.SHIPPING_FREE_THRESHOLD_VND ?? 200000)),
+    );
+    const baseShipFee = Math.max(0, Math.trunc(Number(process.env.SHIPPING_FEE_VND ?? 17000)));
+    const expressShipFee = Math.max(
+      0,
+      Math.trunc(Number(process.env.SHIPPING_EXPRESS_FEE_VND ?? 50000)),
+    );
+    const method = String(shippingMethod ?? "standard").trim().toLowerCase();
+    const shippingFee = method === "express" ? expressShipFee : totalAmount >= freeThreshold ? 0 : baseShipFee;
+    const grandTotal = Math.max(0, Math.trunc(Number(totalAmount) + Number(shippingFee)));
+
     const created = await Orders.create(
       {
         userId: uid,
-        total_Amount: totalAmount,
+        total_Amount: grandTotal,
         status: STATUS.pending,
-        shipping_Address: "Not set",
+        shipping_Address: String(shippingAddress ?? "Not set"),
       },
       { transaction: tx },
     );
@@ -303,7 +378,7 @@ const createOrderFromCart = async ({ userId, note, paymentMethod, paypalCaptureI
     await Cart_Items.destroy({ where: { cartId: cart.cartId }, transaction: tx });
 
     if (normalizedPaymentMethod === "coffee_coin") {
-      const amountCoin = Math.max(0, Math.trunc(Number(totalAmount) || 0));
+      const amountCoin = Math.max(0, Math.trunc(Number(grandTotal) || 0));
       if (amountCoin <= 0) {
         throw new AppError("Invalid order total for Coffee Coin payment", 400);
       }
@@ -372,6 +447,39 @@ const createOrderFromCart = async ({ userId, note, paymentMethod, paypalCaptureI
       },
       { transaction: tx },
     );
+
+    // Reward wallet immediately after order is created: add back shippingFee.
+    // This is done in the same transaction for consistency.
+    if (shippingFee > 0) {
+      const [walletRows2] = await sequelize.query(
+        "SELECT wallet_coin AS walletCoin FROM Users WHERE user_ID = :uid LIMIT 1 FOR UPDATE",
+        { replacements: { uid }, transaction: tx },
+      );
+      const current2 = Math.max(0, Math.trunc(Number(walletRows2?.[0]?.walletCoin ?? 0)));
+      const next2 = current2 + Math.max(0, Math.trunc(Number(shippingFee) || 0));
+      await sequelize.query("UPDATE Users SET wallet_coin = :nextBalance WHERE user_ID = :uid", {
+        replacements: { uid, nextBalance: next2 },
+        transaction: tx,
+      });
+      await sequelize.query(
+        `INSERT INTO wallet_transactions
+          (user_id, type, amount_xu, balance_after, source, reference_id, note, createdAt, updatedAt)
+         VALUES
+          (:userId, :type, :amountXu, :balanceAfter, :source, :referenceId, :note, NOW(), NOW())`,
+        {
+          replacements: {
+            userId: uid,
+            type: "EARN",
+            amountXu: Math.max(0, Math.trunc(Number(shippingFee) || 0)),
+            balanceAfter: next2,
+            source: "ORDER_SHIPPING_BONUS",
+            referenceId: String(created.orderId),
+            note: "Shipping bonus on order creation",
+          },
+          transaction: tx,
+        },
+      );
+    }
 
     await tx.commit();
     const order = await getOrderByIdForActor({
@@ -558,6 +666,28 @@ const resolveRefundDecision = async ({ orderId, actor, approved, note }) => {
   return full;
 };
 
+const deleteOrderByActor = async ({ orderId, actor }) => {
+  const role = normalizeRole(actor?.role);
+  if (role !== "staff" && role !== "admin") {
+    throw new AppError("Only staff/admin can delete orders", 403);
+  }
+
+  const order = await getOrderOr404(orderId);
+
+  await sequelize.transaction(async (tx) => {
+    await Order_Items.destroy({ where: { orderId: order.orderId }, transaction: tx });
+    if (OrderMeta) {
+      await OrderMeta.destroy({ where: { orderId: order.orderId }, transaction: tx });
+    }
+    if (OrderChatMessage) {
+      await OrderChatMessage.destroy({ where: { orderId: order.orderId }, transaction: tx });
+    }
+    await Orders.destroy({ where: { orderId: order.orderId }, transaction: tx });
+  });
+
+  return { deleted: true, orderId: order.orderId };
+};
+
 const updateOrderByActor = async ({ orderId, actor, body }) => {
   const payload = { ...(body || {}) };
   const role = normalizeRole(actor?.role);
@@ -673,6 +803,7 @@ export const orderService = {
   cancelOrderByUser,
   requestRefundByUser,
   resolveRefundDecision,
+  deleteOrderByActor,
   updateOrderByActor,
   listOrderMessages,
   createOrderMessage,
