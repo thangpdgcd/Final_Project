@@ -112,6 +112,21 @@ export const createAuthController = ({ authService }) => {
     }
   };
 
+  const googleLogin = async (req, res) => {
+    try {
+      const token = req.body?.token;
+      const result = await authService.loginWithGoogle({ idToken: token });
+      const { accessToken, refreshToken, user } = result;
+
+      res.cookie("refresh_token", refreshToken, cookieSecureOptions(req));
+      // `token` alias for clients expecting `data.token`
+      return sendSuccess(res, 200, { accessToken, token: accessToken, user }, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 400;
+      return sendError(res, status, error?.message || "Google login failed", null);
+    }
+  };
+
   return {
     registerUser,
     login,
@@ -119,6 +134,7 @@ export const createAuthController = ({ authService }) => {
     getMe,
     logout,
     changePassword,
+    googleLogin,
   };
 };
 

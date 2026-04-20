@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "test": "node --test src/**/*.test.js",
-    
     "start": "node src/server.js"
   },
   "keywords": [],
@@ -24,6 +23,7 @@
     "express": "^5.2.1",
     "express-session": "^1.18.2",
     "express-validator": "^7.3.2",
+    "google-auth-library": "^10.6.2",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",

@@ -629,6 +629,32 @@ const requestRefundByUser = async ({ orderId, actor, note }) => {
   });
   const full = await getOrderByIdForActor({ orderId: order.orderId, actor });
   emitOrderUpdate(full);
+
+  // Notify customer + staff/admin about refund request.
+  try {
+    const row = await notificationService.create({
+      userId: order.userId,
+      type: "order",
+      message: `Yêu cầu hoàn tiền cho đơn hàng #${order.orderId} đã được gửi`,
+    });
+    emitNotificationToUser({ userId: order.userId, notification: row });
+  } catch {}
+
+  try {
+    const staffAdmins = await Users.findAll({
+      where: { roleID: { [Op.in]: ["2", "3"] } },
+      attributes: ["userId"],
+      raw: true,
+    });
+    const ids = staffAdmins.map((u) => u.userId);
+    const rows = await notificationService.createForUsers({
+      userIds: ids,
+      type: "order",
+      message: `Refund requested for order #${order.orderId}`,
+    });
+    emitNotificationsToUsers({ userIds: ids, notifications: rows });
+  } catch {}
+
   return full;
 };
 
@@ -675,6 +701,19 @@ const resolveRefundDecision = async ({ orderId, actor, approved, note }) => {
 
   const full = await getOrderByIdForActor({ orderId: order.orderId, actor });
   emitOrderUpdate(full);
+
+  // Notify customer about the refund decision (and wallet credit if approved).
+  try {
+    const row = await notificationService.create({
+      userId: order.userId,
+      type: "order",
+      message: approved
+        ? `Đơn hàng #${order.orderId} đã được hoàn tiền`
+        : `Yêu cầu hoàn tiền cho đơn hàng #${order.orderId} đã bị từ chối`,
+    });
+    emitNotificationToUser({ userId: order.userId, notification: row });
+  } catch {}
+
   return full;
 };
 

@@ -45,6 +45,14 @@ export default (sequelize) => {
       password: {
         type: DataTypes.STRING,
       },
+      avatar: {
+        type: DataTypes.STRING(1024),
+        allowNull: true,
+      },
+      provider: {
+        type: DataTypes.STRING(32),
+        allowNull: true,
+      },
       roleID: {
         type: DataTypes.STRING,
         allowNull: false,

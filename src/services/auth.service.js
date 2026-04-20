@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
 import { AppError } from "../utils/AppError.js";
 import { getUserAvatar } from "../utils/userAvatar.js";
 
@@ -9,6 +11,11 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^[0-9+]{9,15}$/;
 
 export const createAuthService = ({ authRepository }) => {
+  const GOOGLE_CLIENT_ID =
+    process.env.GOOGLE_CLIENT_ID ||
+    "399537387759-jo0mv148hud22orj0kdr8ih579c2vhuj.apps.googleusercontent.com";
+  const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+
   const normalizeRoleID = (raw) => {
     const v = raw == null ? "" : String(raw).trim().toLowerCase();
     if (!v) return null;
@@ -182,6 +189,62 @@ export const createAuthService = ({ authRepository }) => {
     };
   };
 
+  const loginWithGoogle = async ({ idToken }) => {
+    const token = typeof idToken === "string" ? idToken.trim() : "";
+    if (!token) throw new AppError(400, "token is required");
+
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: token,
+        audience: GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch {
+      throw new AppError(401, "Invalid Google token");
+    }
+
+    const email = typeof payload?.email === "string" ? payload.email.trim().toLowerCase() : "";
+    const name = typeof payload?.name === "string" ? payload.name.trim() : "";
+    const picture = typeof payload?.picture === "string" ? payload.picture.trim() : "";
+    const emailVerified = payload?.email_verified;
+
+    if (!email) throw new AppError(401, "Google token missing email");
+    if (emailVerified === false) throw new AppError(401, "Google email is not verified");
+
+    const randomPassword = crypto.randomBytes(32).toString("hex");
+    const passwordHash = await bcrypt.hash(randomPassword, 10);
+
+    const user = await authRepository.findOrCreateGoogleUser({
+      email,
+      name,
+      avatar: picture || null,
+      roleID: "1",
+      passwordHash,
+    });
+
+    if (!user) throw new AppError(500, "Could not create user");
+
+    const { accessToken, refreshToken } = generateTokens(user);
+    const normalizedRoleID = normalizeRoleID(user.roleID) ?? "1";
+    const avatar = user.avatar ?? (await getUserAvatar(user.userId));
+
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.userId,
+        name: user.name,
+        email: user.email,
+        roleID: normalizedRoleID,
+        avatar: avatar ?? null,
+        phoneNumber: user.phoneNumber ?? null,
+        address: user.address ?? null,
+        provider: user.provider ?? "google",
+      },
+    };
+  };
+
   const refreshAccessToken = async ({ refreshToken }) => {
     if (!refreshToken) {
       throw new AppError(401, "Refresh token not found.");
@@ -233,6 +296,7 @@ export const createAuthService = ({ authRepository }) => {
   return {
     registerUser,
     login,
+    loginWithGoogle,
     generateTokens,
     refreshAccessToken,
     changePassword,

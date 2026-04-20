@@ -27,6 +27,9 @@ export const buildAuthRouter = () => {
     authController.login,
   );
 
+  // Google sign-in (expects { token: <google id_token> })
+  router.post("/auth/google", authController.googleLogin);
+
   router.get("/me", authMiddleware, authController.getMe);
   router.post("/logout", authController.logout);
   router.post("/refresh-token", authController.refreshToken);
