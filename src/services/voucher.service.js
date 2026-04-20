@@ -149,10 +149,41 @@ export const createVoucherService = () => {
     return Vouchers.findOne({ where: { code: String(code), userId: Number(userId) } });
   };
 
+  const listActiveVouchersForUser = async ({ userId }) => {
+    const uid = Number(userId);
+    if (!Number.isInteger(uid) || uid <= 0) throw new AppError("Invalid userId", 400);
+
+    const now = new Date();
+    const rows = await Vouchers.findAll({
+      where: {
+        userId: uid,
+        status: "active",
+        deletedAt: null,
+        expiresAt: { [models.Sequelize.Op.gt]: now },
+      },
+      order: [["createdAt", "DESC"]],
+    });
+
+    return rows.map((v) => ({
+      id: v.id,
+      code: v.code,
+      type: v.type,
+      value: Number(v.value),
+      maxDiscountValue: Number(v.maxDiscountValue),
+      expiresAt: v.expiresAt,
+      status: v.status,
+      createdAt: v.createdAt,
+      usedAt: v.usedAt ?? null,
+      usedCount: v.usedCount ?? 0,
+      maxUsage: v.maxUsage ?? 1,
+    }));
+  };
+
   return {
     createManualVoucher,
     auditSendVoucher,
     findVoucherByCodeForUser,
+    listActiveVouchersForUser,
   };
 };
 
