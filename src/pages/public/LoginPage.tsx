@@ -37,6 +37,10 @@ const LoginPage: React.FC = () => {
   const { login, isAuthenticated } = useAuth();
   const didRedirectRef = useRef(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showGoogle, setShowGoogle] = useState(false);
+  const googleBtnRef = useRef<HTMLDivElement | null>(null);
+  const [autoOpenGoogle, setAutoOpenGoogle] = useState(false);
+  const [googleOpening, setGoogleOpening] = useState(false);
 
   useDocumentTitle('pages.login.documentTitle');
 
@@ -110,6 +114,41 @@ const LoginPage: React.FC = () => {
     loginMutation.mutate({ email: values.email, password: values.password });
   };
 
+  useEffect(() => {
+    if (!showGoogle) return;
+    if (!autoOpenGoogle) return;
+
+    let cancelled = false;
+    const startedAt = Date.now();
+
+    const tryClick = () => {
+      if (cancelled) return;
+      const root = googleBtnRef.current;
+      if (root) {
+        // google button markup is injected by GSI; the clickable element is usually a role=button div
+        const clickable = root.querySelector?.('div[role="button"]') as HTMLDivElement | null;
+        if (clickable) {
+          clickable.click();
+          setAutoOpenGoogle(false);
+          setGoogleOpening(false);
+          return;
+        }
+      }
+      if (Date.now() - startedAt > 2200) {
+        setAutoOpenGoogle(false);
+        setGoogleOpening(false);
+        return;
+      }
+      window.setTimeout(tryClick, 120);
+    };
+
+    setGoogleOpening(true);
+    window.setTimeout(tryClick, 30);
+    return () => {
+      cancelled = true;
+    };
+  }, [autoOpenGoogle, showGoogle]);
+
   const handleGoogleToken = async (token: string | null) => {
     if (!token) {
       messageApi.error(t('auth.loginError'));
@@ -172,6 +211,21 @@ const LoginPage: React.FC = () => {
 
       login(accessToken, finalUser as AuthUser);
       messageApi.success(t('auth.loginSuccess'));
+
+      // DEV-only: clear noisy browser/GSI warnings after a successful login.
+      if (import.meta.env.DEV) {
+        try {
+          // eslint-disable-next-line no-console
+          console.clear();
+        } catch {
+          // ignore
+        }
+      }
+
+      // Ensure Google UI is unmounted immediately after success.
+      setShowGoogle(false);
+      setAutoOpenGoogle(false);
+      setGoogleOpening(false);
       navigate('/', { replace: true });
     } catch (e: unknown) {
       let msg = t('auth.loginError');
@@ -308,12 +362,36 @@ const LoginPage: React.FC = () => {
                         title={t(social.titleKey)}
                         className="contact-social-btn flex h-14 items-center justify-center p-0"
                       >
-                        <GoogleButton
-                          onToken={handleGoogleToken}
-                          loading={googleLoading}
-                          disabled={googleLoading || loginMutation.isPending}
-                          className="scale-[0.92] origin-center"
-                        />
+                        {showGoogle ? (
+                          <div className="relative w-full h-full grid place-items-center">
+                            {/* Keep the GoogleLogin mounted but visually hidden after click */}
+                            <GoogleButton
+                              onToken={handleGoogleToken}
+                              loading={googleLoading}
+                              disabled={googleLoading || loginMutation.isPending}
+                              className="scale-[0.92] origin-center opacity-0 pointer-events-none absolute inset-0 grid place-items-center"
+                              containerRef={googleBtnRef}
+                            />
+                            {/* Show a clean loading indicator instead of the Google icon */}
+                            {googleLoading || googleOpening ? (
+                              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[color:var(--hl-outline-variant)] border-t-[color:var(--hl-primary)]" />
+                            ) : (
+                              <div className="h-5 w-5 rounded-full bg-[color:var(--hl-outline-variant)] opacity-40" />
+                            )}
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowGoogle(true);
+                              setAutoOpenGoogle(true);
+                            }}
+                            className="grid h-14 w-full place-items-center text-[color:var(--hl-on-surface)] hover:text-[color:var(--hl-primary)] transition-colors"
+                            aria-label={t(social.titleKey)}
+                          >
+                            {social.icon}
+                          </button>
+                        )}
                       </div>
                     );
                   }

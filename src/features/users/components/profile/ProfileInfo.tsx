@@ -10,11 +10,6 @@ interface ProfileInfoProps {
   bio?: string;
 }
 
-const ROLE_MAP: Record<string, string> = {
-  '1': 'Quản trị',
-  '2': 'Nhân viên',
-  '3': 'Thành viên',
-};
 
 const useIsDesktop = () => {
   const [isDesktop, setIsDesktop] = useState(() =>
@@ -28,9 +23,9 @@ const useIsDesktop = () => {
   return isDesktop;
 };
 
-const ProfileInfo: React.FC<ProfileInfoProps> = ({ name, email, roleID, ordersCount, bio }) => {
+const ProfileInfo: React.FC<ProfileInfoProps> = ({ name, email, ordersCount, bio }) => {
   const isDesktop = useIsDesktop();
-  const roleLabel = ROLE_MAP[String(roleID)] ?? 'Thành viên';
+
 
   const slideInitial = isDesktop ? { opacity: 0, x: 30, y: 0 } : { opacity: 0, x: 0, y: 20 };
 
@@ -63,7 +58,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({ name, email, roleID, ordersCo
         }}
         className="lg:self-start"
       >
-        {roleLabel.toUpperCase()}
+
       </span>
 
       {/* Name */}

@@ -94,18 +94,30 @@ export const disconnectSupportChatSocket = () => {
 export const supportChatEvents = {
   joinRoom: (payload: JoinRoomPayload, ack?: (res: any) => void) => {
     const socket = connectSupportChatSocket();
-    socket.emit('join_room', payload, ack);
+    const normalizedPayload =
+      payload && typeof (payload as any).conversationId === 'number'
+        ? { ...(payload as any), roomId: (payload as any).conversationId }
+        : payload;
+    socket.emit('join_room', normalizedPayload as any, ack);
   },
 
   sendMessage: (payload: SendMessagePayload, ack?: (res: any) => void) => {
     const socket = connectSupportChatSocket();
-    socket.emit('send_message', payload, ack);
+    const normalizedPayload =
+      payload && typeof (payload as any).conversationId === 'number'
+        ? { ...(payload as any), roomId: (payload as any).conversationId }
+        : payload;
+    socket.emit('send_message', normalizedPayload as any, ack);
   },
 
   onReceiveMessage: (handler: (payload: ReceiveMessagePayload) => void) => {
     const socket = connectSupportChatSocket();
     socket.on('receive_message', handler as any);
-    return () => socket.off('receive_message', handler as any);
+    socket.on('chat:message', handler as any);
+    return () => {
+      socket.off('receive_message', handler as any);
+      socket.off('chat:message', handler as any);
+    };
   },
 
   onError: (handler: (payload: any) => void) => {

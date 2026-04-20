@@ -12,6 +12,8 @@ import api, { setAccessToken } from '@/api/axiosInstance';
 import axios from 'axios';
 import { queryClient } from '@/lib/queryClient';
 import { CART_KEY } from '@/features/cart/hooks/useCart';
+import { connectSocket } from '@/modules/chat/socket/socketClient';
+import { useVoucherVaultStore } from '@/features/voucher/store/useVoucherVaultStore';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -174,6 +176,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     window.addEventListener('auth:cleared', onAuthCleared);
     return () => window.removeEventListener('auth:cleared', onAuthCleared);
   }, []);
+
+  // Global voucher realtime: staff/admin emits `send_voucher` → user vault updates instantly.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.user_ID) return;
+
+    // Ensure vault is hydrated (storage + /vouchers/me best-effort).
+    useVoucherVaultStore.getState().hydrate();
+
+    const socket = connectSocket();
+    const onVoucher = (payload: any) => {
+      const code = typeof payload?.code === 'string' ? payload.code.trim() : '';
+      const message = typeof payload?.message === 'string' ? payload.message.trim() : '';
+      if (!code) return;
+      useVoucherVaultStore.getState().add({ code, message: message || undefined });
+    };
+
+    socket?.on('send_voucher', onVoucher);
+    return () => {
+      socket?.off('send_voucher', onVoucher);
+      // Keep the socket if other modules (chat/notifications) are using it.
+      // If you want aggressive disconnect, do it only when your app has no socket features enabled.
+      // disconnectSocket();
+    };
+  }, [isAuthenticated, user?.user_ID]);
 
   const login = useCallback((accessToken: string, newUser: AuthUser) => {
     // Only touch the token when a real value is supplied.

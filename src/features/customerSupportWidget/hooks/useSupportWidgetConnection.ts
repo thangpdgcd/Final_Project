@@ -3,6 +3,7 @@ import { i18nKeys } from '@/constants/i18nKeys';
 import { toastErrorWithFallback } from '@/lib/toast/i18nToast';
 import type { ReceiveMessagePayload } from '../types';
 import { useSupportWidgetStore } from '../store/useSupportWidgetStore';
+import { useVoucherVaultStore } from '@/features/voucher/store/useVoucherVaultStore';
 import {
   connectSupportWidgetSocket,
   disconnectSupportWidgetSocket,
@@ -198,6 +199,25 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
     return { conversationId, message: normalizedMessage } as ReceiveMessagePayload;
   };
 
+  const extractVoucherCode = (text: string): string | null => {
+    const raw = String(text ?? '').trim();
+    if (!raw) return null;
+
+    // Common staff message formats:
+    // - "Mã voucher: ABC123"
+    // - "Voucher code: ABC123"
+    // - "GIFT VOUCHER ABC123"
+    const match =
+      raw.match(/(?:mã\s*voucher|voucher\s*code|gift\s*voucher)\s*[:\-]?\s*([A-Z0-9_-]{4,})/i) ??
+      raw.match(/\b([A-Z0-9]{6,})\b/); // fallback (last resort)
+
+    const code = String(match?.[1] ?? '').trim().toUpperCase();
+    if (!code) return null;
+    // avoid capturing generic words
+    if (code === 'VOUCHER' || code === 'CODE') return null;
+    return code;
+  };
+
   useEffect(() => {
     if (!enabled) return;
 
@@ -245,7 +265,30 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
         s.reconcileOptimisticIfMatch(payload.message);
       }
       s.appendIncoming(payload);
+
+      // Auto-save voucher codes sent by staff into the local voucher vault
+      // so they show up immediately in Voucher Vault / Promotions.
+      try {
+        if (payload.message?.type === 'text') {
+          const content = String((payload.message as any).content ?? '');
+          const code = extractVoucherCode(content);
+          if (code) {
+            useVoucherVaultStore.getState().add({ code, message: content });
+          }
+        }
+      } catch {
+        // ignore
+      }
     });
+
+    // Some backends emit a dedicated voucher event to customers.
+    const onVoucher = (payload: any) => {
+      const code = typeof payload?.code === 'string' ? payload.code.trim() : '';
+      const message = typeof payload?.message === 'string' ? payload.message.trim() : '';
+      if (!code) return;
+      useVoucherVaultStore.getState().add({ code, message: message || undefined });
+    };
+    socket.on('send_voucher', onVoucher);
 
     const offError = supportWidgetEvents.onError((payload: any) => {
       const msg =
@@ -261,6 +304,7 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
       offJoined();
       offReceive();
       offError();
+      socket.off('send_voucher', onVoucher);
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
       socket.off('connect_error', onError);

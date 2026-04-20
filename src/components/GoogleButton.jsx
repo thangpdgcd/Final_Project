@@ -1,9 +1,9 @@
 import React from 'react'
 import { GoogleLogin } from '@react-oauth/google'
 
-export const GoogleButton = ({ onToken, loading, disabled, className = '' }) => {
+export const GoogleButton = ({ onToken, loading, disabled, className = '', containerRef }) => {
   return (
-    <div className={`relative inline-flex ${className}`}>
+    <div ref={containerRef} className={`relative inline-flex ${className}`}>
       <div className={disabled ? 'pointer-events-none opacity-60' : ''}>
         <GoogleLogin
           onSuccess={(credentialResponse) => {
