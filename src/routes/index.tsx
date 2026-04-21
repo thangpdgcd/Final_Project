@@ -1,8 +1,8 @@
 import { lazy } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import CustomerLayout from '@/layouts/CustomerLayout';
-import ShopLayout from '@/layouts/ShopLayout';
+import CustomerLayout from '@/components/layout/customerlayouts/CustomerLayout';
+import ShopLayout from '@/components/layout/shoplayouts/ShopLayout';
 import RequireAuth from '@/routes/guards/RequireAuth';
 
 const HomePage = lazy(() => import('@/pages/public/HomePage'));
@@ -14,13 +14,13 @@ const BlogPage = lazy(() => import('@/pages/public/BlogPage'));
 const BlogDetailPage = lazy(() => import('@/pages/public/BlogDetailPage'));
 const NotFoundPage = lazy(() => import('@/pages/public/NotFoundPage'));
 
-const ProductsPage = lazy(() => import('@/features/products/pages/ProductsPage'));
-const ProductDetailPage = lazy(() => import('@/features/products/pages/ProductDetailPage'));
-const CartPage = lazy(() => import('@/features/cart/pages/CartPage'));
-const OrderPage = lazy(() => import('@/features/orders/pages/OrderPage'));
-const WishlistPage = lazy(() => import('@/features/users/pages/WishlistPage'));
-const ProfilePage = lazy(() => import('@/pages/store/ProfilePage'));
-const VoucherVaultPage = lazy(() => import('@/pages/store/VoucherVaultPage'));
+const ProductsPage = lazy(() => import('@/pages/products/ProductsPage'));
+const ProductDetailPage = lazy(() => import('@/pages/products/ProductDetailPage'));
+const CartPage = lazy(() => import('@/pages/cart/CartPage'));
+const OrderPage = lazy(() => import('@/pages/order/OrderPage'));
+const WishlistPage = lazy(() => import('@/pages/wishlist/WishlistPage'));
+const ProfilePage = lazy(() => import('@/pages/storeshope/ProfilePage'));
+const VoucherVaultPage = lazy(() => import('@/pages/storeshope/VoucherVaultPage'));
 
 const ProductPage = lazy(() => import('@/pages/shop/ProductPage'));
 

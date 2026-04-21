@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import SortBar from '@/components/shop/SortBar';
-import ProductList from '@/components/shop/ProductList';
-import CurrencySwitcher from '@/components/shop/CurrencySwitcher';
-import ShippingMethod from '@/components/shop/checkout/ShippingMethod';
-import TotalCostCard from '@/components/shop/checkout/TotalCostCard';
-import PriceRangeFilter from '@/components/shop/filters/PriceRangeFilter';
-import AccordionFilters from '@/components/shop/filters/AccordionFilters';
+import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
+import SortBar from '@/features/shop/SortBar';
+import ProductList from '@/features/shop/ProductList';
+import CurrencySwitcher from '@/features/shop/CurrencySwitcher';
+import ShippingMethod from '@/features/shop/checkout/ShippingMethod';
+import TotalCostCard from '@/features/shop/checkout/TotalCostCard';
+import PriceRangeFilter from '@/features/shop/filters/PriceRangeFilter';
+import AccordionFilters from '@/features/shop/filters/AccordionFilters';
 import { products as productData } from '@/data/products';
 
 const getDefaultPriceBounds = (items) => {
@@ -51,7 +51,9 @@ const ProductPage = () => {
   const [selectedProductId, setSelectedProductId] = useState(productData[0]?.id);
 
   const filtered = useMemo(() => {
-    const base = productData.filter((p) => p.priceUSD >= priceRange[0] && p.priceUSD <= priceRange[1]);
+    const base = productData.filter(
+      (p) => p.priceUSD >= priceRange[0] && p.priceUSD <= priceRange[1],
+    );
     return sortProducts(base, sortBy);
   }, [priceRange, sortBy]);
 
@@ -71,7 +73,9 @@ const ProductPage = () => {
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           className="max-w-2xl"
         >
-          <p className="hl-sans text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--hl-secondary)] sm:text-sm">Coffee shop</p>
+          <p className="hl-sans text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--hl-secondary)] sm:text-sm">
+            Coffee shop
+          </p>
           <h1
             className="mt-4 text-4xl font-medium leading-[1.12] tracking-tight text-[color:var(--hl-primary)] sm:text-5xl lg:text-[3rem]"
             style={{ fontFamily: 'var(--font-highland-display)' }}
@@ -79,7 +83,8 @@ const ProductPage = () => {
             Shop premium coffee
           </h1>
           <p className="hl-sans mt-4 text-base leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_76%,transparent)]">
-            Dark roast to light bloom—filter by price, switch currency instantly, and preview total cost with shipping.
+            Dark roast to light bloom—filter by price, switch currency instantly, and preview total
+            cost with shipping.
           </p>
         </motion.div>
 
@@ -90,7 +95,12 @@ const ProductPage = () => {
             </div>
 
             <div className={panelClass}>
-              <PriceRangeFilter min={bounds.min} max={bounds.max} priceRange={priceRange} setPriceRange={setPriceRange} />
+              <PriceRangeFilter
+                min={bounds.min}
+                max={bounds.max}
+                priceRange={priceRange}
+                setPriceRange={setPriceRange}
+              />
             </div>
 
             <div className={panelClass}>
@@ -106,7 +116,13 @@ const ProductPage = () => {
 
           <section className="space-y-4">
             <div className={panelClass}>
-              <SortBar sortBy={sortBy} onChangeSort={setSortBy} resultsCount={filtered.length} viewMode={viewMode} onChangeViewMode={setViewMode} />
+              <SortBar
+                sortBy={sortBy}
+                onChangeSort={setSortBy}
+                resultsCount={filtered.length}
+                viewMode={viewMode}
+                onChangeViewMode={setViewMode}
+              />
             </div>
 
             <ProductList

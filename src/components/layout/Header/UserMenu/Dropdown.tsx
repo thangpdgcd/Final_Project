@@ -11,7 +11,7 @@ import {
   Settings,
   Heart,
 } from 'lucide-react';
-import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/image';
+import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/images/image';
 
 interface DropdownProps {
   isLoggedIn: boolean;

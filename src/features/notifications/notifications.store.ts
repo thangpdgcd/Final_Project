@@ -44,3 +44,4 @@ export const useNotificationsStore = create<NotificationsState>((set, get) => ({
 
 export const selectUnreadCount = (s: { notifications: AppNotification[] }) =>
   s.notifications.reduce((sum, n) => sum + (n.read ? 0 : 1), 0);
+

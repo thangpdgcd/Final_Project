@@ -1,188 +1,78 @@
 import type { TFunction } from 'i18next';
 
-/**
- * Normalize API tokens for lookup: lowercase, trim, collapse separators.
- * Use this for all dynamic enum-like values from the backend.
- */
-export const normalizeApiToken = (raw: unknown): string =>
+type Key =
+  | 'pending'
+  | 'confirmed'
+  | 'processing'
+  | 'shipping'
+  | 'sent'
+  | 'shipped'
+  | 'completed'
+  | 'cancelled'
+  | 'refund_requested'
+  | 'refunded'
+  | 'unknown';
+
+const normalize = (raw: unknown) =>
   String(raw ?? '')
     .trim()
-    .toLowerCase()
-    .replace(/[\s_-]+/g, '');
+    .toLowerCase();
 
-/**
- * Canonical order status strings used for tab logic / comparisons (stable, lowercase).
- * Any API variant is mapped here first; unknown values pass through as-is for logic only.
- */
-const ORDER_STATUS_ALIASES: Record<string, string> = {
-  paid: 'confirmed',
-  accepted: 'confirmed',
-  preparing: 'processing',
-  inprogress: 'processing',
-  delivering: 'shipped',
-  outfordelivery: 'shipped',
-  ontheway: 'shipped',
-  dangiao: 'shipped',
-  complete: 'completed',
-  done: 'completed',
-  refundrequested: 'refund_requested',
-  refundrequest: 'refund_requested',
-  canceled: 'cancelled',
-  refunded: 'refunded',
-  refundcomplete: 'refunded',
-  refundcompleted: 'refunded',
-  partialrefund: 'refunded',
-  partialrefunded: 'refunded',
-  refund: 'refunded',
-  returned: 'refunded',
-  return: 'refunded',
-  pending: 'pending',
-  confirmed: 'confirmed',
-  processing: 'processing',
-  shipping: 'shipping',
-  shipped: 'shipped',
-  sent: 'sent',
-  completed: 'completed',
-  cancelled: 'cancelled',
-  // Common backend / UI variants
-  awaitingconfirmation: 'pending',
-  awaitingpayment: 'pending',
-  awaitingpickup: 'processing',
-  awaitingdelivery: 'shipped',
-  awaiting: 'pending',
-  intransit: 'shipping',
-  delivered: 'completed',
+export const mapOrderStatusToI18nKey = (raw: unknown): Key => {
+  const v = normalize(raw);
+  if (!v) return 'unknown';
+
+  if (v === 'pending' || v === 'awaiting' || v === 'wait' || v === 'chờ xử lý') return 'pending';
+  if (v === 'confirmed' || v === 'confirm' || v === 'đã xác nhận') return 'confirmed';
+  if (v === 'processing' || v === 'packing' || v === 'đang đóng hàng') return 'processing';
+  if (v === 'shipping' || v === 'delivering' || v === 'vận chuyển' || v === 'đang giao')
+    return 'shipping';
+  if (v === 'sent' || v === 'out_for_delivery' || v === 'dispatch') return 'sent';
+  if (v === 'shipped' || v === 'delivered' || v === 'chờ giao hàng') return 'shipped';
+  if (v === 'completed' || v === 'complete' || v === 'done' || v === 'hoàn thành')
+    return 'completed';
+  if (v === 'cancelled' || v === 'canceled' || v === 'cancel' || v === 'đã hủy') return 'cancelled';
+  if (v === 'refund_requested' || v === 'refund-requested' || v === 'refund requested')
+    return 'refund_requested';
+  if (v === 'refunded' || v === 'refund' || v === 'đã hoàn') return 'refunded';
+
+  return 'unknown';
 };
 
-/** Maps canonical order status → i18n key under `order.status.<camelCase>`. */
-const ORDER_STATUS_I18N: Record<string, string> = {
-  pending: 'pending',
-  confirmed: 'confirmed',
-  paid: 'paid',
-  processing: 'processing',
-  shipping: 'shipping',
-  shipped: 'shipped',
-  sent: 'sent',
-  completed: 'completed',
-  cancelled: 'cancelled',
-  canceled: 'cancelled',
-  refund_requested: 'refundRequested',
-  refunded: 'refunded',
+export const normalizeOrderStatusForLogic = (raw: unknown) => mapOrderStatusToI18nKey(raw);
+
+export const translateOrderStatus = (t: TFunction, raw: unknown) => {
+  const key = mapOrderStatusToI18nKey(raw);
+  return t(`order.status.${key}`, { defaultValue: String(raw ?? '') });
 };
 
-/** Maps API token → `order.payment.<camelCase>`. Unmapped → `other` (never raw API). */
-const PAYMENT_ALIASES: Record<string, string> = {
-  cod: 'cod',
-  cashondelivery: 'cod',
-  cash: 'cod',
-  paypal: 'paypal',
-  pay_pal: 'paypal',
-  coffeecoin: 'coffeeCoin',
-  coffee_coin: 'coffeeCoin',
-  momo: 'momo',
-  vnpay: 'vnpay',
-  banktransfer: 'bankTransfer',
-  bank_transfer: 'bankTransfer',
-  wiretransfer: 'bankTransfer',
-  stripe: 'stripe',
-  card: 'card',
-  creditcard: 'card',
-  debitcard: 'card',
-  zalopay: 'zalopay',
-  zalo_pay: 'zalopay',
-  applepay: 'applePay',
-  googlepay: 'googlePay',
+export const mapPaymentMethodToI18nKey = (raw: unknown) => {
+  const v = normalize(raw);
+  if (!v) return 'unknown' as const;
+  if (v === 'paypal') return 'paypal' as const;
+  if (v === 'cod' || v.includes('cash')) return 'cod' as const;
+  if (v === 'coffee_coin' || v === 'coffee coin' || v === 'coin') return 'coffeeCoin' as const;
+  return 'unknown' as const;
 };
 
-/** Maps API token → canonical shipping status (snake_case). */
-const SHIPPING_STATUS_ALIASES: Record<string, string> = {
-  pending: 'pending',
-  preparing: 'preparing',
-  packed: 'packed',
-  picked: 'picked',
-  shipped: 'shipped',
-  intransit: 'inTransit',
-  in_transit: 'inTransit',
-  outfordelivery: 'outForDelivery',
-  out_for_delivery: 'outForDelivery',
-  delivering: 'outForDelivery',
-  delivered: 'delivered',
-  failed: 'failed',
-  returned: 'returned',
-  cancelled: 'cancelled',
+export const translatePaymentMethod = (t: TFunction, raw: unknown) => {
+  const key = mapPaymentMethodToI18nKey(raw);
+  return t(`order.payment.${key}`, { defaultValue: String(raw ?? '') });
 };
 
-/** Canonical shipping → `order.shippingStatus.<camelCase>`. */
-const SHIPPING_STATUS_I18N: Record<string, string> = {
-  pending: 'pending',
-  preparing: 'preparing',
-  packed: 'packed',
-  picked: 'picked',
-  shipped: 'shipped',
-  inTransit: 'inTransit',
-  outForDelivery: 'outForDelivery',
-  delivered: 'delivered',
-  failed: 'failed',
-  returned: 'returned',
-  cancelled: 'cancelled',
+export const mapShippingStatusToI18nKey = (raw: unknown) => {
+  const v = normalize(raw);
+  if (!v) return 'unknown' as const;
+  if (v === 'pending' || v === 'waiting') return 'pending' as const;
+  if (v === 'shipping' || v === 'delivering') return 'shipping' as const;
+  if (v === 'shipped' || v === 'delivered') return 'shipped' as const;
+  if (v === 'completed' || v === 'complete') return 'completed' as const;
+  if (v === 'cancelled' || v === 'canceled') return 'cancelled' as const;
+  return 'unknown' as const;
 };
 
-export const normalizeOrderStatusForLogic = (raw: unknown): string => {
-  const k = normalizeApiToken(raw);
-  return ORDER_STATUS_ALIASES[k] ?? k;
+export const translateShippingStatus = (t: TFunction, raw: unknown) => {
+  const key = mapShippingStatusToI18nKey(raw);
+  return t(`order.shippingStatus.${key}`, { defaultValue: String(raw ?? '') });
 };
 
-/** i18n suffix under `order.status.<suffix>` (camelCase). Use with `t(\`order.status.${suffix}\`)` or i18nKeys.order.status(suffix). */
-export const mapOrderStatusToI18nKey = (raw: unknown): string => {
-  const canonical = normalizeOrderStatusForLogic(raw);
-  return ORDER_STATUS_I18N[canonical] ?? 'unknown';
-};
-
-/** i18n suffix under `order.payment.<suffix>`. */
-export const mapPaymentMethodToI18nKey = (raw: unknown): string => {
-  const token = normalizeApiToken(raw);
-  if (!token) return 'other';
-  return PAYMENT_ALIASES[token] ?? 'other';
-};
-
-/** i18n suffix under `order.shippingStatus.<suffix>`. */
-export const mapShippingStatusToI18nKey = (raw: unknown): string => {
-  const token = normalizeApiToken(raw);
-  if (!token) return 'unknown';
-  const canonical = SHIPPING_STATUS_ALIASES[token] ?? 'unknown';
-  return SHIPPING_STATUS_I18N[canonical] ?? 'unknown';
-};
-
-/**
- * Display label for order status — always from i18n, never raw API text.
- */
-export const translateOrderStatus = (t: TFunction, raw: unknown): string => {
-  const suffix = mapOrderStatusToI18nKey(raw);
-  if (suffix !== 'unknown') return t(`order.status.${suffix}`);
-  return t('order.status.unknown');
-};
-
-/**
- * Display label for payment method — always from i18n, never raw API text.
- */
-export const translatePaymentMethod = (t: TFunction, raw: unknown): string => {
-  const suffix = mapPaymentMethodToI18nKey(raw);
-  return t(`order.payment.${suffix}`, { defaultValue: t('order.payment.other') });
-};
-
-/**
- * Delivery / logistics status (if provided separately from order status).
- */
-export const translateShippingStatus = (t: TFunction, raw: unknown): string => {
-  const suffix = mapShippingStatusToI18nKey(raw);
-  return t(`order.shippingStatus.${suffix}`);
-};
-
-/** Fixed UI shipping method options (checkout) — already translated keys. */
-export const translateShippingLabel = (
-  t: TFunction,
-  key: 'standard' | 'express' | 'pickup',
-): string => t(`order.shipping.${key}`);
-
-/** @deprecated Use mapOrderStatusToI18nKey — kept for any external imports. */
-export const orderStatusToKey = (raw: unknown): string => mapOrderStatusToI18nKey(raw);

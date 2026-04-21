@@ -1,5 +1,5 @@
 import type { Socket } from 'socket.io-client';
-import { connectSocket, getSocket } from '@/modules/chat/socket/socketClient';
+import { connectSocket, getSocket } from '@/features/chat/socket/socketClient';
 
 let joinedForUserId: number | null = null;
 
@@ -24,3 +24,4 @@ export const joinNotificationsRoom = (userId: number) => {
 export const resetJoinedRoom = () => {
   joinedForUserId = null;
 };
+

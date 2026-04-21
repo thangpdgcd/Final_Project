@@ -2,11 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import BlogCard from '@/components/blog/BlogCard';
-import EditorialPageShell from '@/components/layout/EditorialPageShell';
-import PageContainer from '@/components/layout/PageContainer';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import EditorialPageShell from '@/components/layout/editorialpageshells/EditorialPageShell';
+import PageContainer from '@/components/layout/pagescontainer/PageContainer';
+import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
 import { blogs } from '@/data/blogs';
-import { fadeInUp } from '@/utils/motion';
+import { fadeInUp } from '@/utils/motions/motion';
 
 const BlogPage: React.FC = () => {
   const { t } = useTranslation();

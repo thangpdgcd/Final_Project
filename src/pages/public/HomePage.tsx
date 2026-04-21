@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
 import { Layout } from 'antd';
 import { motion } from 'framer-motion';
 import HeroSection from '@/components/sections/home/HeroSection';
@@ -10,7 +10,7 @@ import HandsToHeartSection from '@/components/sections/home/HandsToHeartSection'
 import RoastingProcessSection from '@/components/sections/home/RoastingProcessSection';
 import ReviewsSection from '@/components/sections/home/ReviewsSection';
 import ClubCtaSection from '@/components/sections/home/ClubCtaSection';
-import Chatbox from '@/components/chatbox';
+import Chatbox from '@/features/chatbox';
 
 const { Content } = Layout;
 

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { httpClient } from '@/shared/lib/http/client';
+import { httpClient } from '@/api/http/client';
 import type { OnlineStaffUser } from '../types';
 
 const toNumber = (value: unknown, fallback = 0) => {
@@ -57,3 +57,4 @@ export const staffApi = {
     }
   },
 };
+

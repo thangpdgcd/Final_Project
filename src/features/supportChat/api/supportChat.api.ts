@@ -1,4 +1,4 @@
-import { httpClient } from '@/shared/lib/http/client';
+import { httpClient } from '@/api/http/client';
 import type { SupportChatConversation, SupportChatMessage, SupportChatUser } from '../types';
 
 const toNumber = (value: unknown, fallback = 0) => {
@@ -84,14 +84,7 @@ const mapConversation = (raw: any): SupportChatConversation | null => {
             ? raw.otherUser.avatar
             : undefined;
 
-  return {
-    conversationId,
-    title,
-    avatarUrl,
-    lastMessagePreview,
-    lastMessageAt,
-    unreadCount,
-  };
+  return { conversationId, title, avatarUrl, lastMessagePreview, lastMessageAt, unreadCount };
 };
 
 const mapMessage = (raw: any, conversationIdFallback?: number): SupportChatMessage | null => {
@@ -172,3 +165,4 @@ export const supportChatApi = {
     return mapMessage(raw, body.conversationId);
   },
 };
+

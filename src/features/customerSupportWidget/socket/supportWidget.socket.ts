@@ -1,5 +1,5 @@
 import { io, type Socket } from 'socket.io-client';
-import { getAccessToken } from '@/shared/lib/http/tokenStore';
+import { getAccessToken } from '@/api/http/tokenStore';
 import type { JoinRoomPayload, ReceiveMessagePayload, SendMessagePayload } from '../types';
 
 type SocketStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'error';
@@ -30,22 +30,18 @@ export const getSupportWidgetSocket = () => socketSingleton;
 export const connectSupportWidgetSocket = () => {
   if (socketIoUnsupported) {
     status = 'error';
-    // Return the existing instance if any (but do not attempt reconnects).
     return socketSingleton as Socket;
   }
   const token = getAccessToken();
 
-  // If we already have a socket instance, always refresh auth in case the widget
-  // mounted before AuthProvider populated the token store.
   if (socketSingleton) {
     (socketSingleton as any).auth = token ? { token } : undefined;
-    // Always attempt reconnect when not connected so updated auth can be used.
     if (!socketSingleton.connected) {
       status = 'connecting';
       try {
         socketSingleton.connect();
       } catch {
-        // ignore; connect_error listener will set status
+        // ignore
       }
     }
     return socketSingleton;
@@ -127,7 +123,6 @@ export const supportWidgetEvents = {
 
   onJoinedRoom: (handler: (payload: any) => void) => {
     const socket = connectSupportWidgetSocket();
-    // Some backends emit `joined_room`, others emit `chat:join`.
     socket.on('joined_room', handler);
     socket.on('chat:join', handler);
     return () => {
@@ -152,3 +147,4 @@ export const supportWidgetEvents = {
     return () => socket.off('error', handler);
   },
 };
+

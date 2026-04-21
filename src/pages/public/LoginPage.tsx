@@ -8,16 +8,16 @@ import { motion } from 'framer-motion';
 import { Facebook, Instagram, Chrome } from 'lucide-react';
 import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/store/AuthContext';
-import { authService } from '@/features/auth';
-import { authService as googleAuthService } from '@/services/authService';
-import { GoogleButton } from '@/components/GoogleButton';
-import api, { setAccessToken } from '@/api/axiosInstance';
+import { useAuth } from '@/store/auth/AuthContext';
+import { authService } from '@/services/auth/auth.service';
+import { googleAuthApi } from '@/api/googles/googleAuthApi';
+import { GoogleButton } from '@/components/ui/googlebutton/GoogleButton';
+import api, { setAccessToken } from '@/api/axiosInstances/axiosInstance';
 import axios, { type AxiosResponse } from 'axios';
 import Logo from '@/components/common/Logo';
-import EditorialPageShell from '@/components/layout/EditorialPageShell';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import type { LoginPayload, AuthUser } from '@/types';
+import EditorialPageShell from '@/components/layout/editorialpageshells/EditorialPageShell';
+import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
+import type { LoginPayload, AuthUser } from '@/types/index';
 
 const cloudinaryImg = (path: string) =>
   `https://res.cloudinary.com/dfjecxrnl/image/upload/f_auto,q_auto:best/${path}`;
@@ -156,7 +156,7 @@ const LoginPage: React.FC = () => {
     }
     try {
       setGoogleLoading(true);
-      const { accessToken, user } = await googleAuthService.googleLogin(token);
+      const { accessToken, user } = await googleAuthApi.login(token);
       if (!accessToken) {
         messageApi.error(t('auth.loginError'));
         return;

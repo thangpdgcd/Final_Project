@@ -1,4 +1,4 @@
-import { httpClient } from '@/shared/lib/http/client';
+import { httpClient } from '@/api/http/client';
 import type { SupportWidgetConversation, SupportWidgetMessage, SupportWidgetUser } from '../types';
 
 const toNumber = (value: unknown, fallback = 0) => {
@@ -94,11 +94,7 @@ const mapUser = (raw: any): SupportWidgetUser | undefined => {
     raw.staff?.avatar,
   );
 
-  return {
-    userId,
-    name,
-    avatarUrl,
-  };
+  return { userId, name, avatarUrl };
 };
 
 const mapConversation = (raw: any): SupportWidgetConversation | null => {
@@ -153,14 +149,7 @@ const mapConversation = (raw: any): SupportWidgetConversation | null => {
           : typeof p?.role === 'string'
             ? p.role
             : undefined,
-      name: pickString(
-        p?.name,
-        p?.displayName,
-        p?.display_name,
-        p?.username,
-        p?.fullName,
-        p?.full_name,
-      ),
+      name: pickString(p?.name, p?.displayName, p?.display_name, p?.username, p?.fullName, p?.full_name),
     }))
     .filter((p: any) => p.userId > 0);
 
@@ -223,7 +212,6 @@ export const supportWidgetApi = {
   }): Promise<SupportWidgetConversation[]> => {
     const queryParams: Record<string, unknown> = {};
     if (params?.userId && params.userId > 0) {
-      // Send a few common key aliases to match different backend naming schemes.
       queryParams.userId = params.userId;
       queryParams.customerId = params.userId;
       queryParams.participantUserId = params.userId;
@@ -246,7 +234,6 @@ export const supportWidgetApi = {
     conversationId: number,
     params?: { limit?: number; offset?: number },
   ): Promise<SupportWidgetMessage[]> => {
-    // Prevent accidental draft/invalid fetches (e.g. -1).
     if (!conversationId || conversationId <= 0) return [];
     const limit = params?.limit ?? 50;
     const offset = params?.offset ?? 0;
@@ -263,10 +250,8 @@ export const supportWidgetApi = {
   }): Promise<SupportWidgetMessage | null> => {
     const res = await httpClient.post('/messages', body);
     const rawEnvelope = res.data?.message ?? res.data?.data ?? res.data;
-    const raw =
-      rawEnvelope?.message && typeof rawEnvelope.message === 'object'
-        ? rawEnvelope.message
-        : rawEnvelope;
+    const raw = rawEnvelope?.message && typeof rawEnvelope.message === 'object' ? rawEnvelope.message : rawEnvelope;
     return mapMessage(raw, body.conversationId);
   },
 };
+

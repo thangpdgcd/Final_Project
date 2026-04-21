@@ -1,4 +1,4 @@
-import api from '@/api/axiosInstance';
+import api from '@/api/axiosInstances/axiosInstance';
 import type { AppNotification, NotificationType } from './types';
 
 type RawNotification = any;
@@ -28,15 +28,11 @@ const normalizeType = (v: unknown): NotificationType => {
 
 const normalizeNotification = (raw: RawNotification): AppNotification | null => {
   if (!raw || typeof raw !== 'object') return null;
-  const id = String(
-    raw.id ?? raw.notification_ID ?? raw.notificationId ?? raw._id ?? raw.uuid ?? '',
-  ).trim();
+  const id = String(raw.id ?? raw.notification_ID ?? raw.notificationId ?? raw._id ?? raw.uuid ?? '').trim();
   if (!id) return null;
   const message = String(raw.message ?? raw.content ?? raw.title ?? raw.text ?? '').trim();
   if (!message) return null;
-  const createdAt = toIsoString(
-    raw.createdAt ?? raw.created_at ?? raw.time ?? raw.timestamp ?? raw.date,
-  );
+  const createdAt = toIsoString(raw.createdAt ?? raw.created_at ?? raw.time ?? raw.timestamp ?? raw.date);
   const read = Boolean(raw.read ?? raw.isRead ?? raw.seen ?? raw.status === 'read');
   const type = normalizeType(raw.type ?? raw.kind ?? raw.level);
   const metaRaw = typeof raw.meta === 'object' && raw.meta ? raw.meta : undefined;
@@ -47,23 +43,13 @@ const normalizeNotification = (raw: RawNotification): AppNotification | null => 
     type,
     createdAt,
     read,
-    meta:
-      orderId && !metaRaw?.orderId
-        ? { ...(metaRaw ?? {}), orderId }
-        : metaRaw,
+    meta: orderId && !metaRaw?.orderId ? { ...(metaRaw ?? {}), orderId } : metaRaw,
   };
 };
 
 export const notificationsApi = {
   fetch: async (): Promise<AppNotification[]> => {
-    // Backend routes are mounted under `/api/notifications` (FE baseURL already includes `/api`).
-    // Only fallback to legacy endpoints when we are confident it's a 404.
-    const candidates = [
-      '/notifications',
-      '/users/notifications',
-      '/notification',
-      '/me/notifications',
-    ];
+    const candidates = ['/notifications', '/users/notifications', '/notification', '/me/notifications'];
     let lastErr: unknown;
     for (const url of candidates) {
       try {
@@ -80,9 +66,7 @@ export const notificationsApi = {
       } catch (e: any) {
         lastErr = e;
         const status = e?.response?.status;
-        // Stop early on auth errors; don't try other endpoints.
         if (status === 401 || status === 403) throw e;
-        // Only try next endpoint when current is missing.
         if (status !== 404) break;
       }
     }
@@ -107,8 +91,6 @@ export const notificationsApi = {
       } catch (e: any) {
         lastErr = e;
         const status = e?.response?.status;
-        // Only try fallback candidates when endpoint/method is missing.
-        // Avoid spamming failing requests on real errors (401/403/500...).
         if (status && status !== 404 && status !== 405) break;
       }
     }
@@ -135,3 +117,4 @@ export const notificationsApi = {
     if (lastErr) throw lastErr;
   },
 };
+

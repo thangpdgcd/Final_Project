@@ -2,18 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Search, ShoppingCart, Menu, X, Moon, Sun, ChevronRight } from 'lucide-react';
-import { useTheme } from '@/store/ThemeContext';
-import { useAuth } from '@/store/AuthContext';
-import { useCart } from '@/features/cart';
+import { useTheme } from '@/store/themes/ThemeContext';
+import { useAuth } from '@/store/auth/AuthContext';
+import { useCart } from '@/hooks/cart/useCart';
 import { useTranslation } from 'react-i18next';
 import { changeLanguage } from '@/translates/i18n';
 import Logo from '@/components/common/Logo';
 import UserMenu from './UserMenu';
-import { getImageSrc } from '@/utils/image';
-import { translatedProductName } from '@/utils/productI18n';
-import { useEffectiveUserId } from '@/hooks/useEffectiveUserId';
-import { IconButton } from '@/components/ui/IconButton';
-import { NotificationBell } from '@/features/notifications';
+import { getImageSrc } from '@/utils/images/image';
+import { translatedProductName } from '@/utils/products/productI18n';
+import { useEffectiveUserId } from '@/hooks/usereffectiveuserids/useEffectiveUserId';
+import { IconButton } from '@/features/cart/IconButton';
+import NotificationBell from '@/components/ui/notifications/NotificationBell';
 
 // --- CONSTANTS ---
 const NAV_ITEMS = [

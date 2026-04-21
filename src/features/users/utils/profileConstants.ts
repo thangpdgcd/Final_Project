@@ -1,48 +1,60 @@
-export const formatPrice = (value: number) =>
-  new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    maximumFractionDigits: 0,
-  }).format(value || 0);
-
-type WalletTransactionLabels = {
-  topup: string;
-  refund: string;
-  spend: string;
-  fallback: string;
+export const formatPrice = (value: number, locale: string = 'vi-VN') => {
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: 'VND',
+      maximumFractionDigits: 0,
+    }).format(Number(value) || 0);
+  } catch {
+    return `${Number(value) || 0}`;
+  }
 };
 
-export const getWalletTransactionLabel = (type: string, labels: WalletTransactionLabels) => {
-  const normalizedType = String(type || '').toUpperCase();
-
-  if (normalizedType === 'TOPUP') return labels.topup;
-  if (normalizedType === 'REFUND') return labels.refund;
-  if (normalizedType === 'SPEND') return labels.spend;
-
-  return normalizedType || labels.fallback;
+export const getWalletTransactionLabel = (
+  typeRaw: string,
+  labels: { topup: string; refund: string; spend: string; fallback: string },
+) => {
+  const type = String(typeRaw ?? '')
+    .trim()
+    .toUpperCase();
+  if (!type) return labels.fallback;
+  if (type.includes('TOPUP') || type.includes('DEPOSIT') || type.includes('ADD')) return labels.topup;
+  if (type.includes('REFUND') || type.includes('RETURN')) return labels.refund;
+  if (type.includes('SPEND') || type.includes('PAY') || type.includes('ORDER')) return labels.spend;
+  return labels.fallback;
 };
 
-export const PROFILE_THEME_TOKENS = {
-  dark: {
-    bg: '#131313',
-    surfaceLow: '#1c1b1b',
-    surfaceLowest: '#0e0e0e',
-    surfaceHigh: '#2a2a2a',
-    onSurface: '#e5e2e1',
-    onSurfaceVariant: '#d1c5b6',
-    gold: '#e5c18b',
-    goldDeep: '#c5a370',
-    ringColor: '#131313',
-  },
+type Tokens = {
+  bg: string;
+  surfaceLow: string;
+  surfaceHigh: string;
+  surfaceLowest: string;
+  onSurface: string;
+  onSurfaceVariant: string;
+  gold: string;
+  goldDeep: string;
+};
+
+export const PROFILE_THEME_TOKENS: { light: Tokens; dark: Tokens } = {
   light: {
-    bg: '#faf8f5',
+    bg: '#fff7ed',
     surfaceLow: '#ffffff',
-    surfaceLowest: '#f3f0ea',
-    surfaceHigh: '#ede9e1',
-    onSurface: '#1a0a00',
-    onSurfaceVariant: '#5c3d2e',
-    gold: '#b8892a',
-    goldDeep: '#9a7020',
-    ringColor: '#faf8f5',
+    surfaceHigh: '#fffaf4',
+    surfaceLowest: '#ffffff',
+    onSurface: '#1c1917',
+    onSurfaceVariant: '#57534e',
+    gold: '#c18a2f',
+    goldDeep: '#8a5a14',
   },
-} as const;
+  dark: {
+    bg: '#0b0b10',
+    surfaceLow: '#14141b',
+    surfaceHigh: '#1a1a23',
+    surfaceLowest: '#0f0f16',
+    onSurface: '#fafaf9',
+    onSurfaceVariant: '#a8a29e',
+    gold: '#fbbf24',
+    goldDeep: '#fb923c',
+  },
+};
+

@@ -1,10 +1,10 @@
 import React, { type ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { ThemeProvider } from '@/store/ThemeContext';
-import { AuthProvider } from '@/store/AuthContext';
-import { queryClient } from '@/lib/queryClient';
-import { ShippingProvider } from '@/contexts/ShippingContext';
+import { ThemeProvider } from '@/store/themes/ThemeContext';
+import { AuthProvider } from '@/store/auth/AuthContext';
+import { queryClient } from '@/utils/lib/queryClient';
+import { ShippingProvider } from '@/contexts/shippingcontexts/ShippingContext';
 
 type AppProvidersProps = {
   children: ReactNode;

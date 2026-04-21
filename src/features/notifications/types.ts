@@ -16,3 +16,4 @@ export type AppNotification = {
   /** Optional extra payload from server (orderId, url, etc). */
   meta?: Record<string, unknown>;
 };
+

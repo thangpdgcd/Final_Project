@@ -61,9 +61,8 @@ const makePreview = (m: SupportChatMessage): string => {
   return `[Action] ${m.action}`;
 };
 
-const sortConversations = (list: SupportChatConversation[]) => {
-  return [...list].sort((a, b) => (b.lastMessageAt ?? 0) - (a.lastMessageAt ?? 0));
-};
+const sortConversations = (list: SupportChatConversation[]) =>
+  [...list].sort((a, b) => (b.lastMessageAt ?? 0) - (a.lastMessageAt ?? 0));
 
 export const useSupportChatStore = create<SupportChatState>((set, get) => ({
   connectionStatus: 'idle',
@@ -175,9 +174,7 @@ export const useSupportChatStore = create<SupportChatState>((set, get) => ({
       const idx = existing.findIndex((m) => m.optimistic?.clientId === clientId);
       const next =
         idx === -1 ? [...existing, message] : existing.map((m, i) => (i === idx ? message : m));
-      return {
-        messagesByConversationId: { ...state.messagesByConversationId, [conversationId]: next },
-      };
+      return { messagesByConversationId: { ...state.messagesByConversationId, [conversationId]: next } };
     });
   },
 
@@ -186,14 +183,9 @@ export const useSupportChatStore = create<SupportChatState>((set, get) => ({
       const existing = state.messagesByConversationId[conversationId] ?? [];
       const next = existing.map((m) => {
         if (m.optimistic?.clientId !== clientId) return m;
-        return {
-          ...m,
-          optimistic: { ...m.optimistic, status: 'failed' as const },
-        };
+        return { ...m, optimistic: { ...m.optimistic, status: 'failed' as const } };
       });
-      return {
-        messagesByConversationId: { ...state.messagesByConversationId, [conversationId]: next },
-      };
+      return { messagesByConversationId: { ...state.messagesByConversationId, [conversationId]: next } };
     });
   },
 
@@ -201,8 +193,6 @@ export const useSupportChatStore = create<SupportChatState>((set, get) => ({
     const conversationId = incoming.conversationId;
     const existing = get().messagesByConversationId[conversationId] ?? [];
     if (existing.length === 0) return;
-
-    // If the message already exists (by id), nothing to reconcile.
     if (existing.some((m) => String(m.id) === String(incoming.id))) return;
 
     const incomingPreview = makePreview(incoming);
@@ -226,18 +216,12 @@ export const useSupportChatStore = create<SupportChatState>((set, get) => ({
       const target = updated[realIdx];
       if (!target?.optimistic) return {};
 
-      // Replace the optimistic message with the saved one, but keep the clientId for UI state.
       const next = updated.map((m, i) =>
         i === realIdx
-          ? {
-              ...incoming,
-              optimistic: { clientId: m.optimistic!.clientId, status: 'sent' as const },
-            }
+          ? { ...incoming, optimistic: { clientId: m.optimistic!.clientId, status: 'sent' as const } }
           : m,
       );
-      return {
-        messagesByConversationId: { ...state.messagesByConversationId, [conversationId]: next },
-      };
+      return { messagesByConversationId: { ...state.messagesByConversationId, [conversationId]: next } };
     });
   },
 
@@ -267,19 +251,9 @@ export const useSupportChatStore = create<SupportChatState>((set, get) => ({
         nextLoaded[toConversationId] = true;
       }
 
-      const nextLoadingBy = { ...state.loadingMessagesByConversationId };
-      if (nextLoadingBy[fromConversationId]) {
-        delete nextLoadingBy[fromConversationId];
-      }
-
-      const fromConv = state.conversations.find((c) => c.conversationId === fromConversationId);
-      const remaining = state.conversations.filter((c) => c.conversationId !== fromConversationId);
-      const withTo = upsertConversationInternal(remaining, {
-        conversationId: toConversationId,
-        title: fromConv?.title,
-        avatarUrl: fromConv?.avatarUrl,
-        unreadCount: 0,
-      });
+      const nextConversations = state.conversations.map((c) =>
+        c.conversationId === fromConversationId ? { ...c, conversationId: toConversationId } : c,
+      );
 
       const selectedConversationId =
         state.selectedConversationId === fromConversationId
@@ -290,10 +264,10 @@ export const useSupportChatStore = create<SupportChatState>((set, get) => ({
         messagesByConversationId: nextMessagesBy,
         joinedConversations: nextJoined,
         loadedConversations: nextLoaded,
-        loadingMessagesByConversationId: nextLoadingBy,
-        conversations: sortConversations(withTo),
+        conversations: nextConversations,
         selectedConversationId,
       };
     });
   },
 }));
+

@@ -1,4 +1,5 @@
-export const isNearBottom = (el: HTMLElement, thresholdPx = 120) => {
-  const distanceToBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
-  return distanceToBottom < thresholdPx;
+export const isNearBottom = (el: HTMLElement, threshold = 80) => {
+  const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+  return distance < threshold;
 };
+

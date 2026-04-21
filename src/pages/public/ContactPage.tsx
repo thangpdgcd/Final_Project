@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
 import { Mail, Phone, ArrowRight, Instagram, Facebook, Twitter } from 'lucide-react';
 import { toast } from 'react-toastify';
 

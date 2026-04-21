@@ -1,6 +1,6 @@
 import React from 'react';
-import { CurrencyProvider } from '@/contexts/CurrencyContext';
-import { ShippingProvider } from '@/contexts/ShippingContext';
+import { CurrencyProvider } from '@/contexts/currencycontexts/CurrencyContext';
+import { ShippingProvider } from '@/contexts/shippingcontexts/ShippingContext';
 
 type ShopProvidersProps = {
   children: React.ReactNode;

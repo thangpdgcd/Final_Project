@@ -17,3 +17,4 @@ export const formatTimeAgo = (iso: string, now = Date.now()): string => {
     return `${diffDay}d`;
   }
 };
+

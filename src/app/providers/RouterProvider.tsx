@@ -3,7 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ConfigProvider, Spin, theme as antdTheme } from 'antd';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useTheme } from '@/store/ThemeContext';
+import { useTheme } from '@/store/themes/ThemeContext';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 import AppRoutes from '@/routes';
 

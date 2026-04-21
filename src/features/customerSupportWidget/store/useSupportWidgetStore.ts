@@ -1,10 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type {
-  ReceiveMessagePayload,
-  SupportWidgetConversation,
-  SupportWidgetMessage,
-} from '../types';
+import type { ReceiveMessagePayload, SupportWidgetConversation, SupportWidgetMessage } from '../types';
 
 type ConnectionStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'error';
 
@@ -121,9 +117,7 @@ export const useSupportWidgetStore = create<SupportWidgetState>()(
 
           return {
             conversationId:
-              state.conversationId && state.conversationId > 0
-                ? state.conversationId
-                : conversationId,
+              state.conversationId && state.conversationId > 0 ? state.conversationId : conversationId,
             messages: nextMessages,
             unreadCount: isOpen ? 0 : state.unreadCount + 1,
             lastKnownConversation: state.lastKnownConversation
@@ -218,26 +212,26 @@ export const useSupportWidgetStore = create<SupportWidgetState>()(
     }),
     {
       name: 'supportWidget:v1',
-      version: 1,
       storage: createJSONStorage(() => localStorage),
-      onRehydrateStorage: () => (state, error) => {
-        if (error) {
-          // Keep widget usable even when persisted payload is stale/corrupted.
-          state?.setConversationId(null);
-          state?.setLoadedConversationId(null);
-          state?.setMessages([]);
-        }
-        state?.setHasHydrated(true);
-      },
-      partialize: (state) => ({
-        // Persist only what makes sense across reloads.
-        conversationId: state.conversationId,
-        lastKnownConversation: state.lastKnownConversation,
-        staffUserId: state.staffUserId,
-        messages: state.messages,
-        loadedConversationId: state.loadedConversationId,
-        unreadCount: state.unreadCount,
+      partialize: (s) => ({
+        hasHydrated: s.hasHydrated,
+        isOpen: s.isOpen,
+        unreadCount: s.unreadCount,
+        conversationId: s.conversationId,
+        lastKnownConversation: s.lastKnownConversation,
+        staffUserId: s.staffUserId,
+        messages: s.messages,
+        loadedConversationId: s.loadedConversationId,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        try {
+          state.setHasHydrated(true);
+        } catch {
+          // ignore
+        }
+      },
     },
   ),
 );
+

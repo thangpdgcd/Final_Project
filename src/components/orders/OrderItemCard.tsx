@@ -1,0 +1,61 @@
+import React, { useMemo } from 'react';
+import type { Product } from '@/types/index';
+import { OrderItemActions, type OrderItemRowAction } from './OrderItemActions';
+
+type Props = {
+  raw: any;
+  idx: number;
+  orderId: number;
+  productMap: Map<number, Product>;
+  busyRowKey: string | null;
+  onBuyAgainItem: (args: OrderItemRowAction) => void;
+  onViewProduct: (productId: number) => void;
+  onContactSeller: () => void;
+};
+
+export const OrderItemCard = React.forwardRef<HTMLDivElement, Props>(({
+  raw,
+  idx,
+  productMap,
+  busyRowKey,
+  onBuyAgainItem,
+  onViewProduct,
+  onContactSeller,
+}, ref) => {
+  const productId = Number(raw?.product_ID ?? raw?.productId ?? raw?.id ?? 0);
+  const quantity = Number(raw?.quantity ?? 0) || 0;
+  const price = Number(raw?.price ?? raw?.unitPrice ?? 0) || 0;
+  const rowKey = String(raw?.orderitem_ID ?? raw?.orderItemId ?? `${productId}-${idx}`);
+
+  const product = useMemo(() => (productId ? productMap.get(productId) : undefined), [productId, productMap]);
+  const title = String(product?.name ?? raw?.name ?? `#${productId || idx + 1}`);
+  const busy = busyRowKey === rowKey;
+
+  return (
+    <div
+      ref={ref}
+      className="rounded-xl border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_20%,transparent)] bg-[color:var(--hl-surface-lowest)] p-4"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-[color:var(--hl-on-surface)]">{title}</div>
+          <div className="mt-1 text-xs text-[color:color-mix(in_srgb,var(--hl-on-surface)_65%,transparent)]">
+            Qty: {quantity} • Price: {price.toLocaleString('vi-VN')}
+          </div>
+        </div>
+      </div>
+
+      <OrderItemActions
+        canAct={productId > 0 && quantity > 0}
+        busy={busy}
+        args={{ productId, quantity, price, rowKey }}
+        onBuyAgainItem={onBuyAgainItem}
+        onViewProduct={onViewProduct}
+        onContactSeller={onContactSeller}
+      />
+    </div>
+  );
+});
+
+OrderItemCard.displayName = 'OrderItemCard';
+

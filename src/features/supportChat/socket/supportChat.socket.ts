@@ -1,5 +1,5 @@
 import { io, type Socket } from 'socket.io-client';
-import { getAccessToken } from '@/shared/lib/http/tokenStore';
+import { getAccessToken } from '@/api/http/tokenStore';
 import type { JoinRoomPayload, ReceiveMessagePayload, SendMessagePayload } from '../types';
 
 type SocketStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'error';
@@ -126,3 +126,4 @@ export const supportChatEvents = {
     return () => socket.off('error', handler);
   },
 };
+

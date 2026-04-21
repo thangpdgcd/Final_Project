@@ -16,3 +16,4 @@ export const getSupportChatRole = (
   const r = normalizeRole(user?.roleID);
   return r === 'staff' || r === 'admin' ? 'staff' : 'customer';
 };
+

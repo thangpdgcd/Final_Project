@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
 import { Leaf, Truck } from 'lucide-react';
 
 const cloudinaryImg = (path: string) =>

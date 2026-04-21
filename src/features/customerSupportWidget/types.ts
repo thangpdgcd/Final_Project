@@ -69,3 +69,4 @@ export type ReceiveMessagePayload = {
   conversationId: number;
   message: SupportWidgetMessage;
 };
+

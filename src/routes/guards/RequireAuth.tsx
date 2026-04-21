@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/store/AuthContext';
+import { useAuth } from '@/store/auth/AuthContext';
 
 const RequireAuth: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();

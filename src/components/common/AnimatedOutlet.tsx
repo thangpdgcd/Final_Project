@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Outlet, useLocation } from 'react-router-dom';
-import { pageVariants } from '@/utils/motion';
+import { pageVariants } from '@/utils/motions/motion';
 
 type Props = {
   className?: string;

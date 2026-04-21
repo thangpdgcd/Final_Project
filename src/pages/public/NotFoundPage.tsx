@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import EditorialPageShell from '@/components/layout/EditorialPageShell';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import EditorialPageShell from '@/components/layout/editorialpageshells/EditorialPageShell';
+import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
 
 const NotFoundPage: React.FC = () => {
   const { t } = useTranslation();

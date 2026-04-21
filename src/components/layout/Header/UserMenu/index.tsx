@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useAuth } from '@/store/AuthContext';
+import { useAuth } from '@/store/auth/AuthContext';
 import Dropdown from './Dropdown';
 import { useTranslation } from 'react-i18next';
-import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/image';
+import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/images/image';
 
 interface UserMenuProps {
   onLoginClick: () => void;

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,10 +9,10 @@ import { motion } from 'framer-motion';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { authService } from '@/features/auth';
+import { authService } from '@/services/auth/auth.service';
 import Logo from '@/components/common/Logo';
-import EditorialPageShell from '@/components/layout/EditorialPageShell';
-import type { RegisterPayload } from '@/types';
+import EditorialPageShell from '@/components/layout/editorialpageshells/EditorialPageShell';
+import type { RegisterPayload } from '@/types/index';
 
 const cloudinaryImg = (path: string) =>
   `https://res.cloudinary.com/dfjecxrnl/image/upload/f_auto,q_auto:best/${path}`;

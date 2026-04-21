@@ -1,24 +1,4 @@
-export type BlogSection = {
-  title: string;
-  bullets: string[];
-};
-
-export type BlogContent = {
-  intro?: string;
-  sections?: BlogSection[];
-  conclusion?: string;
-};
-
-export type BlogPost = {
-  id: string;
-  title: string;
-  author: string;
-  date: string;
-  excerpt: string;
-  image: string;
-  tags?: string[];
-  content?: BlogContent;
-};
+import type { BlogPost } from '@/types/blog/blog.types';
 
 export const blogs: BlogPost[] = [
   {
