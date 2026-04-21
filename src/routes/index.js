@@ -7,6 +7,7 @@ import initCategoriesRoutes from "./categoriesRoutes.js";
 import initOrdersRoutes from "./ordersRoutes.js";
 import initCartRoutes from "./cartsRoutes.js";
 import initAuthRoutes from "./authRoutes.js";
+import initTikTokAuthRoutes from "./tiktokAuthRoutes.js";
 import initPaymentsRoutes from "./paymentsRoutes.js";
 import initChatRoutes from "./chatRoutes.js";
 import initPresenceRoutes from "./presenceRoutes.js";
@@ -53,6 +54,8 @@ router.get("/api/health", async (req, res) => {
  */
 const initRoutes = (app) => {
   app.use("/", router);
+  // OAuth login flows (public, no /api prefix)
+  initTikTokAuthRoutes(app);
   // Auth before user/staff routes so `GET /api/users/me` matches the current-user handler,
   // not `GET /api/users/:id` (staff) with id "me".
   initAuthRoutes(app);

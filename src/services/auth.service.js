@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { OAuth2Client } from "google-auth-library";
+import { requireEnv } from "../config/runtimeEnv.js";
 import { AppError } from "../utils/AppError.js";
 import { getUserAvatar } from "../utils/userAvatar.js";
 
@@ -11,9 +12,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^[0-9+]{9,15}$/;
 
 export const createAuthService = ({ authRepository }) => {
-  const GOOGLE_CLIENT_ID =
-    process.env.GOOGLE_CLIENT_ID ||
-    "399537387759-jo0mv148hud22orj0kdr8ih579c2vhuj.apps.googleusercontent.com";
+  const GOOGLE_CLIENT_ID = requireEnv("GOOGLE_CLIENT_ID");
   const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
   const normalizeRoleID = (raw) => {
