@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import NotificationItem from './NotificationItem';
 import type { AppNotification } from '@/features/notifications/types';
 import { useTranslation } from 'react-i18next';
-import { i18nKeys } from '@/constants/i18nKeys';
+import { i18nKeys } from '@/translates/constants/i18nKeys';
 import { dropdownPop } from '@/utils/motions/motion';
 
 type Props = {

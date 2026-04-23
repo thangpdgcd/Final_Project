@@ -8,7 +8,7 @@ import ShippingMethod from '@/features/shop/checkout/ShippingMethod';
 import TotalCostCard from '@/features/shop/checkout/TotalCostCard';
 import PriceRangeFilter from '@/features/shop/filters/PriceRangeFilter';
 import AccordionFilters from '@/features/shop/filters/AccordionFilters';
-import { products as productData } from '@/data/products';
+import { products as productData } from '@/components/data/products';
 
 const getDefaultPriceBounds = (items) => {
   const prices = items.map((p) => p.priceUSD);

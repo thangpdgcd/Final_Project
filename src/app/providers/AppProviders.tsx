@@ -1,10 +1,12 @@
 import React, { type ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Provider as ReduxProvider } from 'react-redux';
 import { ThemeProvider } from '@/store/themes/ThemeContext';
 import { AuthProvider } from '@/store/auth/AuthContext';
 import { queryClient } from '@/utils/lib/queryClient';
-import { ShippingProvider } from '@/contexts/shippingcontexts/ShippingContext';
+import { ShippingProvider } from '@/components/contexts/shippingcontexts/ShippingContext';
+import { store } from '@/redux/store';
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -20,15 +22,17 @@ const OAuthWrapper: React.FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => (
-  <QueryClientProvider client={queryClient}>
-    <OAuthWrapper>
-      <ThemeProvider>
-        <AuthProvider>
-          <ShippingProvider>{children}</ShippingProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </OAuthWrapper>
-  </QueryClientProvider>
+  <ReduxProvider store={store}>
+    <QueryClientProvider client={queryClient}>
+      <OAuthWrapper>
+        <ThemeProvider>
+          <AuthProvider>
+            <ShippingProvider>{children}</ShippingProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </OAuthWrapper>
+    </QueryClientProvider>
+  </ReduxProvider>
 );
 
 export default AppProviders;

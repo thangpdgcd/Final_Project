@@ -4,10 +4,9 @@ import { Typography, Alert, Skeleton, Checkbox } from 'antd';
 import { ShoppingOutlined, ShopOutlined, CreditCardOutlined, TagOutlined } from '@ant-design/icons';
 import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/store/auth/AuthContext';
-import { useCart, useRemoveCartItem, useUpdateCartItem, useAddToCart } from '@/hooks/cart/useCart';
 import { useProducts } from '@/hooks/products/useProducts';
 import type { CartItem as CartItemType, Product } from '@/types/index';
-import Chatbox from '@/features/chatbox';
+import Chatbox from '@/types/widgets/chatbox';
 import EditorialPageShell from '@/components/layout/editorialpageshells/EditorialPageShell';
 import CartItem from '@/features/cart/CartItem';
 import ProductCard from '@/features/products/ProductCard';
@@ -18,12 +17,20 @@ import VoucherInput from '@/components/voucher/VoucherInput';
 import VoucherSummary from '@/components/voucher/VoucherSummary';
 import { useApplyVoucher } from '@/hooks/voucher/useApplyVoucher';
 import { useAppTranslation } from '@/hooks/userapptranslations/useAppTranslation';
-import { i18nKeys } from '@/constants/i18nKeys';
+import { i18nKeys } from '@/translates/constants/i18nKeys';
 import { toastError, toastInfo, toastSuccess, toastWarning } from '@/utils/lib/toast/i18nToast';
 import { CartPurchaseBar } from '@/features/cart/CartPurchaseBar';
 import { translatedProductDescription, translatedProductName } from '@/utils/products/productI18n';
 import { calcShippingFeeVnd } from '@/utils/shippings/shippingFee';
-import { useShipping } from '@/contexts/shippingcontexts/ShippingContext';
+import { useShipping } from '@/components/contexts/shippingcontexts/ShippingContext';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import {
+  addToCartThunk,
+  fetchCartByUserId,
+  removeCartItemThunk,
+  updateCartItemThunk,
+} from '@/redux/slices/cartSlice';
+import { selectCartItemsByUserId, selectCartStatusByUserId } from '@/redux/selectors';
 
 const { Title } = Typography;
 
@@ -44,18 +51,27 @@ const CartPage: React.FC = () => {
 
   const userId = useEffectiveUserId();
 
-  const { data: cartItems = [], isLoading, error } = useCart(userId);
-  const removeItem = useRemoveCartItem();
-  const updateItem = useUpdateCartItem();
+  const dispatch = useAppDispatch();
+  const cartItems = useAppSelector((s) => selectCartItemsByUserId(s, userId));
+  const cartStatus = useAppSelector((s) => selectCartStatusByUserId(s, userId));
+  const cartError = useAppSelector((s) => (userId ? s.cart.errorByUserId[userId] ?? null : null));
+  const isLoading = cartStatus === 'loading';
+  const error = cartError ? new Error(cartError) : null;
+
+  useEffect(() => {
+    if (!userId) return;
+    void dispatch(fetchCartByUserId(userId));
+  }, [dispatch, userId]);
 
   const handleRemove = (id: number) => {
-    removeItem.mutate(id, {
-      onSuccess: () => {
+    if (!userId) return;
+    void dispatch(removeCartItemThunk({ userId, id }))
+      .unwrap()
+      .then(() => {
         toastSuccess(i18nKeys.toast.cart.removeSuccess);
         setSelectedIds((prev) => prev.filter((sid) => sid !== id));
-      },
-      onError: () => toastError(i18nKeys.toast.cart.removeError),
-    });
+      })
+      .catch(() => toastError(i18nKeys.toast.cart.removeError));
   };
 
   const handleQtyChange = (item: CartItemType, delta: number) => {
@@ -64,7 +80,10 @@ const CartPage: React.FC = () => {
       handleRemove(item.cartitem_ID);
       return;
     }
-    updateItem.mutate({ id: item.cartitem_ID, quantity: newQty });
+    if (!userId) return;
+    void dispatch(updateCartItemThunk({ userId, id: item.cartitem_ID, quantity: newQty }))
+      .unwrap()
+      .catch(() => toastError(i18nKeys.toast.cart.updateError));
   };
 
   const handleSelectOne = (id: number, checked: boolean) => {
@@ -131,7 +150,6 @@ const CartPage: React.FC = () => {
   };
 
   const { data: allProducts = [] } = useProducts();
-  const addToCartMutation = useAddToCart();
 
   const handleAddToCart = (product: Product) => {
     if (!userId) {
@@ -139,19 +157,20 @@ const CartPage: React.FC = () => {
       navigate('/login');
       return;
     }
-    addToCartMutation.mutate(
-      {
+    void dispatch(
+      addToCartThunk({
         user_ID: userId,
         product_ID: product.product_ID,
         quantity: 1,
         price: product.price,
-      },
-      {
-        onSuccess: () =>
-          toastSuccess(i18nKeys.toast.cart.addSuccess, { name: translatedProductName(t, product) }),
-        onError: () => toastError(i18nKeys.toast.cart.addError),
-      },
-    );
+      }),
+    )
+      .unwrap()
+      .then(() => {
+        toastSuccess(i18nKeys.toast.cart.addSuccess, { name: translatedProductName(t, product) });
+        window.dispatchEvent(new Event('cart:item-added'));
+      })
+      .catch(() => toastError(i18nKeys.toast.cart.addError));
   };
 
   const recommendedProducts = useMemo(() => {
@@ -270,7 +289,7 @@ const CartPage: React.FC = () => {
                     onSelect={(checked: boolean) => handleSelectOne(item.cartitem_ID, checked)}
                     onQtyChange={handleQtyChange}
                     onRemove={handleRemove}
-                    isRemoving={removeItem.isPending}
+                    isRemoving={isLoading}
                   />
                 ))}
               </AnimatePresence>

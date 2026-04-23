@@ -2,11 +2,18 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import i18n from '@/translates/i18n';
 import type { AppNotification } from '@/features/notifications/types';
-import { notificationsApi } from '@/features/notifications/notifications.api';
 import {
-  selectUnreadCount,
-  useNotificationsStore,
-} from '@/features/notifications/notifications.store';
+  addNotification,
+  clearNotifications,
+  fetchNotificationsThunk,
+  markAllNotificationsReadThunk,
+  markAllReadOptimistic,
+  markNotificationReadThunk,
+  markReadOptimistic,
+  setHydratedForUserId,
+} from '@/redux/slices/notificationsSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { selectNotificationsUnreadCount } from '@/redux/selectors';
 import {
   ensureSocketConnected,
   joinNotificationsRoom,
@@ -70,15 +77,10 @@ const normalizeSocketNotification = (raw: RawSocketNotification): AppNotificatio
 };
 
 export const useNotifications = (userId: number | null | undefined) => {
-  const notifications = useNotificationsStore((s) => s.notifications);
-  const unreadCount = useNotificationsStore(selectUnreadCount);
-  const addNotification = useNotificationsStore((s) => s.addNotification);
-  const setNotifications = useNotificationsStore((s) => s.setNotifications);
-  const hydratedForUserId = useNotificationsStore((s) => s.hydratedForUserId);
-  const setHydratedForUserId = useNotificationsStore((s) => s.setHydratedForUserId);
-  const clear = useNotificationsStore((s) => s.clear);
-  const markReadOptimistic = useNotificationsStore((s) => s.markReadOptimistic);
-  const markAllReadOptimistic = useNotificationsStore((s) => s.markAllReadOptimistic);
+  const dispatch = useAppDispatch();
+  const notifications = useAppSelector((s) => s.notifications.items);
+  const unreadCount = useAppSelector(selectNotificationsUnreadCount);
+  const hydratedForUserId = useAppSelector((s) => s.notifications.hydratedForUserId);
 
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen((v) => !v);
@@ -94,8 +96,8 @@ export const useNotifications = (userId: number | null | undefined) => {
       userIdRef.current = null;
       listenerAttachedRef.current = false;
       resetJoinedRoom();
-      clear();
-      setHydratedForUserId(null);
+      dispatch(clearNotifications());
+      dispatch(setHydratedForUserId(null));
       return;
     }
 
@@ -105,20 +107,19 @@ export const useNotifications = (userId: number | null | undefined) => {
     let alive = true;
     (async () => {
       try {
-        const items = await notificationsApi.fetch();
         if (!alive) return;
-        setNotifications(items);
-        setHydratedForUserId(uid);
+        await dispatch(fetchNotificationsThunk()).unwrap();
+        dispatch(setHydratedForUserId(uid));
       } catch {
         // keep empty state; socket can still push realtime updates
         if (!alive) return;
-        setHydratedForUserId(uid);
+        dispatch(setHydratedForUserId(uid));
       }
     })();
     return () => {
       alive = false;
     };
-  }, [userId, hydratedForUserId, setHydratedForUserId, setNotifications, clear]);
+  }, [dispatch, userId, hydratedForUserId]);
 
   // Socket connect + join room + listener (deduped).
   useEffect(() => {
@@ -134,7 +135,7 @@ export const useNotifications = (userId: number | null | undefined) => {
     const handler = (raw: RawSocketNotification) => {
       const n = normalizeSocketNotification(raw);
       if (!n) return;
-      addNotification({ ...n, read: false });
+      dispatch(addNotification({ ...n, read: false }));
       toast.info(displayNotificationMessage(n), { autoClose: 2500 });
     };
 
@@ -146,28 +147,20 @@ export const useNotifications = (userId: number | null | undefined) => {
       socket.off('receive_notification', handler);
       listenerAttachedRef.current = false;
     };
-  }, [userId, addNotification]);
+  }, [dispatch, userId]);
 
   const api = useMemo(
     () => ({
       markRead: async (id: string) => {
-        markReadOptimistic(id);
-        try {
-          await notificationsApi.markRead(id);
-        } catch {
-          // if API fails, keep optimistic read to avoid annoying bounce
-        }
+        dispatch(markReadOptimistic(id));
+        await dispatch(markNotificationReadThunk(id)).unwrap().catch(() => undefined);
       },
       markAllRead: async () => {
-        markAllReadOptimistic();
-        try {
-          await notificationsApi.markAllRead();
-        } catch {
-          // keep optimistic
-        }
+        dispatch(markAllReadOptimistic());
+        await dispatch(markAllNotificationsReadThunk()).unwrap().catch(() => undefined);
       },
     }),
-    [markAllReadOptimistic, markReadOptimistic],
+    [dispatch],
   );
 
   return {

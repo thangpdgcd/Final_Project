@@ -13,6 +13,11 @@ const normalizeApiBaseUrl = (raw: string): string => {
 
 export const getApiBaseUrl = (): string => {
   const apiUrlEnv = import.meta.env.VITE_API_URL as string | undefined;
-  return apiUrlEnv ? normalizeApiBaseUrl(apiUrlEnv) : 'http://localhost:8080/api';
+  if (apiUrlEnv) return normalizeApiBaseUrl(apiUrlEnv);
+  // In dev, prefer relative URL so Vite proxy (`/api` -> backend) works.
+  if (import.meta.env.DEV) return '/api';
+  // In prod, default to same-origin `/api` (behind reverse proxy).
+  if (typeof window !== 'undefined' && window.location?.origin) return `${window.location.origin}/api`;
+  return 'http://localhost:8080/api';
 };
 

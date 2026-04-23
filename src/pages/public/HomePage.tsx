@@ -10,7 +10,7 @@ import HandsToHeartSection from '@/components/sections/home/HandsToHeartSection'
 import RoastingProcessSection from '@/components/sections/home/RoastingProcessSection';
 import ReviewsSection from '@/components/sections/home/ReviewsSection';
 import ClubCtaSection from '@/components/sections/home/ClubCtaSection';
-import Chatbox from '@/features/chatbox';
+import Chatbox from '@/types/widgets/chatbox';
 
 const { Content } = Layout;
 

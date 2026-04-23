@@ -13,6 +13,7 @@ export const i18nKeys = {
     cart: {
       removeSuccess: 'toast.cart.removeSuccess',
       removeError: 'toast.cart.removeError',
+      updateError: 'toast.cart.updateError',
       checkoutNeedSelection: 'toast.cart.checkoutNeedSelection',
       loginToAdd: 'toast.cart.loginToAdd',
       addSuccess: 'toast.cart.addSuccess',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCurrency } from '@/contexts/currencycontexts/CurrencyContext';
+import { useCurrency } from '@/components/contexts/currencycontexts/CurrencyContext';
 
 const CurrencySwitcher = () => {
   const { selectedCurrency, setSelectedCurrency } = useCurrency() as any;

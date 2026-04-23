@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { i18nKeys } from '@/constants/i18nKeys';
+import { i18nKeys } from '@/translates/constants/i18nKeys';
 import { toastErrorWithFallback } from '@/utils/lib/toast/i18nToast';
 import type { ReceiveMessagePayload } from '@/features/supportChat/types';
 import { useSupportChatStore } from '@/features/supportChat/store/useSupportChatStore';

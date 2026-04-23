@@ -14,6 +14,8 @@ import { queryClient } from '@/utils/lib/queryClient';
 import { CART_KEY } from '@/hooks/cart/useCart';
 import { connectSocket } from '@/features/chat/socket/socketClient';
 import { useVoucherVaultStore } from '@/features/voucher/store/useVoucherVaultStore';
+import { useAppDispatch } from '@/redux/hooks';
+import { clearSession, setHydrated, setSession } from '@/redux/slices/authSlice';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -80,8 +82,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   });
   const [isAuthenticated, setIsAuthenticated] = useState(!!user);
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
+    dispatch(setHydrated(false));
     const storedToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
     if (storedToken) {
       setAccessToken(storedToken);
@@ -94,14 +98,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         clearAuthStorage();
         setUser(null);
         setIsAuthenticated(false);
+        dispatch(clearSession());
         setIsLoading(false);
+        dispatch(setHydrated(true));
         return;
       }
     } catch {
       clearAuthStorage();
       setUser(null);
       setIsAuthenticated(false);
+      dispatch(clearSession());
       setIsLoading(false);
+      dispatch(setHydrated(true));
       return;
     }
     // Keep a dedicated user_ID for modules that rely on it (cart/orders).
@@ -114,10 +122,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // ignore
     }
     setIsLoading(false);
-  }, []);
+    // Sync Redux with the hydrated local session.
+    try {
+      const token = localStorage.getItem('accessToken') || localStorage.getItem('token') || '';
+      const raw = localStorage.getItem('user');
+      const parsed = raw ? normalizeUser(JSON.parse(raw)) : null;
+      if (token && parsed) dispatch(setSession({ accessToken: token, user: parsed }));
+      else dispatch(clearSession());
+    } catch {
+      dispatch(clearSession());
+    } finally {
+      dispatch(setHydrated(true));
+    }
+  }, [dispatch]);
 
-  useEffect(() => {
-    const hydrateFromServer = async () => {
+  const hydrateFromServer = useCallback(async () => {
       const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
       if (!token) return;
       if (localStorage.getItem(ME_ENDPOINT_DISABLED_KEY) === '1') return;
@@ -164,9 +183,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
         // Keep current local state if /me fails for other reasons.
       }
-    };
-    void hydrateFromServer();
   }, []);
+
+  useEffect(() => {
+    void hydrateFromServer();
+  }, [hydrateFromServer]);
+
+  useEffect(() => {
+    const onAuthUpdated = () => {
+      // Re-hydrate after OAuth login flows that only store token first.
+      void hydrateFromServer();
+      // Also sync local user if already written.
+      try {
+        const raw = localStorage.getItem('user');
+        const parsed = raw ? normalizeUser(JSON.parse(raw)) : null;
+        if (parsed) {
+          setUser(parsed);
+          setIsAuthenticated(true);
+        }
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener('auth:updated', onAuthUpdated);
+    return () => window.removeEventListener('auth:updated', onAuthUpdated);
+  }, [hydrateFromServer]);
 
   useEffect(() => {
     const onAuthCleared = () => {
@@ -201,7 +242,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, [isAuthenticated, user?.user_ID]);
 
-  const login = useCallback((accessToken: string, newUser: AuthUser) => {
+  const login = useCallback(
+    (accessToken: string, newUser: AuthUser) => {
     // Only touch the token when a real value is supplied.
     // Callers that only want to refresh user data pass '' to leave the
     // existing token (and its localStorage copies) untouched.
@@ -215,6 +257,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       clearAuthStorage();
       setUser(null);
       setIsAuthenticated(false);
+      dispatch(clearSession());
       return;
     }
     void queryClient.removeQueries({ queryKey: CART_KEY });
@@ -224,9 +267,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('user_ID', String((normalized as any).user_ID));
     }
     setIsAuthenticated(true);
-  }, []);
+    dispatch(
+      setSession({
+        accessToken: accessToken || localStorage.getItem('accessToken') || localStorage.getItem('token') || '',
+        user: normalized,
+      }),
+    );
+    },
+    [dispatch],
+  );
 
-  const logout = useCallback(async () => {
+  const logout = useCallback(
+    async () => {
     try {
       await api.post('/logout');
     } catch (error) {
@@ -240,8 +292,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('user');
       localStorage.removeItem('user_ID');
       void queryClient.removeQueries({ queryKey: CART_KEY });
+      dispatch(clearSession());
     }
-  }, []);
+    },
+    [dispatch],
+  );
 
   const value = useMemo<AuthContextType>(
     () => ({

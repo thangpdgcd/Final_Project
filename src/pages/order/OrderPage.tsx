@@ -9,11 +9,10 @@ import {
   CarOutlined,
 } from '@ant-design/icons';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCreateOrder } from '@/hooks/orders/useOrders';
 import { useAuth } from '@/store/auth/AuthContext';
 import axios from 'axios';
 import type { CartItem } from '@/types/index';
-import Chatbox from '@/features/chatbox';
+import Chatbox from '@/types/widgets/chatbox';
 import EditorialPageShell from '@/components/layout/editorialpageshells/EditorialPageShell';
 import { getImageSrc } from '@/utils/images/image';
 import { CART_KEY } from '@/hooks/cart/useCart';
@@ -26,10 +25,13 @@ import { useApplyVoucher } from '@/hooks/voucher/useApplyVoucher';
 import { useEffectiveUserId } from '@/hooks/usereffectiveuserids/useEffectiveUserId';
 import { useAppTranslation } from '@/hooks/userapptranslations/useAppTranslation';
 import { translatedProductName } from '@/utils/products/productI18n';
-import { i18nKeys } from '@/constants/i18nKeys';
+import { i18nKeys } from '@/translates/constants/i18nKeys';
 import { toastSuccess, toastErrorWithFallback } from '@/utils/lib/toast/i18nToast';
 import { calcShippingFeeVnd } from '@/utils/shippings/shippingFee';
-import { useShipping } from '@/contexts/shippingcontexts/ShippingContext';
+import { useShipping } from '@/components/contexts/shippingcontexts/ShippingContext';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { createOrderThunk } from '@/redux/slices/ordersSlice';
+import { selectIsCreatingOrder } from '@/redux/selectors';
 
 const API_BASE = ((import.meta.env.VITE_API_URL as string) || 'http://localhost:8080').replace(
   /\/+$/,
@@ -54,6 +56,8 @@ const OrderPage: React.FC = () => {
   const qc = useQueryClient();
   const { user } = useAuth();
   const effectiveUserId = useEffectiveUserId();
+  const dispatch = useAppDispatch();
+  const isCreatingOrder = useAppSelector(selectIsCreatingOrder);
   const cartItems: CartItem[] = useMemo(
     () => (location.state as { cartItems?: CartItem[] })?.cartItems || [],
     [location.state],
@@ -84,8 +88,6 @@ const OrderPage: React.FC = () => {
   const paypalRef = useRef<HTMLDivElement | null>(null);
   const renderedRef = useRef(false);
   const savingOnceRef = useRef(false);
-
-  const createOrder = useCreateOrder();
 
   const productsTotal = useMemo(
     () =>
@@ -131,7 +133,8 @@ const OrderPage: React.FC = () => {
 
       await syncCartToSelectionForCheckout(userIdToUse, cartItems);
 
-      const newOrder = await createOrder.mutateAsync({
+      const newOrder = await dispatch(
+        createOrderThunk({
         user_ID: userIdToUse,
         status: 'pending',
         total_Amount: payableTotal,
@@ -150,7 +153,8 @@ const OrderPage: React.FC = () => {
           price: Number(i.products?.price ?? i.price ?? 0),
         })),
         paymentMethod: method === 'coffee_coin' ? 'COFFEE_COIN' : method === 'paypal' ? 'PayPal' : 'COD',
-      });
+        }),
+      ).unwrap();
 
       const id = Number(
         (newOrder as any)?.order_ID ??
@@ -173,7 +177,7 @@ const OrderPage: React.FC = () => {
       shipping.fullName,
       shipping.phone,
       shipping.address,
-      createOrder,
+      dispatch,
       shippingCtx.shippingMethod,
     ],
   );
@@ -629,7 +633,7 @@ const OrderPage: React.FC = () => {
                 <Button
                   type="primary"
                   className="h-12 rounded-sm border-none bg-orange-600 px-14 text-lg font-bold hover:bg-orange-700"
-                  loading={createOrder.isPending}
+                  loading={isCreatingOrder}
                   disabled={
                     paymentMethod === 'coffee_coin' &&
                     !walletLoading &&

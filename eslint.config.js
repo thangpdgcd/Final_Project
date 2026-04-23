@@ -4,6 +4,8 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 
+const tsconfigRootDir = import.meta.dirname;
+
 export default [
   {
     ignores: ['dist/**', 'node_modules/**', '**/*.d.ts', 'src/build-sass.js'],
@@ -16,6 +18,9 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
+      parserOptions: {
+        tsconfigRootDir,
+      },
     },
     plugins: {
       'react-hooks': reactHooks,

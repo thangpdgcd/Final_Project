@@ -43,7 +43,7 @@ import { useTheme } from '@/store/themes/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { getImageSrc } from '@/utils/images/image';
 import { translatedProductDescription, translatedProductName } from '@/utils/products/productI18n';
-import { i18nKeys } from '@/constants/i18nKeys';
+import { i18nKeys } from '@/translates/constants/i18nKeys';
 import { toastWarning } from '@/utils/lib/toast/i18nToast';
 
 const formatPrice = (v: number, locale: string) =>

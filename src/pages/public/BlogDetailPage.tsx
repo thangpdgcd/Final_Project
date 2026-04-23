@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import EditorialPageShell from '@/components/layout/editorialpageshells/EditorialPageShell';
 import PageContainer from '@/components/layout/pagescontainer/PageContainer';
 import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
-import { blogs } from '@/data/blogs';
+import { blogs } from '@/components/data/blogs';
 import { fadeInUp } from '@/utils/motions/motion';
 
 const BlogNotFound: React.FC = () => {

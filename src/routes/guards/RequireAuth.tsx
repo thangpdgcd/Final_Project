@@ -1,25 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/store/auth/AuthContext';
+import { useAppSelector } from '@/redux/hooks';
+import { selectAuthHydrated, selectIsAuthenticated } from '@/redux/selectors';
 
 const RequireAuth: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const hydrated = useAppSelector(selectAuthHydrated);
   const location = useLocation();
   const { t } = useTranslation();
-  const [toastShown, setToastShown] = useState(false);
+  const toastShownRef = useRef(false);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (!hydrated) return;
     if (isAuthenticated) return;
-    if (toastShown) return;
+    if (toastShownRef.current) return;
 
     toast.warning(t('customersCart.notLoggedIn'), { toastId: 'require-login' });
-    setToastShown(true);
-  }, [isAuthenticated, isLoading, t, toastShown]);
+    toastShownRef.current = true;
+  }, [isAuthenticated, hydrated, t]);
 
-  if (isLoading) return null;
+  if (!hydrated) return null;
   if (!isAuthenticated) return <Navigate to="/login" replace state={{ from: location }} />;
 
   return <Outlet />;

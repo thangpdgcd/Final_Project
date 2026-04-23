@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { useCurrency } from '@/contexts/currencycontexts/CurrencyContext';
-import { useShipping } from '@/contexts/shippingcontexts/ShippingContext';
+import { useCurrency } from '@/components/contexts/currencycontexts/CurrencyContext';
+import { useShipping } from '@/components/contexts/shippingcontexts/ShippingContext';
 import type {
   CurrencyCtx,
   ShippingCtx,

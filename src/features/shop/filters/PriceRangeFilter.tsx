@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useCurrency } from '@/contexts/currencycontexts/CurrencyContext';
+import { useCurrency } from '@/components/contexts/currencycontexts/CurrencyContext';
 import type { PriceRangeFilterProps } from '@/types/shop/filters.types';
 
 const clamp = (n: number, min: number, max: number) => {

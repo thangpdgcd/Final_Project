@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from '@/App';
+import App from '@/app/App';
 import '@/translates/i18n';
 
 // DEV-only: reduce noisy Google Identity console logs when origin is misconfigured.

@@ -24,6 +24,9 @@ const VoucherVaultPage = lazy(() => import('@/pages/storeshope/VoucherVaultPage'
 
 const ProductPage = lazy(() => import('@/pages/shop/ProductPage'));
 
+const TikTokLoginPage = lazy(() => import('@/pages/TikTokLoginPage'));
+const TikTokCallbackPage = lazy(() => import('@/pages/TikTokCallbackPage'));
+
 const AppRoutes = () => {
   const location = useLocation();
   return (
@@ -43,6 +46,8 @@ const AppRoutes = () => {
           <Route path="/support" element={<Navigate to="/contacts" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/tiktok-login" element={<TikTokLoginPage />} />
+          <Route path="/auth/tiktok/callback" element={<TikTokCallbackPage />} />
 
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:id" element={<ProductDetailPage />} />

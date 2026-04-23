@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import ProductCard from '@/features/shop/ProductCard';
 import type { Product, ViewMode } from '@/types/shop/shop.types';
-import { useCurrency } from '@/contexts/currencycontexts/CurrencyContext';
+import { useCurrency } from '@/components/contexts/currencycontexts/CurrencyContext';
 import { translatedShopProductName } from '@/utils/products/productI18n';
 
 type RatingProps = {

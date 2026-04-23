@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-function normalizeApiBaseUrl(raw: string): string {
+const normalizeApiBaseUrl = (raw: string) => {
   let v = raw.trim();
-  v = v.replace(/\/+$/, '');
-  if (!/^https?:\/\//i.test(v)) v = `https://${v}`;
-  return v;
-}
+    v = v.replace(/\/+$/, '');
+    if (!/^https?:\/\//i.test(v)) v = `https://${v}`;
+    return v;
+  };
 
 const apiHost = (import.meta.env.VITE_API_URL as string | undefined) || process.env.VITE_API_URL;
 

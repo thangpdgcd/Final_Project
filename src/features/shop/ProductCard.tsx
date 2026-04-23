@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useCurrency } from '@/contexts/currencycontexts/CurrencyContext';
+import { useCurrency } from '@/components/contexts/currencycontexts/CurrencyContext';
 import type { Product } from '@/types/shop/shop.types';
 import { translatedShopProductName } from '@/utils/products/productI18n';
 

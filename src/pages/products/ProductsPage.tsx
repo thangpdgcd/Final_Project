@@ -6,7 +6,7 @@ import { ChevronDown, Filter, RotateCcw, Search, SlidersHorizontal, XCircle } fr
 import { useProducts } from '@/hooks/products/useProducts';
 import { useCategories } from '@/hooks/categories/useCategories';
 import { useAddToCart } from '@/hooks/cart/useCart';
-import Chatbox from '@/features/chatbox';
+import Chatbox from '@/types/widgets/chatbox';
 import ProductGrid from '@/features/products/ProductGrid';
 import type { SortKey, CategoryFilter } from '@/types/index';
 import { useTranslation } from 'react-i18next';

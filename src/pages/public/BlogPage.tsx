@@ -5,7 +5,7 @@ import BlogCard from '@/components/blog/BlogCard';
 import EditorialPageShell from '@/components/layout/editorialpageshells/EditorialPageShell';
 import PageContainer from '@/components/layout/pagescontainer/PageContainer';
 import { useDocumentTitle } from '@/hooks/userdocumentitles/useDocumentTitle';
-import { blogs } from '@/data/blogs';
+import { blogs } from '@/components/data/blogs';
 import { fadeInUp } from '@/utils/motions/motion';
 
 const BlogPage: React.FC = () => {

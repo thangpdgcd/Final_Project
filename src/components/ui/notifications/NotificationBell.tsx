@@ -4,7 +4,7 @@ import { useAuth } from '@/store/auth/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 import { useNotifications } from '@/hooks/notifications/useNotifications';
 import { useTranslation } from 'react-i18next';
-import { i18nKeys } from '@/constants/i18nKeys';
+import { i18nKeys } from '@/translates/constants/i18nKeys';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {
