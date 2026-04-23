@@ -87,7 +87,7 @@ const listenOnPort = (port) => {
             process.exit(0);
           }
           console.error(
-            `❌ Port ${port} is already in use by another process. Stop it, then restart the backend.`,
+            `❌ Port ${port} is alreadys in use by another process. Stop it, then restart the backend.`,
           );
           process.exit(1);
         })
