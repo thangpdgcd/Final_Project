@@ -3,9 +3,12 @@ import ReactDOM from 'react-dom/client';
 import App from '@/app/App';
 import '@/translates/i18n';
 
-// DEV-only: reduce noisy Google Identity console logs when origin is misconfigured.
+// Reduce noisy Google Identity console logs when origin is misconfigured.
 // This does not fix the underlying OAuth config issue (Authorized JS origins).
-if (import.meta.env.DEV) {
+const suppressNoisyConsole =
+  String(import.meta.env.VITE_SUPPRESS_NOISY_CONSOLE ?? '').trim() === '1' || import.meta.env.DEV;
+
+if (suppressNoisyConsole) {
   const shouldSuppress = (args: unknown[]) => {
     const text = args
       .map((a) => (typeof a === 'string' ? a : a instanceof Error ? a.message : ''))
@@ -21,7 +24,6 @@ if (import.meta.env.DEV) {
 
   const origError = console.error;
   const origWarn = console.warn;
-  const origLog = console.log;
   console.error = (...args) => {
     if (shouldSuppress(args)) return;
     origError(...args);
@@ -29,10 +31,6 @@ if (import.meta.env.DEV) {
   console.warn = (...args) => {
     if (shouldSuppress(args)) return;
     origWarn(...args);
-  };
-  console.log = (...args) => {
-    if (shouldSuppress(args)) return;
-    origLog(...args);
   };
 
   window.addEventListener('unhandledrejection', (event) => {
@@ -43,15 +41,15 @@ if (import.meta.env.DEV) {
   });
 
   // Some browsers emit "Failed to load resource" for GSI iframes/scripts directly (not via console.*).
-  // Best-effort suppression in DEV only.
+  // Best-effort suppression; keep the filter narrow.
   window.addEventListener(
     'error',
     (event) => {
-      const target = event.target as any;
+      const target = event.target as (EventTarget & { src?: unknown; href?: unknown }) | null;
       const src = String(target?.src ?? target?.href ?? '');
       if (src.includes('accounts.google.com/gsi/') || src.includes('google.com/gsi/')) {
         event.preventDefault();
-        (event as any).stopImmediatePropagation?.();
+        (event as Event & { stopImmediatePropagation?: () => void }).stopImmediatePropagation?.();
         return;
       }
     },

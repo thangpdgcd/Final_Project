@@ -2,6 +2,8 @@ import React from 'react';
 import { Layout, Row, Col, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getImageSrc } from '@/utils/images/image';
+import logoHeader from '@/assets/img/logo_headermg.png';
 import {
   FacebookFilled,
   InstagramOutlined,
@@ -28,7 +30,7 @@ const FooterPage: React.FC = () => {
             <div className="footer-brand__head">
               <div className="footer-mark">
                 <img
-                  src="https://res.cloudinary.com/dfjecxrnl/image/upload/v1773308731/199bea82-b758-411d-863a-1b7be6ecc8b4.png"
+                  src={getImageSrc(logoHeader)}
                   alt="Phan Coffee logo"
                 />
               </div>

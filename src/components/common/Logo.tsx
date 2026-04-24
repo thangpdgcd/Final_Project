@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getImageSrc } from '@/utils/images/image';
+import logoHeader from '@/assets/img/logo_headermg.png';
 
 interface LogoProps {
   size?: number | string;
@@ -10,11 +11,8 @@ interface LogoProps {
 }
 
 const Logo: React.FC<LogoProps> = ({ size = 48, className = '', showText = true }) => {
-  // `public/` assets must be referenced by URL (not imported as modules).
-  // Use BASE_URL so the component works even if the app is hosted under a subpath.
-  const baseUrl = import.meta.env.BASE_URL ?? '/';
-  /** Local asset in `public/` — most reliable on deploy (Vercel) */
-  const localLogoUrl = `${baseUrl}assets/img/logo_headermg.png`;
+  /** Bundled local asset (always works in Vite build/deploy) */
+  const localLogoUrl = logoHeader;
   /** Cloudinary fallback (optional) */
   const cloudLogoUrl =
     'https://res.cloudinary.com/dfjecxrnl/image/upload/v1773308731/199bea82-b758-411d-863a-1b7be6ecc8b4.png';

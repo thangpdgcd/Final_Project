@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layout, Form, Input, Button, Checkbox, App, Divider } from 'antd';
-import { FacebookFilled, InstagramFilled, ChromeOutlined } from '@ant-design/icons';
+import { ChromeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { login, LoginPayload, LoginResponse } from '../../../api/authsapi/authApi';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,9 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const pick = (obj: unknown, key: string) =>
+    obj && typeof obj === 'object' ? (obj as Record<string, unknown>)[key] : undefined;
+
   const onFinish = async (values: LoginFormValues) => {
     setLoading(true);
     try {
@@ -32,15 +35,14 @@ const LoginPage: React.FC = () => {
 
       const data: LoginResponse = await login(payload);
 
-      // Lưu token & user để header, guard, cart... nhận biết đăng nhập
       if (data?.token) {
         localStorage.setItem('token', data.token);
       }
 
-      if ((data as any)?.user) {
-        const user: any = (data as any).user;
-        // Only allow roleID=1 to sign in to this user-facing app.
-        const roleIdRaw = String(user?.roleID ?? user?.roleId ?? user?.role ?? '').trim();
+      const maybeUser = (data as unknown as { user?: unknown })?.user;
+      if (maybeUser && typeof maybeUser === 'object') {
+        const user = maybeUser as Record<string, unknown>;
+        const roleIdRaw = String(pick(user, 'roleID') ?? pick(user, 'roleId') ?? pick(user, 'role') ?? '').trim();
         if (roleIdRaw !== '1') {
           localStorage.removeItem('token');
           localStorage.removeItem('accessToken');
@@ -51,8 +53,14 @@ const LoginPage: React.FC = () => {
         }
         localStorage.setItem('user', JSON.stringify(user));
 
+        const dataObj = pick(user, 'data');
+        const nestedUserObj = pick(user, 'user');
         const userId =
-          user?.user_ID ?? user?.id ?? user?.userId ?? user?.data?.user_ID ?? user?.user?.user_ID;
+          pick(user, 'user_ID') ??
+          pick(user, 'id') ??
+          pick(user, 'userId') ??
+          pick(dataObj, 'user_ID') ??
+          pick(nestedUserObj, 'user_ID');
 
         if (userId) {
           localStorage.setItem('user_ID', String(userId));
@@ -63,7 +71,7 @@ const LoginPage: React.FC = () => {
 
       navigate('/', { replace: true });
 
-      return (data as any).user;
+      return maybeUser;
     } catch {
       message.error(`❌ ${t('auth.loginError')}`);
     } finally {
@@ -86,7 +94,6 @@ const LoginPage: React.FC = () => {
       <Content className="login-content">
         <div className="login-hero">
           <div className="login-card">
-            {/* LEFT */}
             <div className="login-left">
               <div className="brand-row">
                 <img
@@ -103,29 +110,11 @@ const LoginPage: React.FC = () => {
               <div className="social-wrap">
                 <Button
                   className="social-btn"
-                  icon={<FacebookFilled />}
-                  block
-                  onClick={() => onSocialLogin('Facebook')}
-                >
-                  {t('auth.loginSocialFacebook')}
-                </Button>
-
-                <Button
-                  className="social-btn"
                   icon={<ChromeOutlined />}
                   block
                   onClick={() => onSocialLogin('Google')}
                 >
                   {t('auth.loginSocialGoogle')}
-                </Button>
-
-                <Button
-                  className="social-btn"
-                  icon={<InstagramFilled />}
-                  block
-                  onClick={() => onSocialLogin('Instagram')}
-                >
-                  {t('auth.loginSocialInstagram')}
                 </Button>
               </div>
 

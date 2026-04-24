@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -16,7 +16,7 @@ const BlogNotFound: React.FC = () => {
   useDocumentTitle('pages.blogDetail.notFoundDocumentTitle');
 
   return (
-    <EditorialPageShell>
+    <EditorialPageShell className="abrew">
       <PageContainer wide className="py-12 lg:py-16">
         <div className="contact-form-card max-w-xl rounded-md p-8">
           <h2
@@ -68,10 +68,26 @@ const BlogDetailPage: React.FC = () => {
   });
 
   const sections = post.content?.sections ?? [];
+  const fallbackImg = useMemo(() => {
+    const svg = encodeURIComponent(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#1d1106"/>
+            <stop offset="1" stop-color="#423224"/>
+          </linearGradient>
+        </defs>
+        <rect width="1600" height="900" fill="url(#g)"/>
+        <text x="50%" y="50%" fill="#f8deca" font-size="52" font-family="Georgia, serif" text-anchor="middle" dominant-baseline="middle">Phan Coffee Journal</text>
+      </svg>`,
+    );
+    return `data:image/svg+xml;charset=utf-8,${svg}`;
+  }, []);
+  const [heroSrc, setHeroSrc] = useState(post.image);
 
   return (
-    <EditorialPageShell>
-      <PageContainer className="max-w-4xl py-10 lg:py-14">
+    <EditorialPageShell className="abrew">
+      <PageContainer className="max-w-5xl py-10 lg:py-16">
         <button
           type="button"
           onClick={() => navigate('/blog')}
@@ -81,45 +97,58 @@ const BlogDetailPage: React.FC = () => {
           {t('blogDetail.backToBlog')}
         </button>
 
-        <motion.h1
+        <motion.header
           variants={fadeInUp}
           initial="hidden"
           animate="show"
-          className="mt-6 text-3xl font-medium leading-tight text-[color:var(--hl-primary)] sm:text-4xl"
-          style={{ fontFamily: 'var(--font-highland-display)' }}
+          className="mt-8"
         >
-          {post.title}
-        </motion.h1>
+          <div className="hl-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--hl-secondary)]">
+            {t('blogPage.eyebrow')}
+          </div>
+          <h1
+            className="mt-4 text-3xl font-semibold leading-[1.12] tracking-tight text-[color:var(--hl-primary)] sm:text-4xl lg:text-5xl"
+            style={{ fontFamily: 'var(--font-highland-display)' }}
+          >
+            {post.title}
+          </h1>
+          <div className="hl-sans mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[color:color-mix(in_srgb,var(--hl-on-surface)_68%,transparent)]">
+            <span className="font-semibold text-[color:var(--hl-on-surface)]">{post.author}</span>
+            <span className="opacity-70">•</span>
+            <span>{dateLabel}</span>
+          </div>
+        </motion.header>
 
-        <div className="hl-sans mt-4 text-sm text-[color:color-mix(in_srgb,var(--hl-on-surface)_65%,transparent)]">
-          <span className="font-medium text-[color:var(--hl-on-surface)]">{post.author}</span> •{' '}
-          <span>{dateLabel}</span>
-        </div>
-
-        <div className="mt-8 overflow-hidden rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_25%,transparent)]">
-          <img src={post.image} alt={post.title} className="max-h-[420px] w-full object-cover" />
+        <div className="mt-10 overflow-hidden rounded-lg border border-[color:var(--hl-outline-variant)] bg-[color:color-mix(in_srgb,var(--hl-surface)_92%,transparent)] shadow-[var(--hl-shadow-card)]">
+          <img
+            src={heroSrc}
+            alt={post.title}
+            className="max-h-[520px] w-full object-cover"
+            loading="lazy"
+            onError={() => setHeroSrc(fallbackImg)}
+          />
         </div>
 
         {post.content?.intro && (
-          <p className="hl-sans mt-8 text-base leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_88%,transparent)]">
+          <p className="hl-sans mt-10 text-base leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_88%,transparent)] lg:text-lg">
             {post.content.intro}
           </p>
         )}
 
         {sections.length > 0 && (
-          <div className="mt-10 space-y-6">
+          <div className="mt-12 space-y-7">
             {sections.map((s, idx) => (
               <section
                 key={`${s.title}-${idx}`}
-                className="rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] bg-[color:var(--hl-surface-lowest)] p-6 shadow-sm"
+                className="rounded-lg border border-[color:var(--hl-outline-variant)] bg-[color:color-mix(in_srgb,var(--hl-surface)_88%,transparent)] p-6 shadow-[var(--hl-shadow-card)] lg:p-7"
               >
                 <h2
-                  className="text-lg font-medium text-[color:var(--hl-primary)]"
+                  className="text-lg font-semibold text-[color:var(--hl-primary)] lg:text-xl"
                   style={{ fontFamily: 'var(--font-highland-display)' }}
                 >
                   {s.title}
                 </h2>
-                <ul className="hl-sans mt-4 list-disc space-y-2 pl-5 text-[color:color-mix(in_srgb,var(--hl-on-surface)_88%,transparent)]">
+                <ul className="hl-sans mt-4 list-disc space-y-2.5 pl-5 text-[color:color-mix(in_srgb,var(--hl-on-surface)_88%,transparent)]">
                   {s.bullets.map((b, i) => (
                     <li key={`${idx}-${i}`} className="leading-relaxed">
                       {b}
@@ -132,7 +161,7 @@ const BlogDetailPage: React.FC = () => {
         )}
 
         {post.content?.conclusion && (
-          <div className="mt-10 rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] bg-[color:var(--hl-surface-low)] p-6">
+          <div className="mt-12 rounded-lg border border-[color:var(--hl-outline-variant)] bg-[color:color-mix(in_srgb,var(--hl-surface)_84%,transparent)] p-6 shadow-[var(--hl-shadow-card)] lg:p-7">
             <div
               className="hl-sans text-sm font-semibold uppercase tracking-wider text-[color:var(--hl-primary)]"
               style={{ fontFamily: 'var(--font-highland-display)' }}

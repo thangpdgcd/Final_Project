@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Facebook, Instagram, Chrome } from 'lucide-react';
+import { Chrome } from 'lucide-react';
 import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/auth/AuthContext';
@@ -349,11 +349,9 @@ const LoginPage: React.FC = () => {
                 </span>
                 <div className="flex-1 border-t border-[color:color-mix(in_srgb,var(--hl-outline-variant)_35%,transparent)]" />
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 {[
-                  { icon: <Facebook size={20} />, titleKey: 'auth.loginSocialFacebook' },
                   { icon: <Chrome size={20} />, titleKey: 'auth.loginSocialGoogle' },
-                  { icon: <Instagram size={20} />, titleKey: 'auth.loginSocialInstagram' },
                 ].map((social, i) => {
                   if (social.titleKey === 'auth.loginSocialGoogle') {
                     return (

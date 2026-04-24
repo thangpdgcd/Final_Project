@@ -342,6 +342,40 @@ h5 {
   --hl-shadow-card-hover: 0 8px 40px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ARTISANAL BREW (BLOG-ONLY) – scoped tokens
+   Apply by wrapping blog pages with `.abrew`
+   ═══════════════════════════════════════════════════════════════════════════ */
+.abrew {
+  /* Surfaces (deep espresso tonal layers) */
+  --hl-surface: #1d1106;
+  --hl-surface-variant: #423224;
+  --hl-on-surface: #f8deca;
+  --hl-on-surface-variant: #d0c4bc;
+
+  /* Brand */
+  --hl-primary: #d4c3b8;
+  --hl-primary-light: #f1dfd3;
+  --hl-secondary: #ffb77d;
+  --hl-tertiary: #d97707;
+
+  /* Borders */
+  --hl-outline: rgba(248, 222, 202, 0.22);
+  --hl-outline-variant: rgba(248, 222, 202, 0.12);
+
+  /* Typography */
+  --font-highland-display: 'Noto Serif', Georgia, serif;
+  --font-highland-sans: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+
+  /* Depth */
+  --hl-shadow-card: 0 18px 60px rgba(0, 0, 0, 0.28);
+  --hl-shadow-card-hover: 0 26px 82px rgba(0, 0, 0, 0.34);
+}
+
+.abrew .hl-sans {
+  font-family: var(--font-highland-sans);
+}
+
 /* ─── Typography helper ───────────────────────────────────────────────────── */
 .hl-sans {
   font-family: var(--font-highland-sans);

@@ -485,7 +485,7 @@ const ProductDetailPage: React.FC = () => {
                     <img
                       src={getImageSrc(product.image)}
                       alt={productDisplayName}
-                      className="w-full h-full object-cover transform scale-90 group-hover:scale-100 transition-transform duration-1000"
+                      className="w-full h-full object-cover cursor-pointer transform scale-90 group-hover:scale-100 transition-transform duration-1000"
                     />
                   </div>
                   <div className="aspect-[4/5] md:aspect-square">
@@ -496,7 +496,7 @@ const ProductDetailPage: React.FC = () => {
                           : 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&q=80&w=1200'
                       }
                       alt=""
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover cursor-pointer"
                     />
                   </div>
                 </Carousel>

@@ -2,174 +2,303 @@ import type { BlogPost } from '@/types/blog/blog.types';
 
 export const blogs: BlogPost[] = [
   {
+    id: 'mang-den',
+    title: 'Mang Den (Kon Tum): “Little Da Lat” and the story of highland coffee',
+    author: 'Phan Coffee Lab',
+    date: '2026-04-19',
+    excerpt:
+      'Cool weather, morning mist, and pine forests shape a distinctive origin. Mang Den coffees often taste clean, gently sweet, and aromatic.',
+    image:
+      'https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1400&q=80',
+    tags: ['kon tum', 'mang den', 'origin', 'vietnam'],
+    content: {
+      intro:
+        'Mang Den is in Kon Plong district (Kon Tum), known for its year-round cool climate and forest ecosystem. For coffee, these conditions often mean slower cherry ripening, better sugar development, and a cup that feels smooth and clean.',
+      sections: [
+        {
+          title: 'How climate and soil shape the cup',
+          bullets: [
+            'Cool temperatures and day–night swings support aromatic complexity',
+            'Basalt/red soils rich in minerals help build round body and a longer finish',
+            'Distinct rainy/dry seasons influence sweetness and clarity in processing',
+          ],
+        },
+        {
+          title: 'Common flavor cues (easy to spot)',
+          bullets: [
+            'Gentle caramel/honey-like sweetness',
+            'Cocoa, nutty notes, sometimes a light floral lift',
+            'A clean finish with less “burnt” character when roasted medium',
+          ],
+        },
+        {
+          title: 'Roast and brew suggestions for Mang Den',
+          bullets: [
+            'Medium roast: balanced sweetness and aroma, great for pour-over and espresso',
+            'Medium–dark: works for phin and iced milk coffee, but avoid going too dark',
+            'Phin: aim for 90–92°C water to keep the cup smooth and less harsh',
+          ],
+        },
+      ],
+      conclusion:
+        'If you want a Vietnamese origin experience that still feels refined and clean, Mang Den is worth a dedicated tasting session.',
+    },
+  },
+  {
     id: 'robusta',
-    title: 'Robusta: Mạnh mẽ, dày body và “đá” caffeine',
+    title: 'Robusta: bold, full-bodied, and caffeine-forward',
     author: 'Phan Coffee Lab',
     date: '2026-03-18',
     excerpt:
-      'Robusta không chỉ là “đắng”: nếu rang đúng và pha đúng, robusta có body dày, crema đẹp và vị cacao/đậu rang rất cuốn.',
+      'Robusta isn’t just “bitter”. With good green coffee, proper roasting, and the right brew, it delivers heavy body, thick crema, and addictive cocoa/roasted-nut notes.',
     image:
       'https://images.unsplash.com/photo-1512568400610-62da28bc8a13?auto=format&fit=crop&w=1400&q=80',
     tags: ['robusta', 'beans', 'vietnam'],
     content: {
       intro:
-        'Robusta (Coffea canephora) nổi tiếng với hàm lượng caffeine cao và cấu trúc vị mạnh. Ở Việt Nam, robusta là “xương sống” của nhiều ly cà phê sữa đá nhờ body dày, vị đậm và hậu vị kéo dài.',
+        'Robusta (Coffea canephora) is known for higher caffeine and a powerful structure. In Vietnam, it’s the backbone of many iced milk coffees thanks to its thick body, bold taste, and long finish.',
       sections: [
         {
-          title: 'Hương vị đặc trưng',
+          title: 'Signature flavor profile',
           bullets: [
-            'Body dày, cảm giác “nặng” và chắc',
-            'Nốt cacao, đậu rang, caramel cháy, đôi khi hơi gỗ/đất nếu xử lý kém',
-            'Crema dày khi chiết espresso (đặc biệt với blend robusta)',
+            'Heavy body with a dense, weighty mouthfeel',
+            'Cocoa, roasted nuts, burnt caramel; can turn woody/earthy if quality is low',
+            'Thick crema in espresso (especially in robusta-forward blends)',
           ],
         },
         {
-          title: 'Vì sao robusta dễ bị hiểu lầm?',
+          title: 'Why robusta is often misunderstood',
           bullets: [
-            'Rang quá đậm để “che” khuyết điểm khiến vị đắng gắt',
-            'Pha quá chiết (over-extract) làm chát và khô',
-            'Chất lượng hạt không đồng đều khiến mùi “khét”/“cao su” xuất hiện',
+            'Over-roasting to “hide” defects creates harsh bitterness',
+            'Over-extraction leads to astringency and a dry finish',
+            'Inconsistent lots can produce burnt/rubbery off-notes',
           ],
         },
         {
-          title: 'Gợi ý pha ngon (dễ áp dụng)',
+          title: 'Easy brewing tips that work',
           bullets: [
-            'Phin: giảm nhiệt độ nước (90–92°C) và rút ngắn thời gian để bớt đắng gắt',
-            'Espresso: giảm yield hoặc giảm thời gian nếu thấy vị chát',
-            'Cold brew robusta: cho ra vị cacao và ngọt dịu bất ngờ',
+            'Phin: use cooler water (90–92°C) and shorten brew time to reduce harshness',
+            'Espresso: reduce yield or time if the cup turns astringent',
+            'Robusta cold brew: surprisingly cocoa-forward with gentle sweetness',
           ],
         },
       ],
       conclusion:
-        'Robusta ngon là robusta được xử lý tốt và rang cân bằng. Nếu bạn thích ly cà phê “đậm – tỉnh”, robusta là lựa chọn rất đáng thử.',
+        'Great robusta is well-processed and roasted with balance. If you love coffee that’s bold and energizing, robusta is absolutely worth exploring.',
     },
   },
   {
     id: 'arabica',
-    title: 'Arabica: Thanh thoát, thơm và đa tầng hương',
+    title: 'Arabica: refined, aromatic, and layered',
     author: 'Minh Nguyen',
     date: '2026-02-11',
     excerpt:
-      'Arabica thường nổi bật bởi hương hoa/quả, độ chua dễ chịu và hậu vị sạch. Điểm hay nhất: mỗi vùng trồng cho một “tính cách” khác nhau.',
+      'Arabica often shines with floral/fruit aromatics, pleasant acidity, and a clean finish. The best part: each origin has a distinct “personality”.',
     image:
       'https://images.unsplash.com/photo-1459755486867-b55449bb39ff?auto=format&fit=crop&w=1400&q=80',
     tags: ['arabica', 'single-origin', 'brew'],
     content: {
       intro:
-        'Arabica (Coffea arabica) thường được đánh giá cao nhờ độ thơm và sự đa dạng hương vị. Nếu robusta cho cảm giác “mạnh”, arabica cho cảm giác “tinh tế”.',
+        'Arabica (Coffea arabica) is prized for its aroma and flavor diversity. If robusta feels “powerful”, arabica often feels “nuanced”.',
       sections: [
         {
-          title: 'Arabica ngon thường có gì?',
+          title: 'What great arabica usually tastes like',
           bullets: [
-            'Hương hoa, trái cây, mật ong hoặc chocolate sữa',
-            'Độ chua cân bằng (không “gắt”), hậu vị sạch',
-            'Body vừa phải, dễ uống đen hoặc latte',
+            'Floral, fruity, honeyed, or milk-chocolate-like notes',
+            'Balanced acidity (not sharp) with a clean finish',
+            'Medium body—easy to enjoy black or in a latte',
           ],
         },
         {
-          title: 'Chọn arabica theo gu',
+          title: 'Choosing arabica for your preferences',
           bullets: [
-            'Thích thơm hoa/quả: ưu tiên rang sáng (light–medium)',
-            'Thích ngọt và êm: rang medium, notes caramel/chocolate',
-            'Thích latte: chọn rang medium–dark để nổi vị sữa',
+            'For floral/fruit aromatics: light to medium roast',
+            'For sweetness and comfort: medium roast with caramel/chocolate notes',
+            'For lattes: medium–dark to stand up to milk',
           ],
         },
         {
-          title: 'Pha pour-over để “mở” hương',
+          title: 'Pour-over to “open up” the aromatics',
           bullets: [
-            'Tỉ lệ gợi ý: 1:15 đến 1:16',
-            'Bloom 30–45s để khí CO₂ thoát ra',
-            'Chia nước thành 2–3 lần rót để ổn định chiết xuất',
+            'Suggested ratio: 1:15 to 1:16',
+            'Bloom 30–45s to release CO₂',
+            'Split pours into 2–3 pulses for steadier extraction',
           ],
         },
       ],
       conclusion:
-        'Arabica phù hợp khi bạn muốn “nghe” rõ hương vị của từng vùng trồng. Chỉ cần thay cách pha và mức rang, bạn sẽ có trải nghiệm hoàn toàn khác.',
+        'Arabica is ideal when you want to “hear” an origin clearly. Change the brew method or roast level and you can get a completely different experience.',
     },
   },
   {
     id: 'cold-brew',
-    title: 'Cold Brew: Mịn, ngọt dịu và ít gắt',
+    title: 'Cold brew: smooth, gently sweet, and less harsh',
     author: 'Anh Vu',
     date: '2026-01-26',
     excerpt:
-      'Cold brew ủ lạnh cho ra ly cà phê ít chua gắt, vị ngọt tự nhiên và rất hợp để pha cùng sữa/tonic trong ngày nóng.',
+      'Cold brew tends to be less sharp, naturally sweet, and perfect to mix with milk or tonic on hot days.',
     image:
       'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=1400&q=80',
     tags: ['cold brew', 'iced', 'brew'],
     content: {
       intro:
-        'Cold brew là phương pháp ủ cà phê với nước lạnh trong thời gian dài. Do cơ chế chiết xuất khác, cold brew thường “êm” hơn, ít gắt và dễ uống.',
+        'Cold brew is coffee steeped in cold water for an extended time. Because extraction behaves differently at low temperatures, it often tastes smoother and easier to drink.',
       sections: [
         {
-          title: 'Cold brew khác iced coffee thế nào?',
+          title: 'How cold brew differs from iced coffee',
           bullets: [
-            'Iced coffee: pha nóng rồi làm lạnh → sáng vị, có độ “tươi”',
-            'Cold brew: ủ lạnh → mịn, ít chua gắt, thiên về cacao/caramel',
+            'Iced coffee: brewed hot then chilled → brighter and more “fresh”',
+            'Cold brew: steeped cold → smoother, less sharp, leaning cocoa/caramel',
           ],
         },
         {
-          title: 'Công thức cold brew dễ làm',
+          title: 'An easy cold brew recipe',
           bullets: [
-            'Tỉ lệ concentrate: 1:5 (cà phê:nước) ủ 12–16 giờ',
-            'Uống: pha loãng 1:1 với nước/đá hoặc thêm sữa',
-            'Xay thô để giảm đục và giảm over-extract',
+            'Concentrate ratio: 1:5 (coffee:water), steep 12–16 hours',
+            'Serve: dilute 1:1 with water/ice, or add milk',
+            'Grind coarse to reduce muddiness and over-extraction',
           ],
         },
         {
-          title: 'Mẹo để cold brew ngon hơn',
+          title: 'Tips to make it taste better',
           bullets: [
-            'Dùng rang medium để có vị ngọt rõ',
-            'Lọc 2 lớp (rây + giấy) để sạch vị',
-            'Bảo quản lạnh 3–5 ngày, hương vị ổn định',
+            'Use a medium roast for clearer sweetness',
+            'Filter twice (mesh + paper) for a cleaner cup',
+            'Store cold for 3–5 days; flavor stays stable',
           ],
         },
       ],
       conclusion:
-        'Cold brew là lựa chọn “an toàn” cho ngày nóng: dễ làm, dễ uống, linh hoạt mix đồ uống.',
+        'Cold brew is a “safe win” for warm days: easy to make, easy to drink, and flexible for mixing.',
     },
   },
   {
     id: 'kon-tum',
-    title: 'Cà phê Tây Nguyên: Kon Tum có gì đặc biệt?',
+    title: 'Central Highlands coffee: what makes Kon Tum special?',
     author: 'Phan Coffee Lab',
     date: '2026-03-03',
     excerpt:
-      'Kon Tum nằm ở vùng Tây Nguyên với khí hậu và thổ nhưỡng đặc trưng. Nhiều lô hạt cho vị cacao, hạt dẻ và hậu vị sạch rất hợp gu Việt.',
+      'Kon Tum sits in Vietnam’s Central Highlands with distinctive climate and soils. Many lots show cocoa, nutty notes, and a clean finish that fits local preferences.',
     image:
       'https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=1400&q=80',
     tags: ['kon tum', 'tay nguyen', 'vietnam', 'origin'],
     content: {
       intro:
-        'Kon Tum thuộc Tây Nguyên, có cao độ và khí hậu phù hợp cho robusta chất lượng, và một số vùng còn trồng arabica. Khi được chế biến tốt, cà phê Kon Tum có profile rất “dễ ghiền”.',
+        'Kon Tum is part of the Central Highlands, with elevations and climate suitable for quality robusta, and some areas also grow arabica. When processed well, Kon Tum coffee can be intensely satisfying and easy to love.',
       sections: [
         {
-          title: 'Profile vị thường gặp',
+          title: 'Common cup profile',
           bullets: [
-            'Cacao, hạt dẻ, caramel',
-            'Body tròn, hậu vị sạch',
-            'Rất hợp phin, espresso blend và cold brew',
+            'Cocoa, nuts, caramel',
+            'Round body with a clean finish',
+            'Great for phin, espresso blends, and cold brew',
           ],
         },
         {
-          title: 'Yếu tố tạo nên khác biệt',
+          title: 'What creates the difference',
           bullets: [
-            'Thổ nhưỡng bazan và mùa nắng rõ rệt giúp hạt phát triển đậm vị',
-            'Chế biến (honey/washed/natural) quyết định độ sạch và nốt hương',
-            'Rang vừa giúp giữ ngọt, rang quá đậm dễ mất hương',
+            'Basalt soils and strong dry seasons help build depth of flavor',
+            'Processing (honey/washed/natural) defines clarity and aromatics',
+            'Medium roasts preserve sweetness; too dark can mute aromas',
           ],
         },
         {
-          title: 'Gợi ý chọn hạt Kon Tum',
+          title: 'How to choose Kon Tum beans',
           bullets: [
-            'Ưu tiên thông tin lô: vùng trồng, độ cao, phương pháp chế biến',
-            'Tìm roast date mới (2–6 tuần) để hương thơm rõ',
-            'Nếu pha phin: chọn rang medium–dark cân bằng',
+            'Prefer transparent lot info: region, altitude, processing method',
+            'Choose fresher roast dates (2–6 weeks) for clearer aroma',
+            'For phin: go medium–dark but keep it balanced',
           ],
         },
       ],
       conclusion:
-        'Nếu bạn muốn một ly cà phê đậm vị nhưng vẫn “sạch”, Kon Tum là một origin Việt Nam rất đáng khám phá.',
+        'If you want bold flavor that still tastes clean, Kon Tum is a Vietnamese origin worth exploring.',
+    },
+  },
+  {
+    id: 'kon-tum-processing',
+    title: 'Washed / Honey / Natural: which process fits Kon Tum coffee best?',
+    author: 'Phan Coffee Lab',
+    date: '2026-04-10',
+    excerpt:
+      'Same origin, different processing—completely different personalities. Pick the right process to match your taste without pushing the roast too dark.',
+    image:
+      'https://images.unsplash.com/photo-1509785307050-d4066910ec1e?auto=format&fit=crop&w=1400&q=80',
+    tags: ['processing', 'washed', 'honey', 'natural', 'kon tum'],
+    content: {
+      intro:
+        'Post-harvest processing shapes the final flavor dramatically. With Kon Tum coffees, you’ll commonly see washed, honey, and natural processes.',
+      sections: [
+        {
+          title: 'Washed: clean and bright',
+          bullets: [
+            'Clean finish with sweetness that’s easy to perceive',
+            'Great for pour-over and brighter-style espresso',
+            'If you dislike fermented notes, washed is the safest bet',
+          ],
+        },
+        {
+          title: 'Honey: sweeter, fuller body',
+          bullets: [
+            'Some mucilage is kept → more sweetness and body than washed',
+            'Excellent for phin and espresso blends (crema + longer finish)',
+            'If you like “smooth – sweet – aromatic”, honey is a balanced choice',
+          ],
+        },
+        {
+          title: 'Natural: fruitier with a light “winey” vibe',
+          bullets: [
+            'Can highlight ripe, bold fruit notes',
+            'More likely to show fermenty notes if processing is inconsistent',
+            'Great for cold brew or pour-over if you want something adventurous',
+          ],
+        },
+      ],
+      conclusion:
+        'For everyday drinking, choose washed/honey. For experimentation, try natural (from a reliable roaster with transparent lot info).',
+    },
+  },
+  {
+    id: 'arabica-vs-robusta-vn',
+    title: 'Arabica vs Robusta (Vietnamese preferences): which for phin, espresso, and iced milk coffee?',
+    author: 'Phan Coffee Lab',
+    date: '2026-04-05',
+    excerpt:
+      'There is no “best bean”—only the bean that fits your taste. Match Arabica/Robusta to your brew style for better cups without complicated technique.',
+    image:
+      'https://images.unsplash.com/photo-1516224498413-84ecf3a1e7aa?auto=format&fit=crop&w=1400&q=80',
+    tags: ['arabica', 'robusta', 'phin', 'espresso', 'vietnam'],
+    content: {
+      intro:
+        'Arabica is usually aromatic, layered, and balanced in acidity. Robusta is bold, full-bodied, and higher in caffeine. For Vietnamese preferences, both shine when paired with the right brew method.',
+      sections: [
+        {
+          title: 'If you brew with a phin',
+          bullets: [
+            'For bold iced milk coffee: robusta or a robusta–arabica blend (thick body, flavors cut through milk)',
+            'For smooth black coffee: medium-roast arabica or a well-made honey robusta',
+            'Reduce harsh bitterness with 90–92°C water and avoid over-tamping',
+          ],
+        },
+        {
+          title: 'If you pull espresso',
+          bullets: [
+            'Robusta in a blend boosts crema and body for milk drinks',
+            'Single-origin arabica fits brighter espresso or an Americano',
+            'If it tastes sour: grind finer/increase time. If bitter/astringent: grind coarser/reduce yield',
+          ],
+        },
+        {
+          title: 'If you make cold brew',
+          bullets: [
+            'Robusta can taste cocoa/caramel-forward and smoother than you’d expect',
+            'Arabica can be gently floral/fruity and pairs well with tonic',
+            'Steep 12–16h, grind coarse, filter well for a clean finish',
+          ],
+        },
+      ],
+      conclusion:
+        'Start with the brew method you drink most often, then pick the bean that fits—that’s the fastest way to level up your coffee.',
     },
   },
   {

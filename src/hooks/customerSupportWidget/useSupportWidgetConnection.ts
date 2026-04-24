@@ -9,6 +9,7 @@ import {
   disconnectSupportWidgetSocket,
   supportWidgetEvents,
 } from '@/features/customerSupportWidget/socket/supportWidget.socket';
+import { supportWidgetApi } from '@/features/customerSupportWidget/api/supportWidget.api';
 
 type Options = {
   enabled: boolean;
@@ -233,6 +234,37 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
     socket.on('connect_error', onError);
+
+    // Bootstrap: fetch existing conversation (if any) and join its room.
+    // This makes the widget receive staff replies in realtime.
+    const bootstrap = async () => {
+      const s = useSupportWidgetStore.getState();
+      const existingCid = Number(s.conversationId ?? 0);
+      if (existingCid > 0 && Number(s.joinedConversationId ?? 0) !== existingCid) {
+        supportWidgetEvents.joinRoom({ conversationId: existingCid } as any);
+        s.setJoiningConversationId(existingCid);
+        return;
+      }
+
+      try {
+        const list = await supportWidgetApi.getConversations({ mineOnly: true, limit: 1, offset: 0 });
+        const first = Array.isArray(list) ? list[0] : null;
+        const cid = Number(first?.conversationId ?? 0);
+        if (cid > 0) {
+          s.setConversationId(cid);
+          // pick the non-customer participant as staff (best-effort; backend varies)
+          const parts = Array.isArray(first?.participants) ? first!.participants : [];
+          const staffCandidate = parts.find((p: any) => String(p?.roleAtJoin ?? p?.role ?? '').toLowerCase().includes('staff'));
+          if (staffCandidate?.userId) s.setStaffUserId(Number(staffCandidate.userId));
+          supportWidgetEvents.joinRoom({ conversationId: cid } as any);
+          s.setJoiningConversationId(cid);
+        }
+      } catch {
+        // ignore (widget can still create conversation on first message)
+      }
+    };
+
+    void bootstrap();
 
     const offJoined = supportWidgetEvents.onJoinedRoom((raw: any) => {
       const cid =
