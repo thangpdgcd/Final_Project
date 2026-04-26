@@ -102,7 +102,7 @@ const normalizeXu = (value) => {
   return Math.max(0, Math.trunc(n));
 };
 
-export const getWalletXu = async (userId) => {
+export const getWalletCoin = async (userId) => {
   await ensureWalletCoinColumn();
   await ensureWalletTransactionsTable();
   const user = await Users.findByPk(userId);
@@ -114,13 +114,16 @@ export const getWalletXu = async (userId) => {
   return normalizeXu(rows?.[0]?.walletXu ?? 0);
 };
 
+// Backward-compatible alias (legacy naming)
+export const getWalletXu = getWalletCoin;
+
 export const addWalletCoin = async ({ userId, amountXu }) => {
   await ensureWalletCoinColumn();
   await ensureWalletTransactionsTable();
   const delta = normalizeXu(amountXu);
   const user = await Users.findByPk(userId);
   if (!user) return null;
-  const current = await getWalletXu(userId);
+  const current = await getWalletCoin(userId);
   const next = normalizeXu(current + delta);
   await sequelize.query(
     "UPDATE Users SET wallet_coin = :next WHERE user_ID = :uid",
@@ -179,6 +182,7 @@ export const listWalletTransactions = async ({ userId, limit = 20 }) => {
 export default {
   ensureWalletCoinColumn,
   ensureWalletTransactionsTable,
+  getWalletCoin,
   getWalletXu,
   addWalletCoin,
   recordWalletTransaction,

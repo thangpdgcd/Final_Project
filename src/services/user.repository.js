@@ -1,5 +1,6 @@
 import models from "../models/index.js";
 import {
+  getWalletCoin,
   getWalletXu,
   addWalletCoin,
   recordWalletTransaction,
@@ -18,9 +19,14 @@ export const createUserRepository = () => {
     return user;
   };
 
+  const readWalletCoin = async (userId) => getWalletCoin(userId);
+  const increaseWalletCoin = async ({ userId, amountXu }) =>
+    addWalletCoin({ userId, amountXu });
+
+  // Backward-compatible aliases (legacy naming)
   const readWalletXu = async (userId) => getWalletXu(userId);
   const increaseWalletXu = async ({ userId, amountXu }) =>
-    addWalletCoin({ userId, amountXu });
+    increaseWalletCoin({ userId, amountXu });
   const addWalletTx = async (payload) => recordWalletTransaction(payload);
   const getWalletTxHistory = async ({ userId, limit }) =>
     listWalletTransactions({ userId, limit });
@@ -28,6 +34,8 @@ export const createUserRepository = () => {
   return {
     findById,
     updateById,
+    readWalletCoin,
+    increaseWalletCoin,
     readWalletXu,
     increaseWalletXu,
     addWalletTx,
