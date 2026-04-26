@@ -9,7 +9,7 @@ export const useCart = (userId: number | undefined) =>
     queryKey: [...CART_KEY, userId],
     queryFn: () => cartService.getByUserId(userId!),
     enabled: !!userId && userId > 0,
-    // Giỏ lưu trên server — luôn ưu tiên dữ liệu mới sau refresh / đổi tab
+    // Server-backed cart: always prefer fresh data after refresh/tab switch
     staleTime: 0,
     gcTime: 1000 * 60 * 30,
   });

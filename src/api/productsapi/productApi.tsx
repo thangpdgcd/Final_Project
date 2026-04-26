@@ -1,12 +1,5 @@
 import { http } from '@/api/http/http';
 
-// Cấu hình base URL chung cho API sản phẩm
-// Ưu tiên:
-//   1. VITE_API_URL (Vite)
-//   2. REACT_APP_API_URL (CRA)
-//   3. Mặc định: http://localhost:8080 hoặc http://localhost:8080/api
-//
-// Nếu biến môi trường đã chứa "/api" thì KHÔNG cộng thêm lần nữa.
 export interface Product {
   product_ID: number;
   name: string;
@@ -32,7 +25,7 @@ export const getProductById = async (id: number): Promise<Product> => {
   return res.data;
 };
 
-/** ✅ POST: /api/create-products  (đúng theo route backend) */
+/** POST: /api/create-products (backend route) */
 export const createProduct = async (payload: Omit<Product, 'product_ID'>): Promise<Product> => {
   const res = await http.post(`/create-products`, payload);
   return res.data;

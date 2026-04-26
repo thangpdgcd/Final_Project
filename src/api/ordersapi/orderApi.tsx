@@ -1,4 +1,3 @@
-// src/api/orderApi.ts
 import { http } from '@/api/http/http';
 
 /* --------- TYPES --------- */
@@ -36,14 +35,14 @@ export interface CreateOrderItemPayload {
   price: number;
 }
 
-/* ================= ORDERS API (MATCH BE ROUTES) =================
-BE:
-GET    /api/orders
-POST   /api/create-orders
-GET    /api/orders/:id
-PUT    /api/orders/:id
-DELETE /api/orders/:id
-*/
+/**
+ * Orders API (backend routes):
+ * - GET    /api/orders
+ * - POST   /api/create-orders
+ * - GET    /api/orders/:id
+ * - PUT    /api/orders/:id
+ * - DELETE /api/orders/:id
+ */
 
 export const getAllOrders = async (): Promise<Order[]> => {
   const res = await http.get<Order[]>(`/orders`);
@@ -74,13 +73,13 @@ export const deleteOrder = async (id: number): Promise<{ message: string }> => {
   return res.data;
 };
 
-/* ================= ORDER ITEMS API =================
-⚠️ BE của bạn CHƯA show routes cho orderitems.
-Các endpoint dưới đây chỉ dùng nếu backend bạn thật sự có:
-GET    /api/orders/:order_ID/items
-POST   /api/orderitems
-DELETE /api/orderitems/:orderitem_ID
-*/
+/**
+ * Order items API:
+ * Only use these endpoints if your backend implements them.
+ * - GET    /api/orders/:order_ID/items
+ * - POST   /api/orderitems
+ * - DELETE /api/orderitems/:orderitem_ID
+ */
 
 export const getOrderItemsByOrderId = async (order_ID: number): Promise<OrderItem[]> => {
   const res = await http.get<OrderItem[]>(`/orders/${order_ID}/items`);

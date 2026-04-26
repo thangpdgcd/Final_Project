@@ -1,15 +1,9 @@
 import { http } from '@/api/http/http';
 
 /**
- * Base URL cho API giỏ hàng
- * Ưu tiên:
- *   1. VITE_API_URL hoặc REACT_APP_API_URL
- *   2. Mặc định: http://localhost:8080 hoặc http://localhost:8080/api
- *
- * Nếu biến môi trường đã chứa "/api" thì KHÔNG cộng thêm lần nữa.
- * .env gợi ý:
- *   VITE_API_URL=http://localhost:8080
- *   hoặc REACT_APP_API_URL=http://localhost:8080
+ * Cart API notes:
+ * - `http` handles the base URL (env-driven).
+ * - Keep payloads numeric to match backend expectations.
  */
 export interface CartProduct {
   name: string;

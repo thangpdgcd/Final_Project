@@ -204,10 +204,7 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
     const raw = String(text ?? '').trim();
     if (!raw) return null;
 
-    // Common staff message formats:
-    // - "Mã voucher: ABC123"
-    // - "Voucher code: ABC123"
-    // - "GIFT VOUCHER ABC123"
+    // Common staff message formats (multi-language).
     const match =
       raw.match(/(?:mã\s*voucher|voucher\s*code|gift\s*voucher)\s*[:\-]?\s*([A-Z0-9_-]{4,})/i) ??
       raw.match(/\b([A-Z0-9]{6,})\b/); // fallback (last resort)

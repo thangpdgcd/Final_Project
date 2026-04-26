@@ -1,13 +1,8 @@
 import { http } from '@/api/http/http';
 
 /**
- * Cấu hình base URL cho API categories
- * Ưu tiên:
- *   1. VITE_API_URL (Vite)
- *   2. REACT_APP_API_URL (CRA)
- *   3. Mặc định: http://localhost:8080 hoặc http://localhost:8080/api
- *
- * Nếu biến môi trường đã chứa "/api" thì KHÔNG cộng thêm lần nữa.
+ * Categories API:
+ * - Normalizes multiple backend response shapes.
  */
 /* --------- TYPES --------- */
 export interface Category {
@@ -46,11 +41,10 @@ const extractCategoryList = (payload: any): any[] => {
 };
 
 export interface CreateCategoryPayload {
-  // FE dùng name/description
   name: string;
   description?: string;
 
-  // ✅ hỗ trợ backend dùng Name/Description
+  // Some backends use PascalCase keys
   Name?: string;
   Description?: string;
 }
@@ -65,7 +59,6 @@ export interface UpdateCategoryPayload {
 
 /* --------- API FUNCTIONS --------- */
 
-// Lấy tất cả categories
 export const getAllCategories = async (): Promise<Category[]> => {
   const res = await http.get(`/categories`, {
     params: { page: 1, limit: 1000 },
@@ -76,13 +69,11 @@ export const getAllCategories = async (): Promise<Category[]> => {
     .filter((c) => Number.isFinite(c.category_ID) && c.category_ID > 0);
 };
 
-// Lấy category theo ID
 export const getCategoryById = async (id: number): Promise<any> => {
   const res = await http.get(`/categories/${id}`);
   return res.data;
 };
 
-// Tạo mới category
 export const createCategory = async (payload: CreateCategoryPayload): Promise<any> => {
   const res = await http.post(`/create-categories`, payload, {
     headers: { 'Content-Type': 'application/json' },
@@ -90,7 +81,6 @@ export const createCategory = async (payload: CreateCategoryPayload): Promise<an
   return res.data;
 };
 
-// Cập nhật category
 export const updateCategory = async (id: number, payload: UpdateCategoryPayload): Promise<any> => {
   const res = await http.put(`/categories/${id}`, payload, {
     headers: { 'Content-Type': 'application/json' },
@@ -98,7 +88,6 @@ export const updateCategory = async (id: number, payload: UpdateCategoryPayload)
   return res.data;
 };
 
-// Xoá category
 export const deleteCategory = async (id: number): Promise<any> => {
   const res = await http.delete(`/categories/${id}`);
   return res.data;
