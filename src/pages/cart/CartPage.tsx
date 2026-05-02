@@ -253,7 +253,7 @@ const CartPage: React.FC = () => {
           <div className="space-y-4">
             <div
               style={{ background: 'var(--hl-surface-lowest)' }}
-              className="sticky top-20 z-10 flex items-center gap-4 rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] px-4 py-4 text-sm font-medium text-[color:color-mix(in_srgb,var(--hl-on-surface)_75%,transparent)] shadow-sm dark:text-stone-200"
+              className="flex items-center gap-4 rounded-md border border-[color:color-mix(in_srgb,var(--hl-outline-variant)_22%,transparent)] px-4 py-4 text-sm font-medium text-[color:color-mix(in_srgb,var(--hl-on-surface)_75%,transparent)] shadow-sm dark:text-stone-200"
             >
               <div className="flex w-8 items-center justify-center">
                 <Checkbox checked={allSelected} onChange={(e) => handleSelectAll(e.target.checked)} />
