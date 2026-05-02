@@ -5,7 +5,7 @@ const CLOUDINARY_AVATAR_ENHANCE = 'e_improve,e_brightness:12,e_contrast:10';
  * Inserts avatar-friendly transforms into a Cloudinary image URL when missing.
  * Skips if `e_improve` is already present.
  */
-export function enhanceCloudinaryAvatarUrl(url: string): string {
+export const enhanceCloudinaryAvatarUrl = (url: string): string => {
   const v = String(url).trim();
   if (!v || /e_improve/i.test(v)) return v;
   if (!/cloudinary\.com\//i.test(v) || !/\/image\/upload\//i.test(v)) return v;
@@ -20,7 +20,7 @@ export function enhanceCloudinaryAvatarUrl(url: string): string {
     );
   }
   return v;
-}
+};
 
 export const getImageSrc = (img?: string | null): string => {
   // Keep a guaranteed existing fallback asset from /public

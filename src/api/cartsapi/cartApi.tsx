@@ -32,12 +32,12 @@ export interface AddToCartResponse {
   data?: CartItem;
 }
 
-function unwrapList(resData: any): CartItem[] {
+const unwrapList = (resData: any): CartItem[] => {
   if (Array.isArray(resData)) return resData;
   if (Array.isArray(resData?.data)) return resData.data;
   if (Array.isArray(resData?.cartItems)) return resData.cartItems;
   return [];
-}
+};
 
 export const getCartByUserId = async (user_ID: number): Promise<CartItem[]> => {
   const uid = Number(user_ID);

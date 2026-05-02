@@ -5,7 +5,7 @@ const formatPrice = (v: number) =>
     maximumFractionDigits: 0,
   }).format(v || 0);
 
-export function CartItemAmount({ amount }: { amount: number }) {
+export const CartItemAmount = ({ amount }: { amount: number }) => {
   return (
     <div className="hidden sm:block w-28 text-center">
       <span className="text-sm font-bold text-orange-600 dark:text-orange-500">
@@ -13,5 +13,5 @@ export function CartItemAmount({ amount }: { amount: number }) {
       </span>
     </div>
   );
-}
+};
 

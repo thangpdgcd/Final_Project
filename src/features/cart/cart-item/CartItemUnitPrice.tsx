@@ -5,7 +5,7 @@ const formatPrice = (v: number) =>
     maximumFractionDigits: 0,
   }).format(v || 0);
 
-export function CartItemUnitPrice({ price }: { price: number }) {
+export const CartItemUnitPrice = ({ price }: { price: number }) => {
   return (
     <div className="hidden md:block w-24 text-center">
       <span className="text-sm text-stone-500 dark:text-stone-400 line-through block opacity-50">
@@ -16,5 +16,5 @@ export function CartItemUnitPrice({ price }: { price: number }) {
       </span>
     </div>
   );
-}
+};
 

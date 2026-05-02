@@ -41,7 +41,7 @@ const METHODS: Record<ShippingMethodId, ShippingMethod> = {
   },
 };
 
-export function ShippingProvider({ children }: { children: React.ReactNode }) {
+export const ShippingProvider = ({ children }: { children: React.ReactNode }) => {
   const [shippingMethod, setShippingMethod] = useState<ShippingMethodId>('standard');
 
   const value = useMemo<ShippingContextValue>(() => {
@@ -75,10 +75,10 @@ export function ShippingProvider({ children }: { children: React.ReactNode }) {
   }, [shippingMethod]);
 
   return <ShippingContext.Provider value={value}>{children}</ShippingContext.Provider>;
-}
+};
 
-export function useShipping() {
+export const useShipping = () => {
   const ctx = useContext(ShippingContext);
   if (!ctx) throw new Error('useShipping must be used within ShippingProvider');
   return ctx;
-}
+};

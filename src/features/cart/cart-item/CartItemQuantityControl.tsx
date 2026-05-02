@@ -1,6 +1,6 @@
 import type { CartItem as CartItemType } from '@/types/index';
 
-export function CartItemQuantityControl({
+export const CartItemQuantityControl = ({
   item,
   onQtyChange,
   disabled,
@@ -8,7 +8,7 @@ export function CartItemQuantityControl({
   item: CartItemType;
   onQtyChange: (item: CartItemType, delta: number) => void;
   disabled: boolean;
-}) {
+}) => {
   return (
     <div className="w-24 md:w-32 flex justify-center">
       <div className="flex items-center border border-stone-200 dark:border-stone-800 rounded">
@@ -35,5 +35,5 @@ export function CartItemQuantityControl({
       </div>
     </div>
   );
-}
+};
 

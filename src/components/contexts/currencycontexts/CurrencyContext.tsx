@@ -9,7 +9,7 @@ type CurrencyContextValue = {
 
 const CurrencyContext = createContext<CurrencyContextValue | null>(null);
 
-export function CurrencyProvider({ children }: { children: React.ReactNode }) {
+export const CurrencyProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('USD');
 
   const value = useMemo<CurrencyContextValue>(() => {
@@ -22,10 +22,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   }, [selectedCurrency]);
 
   return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;
-}
+};
 
-export function useCurrency() {
+export const useCurrency = () => {
   const ctx = useContext(CurrencyContext);
   if (!ctx) throw new Error('useCurrency must be used within CurrencyProvider');
   return ctx;
-}
+};
