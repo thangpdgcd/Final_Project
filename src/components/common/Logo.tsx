@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getImageSrc } from '@/utils/images/image';
-import logoHeader from '@/assets/img/logo_headermg.png';
+import logoHeader from '@/assets/img/logo_Web_Phan Coffee.png';
 
 interface LogoProps {
   size?: number | string;

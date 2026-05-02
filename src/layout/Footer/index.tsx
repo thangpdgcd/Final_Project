@@ -3,7 +3,7 @@ import { Layout, Row, Col, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getImageSrc } from '@/utils/images/image';
-import logoHeader from '@/assets/img/logo_headermg.png';
+import logoHeader from '@/assets/img/logo_Web_Phan Coffee.png';
 import {
   FacebookFilled,
   InstagramOutlined,
