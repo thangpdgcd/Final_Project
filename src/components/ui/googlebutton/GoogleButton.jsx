@@ -9,18 +9,23 @@ export const GoogleButton = ({ onToken, loading, disabled, className = '', conta
   if (!clientId) {
     return (
       <div ref={containerRef} className={`relative inline-flex ${className}`}>
-        <div className="pointer-events-none opacity-60">
-          <div
-            aria-hidden="true"
-            className="h-[40px] w-[40px] rounded-full border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
-          />
-        </div>
+        <button
+          type="button"
+          disabled
+          className="pointer-events-none inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-500 opacity-60 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400"
+          aria-label="Google login is not configured"
+        >
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-zinc-200 bg-white text-[11px] font-black text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
+            G
+          </span>
+          Google (chưa cấu hình)
+        </button>
       </div>
     )
   }
 
   return (
-    <div ref={containerRef} className={`relative inline-flex ${className}`}>
+    <div ref={containerRef} className={`relative inline-flex w-full ${className}`}>
       <div className={disabled ? 'pointer-events-none opacity-60' : ''}>
         <GoogleOAuthProvider clientId={clientId}>
           <GoogleLogin
@@ -34,8 +39,8 @@ export const GoogleButton = ({ onToken, loading, disabled, className = '', conta
             useOneTap={false}
             theme="outline"
             size="large"
-            type="icon"
-            shape="circle"
+            type="standard"
+            shape="pill"
             locale="vi"
           />
         </GoogleOAuthProvider>

@@ -35,6 +35,7 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { login, isAuthenticated } = useAuth();
+  const hasGoogleClientId = String(import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '').trim().length > 0;
   const didRedirectRef = useRef(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showGoogle, setShowGoogle] = useState(false);
@@ -243,6 +244,7 @@ const LoginPage: React.FC = () => {
       messageApi.error(String(msg));
     } finally {
       setGoogleLoading(false);
+      setGoogleOpening(false);
     }
   };
 
@@ -362,15 +364,15 @@ const LoginPage: React.FC = () => {
                       >
                         {showGoogle ? (
                           <div className="relative w-full h-full grid place-items-center">
-                            {/* Keep the GoogleLogin mounted but visually hidden after click */}
                             <GoogleButton
                               onToken={handleGoogleToken}
                               loading={googleLoading}
                               disabled={googleLoading || loginMutation.isPending}
+                              // Keep GoogleLogin mounted but visually hidden;
+                              // show a custom loading indicator instead.
                               className="scale-[0.92] origin-center opacity-0 pointer-events-none absolute inset-0 grid place-items-center"
                               containerRef={googleBtnRef}
                             />
-                            {/* Show a clean loading indicator instead of the Google icon */}
                             {googleLoading || googleOpening ? (
                               <div className="h-5 w-5 animate-spin rounded-full border-2 border-[color:var(--hl-outline-variant)] border-t-[color:var(--hl-primary)]" />
                             ) : (
@@ -381,6 +383,10 @@ const LoginPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => {
+                              if (!hasGoogleClientId) {
+                                messageApi.warning('Google login chưa được cấu hình trên môi trường này (thiếu VITE_GOOGLE_CLIENT_ID).');
+                                return;
+                              }
                               setShowGoogle(true);
                               setAutoOpenGoogle(true);
                             }}
