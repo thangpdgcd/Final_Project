@@ -23,7 +23,8 @@ export function enhanceCloudinaryAvatarUrl(url: string): string {
 }
 
 export const getImageSrc = (img?: string | null): string => {
-  if (!img) return '/no-image.png';
+  // Keep a guaranteed existing fallback asset from /public
+  if (!img) return '/favicon.png';
   const v = String(img).trim();
 
   // If it's already a URL or a full data-URI, return it as-is
@@ -53,9 +54,13 @@ export const getImageSrc = (img?: string | null): string => {
   // Allow app-relative/static paths
   if (v.startsWith('/')) return v;
 
+  // Allow relative file paths (common in stored DB values or older codepaths)
+  // e.g. "assets/foo.png", "uploads/foo.jpg", "./img/logo.svg"
+  if (/\.(png|jpe?g|webp|gif|svg)$/i.test(v)) return v;
+
   // Only treat as base64 when it clearly looks like one.
   const looksLikeBase64 = v.length >= 80 && /^[A-Za-z0-9+/=\s]+$/.test(v) && !/\s{2,}/.test(v);
-  if (!looksLikeBase64) return '/no-image.png';
+  if (!looksLikeBase64) return '/favicon.png';
 
   // Basic heuristic to detect MIME type from base64 start
   // PNG: iVBORw0KGgo (starts with iVBOR)
