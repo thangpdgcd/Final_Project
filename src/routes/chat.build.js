@@ -19,6 +19,7 @@ export const buildChatRouter = () => {
   router.get("/conversations/me", authenticate, chatController.listMyConversations);
   router.get("/conversations", authenticate, chatController.listConversations);
   router.post("/conversations/direct", authenticate, chatController.findOrCreateDirectConversation);
+  router.post("/conversations/:conversationId/claim", authenticate, chatController.claimConversation);
   router.get("/conversations/:conversationId", authenticate, chatController.getConversation);
   router.get("/messages/:conversationId", authenticate, chatController.getMessages);
   router.post("/messages", authenticate, chatController.postMessage);

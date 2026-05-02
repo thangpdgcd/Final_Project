@@ -226,6 +226,18 @@ const normalizePaymentMethod = (raw) => {
   return "cod";
 };
 
+const inferPaymentProvider = (method) => {
+  if (method === "paypal") return "paypal";
+  if (method === "coffee_coin") return "internal_wallet";
+  return "cod";
+};
+
+const initialPaymentStatus = ({ method, paypalCaptureId }) => {
+  if (method === "paypal") return paypalCaptureId ? "paid" : "pending";
+  if (method === "coffee_coin") return "pending";
+  return "unpaid";
+};
+
 const assertCanAccessOrder = async ({ actor, order }) => {
   const role = normalizeRole(actor?.role);
   if (role === "admin" || role === "staff") return;
@@ -319,6 +331,11 @@ const createOrderFromCart = async ({
   await ensureWalletTransactionsTable();
 
   const normalizedPaymentMethod = normalizePaymentMethod(paymentMethod);
+  const paymentProvider = inferPaymentProvider(normalizedPaymentMethod);
+  const paymentStatus = initialPaymentStatus({
+    method: normalizedPaymentMethod,
+    paypalCaptureId,
+  });
 
   const tx = await sequelize.transaction();
   try {
@@ -369,6 +386,11 @@ const createOrderFromCart = async ({
         total_Amount: grandTotal,
         status: STATUS.pending,
         shipping_Address: String(shippingAddress ?? "Not set"),
+        paymentMethod: normalizedPaymentMethod,
+        paymentProvider,
+        paymentStatus,
+        paymentRef: paypalCaptureId ? String(paypalCaptureId) : null,
+        paidAt: paypalCaptureId ? new Date() : null,
       },
       { transaction: tx },
     );
@@ -439,6 +461,11 @@ const createOrderFromCart = async ({
           },
           transaction: tx,
         },
+      );
+
+      await created.update(
+        { paymentStatus: "paid", paidAt: new Date() },
+        { transaction: tx },
       );
     }
 
@@ -674,7 +701,12 @@ const resolveRefundDecision = async ({ orderId, actor, approved, note }) => {
   }
 
   const next = approved ? STATUS.refunded : STATUS.completed;
-  await order.update({ status: next });
+  await order.update(
+    {
+      status: next,
+      ...(approved ? { paymentStatus: "refunded" } : null),
+    },
+  );
   if (approved) {
     const refundXu = Math.max(0, Math.trunc(Number(order.total_Amount ?? 0)));
     if (refundXu > 0) {

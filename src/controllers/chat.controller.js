@@ -118,12 +118,27 @@ export const createChatController = ({ chatService }) => {
     }
   };
 
+  const claimConversation = async (req, res) => {
+    try {
+      const conversationId = Number(req.params.conversationId);
+      const data = await chatService.claimConversation({
+        conversationId,
+        user: req.user,
+      });
+      return sendSuccess(res, 200, data, "OK");
+    } catch (error) {
+      const status = Number(error?.statusCode || error?.status) || 500;
+      return sendError(res, status, error?.message || "Error", null);
+    }
+  };
+
   return {
     listConversations,
     listMyConversations,
     createConversation,
     getConversation,
     findOrCreateDirectConversation,
+    claimConversation,
     getMessages,
     postMessage,
   };

@@ -40,6 +40,31 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      paymentMethod: {
+        type: DataTypes.STRING(32),
+        allowNull: true,
+        field: "payment_method",
+      },
+      paymentStatus: {
+        type: DataTypes.STRING(32),
+        allowNull: true,
+        field: "payment_status",
+      },
+      paymentProvider: {
+        type: DataTypes.STRING(64),
+        allowNull: true,
+        field: "payment_provider",
+      },
+      paymentRef: {
+        type: DataTypes.STRING(128),
+        allowNull: true,
+        field: "payment_ref",
+      },
+      paidAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        field: "paid_at",
+      },
     },
     {
       sequelize,

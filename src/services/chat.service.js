@@ -417,6 +417,27 @@ export const createChatService = ({ chatRepository, userRepository, staffReposit
     return toConversationPreview(row);
   };
 
+  const claimConversation = async ({ conversationId, user }) => {
+    const role = normalizeRole(user?.role);
+    if (!(role === "staff" || role === "admin")) {
+      throw new AppError("Only staff/admin can claim conversations", 403);
+    }
+    const id = Number(conversationId);
+    if (!Number.isFinite(id) || id <= 0) throw new AppError("Invalid conversationId", 400);
+
+    const conv = await chatRepository.getConversationById({ conversationId: id });
+    if (!conv) throw new AppError("Conversation not found", 404);
+
+    await chatRepository.addParticipantIfMissing({
+      conversationId: id,
+      userId: user.id,
+      roleAtJoin: role,
+    });
+
+    const row = await chatRepository.getConversationEnrichedById({ conversationId: id });
+    return toConversationPreview(row ?? conv);
+  };
+
   /** REST: tìm hoặc tạo DM admin↔staff / staff↔admin / user↔staff… (cùng rule findOrCreateConversationWithUser). */
   const findOrCreateDirectConversation = async ({ user, recipientUserId }) => {
     const convId = await findOrCreateConversationWithUser({
@@ -433,6 +454,7 @@ export const createChatService = ({ chatRepository, userRepository, staffReposit
     listConversations,
     getConversation,
     findOrCreateDirectConversation,
+    claimConversation,
     findOrCreateConversationWithUser,
     findOrCreateSupportConversationAutoAssign,
     sendMessage,

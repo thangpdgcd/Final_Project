@@ -1,5 +1,6 @@
 import { AppError } from "../utils/AppError.js";
 import { setUserAvatar } from "../utils/userAvatar.js";
+import bcrypt from "bcrypt";
 
 export const createUserService = ({ userRepository }) => {
   const updateProfile = async ({ userId, name, phoneNumber, address }) => {
@@ -75,12 +76,36 @@ export const createUserService = ({ userRepository }) => {
     return { transactions: rows };
   };
 
+  const changePassword = async ({ userId, oldPassword, newPassword, confirmNewPassword }) => {
+    const user = await userRepository.findById(userId);
+    if (!user) throw new AppError("User not found", 404);
+
+    const oldPw = typeof oldPassword === "string" ? oldPassword : "";
+    const newPw = typeof newPassword === "string" ? newPassword : "";
+    const confirmPw = typeof confirmNewPassword === "string" ? confirmNewPassword : "";
+
+    if (!oldPw || !newPw) throw new AppError("Old password and new password are required", 400);
+    if (newPw.length < 6) throw new AppError("New password must be at least 6 characters", 400);
+    if (confirmPw && newPw !== confirmPw) throw new AppError("Confirm password does not match", 400);
+
+    const currentHash = user.password;
+    if (!currentHash) throw new AppError("Password is not set for this account", 400);
+
+    const ok = await bcrypt.compare(oldPw, currentHash);
+    if (!ok) throw new AppError("Old password is incorrect", 401);
+
+    const nextHash = await bcrypt.hash(newPw, 10);
+    await userRepository.updateById(userId, { password: nextHash });
+    return { ok: true };
+  };
+
   return {
     updateProfile,
     setAvatar,
     getWallet,
     topupWalletByPaypal,
     getWalletTransactions,
+    changePassword,
   };
 };
 

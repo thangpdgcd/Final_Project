@@ -25,6 +25,7 @@ export const buildUserRouter = () => {
   };
 
   router.put("/profile", authMiddleware, userController.updateProfile);
+  router.put("/profile/password", authMiddleware, userController.changePassword);
   router.post(
     "/upload-avatar",
     authMiddleware,
