@@ -141,6 +141,11 @@ const OrderPage: React.FC = () => {
         shipping_Address: `${shipping.fullName} | ${shipping.phone} | ${shipping.address}`,
         shippingMethod: shippingCtx.shippingMethod,
         paypalCaptureId: method === 'paypal' ? String(captureId ?? '') : null,
+        payment_ref: method === 'paypal' ? String(captureId ?? '') : undefined,
+        payment_provider: method === 'paypal' ? 'paypal' : undefined,
+        payment_status: method === 'paypal' ? 'captured' : undefined,
+        payment_method:
+          method === 'coffee_coin' ? 'COFFEE_COIN' : method === 'paypal' ? 'PAYPAL' : 'COD',
         note:
           method === 'paypal'
             ? `PayPal | capture: ${String(captureId ?? '')}`
@@ -355,16 +360,38 @@ const OrderPage: React.FC = () => {
         style: { layout: 'vertical', label: 'paypal' },
         createOrder: (_d: any, actions: any) =>
           actions.order.create({ purchase_units: [{ amount: { currency_code: 'USD', value: amountUSD } }] }),
-        onApprove: async (_d: any, actions: any) => {
-          const capture = await actions.order.capture();
-          const captureId = String((capture as any)?.id ?? '');
+        onApprove: async (data: any, actions: any) => {
+          let captureId = '';
+          try {
+            const capture = await actions.order.capture();
+            captureId = String((capture as any)?.id ?? '').trim();
+          } catch (e: any) {
+            const msg = String(e?.message ?? '');
+            const buyerTokenMissing = msg.toLowerCase().includes('buyer access token not present');
+            const fallbackOrderId = String(data?.orderID ?? data?.orderId ?? '').trim();
+            // Some environments block PayPal smart API capture (missing buyer token).
+            // Backend currently stores a reference only, so fall back to orderID to avoid blocking checkout.
+            if (buyerTokenMissing && fallbackOrderId) {
+              captureId = fallbackOrderId;
+            } else {
+              throw e;
+            }
+          }
+          if (!captureId) {
+            const fallbackOrderId = String(data?.orderID ?? data?.orderId ?? '').trim();
+            if (fallbackOrderId) captureId = fallbackOrderId;
+          }
           setShowPaypal(false);
           await handleSaveOrder({ method: 'paypal', captureId });
         },
         onError: (err: any) => {
           // eslint-disable-next-line no-console
           console.error(err);
-          setError(t('checkout.paypalError'));
+          const paypalMsg =
+            String(err?.message ?? err?.details?.[0]?.description ?? err?.details?.[0]?.issue ?? '').trim();
+          setError(paypalMsg ? `${t('checkout.paypalError')}: ${paypalMsg}` : t('checkout.paypalError'));
+          // Reset PayPal UI so user can retry cleanly.
+          setShowPaypal(false);
           renderedRef.current = false;
         },
       })

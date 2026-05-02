@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -29,6 +29,11 @@ const Dropdown: React.FC<DropdownProps> = ({
   onLoginClick,
 }) => {
   const navigate = useNavigate();
+  const [avatarBroken, setAvatarBroken] = useState(false);
+
+  useEffect(() => {
+    setAvatarBroken(false);
+  }, [user?.avatar]);
 
   const handleAction = (path: string) => {
     navigate(path);
@@ -59,11 +64,12 @@ const Dropdown: React.FC<DropdownProps> = ({
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#FFD700] to-amber-200 p-0.5 shadow-lg shadow-[#FFD700]/10">
                 <div className="w-full h-full rounded-full bg-white dark:bg-[#1c1716] flex items-center justify-center overflow-hidden border-2 border-white dark:border-[#1c1716]">
-                  {user?.avatar ? (
+                  {user?.avatar && !avatarBroken ? (
                     <img
                       src={getAvatarImageSrc(user.avatar)}
                       alt="Avatar"
                       className={AVATAR_DISPLAY_IMG_CLASS}
+                      onError={() => setAvatarBroken(true)}
                     />
                   ) : (
                     <span className="text-[#FFD700] font-black text-lg">

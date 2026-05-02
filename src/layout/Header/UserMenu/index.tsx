@@ -13,6 +13,7 @@ interface UserMenuProps {
 
 const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [avatarBroken, setAvatarBroken] = useState(false);
   const { user, isAuthenticated, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -69,6 +70,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    setAvatarBroken(false);
+  }, [user?.avatar]);
+
   if (isLoading) {
     return (
       <div className="flex items-center gap-2">
@@ -91,11 +96,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ onLoginClick }) => {
       >
         <div className="absolute inset-0 bg-[#FFD700]/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity rounded-full" />
         <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-white/5 flex items-center justify-center overflow-hidden relative z-10 border border-stone-200 dark:border-white/5">
-          {isAuthenticated && user?.avatar ? (
+          {isAuthenticated && user?.avatar && !avatarBroken ? (
             <img
               src={getAvatarImageSrc(user.avatar)}
               alt="Avatar"
               className={AVATAR_DISPLAY_IMG_CLASS}
+              onError={() => setAvatarBroken(true)}
             />
           ) : isAuthenticated && user?.name ? (
             <span className="text-[#FFD700] font-black text-sm uppercase">

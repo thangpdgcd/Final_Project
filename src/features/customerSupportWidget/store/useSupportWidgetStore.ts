@@ -46,7 +46,7 @@ type SupportWidgetState = {
   ) => { clientId: string; tempId: string };
   markOptimisticSent: (clientId: string) => void;
   markOptimisticFailed: (clientId: string) => void;
-  reconcileOptimisticIfMatch: (incoming: SupportWidgetMessage) => void;
+  reconcileOptimisticIfMatch: (incoming: SupportWidgetMessage) => boolean;
 };
 
 const createClientId = () => {
@@ -175,15 +175,16 @@ export const useSupportWidgetStore = create<SupportWidgetState>()(
 
       reconcileOptimisticIfMatch: (incoming) => {
         const existing = get().messages;
-        if (existing.length === 0) return;
-        if (existing.some((m) => String(m.id) === String(incoming.id))) return;
+        if (existing.length === 0) return false;
+        if (existing.some((m) => String(m.id) === String(incoming.id))) return false;
 
         const incomingPreview = makePreview(incoming);
         const incomingSenderId = incoming.sender?.userId ?? null;
 
         const matchIdx = [...existing].reverse().findIndex((m) => {
           const opt = m.optimistic;
-          if (!opt || opt.status !== 'sending') return false;
+          if (!opt) return false;
+          if (opt.status === 'failed') return false;
           const sameType = m.type === incoming.type;
           const sameSender = incomingSenderId ? m.sender?.userId === incomingSenderId : true;
           const sameContent = makePreview(m) === incomingPreview;
@@ -191,7 +192,7 @@ export const useSupportWidgetStore = create<SupportWidgetState>()(
           return sameType && sameSender && sameContent && closeInTime;
         });
 
-        if (matchIdx === -1) return;
+        if (matchIdx === -1) return false;
         const realIdx = existing.length - 1 - matchIdx;
 
         set((state) => {
@@ -208,6 +209,7 @@ export const useSupportWidgetStore = create<SupportWidgetState>()(
           );
           return { messages: next };
         });
+        return true;
       },
     }),
     {

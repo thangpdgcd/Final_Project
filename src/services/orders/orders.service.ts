@@ -206,6 +206,14 @@ export const ordersService = {
       body.totalAmount = totalAmount;
     }
     if (payload.paypalCaptureId != null) body.paypalCaptureId = payload.paypalCaptureId;
+
+    // New payment fields (backend migration 20260427100000-add-payment-fields-to-orders.cjs)
+    if ((payload as any).payment_ref != null) body.payment_ref = (payload as any).payment_ref;
+    if ((payload as any).payment_provider != null)
+      body.payment_provider = (payload as any).payment_provider;
+    if ((payload as any).payment_status != null) body.payment_status = (payload as any).payment_status;
+    if ((payload as any).payment_method != null) body.payment_method = (payload as any).payment_method;
+    if ((payload as any).paid_at != null) body.paid_at = (payload as any).paid_at;
     if ((payload as any).shippingMethod) {
       body.shippingMethod = (payload as any).shippingMethod;
       body.shipping_method = (payload as any).shippingMethod;

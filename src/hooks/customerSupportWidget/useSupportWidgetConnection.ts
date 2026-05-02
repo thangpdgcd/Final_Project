@@ -291,7 +291,8 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
       s.setJoinedConversationId(payload.conversationId);
       s.setJoiningConversationId(null);
       if (payload.message) {
-        s.reconcileOptimisticIfMatch(payload.message);
+        const reconciled = s.reconcileOptimisticIfMatch(payload.message);
+        if (reconciled) return;
       }
       s.appendIncoming(payload);
 

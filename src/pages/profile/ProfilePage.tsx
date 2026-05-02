@@ -596,16 +596,27 @@ const ProfilePage: React.FC = () => {
       message.error(t('profile.orders.messages.orderIdMissing'));
       return;
     }
-    const ok = window.confirm(t('profile.orders.messages.cancelOrderConfirm'));
-    if (!ok) return;
-    try {
-      await ordersService.cancelOrder(orderId, { note: 'Customer cancelled from profile page' });
-      message.success(t('profile.orders.messages.cancelOrderSuccess'));
-      await refetchOrders();
-    } catch (err) {
-      if (import.meta.env.DEV) console.error('[cancelOrder]', err);
-      message.error(t('common.requestFailed'));
-    }
+    Modal.confirm({
+      title: t('profile.orders.messages.cancelOrderConfirm'),
+      okText: t('common.submit'),
+      cancelText: t('common.cancel'),
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        const hide = message.loading(t('common.loading'), 0);
+        try {
+          await ordersService.cancelOrder(orderId, { note: 'Customer cancelled from profile page' });
+          hide();
+          message.success(t('profile.orders.messages.cancelOrderSuccess'));
+          await refetchOrders();
+        } catch (err: any) {
+          hide();
+          if (import.meta.env.DEV) console.error('[cancelOrder]', err);
+          const apiMsg =
+            String(err?.response?.data?.message ?? err?.response?.data?.error ?? err?.message ?? '').trim() || '';
+          message.error(apiMsg ? `${t('common.requestFailed')}: ${apiMsg}` : t('common.requestFailed'));
+        }
+      },
+    });
   };
 
   const submitRefundRequest = async (order: Order) => {
@@ -712,6 +723,45 @@ const ProfilePage: React.FC = () => {
       message.error(t('profile.updateError'));
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const [pwForm, setPwForm] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
+  });
+  const [pwLoading, setPwLoading] = useState(false);
+
+  const handleChangePassword = async () => {
+    const oldPassword = String(pwForm.oldPassword ?? '');
+    const newPassword = String(pwForm.newPassword ?? '');
+    const confirmNewPassword = String(pwForm.confirmNewPassword ?? '');
+
+    if (!oldPassword || !newPassword) {
+      message.error(t('profile.security.required'));
+      return;
+    }
+    if (newPassword.length < 6) {
+      message.error(t('profile.security.tooShort'));
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      message.error(t('profile.security.mismatch'));
+      return;
+    }
+
+    try {
+      setPwLoading(true);
+      await profileApi.changePassword({ oldPassword, newPassword, confirmNewPassword });
+      message.success(t('profile.security.success'));
+      setPwForm({ oldPassword: '', newPassword: '', confirmNewPassword: '' });
+    } catch (err: any) {
+      const apiMsg =
+        String(err?.response?.data?.message ?? err?.response?.data?.error ?? err?.message ?? '').trim() || null;
+      message.error(apiMsg ? `${t('profile.security.error')}: ${apiMsg}` : t('profile.security.error'));
+    } finally {
+      setPwLoading(false);
     }
   };
 
@@ -1548,6 +1598,142 @@ const ProfilePage: React.FC = () => {
                           ? t('profile.identity.saveChangesCaps')
                           : t('profile.identity.editProfileCaps')}
                       </motion.button>
+                    </div>
+
+                    {/* Change password */}
+                    <div className="mt-8">
+                      <h3
+                        style={{
+                          fontFamily: "'Manrope', sans-serif",
+                          color: T.onSurface,
+                          fontWeight: 700,
+                          fontSize: '0.8rem',
+                          letterSpacing: '0.1em',
+                          marginBottom: '1rem',
+                          opacity: 0.6,
+                        }}
+                      >
+                        {t('profile.security.sectionTitle')}
+                      </h3>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-1.5">
+                          <label
+                            style={{
+                              color: T.onSurfaceVariant,
+                              fontSize: '0.7rem',
+                              fontFamily: "'Manrope', sans-serif",
+                              fontWeight: 600,
+                              letterSpacing: '0.07em',
+                            }}
+                          >
+                            {t('profile.security.oldPasswordLabel')}
+                          </label>
+                          <input
+                            type="password"
+                            value={pwForm.oldPassword}
+                            onChange={(e) => setPwForm((p) => ({ ...p, oldPassword: e.target.value }))}
+                            placeholder={t('profile.security.oldPasswordPlaceholder')}
+                            style={{
+                              background: T.surfaceLowest,
+                              color: T.onSurface,
+                              border: `1px solid ${T.onSurface}15`,
+                              borderRadius: '0.75rem',
+                              padding: '0.75rem 1rem',
+                              fontSize: '0.875rem',
+                              fontFamily: "'Inter', sans-serif",
+                              outline: 'none',
+                              width: '100%',
+                            }}
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label
+                            style={{
+                              color: T.onSurfaceVariant,
+                              fontSize: '0.7rem',
+                              fontFamily: "'Manrope', sans-serif",
+                              fontWeight: 600,
+                              letterSpacing: '0.07em',
+                            }}
+                          >
+                            {t('profile.security.newPasswordLabel')}
+                          </label>
+                          <input
+                            type="password"
+                            value={pwForm.newPassword}
+                            onChange={(e) => setPwForm((p) => ({ ...p, newPassword: e.target.value }))}
+                            placeholder={t('profile.security.newPasswordPlaceholder')}
+                            style={{
+                              background: T.surfaceLowest,
+                              color: T.onSurface,
+                              border: `1px solid ${T.onSurface}15`,
+                              borderRadius: '0.75rem',
+                              padding: '0.75rem 1rem',
+                              fontSize: '0.875rem',
+                              fontFamily: "'Inter', sans-serif",
+                              outline: 'none',
+                              width: '100%',
+                            }}
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5 md:col-span-2">
+                          <label
+                            style={{
+                              color: T.onSurfaceVariant,
+                              fontSize: '0.7rem',
+                              fontFamily: "'Manrope', sans-serif",
+                              fontWeight: 600,
+                              letterSpacing: '0.07em',
+                            }}
+                          >
+                            {t('profile.security.confirmNewPasswordLabel')}
+                          </label>
+                          <input
+                            type="password"
+                            value={pwForm.confirmNewPassword}
+                            onChange={(e) => setPwForm((p) => ({ ...p, confirmNewPassword: e.target.value }))}
+                            placeholder={t('profile.security.confirmNewPasswordPlaceholder')}
+                            style={{
+                              background: T.surfaceLowest,
+                              color: T.onSurface,
+                              border: `1px solid ${T.onSurface}15`,
+                              borderRadius: '0.75rem',
+                              padding: '0.75rem 1rem',
+                              fontSize: '0.875rem',
+                              fontFamily: "'Inter', sans-serif",
+                              outline: 'none',
+                              width: '100%',
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end mt-5">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          disabled={pwLoading}
+                          onClick={handleChangePassword}
+                          style={{
+                            background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
+                            color: T.surfaceLowest,
+                            fontFamily: "'Manrope', sans-serif",
+                            fontWeight: 800,
+                            fontSize: '0.75rem',
+                            letterSpacing: '0.08em',
+                            borderRadius: '0.75rem',
+                            boxShadow: `0 8px 32px -8px ${T.gold}50`,
+                            transition: 'all 300ms ease-out',
+                          }}
+                          className="px-8 py-2.5 inline-flex items-center gap-2 disabled:opacity-60"
+                        >
+                          {pwLoading && <Loader2 size={14} className="animate-spin" />}
+                          {t('profile.security.submitCaps')}
+                        </motion.button>
+                      </div>
                     </div>
                   </>
                 )}

@@ -15,6 +15,12 @@ export interface WalletTopupPayload {
   note?: string;
 }
 
+export interface ChangePasswordPayload {
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword?: string;
+}
+
 export const pickUserFromProfileResponse = (raw: unknown): Record<string, unknown> | null => {
   if (!raw || typeof raw !== 'object') return null;
   const data = raw as Record<string, any>;
@@ -54,6 +60,36 @@ export const pickAvatarUrlFromResponse = (raw: unknown): string | null => {
 export const updateProfile = async (payload: UpdateProfilePayload) => {
   const res = await api.put('/profile', payload);
   return res.data;
+};
+
+export const changePassword = async (payload: ChangePasswordPayload) => {
+  // IMPORTANT: avoid generic paths that can collide with staff routes like `PUT /users/:id`.
+  // Prefer the user profile endpoint first, then fall back to auth module endpoint.
+  const putCandidates = ['/profile/password', '/profile/change-password'];
+  let lastErr: unknown;
+  for (const url of putCandidates) {
+    try {
+      const res = await api.put(url, payload);
+      return res.data;
+    } catch (err) {
+      lastErr = err;
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        if (status === 404) continue;
+      }
+      throw err;
+    }
+  }
+
+  // Backend auth router uses POST `/auth/change-password`
+  try {
+    const res = await api.post('/auth/change-password', payload);
+    return res.data;
+  } catch (err) {
+    lastErr = err;
+  }
+
+  throw lastErr ?? new Error('CHANGE_PASSWORD_NOT_AVAILABLE');
 };
 
 export const uploadAvatar = async (file: File) => {

@@ -68,7 +68,8 @@ const CustomerSupportWidget: React.FC = () => {
     try {
       await new Promise<void>((resolve) => {
         // Prefer `chat:message` so staff app (StaffChatPage) receives the same event stream.
-        // Fallback: also emit legacy `send_message` for older backends.
+        // NOTE: Do not emit both `chat:message` and legacy `send_message` here.
+        // Doing so can cause the backend to broadcast duplicates (different ids), which appear as double messages.
         const staffUserId = Number(s.staffUserId ?? 0) || undefined;
         const payload: any = {
           message: { type: 'text', content: text },
@@ -86,16 +87,6 @@ const CustomerSupportWidget: React.FC = () => {
           }
           resolve();
         });
-
-        // legacy emit (no-op if server ignores)
-        try {
-          supportWidgetEvents.sendMessage(
-            { conversationId: cid > 0 ? cid : undefined, message: { type: 'text', content: text } } as any,
-            undefined,
-          );
-        } catch {
-          // ignore
-        }
       });
       useSupportWidgetStore.getState().markOptimisticSent(clientId);
     } catch {

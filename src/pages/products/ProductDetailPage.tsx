@@ -657,14 +657,38 @@ const ProductDetailPage: React.FC = () => {
             <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {(isBrewingTool
                 ? [
-                    { icon: Wrench, t: 'Bảo hành 2 năm', d: 'Đổi trả miễn phí' },
-                    { icon: ShieldCheck, t: 'Chứng nhận An toàn', d: 'Thép không gỉ 304' },
-                    { icon: FlaskConical, t: 'Kiểm định Chất lượng', d: 'Độ chính xác ±0.1mm' },
+                    {
+                      icon: Wrench,
+                      t: t('productDetail.features.tool.warranty.title'),
+                      d: t('productDetail.features.tool.warranty.desc'),
+                    },
+                    {
+                      icon: ShieldCheck,
+                      t: t('productDetail.features.tool.safety.title'),
+                      d: t('productDetail.features.tool.safety.desc'),
+                    },
+                    {
+                      icon: FlaskConical,
+                      t: t('productDetail.features.tool.quality.title'),
+                      d: t('productDetail.features.tool.quality.desc'),
+                    },
                   ]
                 : [
-                    { icon: Truck, t: 'Giao hàng Ưu tiên', d: 'Xử lý trong 24h' },
-                    { icon: ShieldCheck, t: 'Cam kết Chất lượng', d: '100% Nguyên chất' },
-                    { icon: Calendar, t: 'Linh hoạt', d: 'Hủy gói bất kỳ lúc nào' },
+                    {
+                      icon: Truck,
+                      t: t('productDetail.features.coffee.shipping.title'),
+                      d: t('productDetail.features.coffee.shipping.desc'),
+                    },
+                    {
+                      icon: ShieldCheck,
+                      t: t('productDetail.features.coffee.quality.title'),
+                      d: t('productDetail.features.coffee.quality.desc'),
+                    },
+                    {
+                      icon: Calendar,
+                      t: t('productDetail.features.coffee.flexible.title'),
+                      d: t('productDetail.features.coffee.flexible.desc'),
+                    },
                   ]
               ).map((item, i) => (
                 <div
@@ -693,24 +717,24 @@ const ProductDetailPage: React.FC = () => {
                   ? [
                       {
                         u: 'Minh Barista',
-                        c: 'Phin lọc rất chuẩn, cà phê nhỏ giọt đều và thơm hơn hẳn. Chất liệu thép dày dặn, bền lắm.',
+                        c: t('productDetail.reviews.samples.tool.0'),
                         r: 5,
                       },
                       {
                         u: 'Quang Roaster',
-                        c: 'Thiết kế tinh tế, không bị rỉ sét sau nhiều tháng sử dụng. Xứng đáng đầu tư cho dụng cụ pha chế.',
+                        c: t('productDetail.reviews.samples.tool.1'),
                         r: 5,
                       },
                     ]
                   : [
                       {
                         u: 'Tùng Nguyễn',
-                        c: 'Cà phê rất thơm, vị đậm đà đúng gu mình. Gói đăng ký định kỳ rất tiện lợi!',
+                        c: t('productDetail.reviews.samples.coffee.0'),
                         r: 5,
                       },
                       {
                         u: 'Hạnh Lê',
-                        c: 'Bao bì xịn xò, quả thực là món quà tuyệt vời cho người yêu cà phê.',
+                        c: t('productDetail.reviews.samples.coffee.1'),
                         r: 5,
                       },
                     ]
@@ -786,14 +810,14 @@ const ProductDetailPage: React.FC = () => {
                     >
                       {purchaseType === 'subscribe' && (
                         <div className="absolute top-0 right-8 translate-y-[-50%] bg-[#6f4e37] text-white px-4 py-1.5 rounded-full text-[9px] font-black tracking-widest z-10">
-                          KHUYÊN DÙNG
+                          {t('productDetail.subscribe.recommended')}
                         </div>
                       )}
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-black text-lg">Đăng ký Định kỳ</div>
+                          <div className="font-black text-lg">{t('productDetail.subscribe.title')}</div>
                           <div className="text-xs text-green-600 font-bold">
-                            Tiết kiệm 15% mỗi kỳ
+                            {t('productDetail.subscribe.save')}
                           </div>
                         </div>
                         <Radio checked={purchaseType === 'subscribe'} />
@@ -806,12 +830,12 @@ const ProductDetailPage: React.FC = () => {
                             className="mt-4 pt-4 border-t border-[#6f4e37]/10 text-[11px] space-y-2 font-medium overflow-hidden"
                           >
                             <div className="flex items-center gap-2 text-gray-600">
-                              <CheckCircle size={14} className="text-green-500" /> Miễn phí vận
-                              chuyển tận nhà
+                              <CheckCircle size={14} className="text-green-500" />{' '}
+                              {t('productDetail.subscribe.perks.freeShipping')}
                             </div>
                             <div className="flex items-center gap-2 text-gray-600">
-                              <CheckCircle size={14} className="text-green-500" /> Nhận ưu đãi cho
-                              lô hàng mới nhất
+                              <CheckCircle size={14} className="text-green-500" />{' '}
+                              {t('productDetail.subscribe.perks.latestBatch')}
                             </div>
                           </motion.div>
                         )}

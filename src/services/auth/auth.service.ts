@@ -151,7 +151,15 @@ export const authService = {
   },
 
   register: async (payload: RegisterPayload): Promise<RegisterResponse> => {
-    const candidates = ['/users/register', '/users/signup', '/users/sign-up', '/register'];
+    const candidates = [
+      '/users/register',
+      '/users/signup',
+      '/users/sign-up',
+      '/register',
+      // Some backends reuse the admin "create user" route for registration.
+      '/create-users',
+      '/users',
+    ];
     const looksLikeMissingRoute = (raw: unknown) => {
       const text = typeof raw === 'string' ? raw : (raw as any)?.message;
       if (typeof text !== 'string') return false;
@@ -167,13 +175,51 @@ export const authService = {
     let lastErr: unknown;
     for (const url of candidates) {
       try {
-        const res = await api.post<RegisterResponse>(url, payload);
+        const bodyVariants: Record<string, unknown>[] = [
+          payload as any,
+          // Common backend naming variants
+          {
+            ...payload,
+            username: (payload as any).username ?? payload.name,
+            name: payload.name,
+          },
+          {
+            ...payload,
+            userName: (payload as any).userName ?? payload.name,
+          },
+          {
+            ...payload,
+            fullName: (payload as any).fullName ?? payload.name,
+          },
+          {
+            ...payload,
+            roleId: (payload as any).roleId ?? payload.roleID,
+          },
+        ];
+
+        let res: any = null;
+        for (const body of bodyVariants) {
+          try {
+            res = await api.post<RegisterResponse>(url, body);
+            break;
+          } catch (err) {
+            lastErr = err;
+            // Payload mismatch -> try the next body variant.
+            if (axios.isAxiosError(err) && err.response?.status === 400) continue;
+            throw err;
+          }
+        }
+        if (!res) throw lastErr ?? new Error('REGISTER_NOT_AVAILABLE');
         return res.data;
       } catch (err) {
         lastErr = err;
-        if (axios.isAxiosError(err) && err.response?.status === 404) {
-          if (looksLikeMissingRoute(err.response?.data)) continue;
-        }
+        // For registration, a 404 almost always means "missing endpoint" (not a business error),
+        // so we can safely try the next candidate.
+        if (axios.isAxiosError(err) && err.response?.status === 404) continue;
+        if (axios.isAxiosError(err) && err.response?.status === 405) continue;
+        if (axios.isAxiosError(err) && err.response?.status === 403) continue;
+        if (axios.isAxiosError(err) && err.response?.status === 401) continue;
+        if (axios.isAxiosError(err) && looksLikeMissingRoute(err.response?.data)) continue;
         throw err;
       }
     }
