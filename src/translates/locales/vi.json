@@ -643,6 +643,21 @@
       "saveChangesCaps": "LƯU THAY ĐỔI",
       "editProfileCaps": "CHỈNH SỬA"
     },
+    "security": {
+      "sectionTitle": "BẢO MẬT",
+      "oldPasswordLabel": "MẬT KHẨU CŨ",
+      "newPasswordLabel": "MẬT KHẨU MỚI",
+      "confirmNewPasswordLabel": "XÁC NHẬN MẬT KHẨU MỚI",
+      "oldPasswordPlaceholder": "Nhập mật khẩu hiện tại...",
+      "newPasswordPlaceholder": "Nhập mật khẩu mới...",
+      "confirmNewPasswordPlaceholder": "Nhập lại mật khẩu mới...",
+      "submitCaps": "ĐỔI MẬT KHẨU",
+      "success": "Đổi mật khẩu thành công!",
+      "error": "Không thể đổi mật khẩu",
+      "required": "Vui lòng nhập đầy đủ các trường mật khẩu.",
+      "tooShort": "Mật khẩu mới phải có ít nhất 6 ký tự.",
+      "mismatch": "Xác nhận mật khẩu không khớp."
+    },
     "orders": {
       "apiNotAvailableHint": "Backend chưa có API đơn hàng cho tài khoản này.",
       "productInfoPending": "Đang xử lý thông tin sản phẩm...",
@@ -900,7 +915,38 @@
     "reviews": {
       "title": "Phản hồi khách hàng",
       "average": "{{score}} trung bình",
-      "verifiedBuyer": "KHÁCH ĐÃ MUA"
+      "verifiedBuyer": "KHÁCH ĐÃ MUA",
+      "samples": {
+        "tool": [
+          "Phin lọc rất chuẩn, cà phê nhỏ giọt đều và thơm hơn hẳn. Chất liệu thép dày dặn, bền lắm.",
+          "Thiết kế tinh tế, không bị rỉ sét sau nhiều tháng sử dụng. Xứng đáng đầu tư cho dụng cụ pha chế."
+        ],
+        "coffee": [
+          "Cà phê rất thơm, vị đậm đà đúng gu mình. Gói đăng ký định kỳ rất tiện lợi!",
+          "Bao bì xịn xò, quả thực là món quà tuyệt vời cho người yêu cà phê."
+        ]
+      }
+    },
+    "features": {
+      "tool": {
+        "warranty": { "title": "Bảo hành 2 năm", "desc": "Đổi trả miễn phí" },
+        "safety": { "title": "Chứng nhận An toàn", "desc": "Thép không gỉ 304" },
+        "quality": { "title": "Kiểm định Chất lượng", "desc": "Độ chính xác ±0.1mm" }
+      },
+      "coffee": {
+        "shipping": { "title": "Giao hàng Ưu tiên", "desc": "Xử lý trong 24h" },
+        "quality": { "title": "Cam kết Chất lượng", "desc": "100% Nguyên chất" },
+        "flexible": { "title": "Linh hoạt", "desc": "Hủy gói bất kỳ lúc nào" }
+      }
+    },
+    "subscribe": {
+      "recommended": "KHUYÊN DÙNG",
+      "title": "Đăng ký Định kỳ",
+      "save": "Tiết kiệm 15% mỗi kỳ",
+      "perks": {
+        "freeShipping": "Miễn phí vận chuyển tận nhà",
+        "latestBatch": "Nhận ưu đãi cho lô hàng mới nhất"
+      }
     },
     "stats": {
       "purchased": "{{countText}} Đã mua",

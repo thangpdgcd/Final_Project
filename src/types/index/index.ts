@@ -123,6 +123,11 @@ export interface Order {
   shipping_Address?: string;
   paymentMethod?: string;
   paypalCaptureId?: string | null;
+  payment_method?: string | null;
+  payment_status?: string | null;
+  payment_provider?: string | null;
+  payment_ref?: string | null;
+  paid_at?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -135,6 +140,11 @@ export interface CreateOrderPayload {
   shippingMethod?: 'standard' | 'express' | string;
   paymentMethod?: string;
   paypalCaptureId?: string | null;
+  payment_method?: string;
+  payment_status?: string;
+  payment_provider?: string;
+  payment_ref?: string;
+  paid_at?: string;
   note?: string;
   items?: Array<{
     product_ID?: number;

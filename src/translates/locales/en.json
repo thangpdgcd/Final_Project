@@ -638,6 +638,21 @@
       "saveChangesCaps": "SAVE CHANGES",
       "editProfileCaps": "EDIT PROFILE"
     },
+    "security": {
+      "sectionTitle": "SECURITY",
+      "oldPasswordLabel": "OLD PASSWORD",
+      "newPasswordLabel": "NEW PASSWORD",
+      "confirmNewPasswordLabel": "CONFIRM NEW PASSWORD",
+      "oldPasswordPlaceholder": "Enter your current password...",
+      "newPasswordPlaceholder": "Enter a new password...",
+      "confirmNewPasswordPlaceholder": "Re-enter the new password...",
+      "submitCaps": "CHANGE PASSWORD",
+      "success": "Password updated successfully!",
+      "error": "Failed to change password",
+      "required": "Please fill in all password fields.",
+      "tooShort": "New password must be at least 6 characters.",
+      "mismatch": "Confirm password does not match."
+    },
     "orders": {
       "apiNotAvailableHint": "Orders API is not available on the backend for this account.",
       "productInfoPending": "Processing product information...",
@@ -895,7 +910,38 @@
     "reviews": {
       "title": "Customer reviews",
       "average": "{{score}} average",
-      "verifiedBuyer": "VERIFIED BUYER"
+      "verifiedBuyer": "VERIFIED BUYER",
+      "samples": {
+        "tool": [
+          "The dripper is precise—coffee flows evenly and tastes noticeably better. Thick steel build feels very durable.",
+          "Elegant design, no rust after months of use. Worth investing in good brewing gear."
+        ],
+        "coffee": [
+          "Super aromatic with a bold taste that fits me perfectly. The subscription plan is very convenient!",
+          "Great packaging—an excellent gift for coffee lovers."
+        ]
+      }
+    },
+    "features": {
+      "tool": {
+        "warranty": { "title": "2-year warranty", "desc": "Free returns/exchanges" },
+        "safety": { "title": "Safety certified", "desc": "304 stainless steel" },
+        "quality": { "title": "Quality inspected", "desc": "Precision ±0.1mm" }
+      },
+      "coffee": {
+        "shipping": { "title": "Priority shipping", "desc": "Processed within 24h" },
+        "quality": { "title": "Quality guarantee", "desc": "100% pure" },
+        "flexible": { "title": "Flexible", "desc": "Cancel anytime" }
+      }
+    },
+    "subscribe": {
+      "recommended": "RECOMMENDED",
+      "title": "Subscription",
+      "save": "Save 15% each delivery",
+      "perks": {
+        "freeShipping": "Free home delivery",
+        "latestBatch": "Get perks on the latest batch"
+      }
     },
     "stats": {
       "purchased": "{{countText}} purchased",
