@@ -1,25 +1,44 @@
 import React from 'react'
-import { GoogleLogin } from '@react-oauth/google'
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google'
 
 export const GoogleButton = ({ onToken, loading, disabled, className = '', containerRef }) => {
+  const clientId = String(import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '').trim()
+
+  // If the environment is missing the client id, don't render GoogleLogin
+  // (it would crash outside GoogleOAuthProvider). Keep the button area inert.
+  if (!clientId) {
+    return (
+      <div ref={containerRef} className={`relative inline-flex ${className}`}>
+        <div className="pointer-events-none opacity-60">
+          <div
+            aria-hidden="true"
+            className="h-[40px] w-[40px] rounded-full border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div ref={containerRef} className={`relative inline-flex ${className}`}>
       <div className={disabled ? 'pointer-events-none opacity-60' : ''}>
-        <GoogleLogin
-          onSuccess={(credentialResponse) => {
-            const token = credentialResponse?.credential
-            onToken?.(token)
-          }}
-          onError={() => {
-            onToken?.(null)
-          }}
-          useOneTap={false}
-          theme="outline"
-          size="large"
-          type="icon"
-          shape="circle"
-          locale="vi"
-        />
+        <GoogleOAuthProvider clientId={clientId}>
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              const token = credentialResponse?.credential
+              onToken?.(token)
+            }}
+            onError={() => {
+              onToken?.(null)
+            }}
+            useOneTap={false}
+            theme="outline"
+            size="large"
+            type="icon"
+            shape="circle"
+            locale="vi"
+          />
+        </GoogleOAuthProvider>
       </div>
 
       {loading ? (
