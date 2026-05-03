@@ -6,7 +6,7 @@ const toUserId = (socket) => socket.data?.userId ?? socket.data?.user?.id;
 
 const normalizeType = (raw) => {
   const t = String(raw ?? "").trim().toLowerCase();
-  if (t === "order" || t === "chat" || t === "system" || t === "voucher") return t;
+  if (t === "order" || t === "chat" || t === "system" || t === "voucher" || t === "email") return t;
   return "system";
 };
 

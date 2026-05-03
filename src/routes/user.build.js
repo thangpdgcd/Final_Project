@@ -5,6 +5,8 @@ import { sendError } from "../utils/response.js";
 import { createUserRepository } from "../services/user.repository.js";
 import { createUserService } from "../services/user.service.js";
 import { createUserController } from "../controllers/user.controller.js";
+import { createStaffEmailService } from "../services/staffEmail.service.js";
+import { createStaffEmailController } from "../controllers/staffEmail.controller.js";
 
 export const buildUserRouter = () => {
   const router = express.Router();
@@ -12,6 +14,8 @@ export const buildUserRouter = () => {
   const userRepository = createUserRepository();
   const userService = createUserService({ userRepository });
   const userController = createUserController({ userService });
+  const staffEmailService = createStaffEmailService();
+  const staffEmailController = createStaffEmailController({ staffEmailService });
   const uploadAvatar = (req, res, next) => {
     uploadCloud.single("file")(req, res, (err) => {
       if (!err) return next();
@@ -39,6 +43,10 @@ export const buildUserRouter = () => {
     userController.getWalletTransactions,
   );
   router.post("/wallet/topup", authMiddleware, userController.topupWallet);
+
+  // Staff emails (in-app inbox for the current user)
+  router.get("/users/me/staff-emails", authMiddleware, staffEmailController.getMyStaffEmails);
+  router.patch("/users/me/staff-emails/:id/read", authMiddleware, staffEmailController.markRead);
 
   return router;
 };

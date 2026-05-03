@@ -4,11 +4,14 @@ import models from "../models/index.js";
 import { setUserAvatar, getUserAvatar } from "../utils/userAvatar.js";
 import { createVoucherAdminService } from "./voucherAdmin.service.js";
 import { promoVoucherService } from "./promoVoucher.service.js";
+import { createNotificationService } from "./notification.service.js";
+import { emitNotificationToUser } from "../infrastructure/socket/notificationEmitter.js";
 
 const voucherAdmin = createVoucherAdminService();
 
 export const createStaffService = ({ staffRepository }) => {
-  const { Users, Orders } = models;
+  const { Users, Orders, StaffEmails } = models;
+  const notificationService = createNotificationService();
 
   const normalizeRole = (raw) => {
     const r = String(raw ?? "").trim().toLowerCase();
@@ -304,16 +307,43 @@ export const createStaffService = ({ staffRepository }) => {
   };
 
   const sendEmailToUser = async ({ staffId, toUserId, subject, content }) => {
-    // Mock provider: log and return OK. Can be replaced with nodemailer later.
+    if (!StaffEmails) throw new AppError("StaffEmails model is not initialized", 500);
     if (!toUserId) throw new AppError("toUserId is required", 400);
     if (!subject || !content) throw new AppError("subject and content are required", 400);
-    return {
-      ok: true,
-      provider: "mock",
-      fromStaffId: Number(staffId),
-      toUserId: Number(toUserId),
-      subject: String(subject),
-    };
+
+    const fromStaffId = Number(staffId);
+    const uid = Number(toUserId);
+    if (!Number.isFinite(fromStaffId) || fromStaffId <= 0) throw new AppError("Invalid staffId", 400);
+    if (!Number.isFinite(uid) || uid <= 0) throw new AppError("Invalid toUserId", 400);
+
+    const user = await Users.findByPk(uid);
+    if (!user) throw new AppError("User not found", 404);
+    const toEmail = String(user.email ?? "").trim();
+    if (!toEmail) throw new AppError("User email not found", 400);
+
+    const row = await StaffEmails.create({
+      toUserId: uid,
+      fromStaffId,
+      toEmail,
+      subject: String(subject).trim(),
+      content: String(content).trim(),
+      status: "sent",
+    });
+
+    // Create a notification (realtime + stored) for the user.
+    try {
+      const noti = await notificationService.create({
+        userId: uid,
+        type: "email",
+        message: `Email from staff: ${String(subject).trim()}`,
+      });
+      emitNotificationToUser({ userId: uid, notification: noti });
+    } catch {
+      // Non-blocking: email record is the source of truth.
+    }
+
+    const plain = typeof row.toJSON === "function" ? row.toJSON() : row;
+    return { ok: true, email: plain };
   };
 
   return {

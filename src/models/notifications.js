@@ -29,7 +29,7 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
       },
       type: {
-        type: DataTypes.ENUM("order", "chat", "system", "voucher"),
+        type: DataTypes.ENUM("order", "chat", "system", "voucher", "email"),
         allowNull: false,
         defaultValue: "system",
       },
