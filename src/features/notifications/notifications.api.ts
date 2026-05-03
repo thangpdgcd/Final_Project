@@ -22,6 +22,7 @@ const normalizeType = (v: unknown): NotificationType => {
   if (t === 'success' || t === 'warning' || t === 'error' || t === 'info') return t;
   if (t.includes('order')) return 'order';
   if (t.includes('promo') || t.includes('sale')) return 'promo';
+  if (t.includes('email')) return 'email';
   if (t) return 'system';
   return 'info';
 };

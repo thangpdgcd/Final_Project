@@ -77,6 +77,9 @@ const NotificationBell: React.FC<Props> = ({ className = '' }) => {
           if (n?.type === 'order' && Number.isFinite(orderId) && orderId > 0) {
             navigate(`/profile?tab=orders&orderId=${orderId}`);
           }
+          if (n?.type === 'email') {
+            navigate(`/profile?tab=profile&section=staffEmails`);
+          }
         }}
       />
     </div>

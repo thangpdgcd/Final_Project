@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, Info, AlertTriangle, XCircle, ShoppingBag, Sparkles } from 'lucide-react';
+import { CheckCircle2, Info, AlertTriangle, XCircle, ShoppingBag, Sparkles, Mail } from 'lucide-react';
 import type { AppNotification } from '@/features/notifications/types';
 import { formatTimeAgo } from '@/features/notifications/lib/time';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,8 @@ const typeIcon = (type: AppNotification['type']) => {
       return <ShoppingBag size={16} className="text-sky-500" />;
     case 'promo':
       return <Sparkles size={16} className="text-fuchsia-500" />;
+    case 'email':
+      return <Mail size={16} className="text-indigo-500" />;
     case 'system':
       return <Info size={16} className="text-stone-400" />;
     default:

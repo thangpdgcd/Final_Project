@@ -42,6 +42,7 @@ import {
 import type { Order, Product } from '@/types/index';
 import { useEffectiveUserId } from '@/hooks/usereffectiveuserids/useEffectiveUserId';
 import { useVoucherVaultStore } from '@/features/voucher/store/useVoucherVaultStore';
+import { staffEmailsApi, type StaffEmail } from '@/features/staffEmails/staffEmails.api';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -245,6 +246,22 @@ const ProfilePage: React.FC = () => {
   const [topupButtonRendered, setTopupButtonRendered] = useState(false);
   const topupPaypalRef = useRef<HTMLDivElement | null>(null);
   const topupRenderedRef = useRef(false);
+
+  // ── Staff emails inbox ───────────────────────────────────────────────────
+  const [staffEmails, setStaffEmails] = useState<StaffEmail[]>([]);
+  const [staffEmailsLoading, setStaffEmailsLoading] = useState(false);
+
+  const fetchStaffEmails = async () => {
+    try {
+      setStaffEmailsLoading(true);
+      const res = await staffEmailsApi.listMine({ limit: 50, offset: 0 });
+      setStaffEmails(Array.isArray(res?.items) ? res.items : []);
+    } catch {
+      setStaffEmails([]);
+    } finally {
+      setStaffEmailsLoading(false);
+    }
+  };
 
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -776,6 +793,12 @@ const ProfilePage: React.FC = () => {
   }, [currentTab, user?.user_ID]);
 
   useEffect(() => {
+    if (currentTab !== 'profile') return;
+    if (currentSection !== 'staffEmails') return;
+    void fetchStaffEmails();
+  }, [currentTab, currentSection, user?.user_ID]);
+
+  useEffect(() => {
     const w = window as any;
     if (
       !topupModalOpen ||
@@ -973,6 +996,13 @@ const ProfilePage: React.FC = () => {
         label: t('profile.sideNav.account'),
         tab: 'profile' as const,
         section: 'identity' as const,
+      },
+      {
+        key: 'staffEmails',
+        icon: <Bell size={14} />,
+        label: 'Email từ staff',
+        tab: 'profile' as const,
+        section: 'staffEmails' as const,
       },
       {
         key: 'orders',
@@ -1409,6 +1439,119 @@ const ProfilePage: React.FC = () => {
                                 <Trash2 size={16} />
                                 XÓA
                               </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </>
+                ) : currentSection === 'staffEmails' ? (
+                  <>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h2
+                          style={{
+                            fontFamily: "'Manrope', sans-serif",
+                            color: T.onSurface,
+                            fontWeight: 800,
+                            fontSize: '0.9rem',
+                            letterSpacing: '0.1em',
+                            opacity: 0.8,
+                          }}
+                        >
+                          Email từ staff
+                        </h2>
+                        <p className="mt-2 text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
+                          Các email staff gửi cho bạn sẽ được lưu ở đây.
+                        </p>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => void fetchStaffEmails()}
+                          style={{
+                            color: T.onSurfaceVariant,
+                            border: `1px solid ${T.onSurface}15`,
+                            fontFamily: "'Manrope', sans-serif",
+                            fontWeight: 700,
+                            fontSize: '0.72rem',
+                            letterSpacing: '0.06em',
+                            borderRadius: '0.75rem',
+                            background: 'transparent',
+                          }}
+                          className="px-4 py-2.5"
+                        >
+                          TẢI LẠI
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 space-y-3">
+                      {staffEmailsLoading ? (
+                        <div className="text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
+                          {t('common.loading')}
+                        </div>
+                      ) : staffEmails.length === 0 ? (
+                        <div
+                          style={{
+                            background: T.surfaceLowest,
+                            border: `1px solid ${T.onSurface}12`,
+                          }}
+                          className="rounded-2xl p-6 text-center"
+                        >
+                          <div className="text-sm font-semibold" style={{ color: T.onSurface }}>
+                            Chưa có email
+                          </div>
+                          <div className="mt-2 text-xs" style={{ color: `${T.onSurfaceVariant}` }}>
+                            Khi staff gửi email, nội dung sẽ xuất hiện tại đây.
+                          </div>
+                        </div>
+                      ) : (
+                        staffEmails.map((e) => (
+                          <div
+                            key={String(e.id)}
+                            style={{ background: T.surfaceLowest, border: `1px solid ${T.onSurface}12` }}
+                            className="rounded-2xl p-4"
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="text-sm font-semibold" style={{ color: T.onSurface }}>
+                                  {e.subject}
+                                </div>
+                                <div className="mt-1 text-xs" style={{ color: `${T.onSurfaceVariant}` }}>
+                                  {e.createdAt ? new Date(e.createdAt).toLocaleString() : ''}
+                                  {e.readAt ? ' • Đã đọc' : ' • Chưa đọc'}
+                                </div>
+                              </div>
+                              {!e.readAt ? (
+                                <button
+                                  type="button"
+                                  onClick={async () => {
+                                    try {
+                                      await staffEmailsApi.markRead(e.id);
+                                    } finally {
+                                      void fetchStaffEmails();
+                                    }
+                                  }}
+                                  style={{
+                                    background: `linear-gradient(135deg, ${T.gold}, ${T.goldDeep})`,
+                                    color: T.surfaceLowest,
+                                    fontFamily: "'Manrope', sans-serif",
+                                    fontWeight: 800,
+                                    fontSize: '0.72rem',
+                                    letterSpacing: '0.08em',
+                                    borderRadius: '0.75rem',
+                                    boxShadow: `0 8px 24px -10px ${T.gold}60`,
+                                  }}
+                                  className="px-3 py-2.5"
+                                >
+                                  ĐÁNH DẤU ĐÃ ĐỌC
+                                </button>
+                              ) : null}
+                            </div>
+                            <div className="mt-3 whitespace-pre-wrap text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
+                              {e.content}
                             </div>
                           </div>
                         ))

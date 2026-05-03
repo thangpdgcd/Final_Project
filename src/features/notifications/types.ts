@@ -5,6 +5,7 @@ export type NotificationType =
   | 'error'
   | 'order'
   | 'promo'
+  | 'email'
   | 'system';
 
 export type AppNotification = {
