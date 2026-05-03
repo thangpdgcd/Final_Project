@@ -9,6 +9,18 @@ import { emitNotificationToUser } from "../infrastructure/socket/notificationEmi
 
 const voucherAdmin = createVoucherAdminService();
 
+const VIET_CHARS_RE = /[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđĐ]/;
+
+/** Heuristic: vi = có dấu/mẫu tự Việt; mixed = vi + từ Latin; else en */
+const detectStaffEmailContentLocale = (subject, content) => {
+  const blob = `${String(subject ?? "")}\n${String(content ?? "")}`;
+  const hasVi = VIET_CHARS_RE.test(blob);
+  const hasEn = /[A-Za-z]{2,}/.test(blob);
+  if (hasVi && hasEn) return "mixed";
+  if (hasVi) return "vi";
+  return "en";
+};
+
 export const createStaffService = ({ staffRepository }) => {
   const { Users, Orders, StaffEmails } = models;
   const notificationService = createNotificationService();
@@ -321,21 +333,28 @@ export const createStaffService = ({ staffRepository }) => {
     const toEmail = String(user.email ?? "").trim();
     if (!toEmail) throw new AppError("User email not found", 400);
 
+    const subjTrim = String(subject).trim();
+    const bodyTrim = String(content).trim();
+    const contentLocale = detectStaffEmailContentLocale(subjTrim, bodyTrim);
+
     const row = await StaffEmails.create({
       toUserId: uid,
       fromStaffId,
       toEmail,
-      subject: String(subject).trim(),
-      content: String(content).trim(),
+      subject: subjTrim,
+      content: bodyTrim,
       status: "sent",
+      contentLocale,
     });
 
     // Create a notification (realtime + stored) for the user.
     try {
+      const localeTag =
+        contentLocale === "vi" ? " [VI]" : contentLocale === "mixed" ? " [VI+EN]" : "";
       const noti = await notificationService.create({
         userId: uid,
         type: "email",
-        message: `Email from staff: ${String(subject).trim()}`,
+        message: `Email from staff${localeTag}: ${subjTrim}`,
       });
       emitNotificationToUser({ userId: uid, notification: noti });
     } catch {

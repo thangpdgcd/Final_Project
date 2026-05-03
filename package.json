@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "node --test src/**/*.test.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "db:migrate": "sequelize-cli db:migrate --config src/config/config.cjs --migrations-path src/migrations",
+    "db:migrate:status": "sequelize-cli db:migrate:status --config src/config/config.cjs --migrations-path src/migrations"
   },
   "keywords": [],
   "author": "",

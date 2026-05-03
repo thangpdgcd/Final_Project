@@ -57,6 +57,11 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: "sent",
       },
+      contentLocale: {
+        type: DataTypes.STRING(8),
+        allowNull: true,
+        field: "content_locale",
+      },
     },
     {
       sequelize,
