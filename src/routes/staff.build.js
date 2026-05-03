@@ -24,13 +24,13 @@ export const buildStaffRouter = () => {
   router.post("/create-users", ...guard, staffController.createAdmin);
   router.put("/users/:id", ...guard, staffController.updateUsers);
   router.delete("/users/:id", ...guard, staffController.deleteUsers);
-  // Only admin can create vouchers
-  router.post("/staff/voucher/create", ...adminGuard, staffController.createManualVoucher);
+  // Staff/Admin can create manual voucher (BE will enforce "new user" for staff)
+  router.post("/staff/voucher/create", ...guard, staffController.createManualVoucher);
 
-  // Voucher view (staff/admin) + CRUD (admin only)
+  // Voucher view (staff/admin) + CRUD (staff/admin) — promo vouchers are managed via /api/admin/vouchers
   router.get("/staff/vouchers", ...guard, staffController.listVouchers);
-  router.put("/staff/vouchers/:id", ...adminGuard, staffController.updateVoucher);
-  router.delete("/staff/vouchers/:id", ...adminGuard, staffController.deleteVoucher);
+  router.put("/staff/vouchers/:id", ...guard, staffController.updateVoucher);
+  router.delete("/staff/vouchers/:id", ...guard, staffController.deleteVoucher);
 
   // Profile
   router.get("/staff/profile", ...guard, staffController.getProfile);

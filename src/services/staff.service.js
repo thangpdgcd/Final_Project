@@ -8,7 +8,45 @@ import { promoVoucherService } from "./promoVoucher.service.js";
 const voucherAdmin = createVoucherAdminService();
 
 export const createStaffService = ({ staffRepository }) => {
-  const { Users } = models;
+  const { Users, Orders } = models;
+
+  const normalizeRole = (raw) => {
+    const r = String(raw ?? "").trim().toLowerCase();
+    if (!r) return null;
+    if (r === "staff" || r === "3") return "staff";
+    if (r === "admin" || r === "2") return "admin";
+    if (r === "customer" || r === "user" || r === "1") return "customer";
+    return null;
+  };
+
+  const envNumber = (name, fallback) => {
+    const raw = process.env[name];
+    if (raw == null || raw === "") return fallback;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : fallback;
+  };
+
+  const isNewUser = async ({ userId }) => {
+    const uid = Number(userId);
+    if (!Number.isInteger(uid) || uid <= 0) throw new AppError("userId must be a positive integer", 400);
+
+    const user = await Users.findByPk(uid);
+    if (!user) throw new AppError("No user exists with this userId", 404);
+
+    // Condition 1: has no orders
+    const ordersCount = await Orders.count({ where: { userId: uid } });
+    if (ordersCount > 0) return { ok: false, reason: "has_orders" };
+
+    // Condition 2: created recently (default: 7 days)
+    const days = envNumber("NEW_USER_DAYS", 7);
+    const createdAt = user.createdAt ? new Date(user.createdAt).getTime() : 0;
+    if (createdAt) {
+      const ageDays = (Date.now() - createdAt) / (1000 * 60 * 60 * 24);
+      if (ageDays > days) return { ok: false, reason: "too_old" };
+    }
+
+    return { ok: true };
+  };
 
   const getAllUsers = async () => {
     return staffRepository.listUsers();
@@ -83,9 +121,21 @@ export const createStaffService = ({ staffRepository }) => {
     return null;
   };
 
-  const createManualVoucher = async ({ voucherService, userId, type, value, staffId }) => {
+  const createManualVoucher = async ({ voucherService, userId, type, value, staffId, staffRole }) => {
     if (!voucherService) throw new AppError("Voucher service not configured", 500);
     if (!userId) throw new AppError("userId is required", 400);
+    const role = normalizeRole(staffRole);
+    if (!role) throw new AppError("Unauthorized", 401);
+
+    // Staff is limited: can create manual voucher ONLY for new users.
+    if (role === "staff") {
+      const verdict = await isNewUser({ userId });
+      if (!verdict.ok) {
+        throw new AppError("Staff can only create vouchers for new users", 403);
+      }
+    }
+
+    // Admin can create for anyone.
     return voucherService.createManualVoucher({ userId, type, value, staffId });
   };
 
@@ -157,7 +207,10 @@ export const createStaffService = ({ staffRepository }) => {
     });
   };
 
-  const deleteVoucher = async ({ id }) => voucherAdmin.softDeleteVoucher({ id });
+  const deleteVoucher = async ({ id, staffId }) => {
+    void staffId;
+    return voucherAdmin.softDeleteVoucher({ id });
+  };
 
   const getStaffProfile = async ({ staffId }) => {
     const id = Number(staffId);

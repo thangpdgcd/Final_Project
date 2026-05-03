@@ -63,15 +63,19 @@ const buildUserContext = async (decoded) => {
 
   const user = await Users.findByPk(id);
   const dbRoleID = user?.roleID != null ? String(user.roleID) : null;
-  const role = fromTokenRole ?? roleIDToRole(dbRoleID);
+  const dbRole = roleIDToRole(dbRoleID);
+  /** DB là nguồn đúng nhất sau khi đăng nhập (JWT có thể stale nếu đổi role / refresh cũ). */
+  const role = dbRole ?? fromTokenRole ?? roleIDToRole(decoded?.roleID);
   if (!role) return null;
   let email = decoded?.email ?? null;
   if (!email) email = user?.email ?? null;
 
   let roleID =
-    decoded?.roleID != null && decoded.roleID !== ""
-      ? String(decoded.roleID)
-      : null;
+    dbRoleID && String(dbRoleID).trim() !== ""
+      ? String(dbRoleID).trim()
+      : decoded?.roleID != null && decoded.roleID !== ""
+        ? String(decoded.roleID)
+        : null;
   if (!roleID) roleID = roleToRoleID(role) ?? dbRoleID;
 
   const avatar = await getUserAvatar(id);

@@ -58,6 +58,7 @@ export const createStaffController = ({ staffService, voucherService, orderServi
     try {
       const { userId, type, value } = req.body ?? {};
       const staffId = req.user?.id;
+      const staffRole = req.user?.role ?? req.user?.roleID;
       if (!userId) return sendError(res, 400, "userId is required", null);
 
       const voucher = await staffService.createManualVoucher({
@@ -66,6 +67,7 @@ export const createStaffController = ({ staffService, voucherService, orderServi
         type,
         value,
         staffId,
+        staffRole,
       });
 
       return sendSuccess(
@@ -100,7 +102,8 @@ export const createStaffController = ({ staffService, voucherService, orderServi
   const updateVoucher = async (req, res) => {
     try {
       const id = req.params.id;
-      const data = await staffService.updateVoucher({ id, patch: req.body });
+      const staffId = req.user?.id;
+      const data = await staffService.updateVoucher({ id, patch: req.body, staffId });
       return sendSuccess(res, 200, data, "OK");
     } catch (error) {
       const status = Number(error?.statusCode || error?.status) || 500;
@@ -111,7 +114,7 @@ export const createStaffController = ({ staffService, voucherService, orderServi
   const deleteVoucher = async (req, res) => {
     try {
       const id = req.params.id;
-      await staffService.deleteVoucher({ id });
+      await staffService.deleteVoucher({ id, staffId: req.user?.id });
       return sendSuccess(res, 200, null, "OK");
     } catch (error) {
       const status = Number(error?.statusCode || error?.status) || 500;
