@@ -16,10 +16,22 @@ export const createStaffRepository = () => {
   };
 
   /** Lite list for dropdowns (fast, no joins). */
-  const listUsersLite = async () => {
+  const listUsersLite = async ({ roleID, limit } = {}) => {
+    const where = {};
+    if (roleID != null && String(roleID).trim() !== "") {
+      // Accept semantic variants too (legacy)
+      const r = String(roleID).trim().toLowerCase();
+      if (r === "1" || r === "customer" || r === "user") where.roleID = { [Op.in]: ["1", "user", "customer"] };
+      else if (r === "2" || r === "admin") where.roleID = { [Op.in]: ["2", "admin"] };
+      else if (r === "3" || r === "staff") where.roleID = { [Op.in]: ["3", "staff"] };
+      else where.roleID = String(roleID).trim();
+    }
+    const lim = Math.min(2000, Math.max(1, Math.trunc(Number(limit || 500))));
     return Users.findAll({
+      where,
       attributes: ["userId", "name", "email", "roleID"],
       order: [["name", "ASC"]],
+      limit: lim,
     });
   };
 

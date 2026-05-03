@@ -52,8 +52,8 @@ export const createStaffService = ({ staffRepository }) => {
     return staffRepository.listUsers();
   };
 
-  const getAllUsersLite = async () => {
-    return staffRepository.listUsersLite();
+  const getAllUsersLite = async ({ roleID, limit } = {}) => {
+    return staffRepository.listUsersLite({ roleID, limit });
   };
 
   /** List users by role for internal chat (e.g. admins roleID "2", staff "3"). */

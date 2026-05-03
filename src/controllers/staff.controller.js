@@ -7,7 +7,10 @@ export const createStaffController = ({ staffService, voucherService, orderServi
         String(req.query?.lite ?? "").toLowerCase() === "true" ||
         String(req.query?.lite ?? "") === "1";
       const data = lite
-        ? await staffService.getAllUsersLite()
+        ? await staffService.getAllUsersLite({
+            roleID: req.query?.role ?? req.query?.roleID ?? null,
+            limit: req.query?.limit ?? null,
+          })
         : await staffService.getAllUsers();
       return sendSuccess(res, 200, data, "OK");
     } catch (error) {
