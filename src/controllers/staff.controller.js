@@ -3,7 +3,12 @@ import { sendSuccess, sendError } from "../utils/response.js";
 export const createStaffController = ({ staffService, voucherService, orderService }) => {
   const getAllUsers = async (req, res) => {
     try {
-      const data = await staffService.getAllUsers();
+      const lite =
+        String(req.query?.lite ?? "").toLowerCase() === "true" ||
+        String(req.query?.lite ?? "") === "1";
+      const data = lite
+        ? await staffService.getAllUsersLite()
+        : await staffService.getAllUsers();
       return sendSuccess(res, 200, data, "OK");
     } catch (error) {
       const status = Number(error?.statusCode || error?.status) || 500;

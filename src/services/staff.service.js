@@ -52,6 +52,10 @@ export const createStaffService = ({ staffRepository }) => {
     return staffRepository.listUsers();
   };
 
+  const getAllUsersLite = async () => {
+    return staffRepository.listUsersLite();
+  };
+
   /** List users by role for internal chat (e.g. admins roleID "2", staff "3"). */
   const listUsersByRoleId = async (roleID) => {
     const safe = String(roleID ?? "").trim();
@@ -266,6 +270,7 @@ export const createStaffService = ({ staffRepository }) => {
 
   return {
     getAllUsers,
+    getAllUsersLite,
     listUsersByRoleId,
     getUserById,
     createUser,

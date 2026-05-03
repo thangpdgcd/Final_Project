@@ -15,6 +15,14 @@ export const createStaffRepository = () => {
     });
   };
 
+  /** Lite list for dropdowns (fast, no joins). */
+  const listUsersLite = async () => {
+    return Users.findAll({
+      attributes: ["userId", "name", "email", "roleID"],
+      order: [["name", "ASC"]],
+    });
+  };
+
   const findUserById = async (id) => Users.findByPk(id);
 
   const findUserByEmail = async (email) => Users.findOne({ where: { email } });
@@ -56,6 +64,7 @@ export const createStaffRepository = () => {
 
   return {
     listUsers,
+    listUsersLite,
     listUsersByRoleId,
     findUserById,
     findUserByEmail,
