@@ -108,20 +108,21 @@ export const createVoucherService = () => {
           { transaction: tx },
         );
 
-        // Notify staff/admin that a voucher was created (per-user notifications, no broadcast)
+        // Notifications should never block voucher creation.
+        // On large datasets, querying all staff/admin accounts can be slow on hosted DBs.
+        // Keep it lightweight: notify the creator only, and fire-and-forget.
         try {
-          const staffAdmins = await Users.findAll({
-            where: { roleID: { [models.Sequelize.Op.in]: ["2", "3"] } },
-            attributes: ["userId"],
-            raw: true,
-          });
-          const ids = staffAdmins.map((u) => u.userId);
-          const rows = await notificationService.createForUsers({
-            userIds: ids,
-            type: "voucher",
-            message: `Voucher created for user #${uid}`,
-          });
-          emitNotificationsToUsers({ userIds: ids, notifications: rows });
+          const notifyUserIds = [sid];
+          void notificationService
+            .createForUsers({
+              userIds: notifyUserIds,
+              type: "voucher",
+              message: `Voucher created for user #${uid}`,
+            })
+            .then((rows) => {
+              emitNotificationsToUsers({ userIds: notifyUserIds, notifications: rows });
+            })
+            .catch(() => {});
         } catch {}
 
         return voucher;
