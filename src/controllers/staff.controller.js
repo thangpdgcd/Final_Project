@@ -99,8 +99,8 @@ export const createStaffController = ({ staffService, voucherService, orderServi
 
   const listVouchers = async (req, res) => {
     try {
-      const { q, userId, page, pageSize } = req.query ?? {};
-      const data = await staffService.listVouchers({ q, userId, page, pageSize });
+      const { q, userId, page, pageSize, lite, includePromo } = req.query ?? {};
+      const data = await staffService.listVouchers({ q, userId, page, pageSize, lite, includePromo });
       return sendSuccess(res, 200, data, "OK");
     } catch (error) {
       const status = Number(error?.statusCode || error?.status) || 500;

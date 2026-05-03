@@ -159,13 +159,17 @@ export const createVoucherAdminService = () => {
 
     const { where } = buildListWhere(query);
 
+    const lite =
+      String(query.lite ?? "").toLowerCase() === "true" ||
+      String(query.lite ?? "") === "1";
+
     const { rows, count } = await Vouchers.findAndCountAll({
       where,
-      include: includeAssociations,
+      include: lite ? [] : includeAssociations,
       order: [["createdAt", "DESC"]],
       limit: pageSize,
       offset,
-      distinct: true,
+      distinct: !lite,
     });
 
     return {

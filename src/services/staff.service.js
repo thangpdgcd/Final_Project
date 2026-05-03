@@ -155,7 +155,18 @@ export const createStaffService = ({ staffRepository }) => {
   };
 
   const listVouchers = async (params = {}) => {
-    const { q, userId, page = 1, pageSize = 20, status, dateFrom, dateTo, includeInactive } = params;
+    const {
+      q,
+      userId,
+      page = 1,
+      pageSize = 20,
+      status,
+      dateFrom,
+      dateTo,
+      includeInactive,
+      lite,
+      includePromo,
+    } = params;
     const manual = await voucherAdmin.listVouchers({
       page,
       pageSize,
@@ -165,42 +176,68 @@ export const createStaffService = ({ staffRepository }) => {
       dateFrom,
       dateTo,
       includeInactive,
+      lite,
     });
 
-    // Merge in admin promo vouchers (promo_vouchers table).
-    // Staff cannot create promo vouchers, but should be able to view + send codes to customers.
-    const promo = await promoVoucherService.list({
-      q,
-      page,
-      pageSize,
-      // Align with "all" behavior by default.
-      status: "all",
-    });
-
-    const promoMapped = (promo?.items ?? []).map((v) => ({
-      id: `promo:${v.id}`,
+    // Normalize manual vouchers to staff frontend shape.
+    const manualItems = (manual?.items ?? []).map((v) => ({
+      id: v.id,
       code: v.code,
-      userId: v.applicableUsers === "specific" ? "specific" : v.applicableUsers ?? "all",
-      type: v.discountType === "percentage" ? "percent" : v.discountType === "fixed" ? "fixed" : v.discountType,
-      value: v.discountValue,
-      expiresAt: v.endDate ?? null,
-      status: v.isActive ? "active" : "inactive",
-      source: "promo",
-      meta: {
-        applicableUsers: v.applicableUsers,
-        specificUsers: v.specificUsers,
-        startDate: v.startDate,
-        endDate: v.endDate,
-        expired: v.expired,
-      },
+      userId: v.user_id ?? null,
+      type: v.discount_type ?? null,
+      value: v.discount_value ?? null,
+      expiresAt: v.expired_at ?? null,
+      status: v.record_status ?? v.display_status ?? "active",
+      source: "manual",
+      meta: v,
     }));
 
-    const manualItems = (manual?.items ?? []).map((v) => ({ ...v, source: v?.source ?? "manual" }));
+    const includePromoBool =
+      String(includePromo ?? "true").toLowerCase() === "true" ||
+      String(includePromo ?? "") === "1";
+
+    let promoMapped = [];
+    let promoTotal = 0;
+    if (includePromoBool) {
+      // Merge in admin promo vouchers (promo_vouchers table).
+      // Staff cannot create promo vouchers, but should be able to view + send codes to customers.
+      const promo = await promoVoucherService.list({
+        q,
+        page,
+        pageSize,
+        // Align with "all" behavior by default.
+        status: "all",
+      });
+      promoTotal = Number(promo?.total ?? 0);
+      promoMapped = (promo?.items ?? []).map((v) => ({
+        id: `promo:${v.id}`,
+        code: v.code,
+        userId: v.applicableUsers === "specific" ? "specific" : v.applicableUsers ?? "all",
+        type:
+          v.discountType === "percentage"
+            ? "percent"
+            : v.discountType === "fixed"
+              ? "fixed"
+              : v.discountType,
+        value: v.discountValue,
+        expiresAt: v.endDate ?? null,
+        status: v.isActive ? "active" : "inactive",
+        source: "promo",
+        meta: {
+          applicableUsers: v.applicableUsers,
+          specificUsers: v.specificUsers,
+          startDate: v.startDate,
+          endDate: v.endDate,
+          expired: v.expired,
+        },
+      }));
+    }
+
     const merged = [...manualItems, ...promoMapped];
 
     return {
       items: merged,
-      total: Number(manual?.total ?? 0) + Number(promo?.total ?? 0),
+      total: Number(manual?.total ?? 0) + promoTotal,
       page: Number(page),
       pageSize: Number(pageSize),
     };
