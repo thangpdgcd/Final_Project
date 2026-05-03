@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
 import models from "../models/index.js";
 
-const { Users, Orders } = models;
+const { Users, Orders, sequelize } = models;
 
 export const createStaffRepository = () => {
   const listUsers = async () => {
@@ -16,7 +16,7 @@ export const createStaffRepository = () => {
   };
 
   /** Lite list for dropdowns (fast, no joins). */
-  const listUsersLite = async ({ roleID, limit } = {}) => {
+  const listUsersLite = async ({ roleID, limit, createdAfter, excludeOrdered } = {}) => {
     const where = {};
     if (roleID != null && String(roleID).trim() !== "") {
       // Accept semantic variants too (legacy)
@@ -25,6 +25,18 @@ export const createStaffRepository = () => {
       else if (r === "2" || r === "admin") where.roleID = { [Op.in]: ["2", "admin"] };
       else if (r === "3" || r === "staff") where.roleID = { [Op.in]: ["3", "staff"] };
       else where.roleID = String(roleID).trim();
+    }
+    if (createdAfter) {
+      where.createdAt = { [Op.gte]: createdAfter };
+    }
+    if (excludeOrdered) {
+      const t = Orders.getTableName();
+      const tableName = typeof t === "string" ? t : t?.tableName;
+      if (tableName) {
+        where.userId = {
+          [Op.notIn]: sequelize.literal(`(SELECT DISTINCT user_ID FROM ${tableName})`),
+        };
+      }
     }
     const lim = Math.min(2000, Math.max(1, Math.trunc(Number(limit || 500))));
     return Users.findAll({

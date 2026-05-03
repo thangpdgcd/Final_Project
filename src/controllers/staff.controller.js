@@ -10,6 +10,7 @@ export const createStaffController = ({ staffService, voucherService, orderServi
         ? await staffService.getAllUsersLite({
             roleID: req.query?.role ?? req.query?.roleID ?? null,
             limit: req.query?.limit ?? null,
+            onlyNew: req.query?.onlyNew ?? null,
           })
         : await staffService.getAllUsers();
       return sendSuccess(res, 200, data, "OK");

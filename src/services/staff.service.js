@@ -52,8 +52,19 @@ export const createStaffService = ({ staffRepository }) => {
     return staffRepository.listUsers();
   };
 
-  const getAllUsersLite = async ({ roleID, limit } = {}) => {
-    return staffRepository.listUsersLite({ roleID, limit });
+  const getAllUsersLite = async ({ roleID, limit, onlyNew } = {}) => {
+    const on = String(onlyNew ?? "").toLowerCase();
+    const isOnlyNew = on === "true" || on === "1";
+    if (!isOnlyNew) return staffRepository.listUsersLite({ roleID, limit });
+
+    const days = envNumber("NEW_USER_DAYS", 7);
+    const createdAfter = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    return staffRepository.listUsersLite({
+      roleID,
+      limit,
+      createdAfter,
+      excludeOrdered: true,
+    });
   };
 
   /** List users by role for internal chat (e.g. admins roleID "2", staff "3"). */
