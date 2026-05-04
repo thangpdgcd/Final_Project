@@ -6,7 +6,6 @@ import { createApp } from "./app.js";
 import { loadEnv } from "./config/runtimeEnv.js";
 import { attachSocketServer } from "./infrastructure/socket/socketServer.js";
 import { registerSocketModules } from "./infrastructure/socket/registerModules.js";
-import { seedChatOnStartup } from "./scripts/seedChat.js";
 
 loadEnv();
 
@@ -107,12 +106,6 @@ const listenOnPort = (port) => {
   httpServer.once("listening", onListening);
   httpServer.listen(port, "0.0.0.0");
 };
-
-try {
-  await seedChatOnStartup();
-} catch (e) {
-  console.error("[chat-seed] Failed:", e?.message || e);
-}
 
 listenOnPort(PORT);
 
