@@ -28,6 +28,10 @@ export const toastErrorWithFallback = (
   options?: ToastOptions,
 ) => {
   const detail = serverMessage?.trim();
+  const detailLower = (detail || '').toLowerCase();
+  if (detailLower.includes('not a participant of this conversation')) {
+    return;
+  }
   reactToastify.error(
     detail ? `${translate(fallbackKey)}: ${detail}` : translate(fallbackKey),
     options,
