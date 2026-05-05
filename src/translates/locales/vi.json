@@ -599,8 +599,23 @@
     "premiumMemberBadge": "HỘI VIÊN CAO CẤP",
     "sideNav": {
       "account": "TÀI KHOẢN",
+      "staffEmails": "EMAIL STAFF",
       "orders": "ĐƠN HÀNG",
       "promotions": "KHUYẾN MÃI"
+    },
+    "staffEmailsInbox": {
+      "title": "Email từ staff",
+      "subtitle": "Các tin staff gửi cho bạn được lưu tại đây.",
+      "refresh": "TẢI LẠI",
+      "emptyTitle": "Chưa có tin",
+      "emptySubtitle": "Khi staff gửi tin, nội dung sẽ hiển thị tại đây.",
+      "read": "Đã đọc",
+      "unread": "Chưa đọc",
+      "markRead": "ĐÁNH DẤU ĐÃ ĐỌC",
+      "contentLangVi": "Tiếng Việt",
+      "contentLangEn": "Tiếng Anh",
+      "contentLangMixed": "Việt + Anh",
+      "contentLangUnknown": ""
     },
     "menu": {
       "myAccount": {

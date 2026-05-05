@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
@@ -9,6 +10,22 @@ const tsconfigRootDir = import.meta.dirname;
 export default [
   {
     ignores: ['dist/**', 'node_modules/**', '**/*.d.ts', 'src/build-sass.js'],
+  },
+  {
+    // Node CLI scripts (.mjs): console, Buffer, puppeteer evaluate() sees browser globals.
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+        document: 'readonly',
+        window: 'readonly',
+      },
+    },
+    rules: {
+      'no-console': 'off',
+    },
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import CustomerLayout from '@/components/layout/customerlayouts/CustomerLayout';
 import ShopLayout from '@/components/layout/shoplayouts/ShopLayout';
 import RequireAuth from '@/routes/guards/RequireAuth';
@@ -21,6 +21,7 @@ const OrderPage = lazy(() => import('@/pages/order/OrderPage'));
 const WishlistPage = lazy(() => import('@/pages/wishlist/WishlistPage'));
 const ProfilePage = lazy(() => import('@/pages/storeshope/ProfilePage'));
 const VoucherVaultPage = lazy(() => import('@/pages/storeshope/VoucherVaultPage'));
+const SupportChatPage = lazy(() => import('@/pages/supportChat/SupportChatPage'));
 
 const ProductPage = lazy(() => import('@/pages/shop/ProductPage'));
 
@@ -40,7 +41,6 @@ const AppRoutes = () => {
           <Route path="/blog/:id" element={<BlogDetailPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contacts" element={<ContactPage />} />
-          <Route path="/support" element={<Navigate to="/contacts" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
@@ -56,6 +56,7 @@ const AppRoutes = () => {
             <Route path="/orders" element={<OrderPage />} />
             <Route path="/wishlist" element={<WishlistPage />} />
             <Route path="/vouchers" element={<VoucherVaultPage />} />
+            <Route path="/support" element={<SupportChatPage />} />
           </Route>
         </Route>
 

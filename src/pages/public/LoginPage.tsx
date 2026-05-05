@@ -42,6 +42,7 @@ const LoginPage: React.FC = () => {
   const googleBtnRef = useRef<HTMLDivElement | null>(null);
   const [autoOpenGoogle, setAutoOpenGoogle] = useState(false);
   const [googleOpening, setGoogleOpening] = useState(false);
+  const [googleUnavailable, setGoogleUnavailable] = useState(false);
 
   useDocumentTitle('pages.login.documentTitle');
 
@@ -366,6 +367,15 @@ const LoginPage: React.FC = () => {
                           <div className="relative w-full h-full grid place-items-center">
                             <GoogleButton
                               onToken={handleGoogleToken}
+                              onUnavailable={() => {
+                                setGoogleUnavailable(true);
+                                setShowGoogle(false);
+                                setAutoOpenGoogle(false);
+                                setGoogleOpening(false);
+                                messageApi.warning(
+                                  'Không thể tải Google Login (có thể bị chặn bởi AdBlock/Privacy extension). Vui lòng tắt chặn cho trang này hoặc dùng đăng nhập bằng email/mật khẩu.',
+                                );
+                              }}
                               loading={googleLoading}
                               disabled={googleLoading || loginMutation.isPending}
                               // Keep GoogleLogin mounted but visually hidden;
@@ -385,6 +395,12 @@ const LoginPage: React.FC = () => {
                             onClick={() => {
                               if (!hasGoogleClientId) {
                                 messageApi.warning('Google login chưa được cấu hình trên môi trường này (thiếu VITE_GOOGLE_CLIENT_ID).');
+                                return;
+                              }
+                              if (googleUnavailable) {
+                                messageApi.warning(
+                                  'Google Login đang bị chặn trên trình duyệt này. Hãy tắt AdBlock/Privacy extension cho trang hoặc dùng đăng nhập bằng email/mật khẩu.',
+                                );
                                 return;
                               }
                               setShowGoogle(true);

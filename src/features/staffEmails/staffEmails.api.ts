@@ -9,6 +9,8 @@ export type StaffEmail = {
   content: string;
   readAt: string | null;
   status: 'queued' | 'sent' | 'failed';
+  /** vi | en | mixed — detected when staff sent */
+  contentLocale?: string | null;
   createdAt: string;
   updatedAt: string;
 };

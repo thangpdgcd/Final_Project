@@ -600,8 +600,23 @@
     "premiumMemberBadge": "PREMIUM MEMBER",
     "sideNav": {
       "account": "ACCOUNT",
+      "staffEmails": "STAFF MAIL",
       "orders": "ORDERS",
       "promotions": "PROMOTIONS"
+    },
+    "staffEmailsInbox": {
+      "title": "Messages from staff",
+      "subtitle": "Staff messages you receive are saved here.",
+      "refresh": "REFRESH",
+      "emptyTitle": "No messages yet",
+      "emptySubtitle": "When staff sends you a message, it will appear here.",
+      "read": "Read",
+      "unread": "Unread",
+      "markRead": "MARK READ",
+      "contentLangVi": "Vietnamese",
+      "contentLangEn": "English",
+      "contentLangMixed": "Vietnamese + English",
+      "contentLangUnknown": ""
     },
     "menu": {
       "myAccount": {

@@ -1000,7 +1000,7 @@ const ProfilePage: React.FC = () => {
       {
         key: 'staffEmails',
         icon: <Bell size={14} />,
-        label: 'Email từ staff',
+        label: t('profile.sideNav.staffEmails'),
         tab: 'profile' as const,
         section: 'staffEmails' as const,
       },
@@ -1459,10 +1459,10 @@ const ProfilePage: React.FC = () => {
                             opacity: 0.8,
                           }}
                         >
-                          Email từ staff
+                          {t('profile.staffEmailsInbox.title')}
                         </h2>
                         <p className="mt-2 text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
-                          Các email staff gửi cho bạn sẽ được lưu ở đây.
+                          {t('profile.staffEmailsInbox.subtitle')}
                         </p>
                       </div>
 
@@ -1482,7 +1482,7 @@ const ProfilePage: React.FC = () => {
                           }}
                           className="px-4 py-2.5"
                         >
-                          TẢI LẠI
+                          {t('profile.staffEmailsInbox.refresh')}
                         </button>
                       </div>
                     </div>
@@ -1501,14 +1501,25 @@ const ProfilePage: React.FC = () => {
                           className="rounded-2xl p-6 text-center"
                         >
                           <div className="text-sm font-semibold" style={{ color: T.onSurface }}>
-                            Chưa có email
+                            {t('profile.staffEmailsInbox.emptyTitle')}
                           </div>
                           <div className="mt-2 text-xs" style={{ color: `${T.onSurfaceVariant}` }}>
-                            Khi staff gửi email, nội dung sẽ xuất hiện tại đây.
+                            {t('profile.staffEmailsInbox.emptySubtitle')}
                           </div>
                         </div>
                       ) : (
-                        staffEmails.map((e) => (
+                        staffEmails.map((e) => {
+                          const loc = String(e.contentLocale ?? '').toLowerCase();
+                          const localeLabel =
+                            loc === 'vi'
+                              ? t('profile.staffEmailsInbox.contentLangVi')
+                              : loc === 'mixed'
+                                ? t('profile.staffEmailsInbox.contentLangMixed')
+                                : loc === 'en'
+                                  ? t('profile.staffEmailsInbox.contentLangEn')
+                                  : '';
+                          const bodyLang = loc === 'vi' || loc === 'mixed' ? 'vi' : 'en';
+                          return (
                           <div
                             key={String(e.id)}
                             style={{ background: T.surfaceLowest, border: `1px solid ${T.onSurface}12` }}
@@ -1516,12 +1527,28 @@ const ProfilePage: React.FC = () => {
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
-                                <div className="text-sm font-semibold" style={{ color: T.onSurface }}>
-                                  {e.subject}
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <div className="text-sm font-semibold" style={{ color: T.onSurface }}>
+                                    {e.subject}
+                                  </div>
+                                  {localeLabel ? (
+                                    <span
+                                      className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md"
+                                      style={{
+                                        background: `${T.gold}18`,
+                                        color: T.gold,
+                                        border: `1px solid ${T.gold}40`,
+                                      }}
+                                    >
+                                      {localeLabel}
+                                    </span>
+                                  ) : null}
                                 </div>
                                 <div className="mt-1 text-xs" style={{ color: `${T.onSurfaceVariant}` }}>
                                   {e.createdAt ? new Date(e.createdAt).toLocaleString() : ''}
-                                  {e.readAt ? ' • Đã đọc' : ' • Chưa đọc'}
+                                  {e.readAt
+                                    ? ` • ${t('profile.staffEmailsInbox.read')}`
+                                    : ` • ${t('profile.staffEmailsInbox.unread')}`}
                                 </div>
                               </div>
                               {!e.readAt ? (
@@ -1546,15 +1573,20 @@ const ProfilePage: React.FC = () => {
                                   }}
                                   className="px-3 py-2.5"
                                 >
-                                  ĐÁNH DẤU ĐÃ ĐỌC
+                                  {t('profile.staffEmailsInbox.markRead')}
                                 </button>
                               ) : null}
                             </div>
-                            <div className="mt-3 whitespace-pre-wrap text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
+                            <div
+                              className="mt-3 whitespace-pre-wrap text-sm"
+                              style={{ color: `${T.onSurfaceVariant}` }}
+                              lang={bodyLang}
+                            >
                               {e.content}
                             </div>
                           </div>
-                        ))
+                          );
+                        })
                       )}
                     </div>
                   </>
