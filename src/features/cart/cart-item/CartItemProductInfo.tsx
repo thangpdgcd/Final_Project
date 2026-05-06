@@ -1,16 +1,38 @@
 import type { CartItem as CartItemType } from '@/types/index';
+import { useNavigate } from 'react-router-dom';
 import { getImageSrc } from '@/utils/images/image';
 import { translatedProductName } from '@/utils/products/productI18n';
 import { useAppTranslation } from '@/hooks/userapptranslations/useAppTranslation';
 
 export const CartItemProductInfo = ({ item }: { item: CartItemType }) => {
   const { t } = useAppTranslation();
+  const navigate = useNavigate();
   const displayName = translatedProductName(t, {
     product_ID: item.product_ID,
     name: item.products?.name ?? '',
   });
+  const productId = Number(item.product_ID ?? (item.products as any)?.product_ID);
+  const canNavigate = Number.isFinite(productId) && productId > 0;
   return (
-    <div className="flex min-w-0 flex-1 gap-4">
+    <div
+      className={[
+        'flex min-w-0 flex-1 gap-4',
+        canNavigate ? 'cursor-pointer' : '',
+      ].join(' ')}
+      role={canNavigate ? 'link' : undefined}
+      tabIndex={canNavigate ? 0 : -1}
+      onClick={() => {
+        if (!canNavigate) return;
+        navigate(`/products/${productId}`);
+      }}
+      onKeyDown={(e) => {
+        if (!canNavigate) return;
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        navigate(`/products/${productId}`);
+      }}
+      aria-label={canNavigate ? displayName : undefined}
+    >
       <img
         src={getImageSrc(item.products?.image)}
         alt={displayName}

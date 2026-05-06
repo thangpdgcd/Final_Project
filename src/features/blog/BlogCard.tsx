@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { BlogCardProps } from '@/types/blog/blog.types';
 
 const BlogCard = ({ post }: BlogCardProps) => {
+  const { t, i18n } = useTranslation();
+  const isVi = i18n.language?.toLowerCase().startsWith('vi');
   const fallbackImg = useMemo(() => {
     const svg = encodeURIComponent(
       `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750">
@@ -53,14 +56,14 @@ const BlogCard = ({ post }: BlogCardProps) => {
             className="mt-3 text-lg font-semibold leading-snug text-[color:var(--hl-primary)]"
             style={{ fontFamily: 'var(--font-highland-display)' }}
           >
-            {post.title}
+            {isVi ? post.title_vi ?? post.title : post.title}
           </h3>
           <p className="hl-sans mt-2 text-sm leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_74%,transparent)] line-clamp-3">
-            {post.excerpt}
+            {isVi ? post.excerpt_vi ?? post.excerpt : post.excerpt}
           </p>
 
           <span className="mt-5 inline-flex items-center justify-center rounded-md border border-[color:var(--hl-outline)] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--hl-primary)] transition-colors hover:border-[color:var(--hl-secondary)] hover:text-[color:var(--hl-secondary)]">
-            Read More
+            {t('blog.ui.readMore')}
           </span>
         </div>
       </Link>

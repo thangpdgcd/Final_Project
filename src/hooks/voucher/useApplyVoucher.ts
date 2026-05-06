@@ -21,6 +21,37 @@ export const useApplyVoucher = (): UseApplyVoucherState => {
     setIsSuccess(false);
   }, []);
 
+  const hydrateApplied = useCallback(
+    (args: {
+      code?: string;
+      discount?: number | null;
+      finalPrice?: number | null;
+      message?: string;
+      success?: boolean;
+    }) => {
+      const nextCode = String(args.code ?? '').trim();
+      if (nextCode) setCode(nextCode);
+
+      setIsApplying(false);
+      setErrorMessage('');
+      setMessage(String(args.message ?? '').trim());
+
+      const nextDiscount =
+        args.discount == null ? null : Number.isFinite(Number(args.discount)) ? Number(args.discount) : null;
+      const nextFinal =
+        args.finalPrice == null
+          ? null
+          : Number.isFinite(Number(args.finalPrice))
+            ? Number(args.finalPrice)
+            : null;
+
+      setDiscount(nextDiscount);
+      setFinalPrice(nextFinal);
+      setIsSuccess(Boolean(args.success ?? true));
+    },
+    [],
+  );
+
   const applyVoucher = useCallback(
     async ({ orderValue, code: overrideCode }: { orderValue: number; code?: string }) => {
       const nextCode = String(overrideCode ?? trimmedCode).trim();
@@ -73,6 +104,7 @@ export const useApplyVoucher = (): UseApplyVoucherState => {
     finalPrice,
     isSuccess,
     applyVoucher,
+    hydrateApplied,
     reset,
   };
 };

@@ -145,7 +145,30 @@ const CartPage: React.FC = () => {
       return;
     }
     startTransition(() => {
-      navigate('/orders', { state: { cartItems: selectedItems } });
+      const code = String(voucher.trimmedCode ?? '').trim();
+      if (voucher.isSuccess && code) {
+        try {
+          localStorage.setItem('checkout_voucher_code', code);
+        } catch {
+          // ignore
+        }
+      }
+      const nextPath = voucher.isSuccess && code ? `/orders?voucher=${encodeURIComponent(code)}` : '/orders';
+      navigate(nextPath, {
+        state: {
+          cartItems: selectedItems,
+          voucherApplied:
+            voucher.isSuccess && code && voucher.discount != null && voucher.finalPrice != null
+              ? {
+                  code,
+                  discount: voucher.discount,
+                  finalPrice: voucher.finalPrice,
+                  message: voucher.message,
+                  success: true,
+                }
+              : null,
+        },
+      });
     });
   };
 
@@ -378,7 +401,7 @@ const CartPage: React.FC = () => {
                 description={translatedProductDescription(t, product, 'list')}
                 price={formatPrice(product.price)}
                 imageSrc={getImageSrc(product.image)}
-                onOpen={() => navigate(`/product-detail/${product.product_ID}`)}
+                onOpen={() => navigate(`/products/${product.product_ID}`)}
                 onAddToCart={handleAddToCart}
               />
             ))}

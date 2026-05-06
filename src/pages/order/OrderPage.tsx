@@ -63,6 +63,23 @@ const OrderPage: React.FC = () => {
     [location.state],
   );
 
+  const voucherAppliedFromCart = useMemo(() => {
+    const raw = (location.state as any)?.voucherApplied;
+    if (!raw) return null;
+    const code = String(raw?.code ?? '').trim();
+    const discount = Number(raw?.discount);
+    const finalPrice = Number(raw?.finalPrice);
+    if (!code) return null;
+    if (!Number.isFinite(discount) || !Number.isFinite(finalPrice)) return null;
+    return {
+      code,
+      discount,
+      finalPrice,
+      message: String(raw?.message ?? '').trim(),
+      success: Boolean(raw?.success ?? true),
+    };
+  }, [location.state]);
+
   const [showPaypal, setShowPaypal] = useState(false);
   const [sdkReady, setSdkReady] = useState(false);
   const [loadingSdk, setLoadingSdk] = useState(false);
@@ -106,18 +123,19 @@ const OrderPage: React.FC = () => {
   const grandTotal = productsTotal + shippingFee;
 
   useEffect(() => {
-    setPayableTotal(grandTotal);
-    if (
-      voucher.isSuccess ||
-      voucher.discount != null ||
-      voucher.finalPrice != null ||
-      voucher.message ||
-      voucher.errorMessage
-    ) {
-      voucher.reset();
+    // Keep payableTotal in sync with voucher result (or fallback to grandTotal).
+    if (voucher.isSuccess) {
+      if (voucher.finalPrice != null && Number.isFinite(Number(voucher.finalPrice))) {
+        setPayableTotal(Number(voucher.finalPrice));
+        return;
+      }
+      if (voucher.discount != null && Number.isFinite(Number(voucher.discount))) {
+        setPayableTotal(Math.max(0, grandTotal - Number(voucher.discount)));
+        return;
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [grandTotal]);
+    setPayableTotal(grandTotal);
+  }, [grandTotal, voucher.discount, voucher.finalPrice, voucher.isSuccess]);
 
   const amountUSD = useMemo(() => {
     const usd = payableTotal / 24000;
@@ -212,15 +230,34 @@ const OrderPage: React.FC = () => {
 
   useEffect(() => {
     const search = String(location.search ?? '');
-    const code = new URLSearchParams(search).get('voucher')?.trim() ?? '';
+    const fromQuery = new URLSearchParams(search).get('voucher')?.trim() ?? '';
+    let code = fromQuery;
+    if (!code) {
+      try {
+        code = localStorage.getItem('checkout_voucher_code')?.trim() ?? '';
+        if (code) localStorage.removeItem('checkout_voucher_code');
+      } catch {
+        // ignore
+      }
+    }
     if (!code) return;
     if (autoAppliedRef.current) return;
     if (!cartItems.length) return;
 
+    // If Cart already applied successfully, don't call API again (some backends consume voucher usage).
+    if (voucherAppliedFromCart?.success && voucherAppliedFromCart.code) {
+      voucher.hydrateApplied(voucherAppliedFromCart);
+      if (Number.isFinite(voucherAppliedFromCart.finalPrice) && voucherAppliedFromCart.finalPrice >= 0) {
+        setPayableTotal(voucherAppliedFromCart.finalPrice);
+      }
+      autoAppliedRef.current = true;
+      return;
+    }
+
     voucher.setCode(code);
     autoAppliedRef.current = true;
     void handleApplyVoucher(code);
-  }, [location.search, cartItems.length, handleApplyVoucher, voucher]);
+  }, [location.search, cartItems.length, handleApplyVoucher, voucher, voucherAppliedFromCart]);
 
   const fetchWalletCoin = async () => {
     if (!user?.user_ID) return;

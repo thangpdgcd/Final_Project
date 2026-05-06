@@ -16,6 +16,13 @@ export type UseApplyVoucherState = {
   finalPrice: number | null;
   isSuccess: boolean;
   applyVoucher: (args: { orderValue: number; code?: string }) => Promise<ApplyVoucherResult | null>;
+  hydrateApplied: (args: {
+    code?: string;
+    discount?: number | null;
+    finalPrice?: number | null;
+    message?: string;
+    success?: boolean;
+  }) => void;
   reset: () => void;
 };
 

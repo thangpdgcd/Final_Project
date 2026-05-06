@@ -48,26 +48,9 @@ const BlogDetailPage: React.FC = () => {
   const { t, i18n } = useTranslation();
 
   const post = useMemo(() => blogs.find((b) => b.id === id), [id]);
-
-  useEffect(() => {
-    if (!post) return;
-    const prev = document.title;
-    document.title = t('pages.blogDetail.documentTitle', { title: post.title });
-    return () => {
-      document.title = prev;
-    };
-  }, [post, t, i18n.language]);
-
-  if (!post) return <BlogNotFound />;
-
-  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
-  const dateLabel = new Date(post.date).toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-
-  const sections = post.content?.sections ?? [];
+  const isVi = i18n.language?.toLowerCase().startsWith('vi');
+  const title = post ? (isVi ? post.title_vi ?? post.title : post.title) : '';
+  const content = post ? (isVi ? post.content_vi ?? post.content : post.content) : undefined;
   const fallbackImg = useMemo(() => {
     const svg = encodeURIComponent(
       `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
@@ -83,7 +66,32 @@ const BlogDetailPage: React.FC = () => {
     );
     return `data:image/svg+xml;charset=utf-8,${svg}`;
   }, []);
-  const [heroSrc, setHeroSrc] = useState(post.image);
+  const [heroSrc, setHeroSrc] = useState<string>('');
+
+  useEffect(() => {
+    if (!post) return;
+    setHeroSrc(post.image);
+  }, [post]);
+
+  useEffect(() => {
+    if (!post) return;
+    const prev = document.title;
+    document.title = t('pages.blogDetail.documentTitle', { title });
+    return () => {
+      document.title = prev;
+    };
+  }, [post, t, i18n.language, title]);
+
+  if (!post) return <BlogNotFound />;
+
+  const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+  const dateLabel = new Date(post.date).toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const sections = content?.sections ?? [];
 
   return (
     <EditorialPageShell className="abrew">
@@ -110,7 +118,7 @@ const BlogDetailPage: React.FC = () => {
             className="mt-4 text-3xl font-semibold leading-[1.12] tracking-tight text-[color:var(--hl-primary)] sm:text-4xl lg:text-5xl"
             style={{ fontFamily: 'var(--font-highland-display)' }}
           >
-            {post.title}
+            {title}
           </h1>
           <div className="hl-sans mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[color:color-mix(in_srgb,var(--hl-on-surface)_68%,transparent)]">
             <span className="font-semibold text-[color:var(--hl-on-surface)]">{post.author}</span>
@@ -121,17 +129,17 @@ const BlogDetailPage: React.FC = () => {
 
         <div className="mt-10 overflow-hidden rounded-lg border border-[color:var(--hl-outline-variant)] bg-[color:color-mix(in_srgb,var(--hl-surface)_92%,transparent)] shadow-[var(--hl-shadow-card)]">
           <img
-            src={heroSrc}
-            alt={post.title}
+            src={heroSrc || post.image}
+            alt={title}
             className="max-h-[520px] w-full object-cover"
             loading="lazy"
             onError={() => setHeroSrc(fallbackImg)}
           />
         </div>
 
-        {post.content?.intro && (
+        {content?.intro && (
           <p className="hl-sans mt-10 text-base leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_88%,transparent)] lg:text-lg">
-            {post.content.intro}
+            {content.intro}
           </p>
         )}
 
@@ -160,7 +168,7 @@ const BlogDetailPage: React.FC = () => {
           </div>
         )}
 
-        {post.content?.conclusion && (
+        {content?.conclusion && (
           <div className="mt-12 rounded-lg border border-[color:var(--hl-outline-variant)] bg-[color:color-mix(in_srgb,var(--hl-surface)_84%,transparent)] p-6 shadow-[var(--hl-shadow-card)] lg:p-7">
             <div
               className="hl-sans text-sm font-semibold uppercase tracking-wider text-[color:var(--hl-primary)]"
@@ -169,7 +177,7 @@ const BlogDetailPage: React.FC = () => {
               {t('blogDetail.conclusionHeading')}
             </div>
             <p className="hl-sans mt-3 leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_88%,transparent)]">
-              {post.content.conclusion}
+              {content.conclusion}
             </p>
           </div>
         )}

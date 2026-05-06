@@ -870,6 +870,13 @@
     "notFoundCta": "Quay lại Blog",
     "conclusionHeading": "Kết luận"
   },
+  "blog": {
+    "ui": {
+      "featured": "Nổi bật",
+      "readArticle": "Đọc bài viết",
+      "readMore": "Xem thêm"
+    }
+  },
   "wishlist": {
     "premiumGrade": "Hạng Premium",
     "inStock": "Còn hàng",

@@ -9,11 +9,12 @@ import { blogs } from '@/components/data/blogs';
 import { fadeInUp } from '@/utils/motions/motion';
 
 const BlogPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useDocumentTitle('pages.blog.documentTitle');
 
   const [featured, ...rest] = blogs;
+  const isVi = i18n.language?.toLowerCase().startsWith('vi');
 
   return (
     <EditorialPageShell className="abrew">
@@ -52,7 +53,7 @@ const BlogPage: React.FC = () => {
                 <div className="relative aspect-[16/10] overflow-hidden lg:aspect-[16/9]">
                   <img
                     src={featured.image}
-                    alt={featured.title}
+                    alt={isVi ? featured.title_vi ?? featured.title : featured.title}
                     className="h-full w-full object-cover"
                     loading="lazy"
                   />
@@ -62,23 +63,23 @@ const BlogPage: React.FC = () => {
               <div className="lg:col-span-5">
                 <div className="p-6 sm:p-8 lg:p-10">
                   <div className="hl-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--hl-secondary)]">
-                    Featured
+                    {t('blog.ui.featured')}
                   </div>
                   <h2
                     className="mt-4 text-2xl font-semibold leading-snug text-[color:var(--hl-primary)] sm:text-3xl"
                     style={{ fontFamily: 'var(--font-highland-display)' }}
                   >
-                    {featured.title}
+                    {isVi ? featured.title_vi ?? featured.title : featured.title}
                   </h2>
                   <p className="hl-sans mt-4 text-sm leading-relaxed text-[color:color-mix(in_srgb,var(--hl-on-surface)_78%,transparent)] sm:text-base">
-                    {featured.excerpt}
+                    {isVi ? featured.excerpt_vi ?? featured.excerpt : featured.excerpt}
                   </p>
                   <div className="mt-6">
                     <a
                       href={`/blog/${featured.id}`}
                       className="inline-flex items-center justify-center rounded-md bg-[color:var(--hl-tertiary)] px-5 py-2.5 text-sm font-bold text-[color:var(--hl-on-surface)] transition-transform duration-300 hover:-translate-y-0.5"
                     >
-                      Read article
+                      {t('blog.ui.readArticle')}
                     </a>
                   </div>
                   <div className="hl-sans mt-6 text-xs text-[color:color-mix(in_srgb,var(--hl-on-surface)_60%,transparent)]">

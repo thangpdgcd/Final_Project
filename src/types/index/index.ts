@@ -61,6 +61,13 @@ export interface Product {
   description_en?: string;
   description_vi?: string;
   image?: string;
+  /**
+   * Optional secondary image / gallery fields.
+   * Backend naming may vary; UI normalizes these in ProductDetailPage.
+   */
+  image2?: string;
+  image_2?: string;
+  images?: string[];
   categories_ID: number;
   user_ID: number;
 }

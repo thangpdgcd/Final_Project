@@ -251,6 +251,19 @@ const ProductDetailPage: React.FC = () => {
   const finalPrice = basePrice * (1 - discountRate) * quantity;
   const savings = basePrice * discountRate * quantity;
 
+  const galleryImages = useMemo(() => {
+    // Normalize multiple backend shapes into a stable 2-image gallery for the detail carousel.
+    const raw = product as any;
+    const fromImagesArray = Array.isArray(raw?.images) ? raw.images : [];
+    const primary = raw?.image ?? fromImagesArray?.[0];
+    const secondary = raw?.image2 ?? raw?.image_2 ?? fromImagesArray?.[1] ?? primary;
+    // Keep at least 2 slides even when secondary is missing.
+    const normalized = [primary, secondary].filter(Boolean);
+    if (normalized.length === 1) normalized.push(normalized[0]);
+    // If still empty, let getImageSrc fallback handle it.
+    return (normalized.length ? normalized : [undefined, undefined]).map(getImageSrc);
+  }, [product]);
+
   // ── Category / theme detection ─────────────────────────────────────────────
   // Detect COFFEE products by category name (Robusta / Arabica / Blend / Specialty).
   // Everything else (Accessories, Stationery, Electronics, Office Tools …) is
@@ -481,24 +494,23 @@ const ProductDetailPage: React.FC = () => {
                 }}
               >
                 <Carousel autoplay effect="fade" dotPosition="bottom" className="detail-carousel">
-                  <div className="aspect-[4/5] md:aspect-square flex items-center justify-center bg-white">
-                    <img
-                      src={getImageSrc(product.image)}
-                      alt={productDisplayName}
-                      className="w-full h-full object-cover cursor-pointer transform scale-90 group-hover:scale-100 transition-transform duration-1000"
-                    />
-                  </div>
-                  <div className="aspect-[4/5] md:aspect-square">
-                    <img
-                      src={
-                        isBrewingTool
-                          ? 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=1200'
-                          : 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&q=80&w=1200'
-                      }
-                      alt=""
-                      className="w-full h-full object-cover cursor-pointer"
-                    />
-                  </div>
+                  {galleryImages.map((src, idx) => (
+                    <div
+                      key={`${product.product_ID}-${idx}`}
+                      className="aspect-[4/5] md:aspect-square flex items-center justify-center bg-white"
+                    >
+                      <img
+                        src={src}
+                        alt={idx === 0 ? productDisplayName : `${productDisplayName} ${idx + 1}`}
+                        className={[
+                          'w-full h-full object-cover cursor-pointer',
+                          idx === 0
+                            ? 'transform scale-90 group-hover:scale-100 transition-transform duration-1000'
+                            : '',
+                        ].join(' ')}
+                      />
+                    </div>
+                  ))}
                 </Carousel>
               </div>
             </section>

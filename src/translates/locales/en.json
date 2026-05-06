@@ -865,6 +865,13 @@
     "notFoundCta": "Back to Blog",
     "conclusionHeading": "Conclusion"
   },
+  "blog": {
+    "ui": {
+      "featured": "Featured",
+      "readArticle": "Read article",
+      "readMore": "Read more"
+    }
+  },
   "wishlist": {
     "premiumGrade": "Premium Grade",
     "inStock": "In Stock",
