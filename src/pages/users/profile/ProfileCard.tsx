@@ -15,6 +15,7 @@ export interface ProfileCardProps {
   isLoading: boolean;
   currentTab: string;
   ordersCount: number;
+  voucherCount: number;
   onAvatarClick: () => void;
   onEdit: () => void;
   onSave: () => void;
@@ -29,6 +30,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   isLoading,
   currentTab,
   ordersCount,
+  voucherCount,
   onAvatarClick,
   onEdit,
   onSave,
@@ -73,6 +75,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 email={user.email}
                 roleID={user.roleID as string | number}
                 ordersCount={ordersCount}
+                voucherCount={voucherCount}
               />
 
               <ProfileActions

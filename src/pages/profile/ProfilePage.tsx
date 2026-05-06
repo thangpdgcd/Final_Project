@@ -1180,6 +1180,7 @@ const ProfilePage: React.FC = () => {
             isLoading={isLoading}
             currentTab={currentTab}
             ordersCount={userOrders.length}
+            voucherCount={voucherVault.length}
             onAvatarClick={() => fileInputRef.current?.click()}
             onEdit={() => setIsEditing(true)}
             onSave={handleSaveProfile}
@@ -1275,10 +1276,6 @@ const ProfilePage: React.FC = () => {
                         >
                           {t('profile.sideNav.promotions')}
                         </h2>
-                        <p className="mt-2 text-sm" style={{ color: `${T.onSurfaceVariant}` }}>
-                          Voucher staff gửi cho bạn sẽ tự lưu ở đây. Bạn có thể copy hoặc dùng trực
-                          tiếp ở giỏ hàng.
-                        </p>
                       </div>
 
                       <div className="flex gap-2">
@@ -1297,7 +1294,7 @@ const ProfilePage: React.FC = () => {
                           }}
                           className="px-4 py-2.5"
                         >
-                          DÙNG Ở GIỎ
+                          {t('vouchers.goToCart')}
                         </button>
                         <button
                           type="button"
@@ -1314,7 +1311,7 @@ const ProfilePage: React.FC = () => {
                           }}
                           className="px-4 py-2.5"
                         >
-                          XÓA TẤT CẢ
+                          {t('vouchers.clearAll')}
                         </button>
                       </div>
                     </div>
@@ -1329,10 +1326,10 @@ const ProfilePage: React.FC = () => {
                           className="rounded-2xl p-6 text-center"
                         >
                           <div className="text-sm font-semibold" style={{ color: T.onSurface }}>
-                            Chưa có voucher
+                            {t('vouchers.emptyTitle')}
                           </div>
                           <div className="mt-2 text-xs" style={{ color: `${T.onSurfaceVariant}` }}>
-                            Khi staff gửi voucher qua chat, mã sẽ tự động xuất hiện tại đây.
+                            {t('vouchers.emptySubtitle')}
                           </div>
                         </div>
                       ) : (
@@ -1358,7 +1355,7 @@ const ProfilePage: React.FC = () => {
                                   className="text-xs"
                                   style={{ color: `${T.onSurfaceVariant}` }}
                                 >
-                                  Nhận lúc {formatVaultTime(v.receivedAt)}
+                                  {t('vouchers.receivedAt', { time: formatVaultTime(v.receivedAt) })}
                                 </span>
                               </div>
                               {v.message ? (
@@ -1395,7 +1392,7 @@ const ProfilePage: React.FC = () => {
                                 className="px-3 py-2.5 inline-flex items-center gap-2"
                               >
                                 <Ticket size={16} />
-                                DÙNG
+                                {t('vouchers.useInCart')}
                               </button>
                               <button
                                 type="button"
@@ -1419,7 +1416,7 @@ const ProfilePage: React.FC = () => {
                                 className="px-3 py-2.5 inline-flex items-center gap-2"
                               >
                                 <Copy size={16} />
-                                COPY
+                                {t('common.copy')}
                               </button>
                               <button
                                 type="button"
@@ -1437,7 +1434,7 @@ const ProfilePage: React.FC = () => {
                                 className="px-3 py-2.5 inline-flex items-center gap-2"
                               >
                                 <Trash2 size={16} />
-                                XÓA
+                                {t('common.delete')}
                               </button>
                             </div>
                           </div>

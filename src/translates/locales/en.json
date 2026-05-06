@@ -9,6 +9,8 @@
     "submit": "Submit",
     "cancel": "Cancel",
     "clear": "Reset",
+    "copy": "Copy",
+    "delete": "Delete",
     "theme": "Theme",
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",

@@ -49,9 +49,6 @@ const VoucherVaultPage = () => {
                 <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                   {t('profile.sidebar.vouchers')}
                 </h1>
-                <p className="mt-1 text-sm text-slate-500 dark:text-white/65">
-                  {t('vouchers.subtitle')}
-                </p>
               </div>
             </div>
           </div>

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Ticket, Award } from 'lucide-react';
+import { ShoppingBag, Ticket } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ProfileInfoProps {
   name: string;
   email: string;
   roleID: number | string;
   ordersCount: number;
+  voucherCount: number;
   bio?: string;
 }
 
@@ -23,16 +25,16 @@ const useIsDesktop = () => {
   return isDesktop;
 };
 
-const ProfileInfo: React.FC<ProfileInfoProps> = ({ name, email, ordersCount, bio }) => {
+const ProfileInfo: React.FC<ProfileInfoProps> = ({ name, email, ordersCount, voucherCount, bio }) => {
   const isDesktop = useIsDesktop();
+  const { t } = useTranslation();
 
 
   const slideInitial = isDesktop ? { opacity: 0, x: 30, y: 0 } : { opacity: 0, x: 0, y: 20 };
 
   const stats = [
-    { label: 'ĐƠN HÀNG', value: ordersCount, icon: <ShoppingBag size={14} /> },
-    { label: 'VOUCHER', value: '—', icon: <Ticket size={14} /> },
-    { label: 'ĐIỂM', value: '—', icon: <Award size={14} /> },
+    { label: t('profile.stats.orders'), value: ordersCount, icon: <ShoppingBag size={14} /> },
+    { label: t('profile.stats.voucher'), value: voucherCount, icon: <Ticket size={14} /> },
   ];
 
   return (
