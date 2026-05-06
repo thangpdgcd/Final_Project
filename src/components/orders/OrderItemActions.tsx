@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type OrderItemRowAction = {
   productId: number;
@@ -12,7 +13,7 @@ type Props = {
   busy: boolean;
   args: OrderItemRowAction;
   onBuyAgainItem: (args: OrderItemRowAction) => void;
-  onViewProduct: (productId: number) => void;
+  onViewOrder: () => void;
   onContactSeller: () => void;
 };
 
@@ -21,9 +22,10 @@ export const OrderItemActions: React.FC<Props> = ({
   busy,
   args,
   onBuyAgainItem,
-  onViewProduct,
+  onViewOrder,
   onContactSeller,
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="mt-3 flex flex-wrap gap-2">
       <button
@@ -32,21 +34,21 @@ export const OrderItemActions: React.FC<Props> = ({
         onClick={() => onBuyAgainItem(args)}
         className="rounded-md bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
       >
-        Buy again
+        {t('order.buyAgain')}
       </button>
       <button
         type="button"
-        onClick={() => onViewProduct(args.productId)}
+        onClick={onViewOrder}
         className="rounded-md border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50"
       >
-        View
+        {t('order.viewDetails')}
       </button>
       <button
         type="button"
         onClick={onContactSeller}
         className="rounded-md border border-stone-200 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-50"
       >
-        Contact
+        {t('order.contactSeller')}
       </button>
     </div>
   );

@@ -20,7 +20,7 @@ import { App, Modal, InputNumber, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/auth/AuthContext';
 import * as profileApi from '@/api/profilesapi/profileApi';
-import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc } from '@/utils/images/image';
+import { AVATAR_DISPLAY_IMG_CLASS, getAvatarImageSrc, getImageSrc } from '@/utils/images/image';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useOrders } from '@/hooks/orders/useOrders';
 import { ordersService } from '@/services/orders/orders.service';
@@ -71,10 +71,10 @@ const formatVaultTime = (ms: number) => {
 const OrderItemsSummary: React.FC<{
   orderId: number;
   onBuyAgainItem: (args: OrderItemRowAction) => void;
-  onViewProduct: (productId: number) => void;
+  onViewOrder: () => void;
   onContactSeller: () => void;
   busyRowKey: string | null;
-}> = ({ orderId, onBuyAgainItem, onViewProduct, onContactSeller, busyRowKey }) => {
+}> = ({ orderId, onBuyAgainItem, onViewOrder, onContactSeller, busyRowKey }) => {
   const { t } = useTranslation();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -181,7 +181,7 @@ const OrderItemsSummary: React.FC<{
             productMap={productMap}
             busyRowKey={busyRowKey}
             onBuyAgainItem={onBuyAgainItem}
-            onViewProduct={onViewProduct}
+            onViewOrder={() => onViewOrder()}
             onContactSeller={onContactSeller}
           />
         ))}
@@ -221,6 +221,9 @@ const ProfilePage: React.FC = () => {
   const [buyAgainRowKey, setBuyAgainRowKey] = useState<string | null>(null);
   const [refundBusyOrderId, setRefundBusyOrderId] = useState<number | null>(null);
   const [refundConfirmOrder, setRefundConfirmOrder] = useState<Order | null>(null);
+  const [viewOrder, setViewOrder] = useState<Order | null>(null);
+  const [viewOrderItems, setViewOrderItems] = useState<any[]>([]);
+  const [viewOrderItemsLoading, setViewOrderItemsLoading] = useState(false);
   const [walletXu, setWalletXu] = useState<number>(0);
   const [walletTransactions, setWalletTransactions] = useState<
     Array<{
@@ -246,6 +249,31 @@ const ProfilePage: React.FC = () => {
   const [topupButtonRendered, setTopupButtonRendered] = useState(false);
   const topupPaypalRef = useRef<HTMLDivElement | null>(null);
   const topupRenderedRef = useRef(false);
+
+  useEffect(() => {
+    if (!viewOrder) return;
+    const oid = Number((viewOrder as any)?.order_ID ?? (viewOrder as any)?.orderId ?? (viewOrder as any)?.id);
+    if (!oid) return;
+    let alive = true;
+    setViewOrderItemsLoading(true);
+    ordersService
+      .getItemsByOrderId(oid)
+      .then((res) => {
+        if (!alive) return;
+        setViewOrderItems(Array.isArray(res) ? res : []);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setViewOrderItems([]);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setViewOrderItemsLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [viewOrder]);
 
   // ── Staff emails inbox ───────────────────────────────────────────────────
   const [staffEmails, setStaffEmails] = useState<StaffEmail[]>([]);
@@ -2152,7 +2180,7 @@ const ProfilePage: React.FC = () => {
                                   orderId={orderID}
                                   busyRowKey={buyAgainRowKey}
                                   onBuyAgainItem={(a) => void handleBuyAgainOneItem(a)}
-                                  onViewProduct={(pid) => navigate(`/products/${pid}`)}
+                                  onViewOrder={() => setViewOrder(order)}
                                   onContactSeller={() => navigate('/contacts')}
                                 />
                               </div>
@@ -2430,6 +2458,129 @@ const ProfilePage: React.FC = () => {
           )}
         </div>
       </div>
+
+      <Modal
+        title={
+          viewOrder
+            ? `${t('order.viewDetails')} #${String(
+                (viewOrder as any)?.order_ID ?? (viewOrder as any)?.orderId ?? (viewOrder as any)?.id ?? '',
+              )}`
+            : t('order.viewDetails')
+        }
+        open={Boolean(viewOrder)}
+        centered
+        width={720}
+        onCancel={() => {
+          setViewOrder(null);
+          setViewOrderItems([]);
+        }}
+        footer={[
+          <button
+            key="close"
+            type="button"
+            onClick={() => {
+              setViewOrder(null);
+              setViewOrderItems([]);
+            }}
+            className="px-4 py-2 rounded-md bg-stone-200 text-stone-700 font-semibold hover:bg-stone-300 transition-colors"
+          >
+            {t('common.close')}
+          </button>,
+        ]}
+      >
+        {viewOrder ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div>
+                <div className="text-stone-500">{t('order.total')}</div>
+                <div className="font-semibold text-stone-900">
+                  {Number((viewOrder as any)?.total_Amount ?? 0).toLocaleString(i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US')}{' '}
+                  VND
+                </div>
+              </div>
+              <div>
+                <div className="text-stone-500">{t('order.status.pending')}</div>
+                <div className="font-semibold text-stone-900">
+                  {String((viewOrder as any)?.status ?? (viewOrder as any)?.shippingStatus ?? '').trim() || t('order.status.unknown')}
+                </div>
+              </div>
+              {(viewOrder as any)?.shipping_Address ? (
+                <div className="sm:col-span-2">
+                  <div className="text-stone-500">{t('checkout.shippingTitle')}</div>
+                  <div className="font-medium text-stone-900 break-words">
+                    {String((viewOrder as any)?.shipping_Address)}
+                  </div>
+                </div>
+              ) : null}
+              {(viewOrder as any)?.paymentMethod || (viewOrder as any)?.payment_method ? (
+                <div className="sm:col-span-2">
+                  <div className="text-stone-500">{t('profile.orders.paymentLabel')}</div>
+                  <div className="font-medium text-stone-900 break-words">
+                    {String((viewOrder as any)?.paymentMethod ?? (viewOrder as any)?.payment_method)}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="border-t pt-4">
+              <div className="text-sm font-semibold text-stone-700 mb-2">{t('checkout.tableProduct')}</div>
+              {viewOrderItemsLoading ? (
+                <div className="py-3 flex items-center gap-2 text-sm text-stone-500">
+                  <Spin size="small" /> {t('common.loading')}
+                </div>
+              ) : viewOrderItems.length === 0 ? (
+                <div className="py-3 text-sm text-stone-500">{t('order.itemsEmpty')}</div>
+              ) : (
+                <div className="space-y-2">
+                  {viewOrderItems.map((it, idx) => {
+                    const pid = Number((it as any)?.product_ID ?? (it as any)?.productId ?? 0);
+                    const qty = Number((it as any)?.quantity ?? 0) || 0;
+                    const price = Number((it as any)?.price ?? 0) || 0;
+                    const name =
+                      String(
+                        (it as any)?.products?.name ??
+                          (it as any)?.product?.name ??
+                          (it as any)?.name ??
+                          '',
+                      ).trim() || t('order.productFallbackGeneric');
+                    const image =
+                      (it as any)?.products?.image ??
+                      (it as any)?.product?.image ??
+                      (it as any)?.image ??
+                      null;
+                    return (
+                      <div
+                        key={String((it as any)?.orderitem_ID ?? `${pid}-${idx}`)}
+                        className="flex items-center justify-between gap-3 rounded-md border border-stone-100 bg-stone-50 px-3 py-2"
+                      >
+                        <div className="min-w-0 flex items-center gap-3">
+                          <img
+                            src={getImageSrc(image)}
+                            alt={name}
+                            className="h-10 w-10 shrink-0 rounded border border-stone-200 object-cover bg-white"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/favicon.png';
+                            }}
+                          />
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-stone-900 truncate">{name}</div>
+                          <div className="text-xs text-stone-500">
+                            {t('order.quantity')}: {qty}
+                          </div>
+                          </div>
+                        </div>
+                        <div className="text-sm font-semibold text-stone-900">
+                          {(price * qty).toLocaleString(i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US')} VND
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : null}
+      </Modal>
 
       <Modal
         title={t('profile.refund.modalTitle')}

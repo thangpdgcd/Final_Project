@@ -10,17 +10,18 @@ type Props = {
   productMap: Map<number, Product>;
   busyRowKey: string | null;
   onBuyAgainItem: (args: OrderItemRowAction) => void;
-  onViewProduct: (productId: number) => void;
+  onViewOrder: (orderId: number) => void;
   onContactSeller: () => void;
 };
 
 export const OrderItemCard = React.forwardRef<HTMLDivElement, Props>(({
   raw,
   idx,
+  orderId,
   productMap,
   busyRowKey,
   onBuyAgainItem,
-  onViewProduct,
+  onViewOrder,
   onContactSeller,
 }, ref) => {
   const productId = Number(raw?.product_ID ?? raw?.productId ?? raw?.id ?? 0);
@@ -61,7 +62,7 @@ export const OrderItemCard = React.forwardRef<HTMLDivElement, Props>(({
         busy={busy}
         args={{ productId, quantity, price, rowKey }}
         onBuyAgainItem={onBuyAgainItem}
-        onViewProduct={onViewProduct}
+        onViewOrder={() => onViewOrder(orderId)}
         onContactSeller={onContactSeller}
       />
     </div>
