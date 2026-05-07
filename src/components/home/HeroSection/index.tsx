@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -19,6 +19,35 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
     image: string;
   }>;
 
+  const renderHeroTitle = (raw: string) => {
+    // We only support a tiny, known-safe subset used by translations:
+    // - <br /> for line breaks
+    // - <span>...</span> for highlighted words
+    const parts = String(raw ?? '').split(/<br\s*\/?>/gi);
+    return (
+      <>
+        {parts.map((part, idx) => {
+          const s = String(part ?? '');
+          const m = s.match(/^(.*?)<span>([\s\S]*?)<\/span>(.*)$/i);
+          return (
+            <React.Fragment key={idx}>
+              {idx > 0 ? <br /> : null}
+              {m ? (
+                <>
+                  {m[1]}
+                  <span className="text-amber-400">{m[2]}</span>
+                  {m[3]}
+                </>
+              ) : (
+                s
+              )}
+            </React.Fragment>
+          );
+        })}
+      </>
+    );
+  };
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -26,13 +55,13 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  const slideVariants: any = {
+  const slideVariants: Variants = {
     initial: { opacity: 0, scale: 1.1 },
     animate: { opacity: 1, scale: 1, transition: { duration: 1.5, ease: 'easeOut' } },
     exit: { opacity: 0, transition: { duration: 1 } },
   };
 
-  const textVariants: any = {
+  const textVariants: Variants = {
     hidden: { opacity: 0, y: 30, filter: 'blur(10px)' },
     visible: {
       opacity: 1,
@@ -102,8 +131,9 @@ const HeroSection: React.FC<Props> = ({ onScrollNext }) => {
               variants={textVariants}
               transition={{ delay: 0.2 }}
               className="text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tighter leading-[0.9] uppercase"
-              dangerouslySetInnerHTML={{ __html: slides[currentSlide].title }}
-            />
+            >
+              {renderHeroTitle(slides[currentSlide].title)}
+            </motion.h1>
 
             <motion.p
               variants={textVariants}
