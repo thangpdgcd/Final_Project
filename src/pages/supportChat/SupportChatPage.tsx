@@ -89,9 +89,9 @@ const SupportChatPage: React.FC = () => {
             { incrementUnreadIfNotSelected: false },
           );
         }
-      } catch (e: unknown) {
+      } catch {
         markOptimisticFailed(selectedConversationId, clientId);
-        messageApi.error('Gửi tin nhắn thất bại. Vui lòng thử lại.');
+        messageApi.error('send message failed.');
       }
     },
     [
