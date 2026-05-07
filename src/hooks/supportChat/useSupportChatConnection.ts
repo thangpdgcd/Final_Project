@@ -21,7 +21,7 @@ export const useSupportChatConnection = ({ enabled }: Options) => {
   const migrateConversation = useSupportChatStore((s) => s.migrateConversation);
   const markConversationJoined = useSupportChatStore((s) => s.markConversationJoined);
   const setConnectionStatus = useSupportChatStore((s) => s.setConnectionStatus);
-
+//listening for message realtime
   useEffect(() => {
     if (!enabled) return;
 

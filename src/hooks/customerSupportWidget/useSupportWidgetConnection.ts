@@ -206,7 +206,7 @@ export const useSupportWidgetConnection = ({ enabled }: Options) => {
 
     // Common staff message formats (multi-language).
     const match =
-      raw.match(/(?:mã\s*voucher|voucher\s*code|gift\s*voucher)\s*[:\-]?\s*([A-Z0-9_-]{4,})/i) ??
+      raw.match(/(?:mã\s*voucher|voucher\s*code|gift\s*voucher)\s*[:-]?\s*([A-Z0-9_-]{4,})/i) ??
       raw.match(/\b([A-Z0-9]{6,})\b/); // fallback (last resort)
 
     const code = String(match?.[1] ?? '').trim().toUpperCase();

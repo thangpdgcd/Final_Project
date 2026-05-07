@@ -15,6 +15,7 @@ export const disconnectSupportChatSocket = () => {
   // Intentionally no-op: socket is shared across modules.
 };
 
+// event joinroom
 export const supportChatEvents = {
   joinRoom: (payload: JoinRoomPayload, ack?: (res: any) => void) => {
     const socket = connectSupportChatSocket();
